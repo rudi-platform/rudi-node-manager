@@ -1,0 +1,13 @@
+image: node:14.15
+
+
+
+# This folder is cached between builds
+cache:
+  paths:
+    - node_modules/
+
+npm_back:
+  script:
+    - npm install
+
