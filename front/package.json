@@ -27,7 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.js --fix"
+    "lint": "eslint src/**/*.js"
   },
   "eslintConfig": {
     "extends": [
@@ -50,7 +50,6 @@
   "proxy": "http://localhost:5000",
   "devDependencies": {
     "eslint": "^7.22.0",
-    "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.22.0"
   }
 }

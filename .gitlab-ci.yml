@@ -4,9 +4,27 @@ cache:
   paths:
     - node_modules/
 
-npm_back:
+back_npm:
   tags:
     - nodejs
   script:
     - npm install
+
+front_npm:
+  tags:
+    - nodejs
+  script:
+    - cd front && npm install
+    
+back_test:
+  tags:
+    - nodejs
+  script:
+    - npm run test
+
+lint:
+  tags:
+    - nodejs
+  script:
+    - npm run lint
 
