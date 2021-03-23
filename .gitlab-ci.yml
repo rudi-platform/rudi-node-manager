@@ -3,6 +3,7 @@
 cache:
   paths:
     - node_modules/
+    - front/node_modules/
 
 back_npm:
   tags:

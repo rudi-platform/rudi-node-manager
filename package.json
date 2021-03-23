@@ -9,7 +9,7 @@
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run server\"",
     "front:build": "cd front && npm run build",
-    "lint": "eslint ./**/*.js"
+    "lint": "eslint \"**/*.js\""
   },
   "author": "",
   "license": "ISC",

@@ -3,7 +3,7 @@
         "browser": true,
         "es2021": true
     },
-    "ignorePatterns": ["**/*.spec.js","**/*.test.js"],
+    "ignorePatterns": ["**/*.spec.js","**/*.test.js","./node_modules/*"],
     "extends": [
         "google"
     ],
