@@ -18,7 +18,15 @@ TODO :
 - filtre/sort/search
 - remove key={...+i} when possible
 */
+
+/**
+ * Main Class
+ */
 class App extends Component {
+  /**
+ * render the app
+ * @return {ReactNode} html of the app
+ */
   render() {
     return (
       <Router>
@@ -26,8 +34,9 @@ class App extends Component {
         <header>
           <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <div className="container-fluid">
-              <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+              <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
               </button>
               <div className="collapse navbar-collapse" id="navbarCollapse">
@@ -71,7 +80,6 @@ class App extends Component {
           </Route>
           <Route path="/licence">
           </Route>
-          <Route path="/metadataTEMP/:id" children={<MetadataDetail />} />
           <Route path="/metadata/:id">
             <MetadataDetail />
           </Route>
