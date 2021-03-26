@@ -29,7 +29,12 @@ back_test:
   tags:
     - nodejs
   script:
-    - npm run test
+    - 'npm run testCI'
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
 
 lint:
   stage: quality

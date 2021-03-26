@@ -1,3 +1,4 @@
 {
-    "testRegex": "((\\.|/*.)(spec))\\.js?$"
+    "testRegex": "((\\.|/*.)(spec))\\.js?$",
+    "reporters": [ "default", "jest-junit" ]
 }
