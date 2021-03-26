@@ -170,7 +170,7 @@ class MetadataDetail extends Component {
         })
         .catch((e) => {
           console.log(e);
-          this.setState({...state, isFetching: false, isError: true});
+          this.setState({...this.state, isFetching: false, isError: true});
         });
   };
 }
