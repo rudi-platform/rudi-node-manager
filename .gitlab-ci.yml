@@ -1,4 +1,9 @@
 
+stages:
+  - npm_install
+  - test
+  - quality
+
 # This folder is cached between builds
 cache:
   paths:
@@ -6,24 +11,28 @@ cache:
     - front/node_modules/
 
 back_npm:
+  stage: npm_install
   tags:
     - nodejs
   script:
     - npm install
 
 front_npm:
+  stage: npm_install
   tags:
     - nodejs
   script:
     - cd front && npm install
     
 back_test:
+  stage: test
   tags:
     - nodejs
   script:
     - npm run test
 
 lint:
+  stage: quality
   tags:
     - nodejs
   script:
