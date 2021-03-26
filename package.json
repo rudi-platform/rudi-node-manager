@@ -4,11 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config ./jest.config.json",
     "front": "cd front && npm start",
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run server\"",
-    "front:build": "cd front && npm run build"
+    "front:build": "cd front && npm run build",
+    "lint": "eslint \"**/*.js\""
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +19,14 @@
     "concurrently": "^5.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "ini": "^1.3.8",
     "nodemon": "^2.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-only-warn": "^1.0.2",
+    "jest": "26.6.0",
+    "jest-express": "^1.12.0"
   }
 }

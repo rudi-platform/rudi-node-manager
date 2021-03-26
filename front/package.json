@@ -12,6 +12,7 @@
     "jquery": "^3.5.1",
     "moment": "^2.29.1",
     "popper.js": "^1.16.1",
+    "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-bootstrap-icons": "^1.4.0",
     "react-country-flag": "^2.3.0",
@@ -27,7 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.js --fix"
+    "lint": "eslint src/**/*.js"
   },
   "eslintConfig": {
     "extends": [
@@ -49,8 +50,8 @@
   },
   "proxy": "http://localhost:5000",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.22.0",
-    "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.22.0"
   }
 }
