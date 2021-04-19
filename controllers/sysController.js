@@ -1,0 +1,14 @@
+const axios = require('axios');
+const config = require('../config');
+
+
+exports.getHash = (req, res, next) => {
+  try {
+    const hashId = require('child_process').execSync('git rev-parse --short HEAD')
+    res.status(200).json(`${hashId}`.trim());
+  } catch (err) {
+    console.log(err);
+    throw err
+  }
+};
+
