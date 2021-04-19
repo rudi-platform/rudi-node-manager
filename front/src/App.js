@@ -9,7 +9,11 @@ import {
 
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
+import {createBrowserHistory} from 'history';
 
+export const history = createBrowserHistory({
+  basename: process.env.PUBLIC_URL,
+});
 /*
 TODO :
 - sticky filtre
