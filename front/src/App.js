@@ -50,7 +50,7 @@ class App extends Component {
                     <Link to="/"><button type="button" className="btn btn-primary">Catalogue</button></Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/licence"><button type="button" className="btn btn-primary">Licence</button></Link>
+                    <Link to="/licence"><button type="button" className="btn btn-primary">Licence Test</button></Link>
                   </li>
                   <li className="nav-item">
                     <button type="button" className="btn btn-primary">Visualisation</button>
