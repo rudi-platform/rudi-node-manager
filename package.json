@@ -7,6 +7,7 @@
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
+    "startProd": "Set NODE_ENV=production&node server",
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run server\"",
     "front:build": "cd front && npm run build",
