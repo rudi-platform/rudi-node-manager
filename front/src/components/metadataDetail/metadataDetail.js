@@ -48,8 +48,8 @@ class MetadataDetail extends Component {
                 <a href="#" className="btn btn-secondary">Modifier <Pencil/></a>
               </h5>
               <div className="card-body">
-                <p className="card-text">{this.state.metadata.abstract[0].text}</p>
-                <p className="card-text">{this.state.metadata.summary[0].text}</p>
+                {this.state.metadata.synopsis.length && <p className="card-text">{this.state.metadata.synopsis[0].text}</p>}
+                {this.state.metadata.summary.length && <p className="card-text">{this.state.metadata.summary[0].text}</p>}
                 <div><a href="#" className="btn btn-secondary">{this.state.metadata.theme}</a></div>
                 <div>{this.state.metadata.keywords.map((keyword, i) => {
                   return (
@@ -99,42 +99,42 @@ class MetadataDetail extends Component {
                     );
                   })}
                 </div>
-                <div className="card-text">temporal_spread : <small className="text-muted">
+                {this.state.metadata.temporal_spread && <div className="card-text">temporal_spread : <small className="text-muted">
                   <Moment format="DD/MM/YYYY">
                     {this.state.metadata.temporal_spread.start_date}
                   </Moment> - <Moment format="DD/MM/YYYY">
                     {this.state.metadata.temporal_spread.end_date}
-                  </Moment></small></div>
+                  </Moment></small></div>}
                 <div className="card-text">geography : <small className="text-muted">TODO</small></div>
                 <div className="row">
                   <div className="col-4">
                     <div className="card">
                       <h5 className="card-header">Historique du jeu de donnée</h5>
-                      <div className="card-text">Créé : <small className="text-muted">
+                      {this.state.metadata.dataset_dates.created && <div className="card-text">Créé : <small className="text-muted">
                         <Moment format="DD/MM/YYYY HH:mm:ss">
                           {this.state.metadata.dataset_dates.created}
                         </Moment>
-                      </small></div>
-                      <div className="card-text">Publié :
+                      </small></div>}
+                      {this.state.metadata.dataset_dates.published && <div className="card-text">Publié :
                         <small className="text-muted">
                           <Moment format="DD/MM/YYYY HH:mm:ss">{this.state.metadata.dataset_dates.published}</Moment>
                         </small>
-                      </div>
-                      <div className="card-text">Validé :
+                      </div>}
+                      {this.state.metadata.dataset_dates.validated && <div className="card-text">Validé :
                         <small className="text-muted">
                           <Moment format="DD/MM/YYYY HH:mm:ss">{this.state.metadata.dataset_dates.validated}</Moment>
                         </small>
-                      </div>
-                      <div className="card-text">Mis a jour :
+                      </div>}
+                      {this.state.metadata.dataset_dates.updated && <div className="card-text">Mis a jour :
                         <small className="text-muted">
                           <Moment format="DD/MM/YYYY HH:mm:ss">{this.state.metadata.dataset_dates.updated}</Moment>
                         </small>
-                      </div>
-                      <div className="card-text">Supprimé :
+                      </div>}
+                      {this.state.metadata.dataset_dates.deleted && <div className="card-text">Supprimé :
                         <small className="text-muted">
                           <Moment format="DD/MM/YYYY HH:mm:ss">{this.state.metadata.dataset_dates.deleted}</Moment>
                         </small>
-                      </div>
+                      </div>}
                     </div>
                   </div>
                 </div>
