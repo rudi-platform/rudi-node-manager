@@ -13,12 +13,11 @@ import {createBrowserHistory} from 'history';
 
 console.log("process.env.PUBLIC_URL : ", process.env.PUBLIC_URL)
 export const history = createBrowserHistory({
-  basename: process.env.PUBLIC_URL,
+  basename: "/prodmanager-shared",
 });
 /*
 TODO :
 - sticky filtre
-- pagination + scroll
 - responsive
 - filtre/sort/search
 - remove key={...+i} when possible
