@@ -56,9 +56,9 @@ class MetadataDetail extends Component {
                     <a href="#" className="btn btn-secondary" key={keyword+i}>{keyword}</a>
                   );
                 })}</div>
-                <div className="card-text">Id Local :
+                {this.state.metadata.local_id && <div className="card-text">Id Local :
                   <small className="text-muted">{this.state.metadata.local_id}</small>
-                </div>
+                </div>}
                 <div className="card-text">DOI : <small className="text-muted">{this.state.metadata.doi}</small></div>
                 <div className="card-text">Producteur :
                   <small className="text-muted">{this.state.metadata.producer.organization_name}</small>
