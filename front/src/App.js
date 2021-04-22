@@ -13,7 +13,7 @@ import {createBrowserHistory} from 'history';
 
 console.log("process.env.PUBLIC_URL : ", process.env.PUBLIC_URL)
 export const history = createBrowserHistory({
-  basename: process.env.PUBLIC_URL,
+  basename: PUBLIC_URL
 });
 /*
 TODO :
@@ -33,7 +33,7 @@ class App extends Component {
  */
   render() {
     return (
-      <Router history={history}>
+      <Router history={history} basename="/prodmanager-shared" >
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <header>
           <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
