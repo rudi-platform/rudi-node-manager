@@ -11,4 +11,12 @@ exports.getHash = (req, res, next) => {
     throw err
   }
 };
+exports.getTest = (req, res, next) => {
+  try {
+    res.status(200).json("test");
+  } catch (err) {
+    console.log(err);
+    throw err
+  }
+};
 

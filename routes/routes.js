@@ -7,5 +7,6 @@ router.get('/resources', controllers.resourcesList);
 router.get('/resources/:id', controllers.getResourceById);
 
 router.get('/hash', sysController.getHash);
+router.get('/test', sysController.getTest);
 
 module.exports = router;
