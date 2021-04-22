@@ -80,9 +80,6 @@ class App extends Component {
           <Route exact path="/">
             <Catalogue />
           </Route>
-          <Route path="/prodmanager-shared">
-            <Catalogue />
-          </Route>
           <Route path="/gestion">
             <Catalogue />
           </Route>
