@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import {withRouter} from 'react-router';
+import {withRouter} from 'react-router-dom';
 import Moment from 'react-moment';
 import ReactCountryFlag from 'react-country-flag';
 import ISO6391 from 'iso-639-1';
