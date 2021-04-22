@@ -34,7 +34,7 @@ class App extends Component {
  */
   render() {
     return (
-      <Router history={history} basename="/prodmanager-shared" >
+      <Router basename="/prodmanager-shared" >
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <header>
           <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
