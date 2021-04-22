@@ -104,7 +104,7 @@ class Catalogue extends Component {
    * trigger a la création du composant : get la 1er page du catalogue
    */
   componentDidMount() {
-    axios.get('/api/v1/resources', {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
       const metadatas = res.data.body;
       this.setState({metadatas});
     });
@@ -120,7 +120,7 @@ class Catalogue extends Component {
         this.setState({hasMore: false});
         return;
       }
-      axios.get('/api/v1/resources', {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
         const metadatas = res.data.body;
         this.setState({
           metadatas: this.state.metadatas.concat(metadatas),
