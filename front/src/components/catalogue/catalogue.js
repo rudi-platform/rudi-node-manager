@@ -20,82 +20,8 @@ class Catalogue extends Component {
     super(props);
     this.state = {
       metadatas: [],
+      groupBy: [],
       hasMore: true,
-    };
-    this.temp = {
-      filter: [
-        {
-          name: 'producer.organization_name',
-          text: 'Producteur',
-          values: [
-            {
-              count: 100,
-              name: 'Kéolis',
-            },
-            {
-              count: 75,
-              name: 'IRISA',
-            },
-            {
-              count: 66,
-              name: 'Rennes Metropole',
-            },
-            {
-              count: 11,
-              name: 'Micropole',
-            },
-            {
-              count: 2,
-              name: 'Startup 1',
-            },
-          ],
-        },
-        {
-          name: 'dataset_dates.updated',
-          text: 'Date de mise à jours',
-          values: [
-            {
-              count: 125,
-              name: '2021',
-            },
-            {
-              count: 90,
-              name: '2020',
-            },
-            {
-              count: 79,
-              name: '2019',
-            },
-            {
-              count: 5,
-              name: '2018',
-            },
-            {
-              count: 1,
-              name: '2017',
-            },
-          ],
-        },
-        {
-          name: 'theme',
-          text: 'Theme',
-          values: [
-            {
-              count: 84,
-              name: 'Transport',
-            },
-            {
-              count: 80,
-              name: 'Economie',
-            },
-            {
-              count: 79,
-              name: 'Culture',
-            },
-          ],
-        },
-
-      ],
     };
     this.currentOffset = 0;
   }
@@ -104,9 +30,28 @@ class Catalogue extends Component {
    * trigger a la création du composant : get la 1er page du catalogue
    */
   componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
-      const metadatas = res.data.body;
-      this.setState({metadatas});
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limit: 10, offset: this.currentOffset}})
+        .then((res) => {
+          const metadatas = res.data.body;
+          this.setState({metadatas});
+        });
+    let groupBy = [{name: 'producer.organization_name',
+      text: 'Producteur',
+      values: [],
+    },
+    {
+      name: 'theme',
+      text: 'Theme',
+      values: [],
+    }];
+    Promise.all(groupBy.map((group) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?group_by=${group.name}`)),
+    ).then((values) => {
+      groupBy = groupBy.map((group, i) => {
+        group.values=values[i].data.body;
+        return group;
+      });
+      this.setState({groupBy});
+      console.log(this.state.groupBy);
     });
   }
   /**
@@ -120,14 +65,35 @@ class Catalogue extends Component {
         this.setState({hasMore: false});
         return;
       }
-      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limite: 10, offset: this.currentOffset}}).then((res) => {
-        const metadatas = res.data.body;
-        this.setState({
-          metadatas: this.state.metadatas.concat(metadatas),
-        });
-      });
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limit: 10, offset: this.currentOffset}})
+          .then((res) => {
+            const metadatas = res.data.body;
+            this.setState({
+              metadatas: this.state.metadatas.concat(metadatas),
+            });
+          });
     };
   };
+
+  /**
+ * récupere le label pour un element d'un groupBy
+  * @param {*} filterObject element d'un groupBy
+  * @param {String} name string attribue
+ * @return {String} label de l'élément
+ */
+  getFilterLabel(filterObject, name) {
+    name = name.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+    const a = name.split('.');
+    for (let i = 0, n = a.length; i < n; ++i) {
+      const k = a[i];
+      if (k in filterObject) {
+        filterObject = filterObject[k];
+      } else {
+        return;
+      }
+    }
+    return filterObject;
+  }
 
   /**
    * render le composant
@@ -166,15 +132,15 @@ class Catalogue extends Component {
             <div className="col-12 border rounded tempMargin" >
               <h5>Filtrer</h5>
               <div className="row">
-                {this.temp.filter.map((filter, i) => {
+                {this.state.groupBy.map((filter, i) => {
                   return (<div className="col border rounded" key={filter.name}>
 
                     <span>{filter.text}</span>
                     <ul className="list-group">
                       {filter.values.map((filterValue, i) => {
                         return (<li className="list-group-item d-flex justify-content-between align-items-center"
-                          key={filterValue.name + i}>
-                          {filterValue.name}
+                          key={this.getFilterLabel(filterValue, filter.name) + i}>
+                          {this.getFilterLabel(filterValue, filter.name)}
                           <span className="badge badge-primary badge-pill">{filterValue.count}</span>
                         </li>);
                       })}

@@ -11,11 +11,11 @@ import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
 import {createBrowserHistory} from 'history';
 
-console.log("process.env.PUBLIC_URL : ", process.env.PUBLIC_URL)
+console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
 // TODO : move to util.js
 export const PUBLIC_URL = process.env.PUBLIC_URL;
 export const history = createBrowserHistory({
-  basename: PUBLIC_URL
+  basename: PUBLIC_URL,
 });
 /*
 TODO :

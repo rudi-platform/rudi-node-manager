@@ -48,8 +48,10 @@ class MetadataDetail extends Component {
                 <a href="#" className="btn btn-secondary">Modifier <Pencil/></a>
               </h5>
               <div className="card-body">
-                {this.state.metadata.synopsis.length && <p className="card-text">{this.state.metadata.synopsis[0].text}</p>}
-                {this.state.metadata.summary.length && <p className="card-text">{this.state.metadata.summary[0].text}</p>}
+                {this.state.metadata.synopsis.length &&
+                <p className="card-text">{this.state.metadata.synopsis[0].text}</p>}
+                {this.state.metadata.summary.length &&
+                <p className="card-text">{this.state.metadata.summary[0].text}</p>}
                 <div><a href="#" className="btn btn-secondary">{this.state.metadata.theme}</a></div>
                 <div>{this.state.metadata.keywords.map((keyword, i) => {
                   return (
@@ -99,7 +101,8 @@ class MetadataDetail extends Component {
                     );
                   })}
                 </div>
-                {this.state.metadata.temporal_spread && <div className="card-text">temporal_spread : <small className="text-muted">
+                {this.state.metadata.temporal_spread &&
+                <div className="card-text">temporal_spread : <small className="text-muted">
                   <Moment format="DD/MM/YYYY">
                     {this.state.metadata.temporal_spread.start_date}
                   </Moment> - <Moment format="DD/MM/YYYY">
@@ -110,7 +113,8 @@ class MetadataDetail extends Component {
                   <div className="col-4">
                     <div className="card">
                       <h5 className="card-header">Historique du jeu de donnée</h5>
-                      {this.state.metadata.dataset_dates.created && <div className="card-text">Créé : <small className="text-muted">
+                      {this.state.metadata.dataset_dates.created &&
+                      <div className="card-text">Créé : <small className="text-muted">
                         <Moment format="DD/MM/YYYY HH:mm:ss">
                           {this.state.metadata.dataset_dates.created}
                         </Moment>
