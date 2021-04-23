@@ -54,19 +54,19 @@ class App extends Component {
                     <Link to="/licence"><button type="button" className="btn btn-primary">Licence</button></Link>
                   </li>
                   <li className="nav-item">
-                    <button type="button" className="btn btn-primary">Visualisation</button>
+                    <Link to="/show"><button type="button" className="btn btn-primary">Visualisation</button></Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/gestion"><button type="button" className="btn btn-primary">Gestion</button></Link>
                   </li>
                   <li className="nav-item">
-                    <button type="button" className="btn btn-primary">Monitoring</button>
+                    <Link to="/monitoring"><button type="button" className="btn btn-primary">Monitoring</button></Link>
                   </li>
                   <li className="nav-item">
-                    <button type="button" className="btn btn-primary">Utilisateur</button>
+                    <Link to="/user"><button type="button" className="btn btn-primary">Utilisateur</button></Link>
                   </li>
                   <li className="nav-item">
-                    <button type="button" className="btn btn-primary">Configuration</button>
+                    <Link to="/conf"><button type="button" className="btn btn-primary">Configuration</button></Link>
                   </li>
                 </ul>
               </div>
@@ -85,6 +85,19 @@ class App extends Component {
             <Catalogue />
           </Route>
           <Route path="/licence">
+            <div className="tempPaddingTop">Work in progress</div>
+          </Route>
+          <Route path="/show">
+            <div className="tempPaddingTop">Work in progress</div>
+          </Route>
+          <Route path="/monitoring">
+            <div className="tempPaddingTop">Work in progress</div>
+          </Route>
+          <Route path="/user">
+            <div className="tempPaddingTop">Work in progress</div>
+          </Route>
+          <Route path="/conf">
+            <div className="tempPaddingTop">Work in progress</div>
           </Route>
           <Route path="/metadata/:id">
             <MetadataDetail />
