@@ -43,6 +43,11 @@ class Catalogue extends Component {
       name: 'theme',
       text: 'Theme',
       values: [],
+    },
+    {
+      name: 'resource_languages',
+      text: 'Language',
+      values: [],
     }];
     Promise.all(groupBy.map((group) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?group_by=${group.name}`)),
     ).then((values) => {
@@ -96,13 +101,25 @@ class Catalogue extends Component {
   }
 
   /**
+ * affiche le text en fonction de la langue choisi
+  * @param {*} langObjectArray Array d'objet au format {lang:'', text:''}
+  * @param {String} lang langue selectionnée
+ * @return {String} text dans la langue appropriée
+ */
+  getLangText(langObjectArray, lang) {
+    // TODO
+    return langObjectArray[0].text;
+  }
+
+  // TODO :  sticky-top ?
+  /**
    * render le composant
    * @return {ReactNode} html du composant
    */
   render() {
     return ( <div className="tempPaddingTop" >
       <div className="row">
-        <div className="col-3 border rounded sticky-top  tempAlign">
+        <div className="col-3 border rounded  tempAlign">
           <div className="row">
             <div className="col-12 border rounded tempMargin" ><h5>Trier</h5>
               <div className="btn-group" role="group" aria-label="sort">
@@ -169,7 +186,7 @@ class Catalogue extends Component {
                     <h5 className="card-header">{metadata.resource_title}</h5>
                   </Link>
                   <div className="card-body">
-                    <p className="card-text">{metadata.summary[0].text}</p>
+                    <p className="card-text">{this.getLangText(metadata.summary)}</p>
                     <p className="card-text">Producteur :
                       <small className="text-muted">{metadata.producer.organization_name}</small>
                     </p>
