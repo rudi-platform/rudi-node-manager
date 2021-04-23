@@ -36,17 +36,17 @@ class Catalogue extends Component {
           this.setState({metadatas});
         });
     let groupBy = [{name: 'producer.organization_name',
-      text: 'Producteur',
+      text: 'Source :',
       values: [],
     },
     {
       name: 'theme',
-      text: 'Theme',
+      text: 'Theme :',
       values: [],
     },
     {
       name: 'resource_languages',
-      text: 'Language',
+      text: 'Language :',
       values: [],
     }];
     Promise.all(groupBy.map((group) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?group_by=${group.name}`)),
