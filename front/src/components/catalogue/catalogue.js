@@ -20,22 +20,34 @@ class Catalogue extends Component {
     super(props);
     this.state = {
       metadatas: [],
-      groupBy: [],
+      countBy: [],
+      currentFilters: [],
       hasMore: true,
     };
     this.currentOffset = 0;
   }
 
   /**
+ * crée l'object params pour la requete
+  * @param {*} baseParams base des params
+ * @return {*} params enrichis pour la requete
+ */
+   createParams(baseParams) {
+    this.state.currentFilters.forEach(filter => Object.assign(baseParams, filter) );
+    return baseParams;
+  }
+
+  /**
    * trigger a la création du composant : get la 1er page du catalogue
    */
   componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limit: 10, offset: this.currentOffset}})
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`, {params: this.createParams({limit: 10, offset: this.currentOffset})})
         .then((res) => {
           const metadatas = res.data.body;
           this.setState({metadatas});
         });
-    let groupBy = [{name: 'producer.organization_name',
+    let countBy = [{name: 'producer',
+      displayName: 'organization_name',
       text: 'Source :',
       values: [],
     },
@@ -49,14 +61,13 @@ class Catalogue extends Component {
       text: 'Language :',
       values: [],
     }];
-    Promise.all(groupBy.map((group) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?group_by=${group.name}`)),
+    Promise.all(countBy.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?count_by=${count.name}`)),
     ).then((values) => {
-      groupBy = groupBy.map((group, i) => {
-        group.values=values[i].data.body;
-        return group;
+      countBy = countBy.map((count, i) => {
+        count.values=values[i].data.body;
+        return count;
       });
-      this.setState({groupBy});
-      console.log(this.state.groupBy);
+      this.setState({countBy});
     });
   }
   /**
@@ -70,7 +81,7 @@ class Catalogue extends Component {
         this.setState({hasMore: false});
         return;
       }
-      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: {limit: 10, offset: this.currentOffset}})
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`, {params: this.createParams({limit: 10, offset: this.currentOffset})})
           .then((res) => {
             const metadatas = res.data.body;
             this.setState({
@@ -81,23 +92,17 @@ class Catalogue extends Component {
   };
 
   /**
- * récupere le label pour un element d'un groupBy
-  * @param {*} filterObject element d'un groupBy
-  * @param {String} name string attribue
+ * récupere le label pour un element d'un countBy
+  * @param {*} filterElement element d'un countBy
+  * @param {*} filterConfig configuration du countBy
  * @return {String} label de l'élément
  */
-  getFilterLabel(filterObject, name) {
-    name = name.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-    const a = name.split('.');
-    for (let i = 0, n = a.length; i < n; ++i) {
-      const k = a[i];
-      if (k in filterObject) {
-        filterObject = filterObject[k];
-      } else {
-        return;
-      }
+  getFilterLabel(filterElement, filterConfig) {
+    let result = filterElement[filterConfig.name];
+    if (filterConfig.displayName) {
+      result = result[filterConfig.displayName];
     }
-    return filterObject;
+    return result;
   }
 
   /**
@@ -149,15 +154,15 @@ class Catalogue extends Component {
             <div className="col-12 border rounded tempMargin" >
               <h5>Filtrer</h5>
               <div className="row">
-                {this.state.groupBy.map((filter, i) => {
+                {this.state.countBy.map((filter, i) => {
                   return (<div className="col border rounded" key={filter.name}>
 
                     <span>{filter.text}</span>
                     <ul className="list-group">
                       {filter.values.map((filterValue, i) => {
                         return (<li className="list-group-item d-flex justify-content-between align-items-center"
-                          key={this.getFilterLabel(filterValue, filter.name) + i}>
-                          {this.getFilterLabel(filterValue, filter.name)}
+                          key={this.getFilterLabel(filterValue, filter) + i}>
+                          {this.getFilterLabel(filterValue, filter)}
                           <span className="badge badge-primary badge-pill">{filterValue.count}</span>
                         </li>);
                       })}
