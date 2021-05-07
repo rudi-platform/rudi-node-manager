@@ -24,7 +24,9 @@ class Catalogue extends Component {
       currentFilters: [],
       hasMore: true,
     };
+    // {theme:'"utilitiesCommunication"'},{'producer.organization_name':'"Wilkinson - Schowalter"'}
     this.currentOffset = 0;
+    this.PAGE_SIZE = 10;
   }
 
   /**
@@ -36,30 +38,59 @@ class Catalogue extends Component {
     this.state.currentFilters.forEach((filter) => Object.assign(baseParams, filter) );
     return baseParams;
   }
+  /**
+ * ajoute un filter pour la requete
+  * @param {*} filterParam element a rajouter
+ */
+  addToFilter(filterParam) {
+    this.setState({
+      currentFilters: this.state.currentFilters.concat(filterParam),
+    }, ()=>{
+    // TODO : reset catalogue/state + make a function
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
+          {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
+          .then((res) => {
+            const metadatas = res.data.body;
+            this.setState({metadatas});
+          });
+    });
+    // TODO remove filter ?
+  }
 
   /**
    * trigger a la création du composant : get la 1er page du catalogue
    */
   componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`, {params: this.createParams({limit: 10, offset: this.currentOffset})})
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
+        {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
         .then((res) => {
           const metadatas = res.data.body;
           this.setState({metadatas});
         });
+    // TODO : global/conf
     let countBy = [{name: 'producer',
       displayName: 'organization_name',
       text: 'Source :',
       values: [],
+      toFilterParam: (elem) => {
+        return {'producer.organization_name': `"${elem.producer.organization_name}"`};
+      },
     },
     {
       name: 'theme',
       text: 'Theme :',
       values: [],
+      toFilterParam: (elem) => {
+        return {theme: `"${elem.theme}"`};
+      },
     },
     {
       name: 'resource_languages',
       text: 'Language :',
       values: [],
+      toFilterParam: (elem) => {
+        return {resource_languages: `"${elem.resource_languages}"`};
+      },
     }];
     Promise.all(countBy.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?count_by=${count.name}`)),
     ).then((values) => {
@@ -76,14 +107,14 @@ class Catalogue extends Component {
  */
   fetchMoreData() {
     return () => {
-      this.currentOffset++;
-      if ('TODO : Stop condition' === false) {
-        this.setState({hasMore: false});
-        return;
-      }
-      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`, {params: this.createParams({limit: 10, offset: this.currentOffset})})
+      this.currentOffset+= this.PAGE_SIZE;
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
+          {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
           .then((res) => {
             const metadatas = res.data.body;
+            if (metadatas.length === 0) {
+              this.setState({hasMore: false});
+            }
             this.setState({
               metadatas: this.state.metadatas.concat(metadatas),
             });
@@ -161,7 +192,8 @@ class Catalogue extends Component {
                     <ul className="list-group">
                       {filter.values.map((filterValue, i) => {
                         return (<li className="list-group-item d-flex justify-content-between align-items-center"
-                          key={this.getFilterLabel(filterValue, filter) + i}>
+                          key={this.getFilterLabel(filterValue, filter) + i}
+                          onClick={(e) => this.addToFilter(filter.toFilterParam(filterValue))}>
                           {this.getFilterLabel(filterValue, filter)}
                           <span className="badge badge-primary badge-pill">{filterValue.count}</span>
                         </li>);
