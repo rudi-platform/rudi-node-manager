@@ -32,8 +32,8 @@ class Catalogue extends Component {
   * @param {*} baseParams base des params
  * @return {*} params enrichis pour la requete
  */
-   createParams(baseParams) {
-    this.state.currentFilters.forEach(filter => Object.assign(baseParams, filter) );
+  createParams(baseParams) {
+    this.state.currentFilters.forEach((filter) => Object.assign(baseParams, filter) );
     return baseParams;
   }
 

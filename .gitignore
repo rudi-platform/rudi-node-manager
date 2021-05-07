@@ -4,3 +4,4 @@ package-lock.json
 .gitconfig
 coverage
 junit.xml
+db
