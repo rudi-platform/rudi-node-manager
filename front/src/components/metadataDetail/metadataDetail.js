@@ -170,7 +170,7 @@ class MetadataDetail extends Component {
     this.setState({...this.state, isFetching: true});
     axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/` + this.id)
         .then((response) => {
-          this.setState({metadata: response.data.body, isFetching: false, isError: false});
+          this.setState({metadata: response.data, isFetching: false, isError: false});
         })
         .catch((e) => {
           console.log(e);

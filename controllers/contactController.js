@@ -2,32 +2,33 @@ const axios = require('axios');
 const config = require('../config');
 const errorHandler = require('./errorHandler');
 
-const resourcesList = (req, res, next) => {
+const contactList = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
-  return axios.get(serveur+'/resources', {params: req.query}).then((resRUDI) => {
-    const metadatas = resRUDI.data;
-    res.status(200).json(metadatas);
+  return axios.get(serveur+'/contacts', {params: req.query}).then((resRUDI) => {
+    const contacts = resRUDI.data;
+    res.status(200).json(contacts);
   })
       .catch((error) => {
         errorHandler.error(error);
         res.status(501).json(error);
       });
 };
-exports.getResourceById = (req, res, next) => {
+exports.getContactById = (req, res, next) => {
   const {id} = req.params;
   const serveur = `${config.API_RUDI.listening_address}`;
-  return axios.get(serveur+'/resources/' + id, {params: req.query}).then((resRUDI) => {
-    const metadata = resRUDI.data;
-    res.status(200).json(metadata);
+  return axios.get(serveur+'/contacts/' + id, {params: req.query}).then((resRUDI) => {
+    const contact = resRUDI.data;
+    res.status(200).json(contact);
   })
       .catch((error) => {
         errorHandler.error(error);
         res.status(501).json(error);
       });
 };
-exports.postResources = (req, res, next) => {
+
+exports.postContact = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
-  return axios.post(serveur+'/resources', req.body).then((resRUDI) => {
+  return axios.post(serveur+'/contacts', req.body).then((resRUDI) => {
     res.status(200);
   })
       .catch((error) => {
@@ -36,4 +37,4 @@ exports.postResources = (req, res, next) => {
       });
 };
 
-module.exports.resourcesList = resourcesList;
+module.exports.contactList = contactList;

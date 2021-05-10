@@ -50,7 +50,7 @@ class Catalogue extends Component {
       axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
           {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
           .then((res) => {
-            const metadatas = res.data.body;
+            const metadatas = res.data;
             this.setState({metadatas});
           });
     });
@@ -64,7 +64,7 @@ class Catalogue extends Component {
     axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
         {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
         .then((res) => {
-          const metadatas = res.data.body;
+          const metadatas = res.data;
           this.setState({metadatas});
         });
     // TODO : global/conf
@@ -95,7 +95,7 @@ class Catalogue extends Component {
     Promise.all(countBy.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?count_by=${count.name}`)),
     ).then((values) => {
       countBy = countBy.map((count, i) => {
-        count.values=values[i].data.body;
+        count.values=values[i].data;
         return count;
       });
       this.setState({countBy});
@@ -111,7 +111,7 @@ class Catalogue extends Component {
       axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
           {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
           .then((res) => {
-            const metadatas = res.data.body;
+            const metadatas = res.data;
             if (metadatas.length === 0) {
               this.setState({hasMore: false});
             }
