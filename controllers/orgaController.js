@@ -28,9 +28,22 @@ exports.getOrgaById = (req, res, next) => {
 
 exports.postOrga = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
-  return axios.post(serveur+'/organizations', req.body).then((resRUDI) => {
-    res.status(200);
-  })
+  return axios.post(serveur+'/organizations', req.body, {headers: {'Content-Type': 'application/json'}})
+      .then((resRUDI) => {
+        res.status(200);
+      })
+      .catch((error) => {
+        errorHandler.error(error);
+        res.status(501).json(error);
+      });
+};
+
+exports.putOrga = (req, res, next) => {
+  const serveur = `${config.API_RUDI.listening_address}`;
+  return axios.put(serveur+'/organizations', req.body, {headers: {'Content-Type': 'application/json'}})
+      .then((resRUDI) => {
+        res.status(200);
+      })
       .catch((error) => {
         errorHandler.error(error);
         res.status(501).json(error);

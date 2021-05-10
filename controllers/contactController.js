@@ -28,7 +28,17 @@ exports.getContactById = (req, res, next) => {
 
 exports.postContact = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
-  return axios.post(serveur+'/contacts', req.body).then((resRUDI) => {
+  return axios.post(serveur+'/contacts', req.body, {headers: {'Content-Type': 'application/json'}}).then((resRUDI) => {
+    res.status(200);
+  })
+      .catch((error) => {
+        errorHandler.error(error);
+        res.status(501).json(error);
+      });
+};
+exports.putContact = (req, res, next) => {
+  const serveur = `${config.API_RUDI.listening_address}`;
+  return axios.put(serveur+'/contacts', req.body, {headers: {'Content-Type': 'application/json'}}).then((resRUDI) => {
     res.status(200);
   })
       .catch((error) => {
