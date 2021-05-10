@@ -24,7 +24,7 @@ describe('Controllers', () => {
 
     await controllers.resourcesList({}, response, null);
 
-    expect(response.body).toStrictEqual({body: data});
+    expect(response.body).toStrictEqual(data);
   });
   test('getResourceById should return data', async () => {
     const data = {'global_id': 'global',
@@ -34,6 +34,6 @@ describe('Controllers', () => {
 
     await controllers.getResourceById({params:{id:"aaaa"}}, response, null);
 
-    expect(response.body).toStrictEqual({body: data});
+    expect(response.body).toStrictEqual(data);
   });
 });
