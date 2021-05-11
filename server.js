@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 // Require Route
-const api = require('./routes/routes');
+const apiV1 = require('./routes/routesV1');
+const apiAdmin = require('./routes/routesAdmin');
 // Require Config
 const config = require('./config');
 
@@ -29,7 +30,8 @@ app.use(bodyParser.urlencoded({
 // Configure the CORs middleware
 app.use(cors());
 // Configure app to use route
-app.use('/api/v1/', api);
+app.use('/api/v1/', apiV1);
+app.use('/api/admin/', apiAdmin);
 
 // This middleware informs the express application to serve our compiled React files
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {

@@ -9,7 +9,6 @@ try {
 } catch (error) {
   customExist = false;
 }
-/* TODO IMPROVE (surcharge champs par champs) */
 
 const config = ini.parse(fs.readFileSync(defaultConfigFile, 'utf-8'));
 
@@ -23,6 +22,9 @@ if (customExist) {
   }
   if (customConfig.API_RUDI && customConfig.API_RUDI.listening_address) {
     config.API_RUDI.listening_address = customConfig.API_RUDI.listening_address;
+  }
+  if (customConfig.API_RUDI && customConfig.API_RUDI.admin_api) {
+    config.API_RUDI.admin_api = customConfig.API_RUDI.admin_api;
   }
 };
 

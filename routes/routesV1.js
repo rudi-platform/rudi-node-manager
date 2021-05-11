@@ -1,9 +1,9 @@
 const express = require('express');
 const router = new express.Router();
-const controllers = require('./../controllers/controllers');
-const orgaController = require('./../controllers/orgaController');
-const contactController = require('./../controllers/contactController');
-const sysController = require('./../controllers/sysController');
+const controllers = require('../controllers/controllers');
+const orgaController = require('../controllers/orgaController');
+const contactController = require('../controllers/contactController');
+const sysController = require('../controllers/sysController');
 
 // TODO : propage res.status
 
