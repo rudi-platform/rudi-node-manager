@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
+import {Plus} from 'react-bootstrap-icons';
 
 import {
   Link,
@@ -22,6 +23,7 @@ class Catalogue extends Component {
       metadatas: [],
       countBy: [],
       currentFilters: [],
+      formUrl: '',
       hasMore: true,
     };
     // {theme:'"utilitiesCommunication"'},{'producer.organization_name':'"Wilkinson - Schowalter"'}
@@ -66,6 +68,11 @@ class Catalogue extends Component {
         .then((res) => {
           const metadatas = res.data;
           this.setState({metadatas});
+        });
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`)
+        .then((res) => {
+          const formUrl = res.data;
+          this.setState({formUrl});
         });
     // TODO : global/conf
     let countBy = [{name: 'producer',
@@ -209,6 +216,9 @@ class Catalogue extends Component {
           </div>
         </div>
         <div className="col-9 row ">
+          <div className="col-12">
+            <a href={this.state.formUrl} className="btn btn-secondary">Ajouter un Jeu de Donnée <Plus/></a>
+          </div>
           <InfiniteScroll
             dataLength={this.state.metadatas.length}
             next={this.fetchMoreData()}

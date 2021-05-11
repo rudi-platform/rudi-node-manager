@@ -24,6 +24,7 @@ router.put('/contacts', contactController.putContact);
 router.get('/contacts/:id', contactController.getContactById);
 
 router.get('/hash', sysController.getHash);
+router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
 
 module.exports = router;

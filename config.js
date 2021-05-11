@@ -26,6 +26,9 @@ if (customExist) {
   if (customConfig.API_RUDI && customConfig.API_RUDI.admin_api) {
     config.API_RUDI.admin_api = customConfig.API_RUDI.admin_api;
   }
+  if (customConfig.formulaire && customConfig.formulaire.base_url) {
+    config.formulaire.base_url = customConfig.formulaire.base_url;
+  }
 };
 
 module.exports = config;

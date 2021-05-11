@@ -31,6 +31,7 @@ class MetadataDetail extends Component {
     this.state = {
       isFetching: true,
       isError: false,
+      formUrl: '',
       metadata: {},
     };
     this.isFlag = false;
@@ -45,7 +46,7 @@ class MetadataDetail extends Component {
       {!this.state.isFetching && !this.state.isError &&
             <div className="card tempPaddingTop">
               <h5 className="card-header">{this.state.metadata.resource_title}
-                <a href="#" className="btn btn-secondary">Modifier <Pencil/></a>
+                <a href={this.state.formUrl} className="btn btn-secondary">Modifier <Pencil/></a>
               </h5>
               <div className="card-body">
                 {this.state.metadata.synopsis.length &&
@@ -161,6 +162,11 @@ class MetadataDetail extends Component {
  */
   componentDidMount() {
     this.fetchMetadata();
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`)
+        .then((res) => {
+          const formUrl = `${res.data}?update=${this.id}`;
+          this.setState({formUrl});
+        });
   }
 
   /**
