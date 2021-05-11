@@ -7,7 +7,7 @@ const path = require('path');
 const apiV1 = require('./routes/routesV1');
 const apiAdmin = require('./routes/routesAdmin');
 // Require Config
-const config = require('./config');
+const config = require('./config/config');
 
 // Create a new express application named 'app'
 const app = express();

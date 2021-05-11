@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../config');
+const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 
 const resourcesList = (req, res, next) => {
