@@ -34,7 +34,15 @@ if (customExist) {
   }
 
   // DATABASE
-  // TODO
-}
+  if (customConfig.database && customConfig.database.db_directory) {
+    config.database.db_directory = customConfig.database.db_directory;
+  }
+  if (customConfig.database && customConfig.database.first_user_name) {
+    config.database.first_user_name = customConfig.database.first_user_name;
+  }
+  if (customConfig.database && customConfig.database.first_user_pwd) {
+    config.database.first_user_pwd = customConfig.database.first_user_pwd;
+  }
+};
 
 module.exports = config;
