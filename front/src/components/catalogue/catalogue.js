@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
-import {Plus} from 'react-bootstrap-icons';
-
-import {
-  Link,
-} from 'react-router-dom';
+import {Plus, Pencil, Trash, ArrowUpCircleFill} from 'react-bootstrap-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import PropTypes from 'prop-types';
 
 /**
  * Composant : Catalogue
@@ -26,7 +23,6 @@ class Catalogue extends Component {
       formUrl: '',
       hasMore: true,
     };
-    // {theme:'"utilitiesCommunication"'},{'producer.organization_name':'"Wilkinson - Schowalter"'}
     this.currentOffset = 0;
     this.PAGE_SIZE = 10;
   }
@@ -162,6 +158,7 @@ class Catalogue extends Component {
   render() {
     return ( <div className="tempPaddingTop" >
       <div className="row">
+        {this.props.display && this.props.display.searchbar &&
         <div className="col-3 border rounded  tempAlign">
           <div className="row">
             <div className="col-12 border rounded tempMargin" ><h5>Trier</h5>
@@ -215,41 +212,63 @@ class Catalogue extends Component {
             </div>
           </div>
         </div>
-        <div className="col-9 row ">
+        }
+        <div className="col-9">
+          <div className="row">
+            {this.props.display && this.props.display.editJDD &&
           <div className="col-12">
             <a href={this.state.formUrl} className="btn btn-secondary">Ajouter un Jeu de Donnée <Plus/></a>
           </div>
-          <InfiniteScroll
-            dataLength={this.state.metadatas.length}
-            next={this.fetchMoreData()}
-            hasMore={this.state.hasMore}
-            loader={<h4>Loading...</h4>}
-          >
-            {this.state.metadatas.map((metadata, i) => {
-              return (<div className="col-12" key={metadata.global_id + i}>
+            }
+            <InfiniteScroll
+              dataLength={this.state.metadatas.length}
+              next={this.fetchMoreData()}
+              hasMore={this.state.hasMore}
+              loader={<h4>Loading...</h4>}
+            >
+              {this.state.metadatas.map((metadata, i) => {
+                return (<div className="col-12" key={metadata.global_id + i}>
 
-                <div className="card tempMargin">
-                  <Link to={`/metadata/${metadata.global_id}`}>
-                    <h5 className="card-header">{metadata.resource_title}</h5>
-                  </Link>
-                  <div className="card-body">
-                    <p className="card-text">{this.getLangText(metadata.summary)}</p>
-                    <p className="card-text">Producteur :
-                      <small className="text-muted">{metadata.producer.organization_name}</small>
-                    </p>
-                    <a href="#" className="btn btn-secondary">{metadata.theme}</a>
+                  <div className="card tempMargin">
+
+                    <h5 className="card-header">
+                      <div className="row">
+                        <a href={`${this.state.formUrl}?read-only=${metadata.global_id}`} className="col-9">
+                          {metadata.resource_title}
+                        </a>
+                        {this.props.display && this.props.display.editJDD &&
+                      <div className="btn-group col-3" role="group" >
+                        <button type="button" className="btn btn-success"><ArrowUpCircleFill/></button>
+                        <a className="btn btn-warning"
+                          href={`${this.state.formUrl}?update=${metadata.global_id}`}><Pencil/></a>
+                        <button type="button" className="btn btn-danger"><Trash/></button>
+                      </div>
+                        }
+                      </div>
+                    </h5>
+                    <div className="card-body">
+                      <p className="card-text">{this.getLangText(metadata.summary)}</p>
+                      <p className="card-text">Producteur :
+                        <small className="text-muted">{metadata.producer.organization_name}</small>
+                      </p>
+                      <a href="#" className="btn btn-secondary">{metadata.theme}</a>
+                    </div>
                   </div>
                 </div>
-              </div>
-              );
-            })}
-          </InfiniteScroll>
+                );
+              })}
+            </InfiniteScroll>
 
+          </div>
         </div>
       </div>
     </div>);
   };
 }
-
+Catalogue.propTypes = {
+  display: PropTypes.object,
+  specialSearch: PropTypes.object,
+  editMode: PropTypes.object,
+};
 
 export default withRouter(Catalogue);

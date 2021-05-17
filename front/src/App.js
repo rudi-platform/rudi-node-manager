@@ -79,13 +79,16 @@ class App extends Component {
 
         <Switch>
           <Route exact path="/">
-            <Catalogue />
+            <Catalogue display={{searchbar: true, editJDD: false}}
+              specialSearch={{}} editMode={{}} />
           </Route>
           <Route path="/gestion">
-            <Catalogue />
+            <Catalogue display={{searchbar: true, editJDD: true}}
+              specialSearch={{}} editMode={{}} />
           </Route>
           <Route path="/licence">
-            <div className="tempPaddingTop">Work in progress</div>
+            <Catalogue display={{searchbar: false, editJDD: true}}
+              specialSearch={{}} editMode={{}} />
           </Route>
           <Route path="/show">
             <div className="tempPaddingTop">Work in progress</div>

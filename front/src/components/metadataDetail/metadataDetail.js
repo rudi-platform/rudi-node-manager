@@ -16,6 +16,7 @@ TODO :
 - remove key={...+i} when possible
 */
 
+// FIXME : TO REMOVE
 /**
  * Composant : Détail d'une Métadonnée
  * @return {void}
