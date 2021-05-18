@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
-import {Plus, Pencil, Trash, ArrowUpCircleFill} from 'react-bootstrap-icons';
+import {Plus, Pencil, Trash, Check} from 'react-bootstrap-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 
@@ -232,13 +232,19 @@ class Catalogue extends Component {
                   <div className="card tempMargin">
 
                     <h5 className="card-header">
-                      <div className="row">
-                        <a href={`${this.state.formUrl}?read-only=${metadata.global_id}`} className="col-9">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <a href={`${this.state.formUrl}?read-only=${metadata.global_id}`}>
                           {metadata.resource_title}
                         </a>
+                        { !metadata.dataset_dates.published && !metadata.dataset_dates.deleted &&
+                        <span className="badge badge-warning badge-pill">waiting</span>}
+                        { metadata.dataset_dates.published && !metadata.dataset_dates.deleted &&
+                        <span className="badge badge-success badge-pill">published</span>}
+                        { metadata.dataset_dates.deleted &&
+                        <span className="badge badge-danger badge-pill">deleted</span>}
                         {this.props.display && this.props.display.editJDD &&
-                      <div className="btn-group col-3" role="group" >
-                        <button type="button" className="btn btn-success"><ArrowUpCircleFill/></button>
+                      <div className="btn-group" role="group" >
+                        <button type="button" className="btn btn-success"><Check/></button>
                         <a className="btn btn-warning"
                           href={`${this.state.formUrl}?update=${metadata.global_id}`}><Pencil/></a>
                         <button type="button" className="btn btn-danger"><Trash/></button>
@@ -251,6 +257,18 @@ class Catalogue extends Component {
                       <p className="card-text">Producteur :
                         <small className="text-muted">{metadata.producer.organization_name}</small>
                       </p>
+                      <p className="card-text">global_id :
+                        <small className="text-muted">{metadata.global_id}</small>
+                      </p>
+                      <p className="card-text">media_id :
+                        {metadata.available_formats.map((ressource, i) => {
+                          return (
+                            <small key={ressource.media_id} className="text-muted">{ressource.media_id}</small>
+                          );
+                        })}
+                      </p>
+
+
                       <a href="#" className="btn btn-secondary">{metadata.theme}</a>
                     </div>
                   </div>
