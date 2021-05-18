@@ -30,7 +30,7 @@ exports.postOrga = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
   return axios.post(serveur+'/organizations', req.body, {headers: {'Content-Type': 'application/json'}})
       .then((resRUDI) => {
-        res.status(200);
+        res.sendStatus(200);
       })
       .catch((error) => {
         errorHandler.error(error);
@@ -42,7 +42,7 @@ exports.putOrga = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
   return axios.put(serveur+'/organizations', req.body, {headers: {'Content-Type': 'application/json'}})
       .then((resRUDI) => {
-        res.status(200);
+        res.sendStatus(200);
       })
       .catch((error) => {
         errorHandler.error(error);
