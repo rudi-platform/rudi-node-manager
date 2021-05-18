@@ -28,7 +28,7 @@ exports.getResourceById = (req, res, next) => {
 exports.postResources = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
   return axios.post(serveur+'/resources', req.body, {headers: {'Content-Type': 'application/json'}}).then((resRUDI) => {
-    res.sendStatus(200);
+    res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
         errorHandler.error(error);
@@ -38,7 +38,7 @@ exports.postResources = (req, res, next) => {
 exports.putResources = (req, res, next) => {
   const serveur = `${config.API_RUDI.listening_address}`;
   return axios.put(serveur+'/resources', req.body, {headers: {'Content-Type': 'application/json'}}).then((resRUDI) => {
-    res.sendStatus(200);
+    res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
         errorHandler.error(error);
