@@ -5,6 +5,7 @@ import {Plus, Pencil, Trash, Check} from 'react-bootstrap-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 
+// TODO : Split en sous composant
 /**
  * Composant : Catalogue
  * @return {void}
@@ -21,10 +22,20 @@ class Catalogue extends Component {
       countBy: [],
       currentFilters: [],
       formUrl: '',
+      editID: '',
       hasMore: true,
     };
     this.currentOffset = 0;
     this.PAGE_SIZE = 10;
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+  /**
+ * met a jour le state lors de la modification de l'input de modification de JDD
+  * @param {*} event event
+ */
+  handleChange(event) {
+    this.setState({editID: event.target.value});
   }
 
   /**
@@ -217,7 +228,23 @@ class Catalogue extends Component {
           <div className="row">
             {this.props.display && this.props.display.editJDD &&
           <div className="col-12">
-            <a href={this.state.formUrl} className="btn btn-secondary">Ajouter un Jeu de Donnée <Plus/></a>
+            <div className="card tempMargin">
+              <div className="card-body">
+                <div>
+                  <a href={this.state.formUrl} className="btn btn-secondary">Ajouter un Jeu de Donnée <Plus/></a>
+                </div>
+                <div className="card-text">Modifier un Jeu de donnée :
+                  <div className="btn-group" role="group" >
+                    <input type="text" className="form-control" placeholder="id du jeu de donnée"
+                      value={this.state.editID} onChange={this.handleChange}/>
+                    <button type="button" className="btn btn-success"><Check/></button>
+                    <a className="btn btn-warning"
+                      href={`${this.state.formUrl}?update=${this.state.editID}`}><Pencil/></a>
+                    <button type="button" className="btn btn-danger"><Trash/></button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
             }
             <InfiniteScroll
