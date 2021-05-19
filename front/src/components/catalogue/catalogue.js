@@ -28,6 +28,32 @@ class Catalogue extends Component {
     this.currentOffset = 0;
     this.PAGE_SIZE = 10;
 
+    // TODO : global/conf
+    this.countByConf = [{name: 'producer',
+      displayName: 'organization_name',
+      text: 'Source :',
+      values: [],
+      toFilterParam: (elem) => {
+        return {'producer.organization_name': `"${elem.producer.organization_name}"`};
+      },
+    },
+    {
+      name: 'theme',
+      text: 'Theme :',
+      values: [],
+      toFilterParam: (elem) => {
+        return {theme: `"${elem.theme}"`};
+      },
+    },
+    {
+      name: 'resource_languages',
+      text: 'Language :',
+      values: [],
+      toFilterParam: (elem) => {
+        return {resource_languages: `"${elem.resource_languages}"`};
+      },
+    }];
+
     this.handleChange = this.handleChange.bind(this);
   }
   /**
@@ -55,13 +81,8 @@ class Catalogue extends Component {
     this.setState({
       currentFilters: this.state.currentFilters.concat(filterParam),
     }, ()=>{
-    // TODO : reset catalogue/state + make a function
-      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
-          {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
-          .then((res) => {
-            const metadatas = res.data;
-            this.setState({metadatas});
-          });
+      this.currentOffset = 0;
+      this.getInitialData();
     });
     // TODO remove filter ?
   }
@@ -70,51 +91,39 @@ class Catalogue extends Component {
    * trigger a la création du composant : get la 1er page du catalogue
    */
   componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
-        {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
-        .then((res) => {
-          const metadatas = res.data;
-          this.setState({metadatas});
-        });
     axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`)
         .then((res) => {
           const formUrl = res.data;
           this.setState({formUrl});
         });
-    // TODO : global/conf
-    let countBy = [{name: 'producer',
-      displayName: 'organization_name',
-      text: 'Source :',
-      values: [],
-      toFilterParam: (elem) => {
-        return {'producer.organization_name': `"${elem.producer.organization_name}"`};
-      },
-    },
-    {
-      name: 'theme',
-      text: 'Theme :',
-      values: [],
-      toFilterParam: (elem) => {
-        return {theme: `"${elem.theme}"`};
-      },
-    },
-    {
-      name: 'resource_languages',
-      text: 'Language :',
-      values: [],
-      toFilterParam: (elem) => {
-        return {resource_languages: `"${elem.resource_languages}"`};
-      },
-    }];
-    Promise.all(countBy.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources?count_by=${count.name}`)),
-    ).then((values) => {
-      countBy = countBy.map((count, i) => {
-        count.values=values[i].data;
-        return count;
-      });
-      this.setState({countBy});
-    });
+
+        this.getInitialData();
+
+    
   }
+
+/**
+ * recup la 1er page des metadonnées et les countBy 
+ */
+getInitialData() {
+  axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`,
+  {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
+  .then((res) => {
+    const metadatas = res.data;
+    this.setState({metadatas});
+  });
+  // FIXME : Filtre not working with count_by yet (proposer : { $match: { filter  } }, au début du aggregate?)
+Promise.all(this.countByConf.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: this.createParams({count_by:count.name})})),
+).then((values) => {
+let countBy = this.countByConf.map((count, i) => {
+  count.values=values[i].data;
+  return count;
+});
+this.setState({countBy});
+});
+}
+
+
   /**
  * récupere la page suivante
  * @return {Function} fonction utilisée par InfiniteScroll
@@ -122,7 +131,7 @@ class Catalogue extends Component {
   fetchMoreData() {
     return () => {
       this.currentOffset+= this.PAGE_SIZE;
-      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources/filter`,
+      axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`,
           {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
           .then((res) => {
             const metadatas = res.data;
