@@ -1,0 +1,94 @@
+import React, {Component} from 'react';
+import {withRouter} from 'react-router-dom';
+import jspreadsheet from 'jspreadsheet-ce';
+import '../../../node_modules/jspreadsheet-ce/dist/jspreadsheet.css';
+import {Check} from 'react-bootstrap-icons';
+import axios from 'axios';
+
+
+/**
+ * Composant : Visualisation
+ * @return {void}
+ */
+class Visualisation extends Component {
+  /**
+   * Constructeur
+   * @param {*} props props passés par le parent
+   */
+  constructor(props) {
+    super(props);
+    this.state = {
+      media_id: '',
+      options: {
+        data: [[]],
+        minDimensions: [10, 10],
+      },
+    };
+    this.wrapper = React.createRef();
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleOnClick = this.handleOnClick.bind(this);
+  }
+  /**
+ * met a jour le state lors de la modification de l'input du media_id
+  * @param {*} event event
+ */
+  handleChange(event) {
+    this.setState({media_id: event.target.value});
+  }
+
+  /**
+ * get the doc
+ */
+  handleOnClick() {
+    axios.get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`)
+        .then((res) => {
+          console.log(res.data);
+          // TODO : check fileRes.headers.content-type de axios.get(url) ?
+          if (res.data.url) {
+            const options = {
+              csv: res.data.url,
+              csvHeaders: true,
+              csvDelimiter: ';',
+              editable: false,
+              tableOverflow: true,
+              lazyLoading: true,
+              loadingSpin: true,
+            };
+            this.setState({options});
+            this.el.destroy(this.wrapper.current, false);
+            this.el = jspreadsheet(this.wrapper.current, this.state.options);
+          }
+        });
+  }
+
+  /**
+   * trigger a la création du composant
+   */
+  componentDidMount() {
+    this.el = jspreadsheet(this.wrapper.current, this.state.options);
+  }
+
+  /**
+   * render le composant
+   * @return {ReactNode} html du composant
+   */
+  render() {
+    return ( <div className="tempPaddingTop" >
+
+
+Afficher une donnée (csv) :
+      <div className="btn-group" role="group" >
+        <input type="text" className="form-control" placeholder="media_id"
+          value={this.state.media_id} onChange={this.handleChange}/>
+        <button type="button" className="btn btn-success" onClick={this.handleOnClick}><Check/></button>
+      </div>
+      <br></br>
+      <div ref={this.wrapper} />
+    </div>);
+  };
+}
+Visualisation.propTypes = {
+};
+
+export default withRouter(Visualisation);

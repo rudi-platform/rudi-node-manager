@@ -6,6 +6,7 @@ const path = require('path');
 // Require Route
 const apiV1 = require('./routes/routesV1');
 const apiAdmin = require('./routes/routesAdmin');
+const apiMedia = require('./routes/routesMedia');
 // Require Config
 const config = require('./config/config');
 
@@ -32,6 +33,7 @@ app.use(cors());
 // Configure app to use route
 app.use('/api/v1/', apiV1);
 app.use('/api/admin/', apiAdmin);
+app.use('/api/media/', apiMedia);
 
 // This middleware informs the express application to serve our compiled React files
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {

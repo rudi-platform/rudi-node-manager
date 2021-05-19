@@ -9,6 +9,7 @@ import {
 
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
+import Visualisation from './components/visualisation/visualisation';
 import {createBrowserHistory} from 'history';
 
 console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
@@ -23,6 +24,7 @@ TODO :
 - responsive
 - filtre/sort/search
 - remove key={...+i} when possible
+- catch error on axios call
 */
 
 /**
@@ -91,7 +93,7 @@ class App extends Component {
               specialSearch={{}} editMode={{}} />
           </Route>
           <Route path="/show">
-            <div className="tempPaddingTop">Work in progress</div>
+            <Visualisation/>
           </Route>
           <Route path="/monitoring">
             <div className="tempPaddingTop">Work in progress</div>

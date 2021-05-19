@@ -11,6 +11,7 @@
     "history": "^5.0.0",
     "iso-639-1": "^2.1.8",
     "jquery": "^3.5.1",
+    "jspreadsheet-ce": "^4.7.3",
     "moment": "^2.29.1",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
