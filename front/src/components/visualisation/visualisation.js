@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
 import jspreadsheet from 'jspreadsheet-ce';
-//import '../../../node_modules/jspreadsheet-ce/dist/jspreadsheet.css';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
 import {Check} from 'react-bootstrap-icons';
 import axios from 'axios';

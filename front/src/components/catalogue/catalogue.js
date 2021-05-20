@@ -65,6 +65,14 @@ class Catalogue extends Component {
   }
 
   /**
+ * download le fichier via media_id
+  * @param {*} ressource connector du fichier
+ */
+  downloadFile(ressource) {
+    window.open(`${process.env.PUBLIC_URL}/api/media/download/${ressource.media_id}`);
+  }
+
+  /**
  * crée l'object params pour la requete
   * @param {*} baseParams base des params
  * @return {*} params enrichis pour la requete
@@ -97,31 +105,30 @@ class Catalogue extends Component {
           this.setState({formUrl});
         });
 
-        this.getInitialData();
-
-    
+    this.getInitialData();
   }
 
-/**
- * recup la 1er page des metadonnées et les countBy 
+  /**
+ * recup la 1er page des metadonnées et les countBy
  */
-getInitialData() {
-  axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`,
-  {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
-  .then((res) => {
-    const metadatas = res.data;
-    this.setState({metadatas});
-  });
-  // FIXME : Filtre not working with count_by yet (proposer : { $match: { filter  } }, au début du aggregate?)
-Promise.all(this.countByConf.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {params: this.createParams({count_by:count.name})})),
-).then((values) => {
-let countBy = this.countByConf.map((count, i) => {
-  count.values=values[i].data;
-  return count;
-});
-this.setState({countBy});
-});
-}
+  getInitialData() {
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`,
+        {params: this.createParams({limit: this.PAGE_SIZE, offset: this.currentOffset})})
+        .then((res) => {
+          const metadatas = res.data;
+          this.setState({metadatas});
+        });
+    // FIXME : Filtre not working with count_by yet (proposer : { $match: { filter  } }, au début du aggregate?)
+    Promise.all(this.countByConf.map((count) => axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`,
+        {params: this.createParams({count_by: count.name})})),
+    ).then((values) => {
+      const countBy = this.countByConf.map((count, i) => {
+        count.values=values[i].data;
+        return count;
+      });
+      this.setState({countBy});
+    });
+  }
 
 
   /**
@@ -299,7 +306,11 @@ this.setState({countBy});
                       <p className="card-text">media_id :
                         {metadata.available_formats.map((ressource, i) => {
                           return (
-                            <small key={ressource.media_id} className="text-muted">{ressource.media_id}</small>
+                            <span key={`${ressource.media_id}`}>
+                              <small className="text-muted">{ressource.media_id}</small>
+                              <button type="button" className="btn btn-success"
+                                onClick={(e) => this.downloadFile(ressource)}>Download</button>
+                            </span>
                           );
                         })}
                       </p>
