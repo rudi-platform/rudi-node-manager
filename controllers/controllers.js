@@ -9,7 +9,7 @@ const resourcesList = (req, res, next) => {
     res.status(200).json(metadatas);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -21,7 +21,7 @@ exports.getResourceById = (req, res, next) => {
     res.status(200).json(metadata);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -31,8 +31,8 @@ exports.postResources = (req, res, next) => {
     res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
-        errorHandler.error(error);
-        res.status(501).json(error);
+        error = errorHandler.error(error);
+        res.status(500).send(error);
       });
 };
 exports.putResources = (req, res, next) => {
@@ -41,7 +41,7 @@ exports.putResources = (req, res, next) => {
     res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };

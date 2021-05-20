@@ -10,7 +10,7 @@ exports.getMediaById = (req, res, next) => {
     res.status(200).json(results);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -24,7 +24,7 @@ exports.getDownloadById = (req, res, next) => {
     res.status(200).contentType(resRUDI.headers['content-type']).json(results);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };

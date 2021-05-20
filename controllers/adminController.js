@@ -9,7 +9,7 @@ exports.getEnum = (req, res, next) => {
     res.status(200).json(results);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };

@@ -9,7 +9,7 @@ const contactList = (req, res, next) => {
     res.status(200).json(contacts);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -21,7 +21,7 @@ exports.getContactById = (req, res, next) => {
     res.status(200).json(contact);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -32,7 +32,7 @@ exports.postContact = (req, res, next) => {
     res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -42,7 +42,7 @@ exports.putContact = (req, res, next) => {
     res.status(200).json(resRUDI.data);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };

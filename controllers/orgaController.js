@@ -9,7 +9,7 @@ const orgaList = (req, res, next) => {
     res.status(200).json(organizations);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -21,7 +21,7 @@ exports.getOrgaById = (req, res, next) => {
     res.status(200).json( organization);
   })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -33,7 +33,7 @@ exports.postOrga = (req, res, next) => {
         res.status(200).json(resRUDI.data);
       })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
@@ -45,7 +45,7 @@ exports.putOrga = (req, res, next) => {
         res.status(200).json(resRUDI.data);
       })
       .catch((error) => {
-        errorHandler.error(error);
+        error = errorHandler.error(error);
         res.status(501).json(error);
       });
 };
