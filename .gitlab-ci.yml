@@ -1,4 +1,3 @@
-
 stages:
   - npm_install
   - test
@@ -23,7 +22,7 @@ front_npm:
     - nodejs
   script:
     - cd front && npm install
-    
+
 back_test:
   stage: test
   tags:
@@ -42,4 +41,3 @@ lint:
     - nodejs
   script:
     - npm run lint
-

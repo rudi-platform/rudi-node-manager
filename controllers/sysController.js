@@ -25,4 +25,3 @@ exports.getTest = (req, res, next) => {
     throw err;
   }
 };
-

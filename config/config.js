@@ -33,9 +33,8 @@ if (customExist) {
     config.formulaire.base_url = customConfig.formulaire.base_url;
   }
 
-
   // DATABASE
   // TODO
-};
+}
 
 module.exports = config;

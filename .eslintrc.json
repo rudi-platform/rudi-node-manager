@@ -1,22 +1,24 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "ignorePatterns": [
+    "**/*.spec.js",
+    "**/*.test.js",
+    "./node_modules/*",
+    "./coverage/*",
+    "./front/build/*"
+  ],
+  "extends": ["google", "prettier"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "ignorePatterns": ["**/*.spec.js","**/*.test.js","./node_modules/*","./coverage/*","./front/build/*"],
-    "extends": [
-        "google"
-    ],
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 12
-    },
-    "plugins": [
-        "only-warn"
-    ],
-    "rules": {
-        "max-len": ["warn",{ "code": 120 ,"ignoreComments":true}]
-    }
+    "ecmaVersion": 12
+  },
+  "plugins": ["only-warn"],
+  "rules": {
+    "max-len": ["warn", { "code": 120, "ignoreComments": true }]
+  }
 }

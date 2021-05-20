@@ -24,9 +24,11 @@ app.use((req, res, next) => {
 
 // Configure the bodyParser middleware
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true,
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+);
 
 // Configure the CORs middleware
 app.use(cors());
@@ -39,10 +41,10 @@ app.use('/api/media/', apiMedia);
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   app.use(express.static(path.join(__dirname, 'front/build')));
 
-  app.get('/*', function(req, res) {
+  app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname, 'front/build', 'index.html'));
   });
-};
+}
 
 // Catch any bad requests
 app.get('*', (req, res) => {

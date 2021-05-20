@@ -4,13 +4,14 @@ const errorHandler = require('./errorHandler');
 
 exports.getEnum = (req, res, next) => {
   const serveurAdmin = `${config.API_RUDI.admin_api}`;
-  return axios.get(serveurAdmin+'/enum').then((resRUDI) => {
-    const results = resRUDI.data;
-    res.status(200).json(results);
-  })
-      .catch((error) => {
-        error = errorHandler.error(error);
-        res.status(501).json(error);
-      });
+  return axios
+    .get(serveurAdmin + '/enum')
+    .then((resRUDI) => {
+      const results = resRUDI.data;
+      res.status(200).json(results);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
 };
-

@@ -1,16 +1,11 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
 import Visualisation from './components/visualisation/visualisation';
-import {createBrowserHistory} from 'history';
+import { createBrowserHistory } from 'history';
 
 console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
 // TODO : move to util.js
@@ -32,43 +27,77 @@ TODO :
  */
 class App extends Component {
   /**
- * render the app
- * @return {ReactNode} html of the app
- */
+   * render the app
+   * @return {ReactNode} html of the app
+   */
   render() {
     return (
-      <Router basename={PUBLIC_URL} >
+      <Router basename={PUBLIC_URL}>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <header>
           <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <div className="container-fluid">
-              <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
-                aria-expanded="false" aria-label="Toggle navigation">
+              <button
+                className="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
                 <span className="navbar-toggler-icon"></span>
               </button>
               <div className="collapse navbar-collapse" id="navbarCollapse">
                 <ul className="navbar-nav me-auto mb-2 mb-md-0">
                   <li className="nav-item">
-                    <Link to="/"><button type="button" className="btn btn-primary">Catalogue</button></Link>
+                    <Link to="/">
+                      <button type="button" className="btn btn-primary">
+                        Catalogue
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/licence"><button type="button" className="btn btn-primary">Licence</button></Link>
+                    <Link to="/licence">
+                      <button type="button" className="btn btn-primary">
+                        Licence
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/show"><button type="button" className="btn btn-primary">Visualisation</button></Link>
+                    <Link to="/show">
+                      <button type="button" className="btn btn-primary">
+                        Visualisation
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/gestion"><button type="button" className="btn btn-primary">Gestion</button></Link>
+                    <Link to="/gestion">
+                      <button type="button" className="btn btn-primary">
+                        Gestion
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/monitoring"><button type="button" className="btn btn-primary">Monitoring</button></Link>
+                    <Link to="/monitoring">
+                      <button type="button" className="btn btn-primary">
+                        Monitoring
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/user"><button type="button" className="btn btn-primary">Utilisateur</button></Link>
+                    <Link to="/user">
+                      <button type="button" className="btn btn-primary">
+                        Utilisateur
+                      </button>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/conf"><button type="button" className="btn btn-primary">Configuration</button></Link>
+                    <Link to="/conf">
+                      <button type="button" className="btn btn-primary">
+                        Configuration
+                      </button>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -76,24 +105,32 @@ class App extends Component {
           </nav>
         </header>
 
-
         <div id="root"></div>
 
         <Switch>
           <Route exact path="/">
-            <Catalogue display={{searchbar: true, editJDD: false}}
-              specialSearch={{}} editMode={{}} />
+            <Catalogue
+              display={{ searchbar: true, editJDD: false }}
+              specialSearch={{}}
+              editMode={{}}
+            />
           </Route>
           <Route path="/gestion">
-            <Catalogue display={{searchbar: true, editJDD: true}}
-              specialSearch={{}} editMode={{}} />
+            <Catalogue
+              display={{ searchbar: true, editJDD: true }}
+              specialSearch={{}}
+              editMode={{}}
+            />
           </Route>
           <Route path="/licence">
-            <Catalogue display={{searchbar: false, editJDD: true}}
-              specialSearch={{}} editMode={{}} />
+            <Catalogue
+              display={{ searchbar: false, editJDD: true }}
+              specialSearch={{}}
+              editMode={{}}
+            />
           </Route>
           <Route path="/show">
-            <Visualisation/>
+            <Visualisation />
           </Route>
           <Route path="/monitoring">
             <div className="tempPaddingTop">Work in progress</div>
@@ -107,7 +144,6 @@ class App extends Component {
           <Route path="/metadata/:id">
             <MetadataDetail />
           </Route>
-
         </Switch>
       </Router>
     );
