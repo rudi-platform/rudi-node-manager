@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.js"
@@ -55,7 +55,6 @@
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.22.0",
-    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react": "^7.22.0"
   }
 }
