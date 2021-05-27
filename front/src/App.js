@@ -52,49 +52,49 @@ class App extends Component {
                 <ul className="navbar-nav me-auto mb-2 mb-md-0">
                   <li className="nav-item">
                     <Link to="/">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Catalogue
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/licence">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Licence
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/show">
-                      <button type="button" className="btn btn-primary">
+                    <Link to="/show/">
+                      <button type="button" className="btn btn-primary button-margin">
                         Visualisation
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/gestion">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Gestion
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/monitoring">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Monitoring
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/user">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Utilisateur
                       </button>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/conf">
-                      <button type="button" className="btn btn-primary">
+                      <button type="button" className="btn btn-primary button-margin">
                         Configuration
                       </button>
                     </Link>
@@ -128,6 +128,9 @@ class App extends Component {
               specialSearch={{}}
               editMode={{}}
             />
+          </Route>
+          <Route path="/show/:id">
+            <Visualisation />
           </Route>
           <Route path="/show">
             <Visualisation />

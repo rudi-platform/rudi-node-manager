@@ -37,6 +37,10 @@
   }
 }
 
+.button-margin {
+  margin: 0px 2px;
+}
+
 .tempMinHeight {
   min-height: 150px;
 }

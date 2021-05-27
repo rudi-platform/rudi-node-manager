@@ -4,6 +4,7 @@ import jspreadsheet from 'jspreadsheet-ce';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
 import { Check } from 'react-bootstrap-icons';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 /**
  * Composant : Visualisation
@@ -17,7 +18,7 @@ class Visualisation extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      media_id: '',
+      media_id: props.match.params.id ? props.match.params.id : '',
       options: {
         data: [[]],
         minDimensions: [10, 10],
@@ -65,6 +66,9 @@ class Visualisation extends Component {
    */
   componentDidMount() {
     this.el = jspreadsheet(this.wrapper.current, this.state.options);
+    if (this.state.media_id.length) {
+      this.handleOnClick();
+    }
   }
 
   /**
@@ -93,6 +97,6 @@ class Visualisation extends Component {
     );
   }
 }
-Visualisation.propTypes = {};
+Visualisation.propTypes = { match: PropTypes.object };
 
 export default withRouter(Visualisation);

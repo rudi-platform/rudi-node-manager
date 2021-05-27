@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
-import { Plus, Pencil, Trash, Check } from 'react-bootstrap-icons';
+import { Plus, Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 
@@ -376,27 +376,33 @@ class Catalogue extends Component {
                             </small>
                           </p>
                           <p className="card-text">
-                            global_id :<small className="text-muted">{metadata.global_id}</small>
+                            global_id : <small className="text-muted"> {metadata.global_id}</small>
                           </p>
                           <p className="card-text">
                             media_id :
                             {metadata.available_formats.map((ressource, i) => {
                               return (
                                 <span key={`${ressource.media_id}`}>
-                                  <small className="text-muted">{ressource.media_id}</small>
+                                  <small className="text-muted"> {ressource.media_id}</small>
                                   <button
                                     type="button"
-                                    className="btn btn-success"
+                                    className="btn btn-success button-margin"
                                     onClick={(e) => this.downloadFile(ressource)}
                                   >
-                                    Download
+                                    Download <CloudDownload />
                                   </button>
+                                  <a
+                                    className="btn btn-success button-margin"
+                                    href={`/show/${ressource.media_id}`}
+                                  >
+                                    Visualisation <Eye />
+                                  </a>
                                 </span>
                               );
                             })}
                           </p>
 
-                          <a href="#" className="btn btn-secondary">
+                          <a href="#" className="btn btn-secondary button-margin">
                             {metadata.theme}
                           </a>
                         </div>
