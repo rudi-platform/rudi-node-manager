@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
-import { Plus, Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
+import MetadataCard from './metadataCard';
+import EditCard from './editCard';
 
-// TODO : Split en sous composant
 /**
  * Composant : Catalogue
  * @return {void}
@@ -22,7 +22,6 @@ class Catalogue extends Component {
       countBy: [],
       currentFilters: [],
       formUrl: '',
-      editID: '',
       hasMore: true,
     };
     this.currentOffset = 0;
@@ -56,23 +55,6 @@ class Catalogue extends Component {
         },
       },
     ];
-
-    this.handleChange = this.handleChange.bind(this);
-  }
-  /**
-   * met a jour le state lors de la modification de l'input de modification de JDD
-   * @param {*} event event
-   */
-  handleChange(event) {
-    this.setState({ editID: event.target.value });
-  }
-
-  /**
-   * download le fichier via media_id
-   * @param {*} ressource connector du fichier
-   */
-  downloadFile(ressource) {
-    window.open(`${process.env.PUBLIC_URL}/api/media/download/${ressource.media_id}`);
   }
 
   /**
@@ -178,17 +160,6 @@ class Catalogue extends Component {
     return result;
   }
 
-  /**
-   * affiche le text en fonction de la langue choisi
-   * @param {*} langObjectArray Array d'objet au format {lang:'', text:''}
-   * @param {String} lang langue selectionnée
-   * @return {String} text dans la langue appropriée
-   */
-  getLangText(langObjectArray, lang) {
-    // TODO
-    return langObjectArray[0].text;
-  }
-
   // TODO :  sticky-top ?
   /**
    * render le composant
@@ -287,41 +258,7 @@ class Catalogue extends Component {
           <div className="col-9">
             <div className="row">
               {this.props.display && this.props.display.editJDD && (
-                <div className="col-12">
-                  <div className="card tempMargin">
-                    <div className="card-body">
-                      <div>
-                        <a href={this.state.formUrl} className="btn btn-secondary">
-                          Ajouter un Jeu de Donnée <Plus />
-                        </a>
-                      </div>
-                      <div className="card-text">
-                        Modifier un Jeu de donnée :
-                        <div className="btn-group" role="group">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="id du jeu de donnée"
-                            value={this.state.editID}
-                            onChange={this.handleChange}
-                          />
-                          <button type="button" className="btn btn-success">
-                            <Check />
-                          </button>
-                          <a
-                            className="btn btn-warning"
-                            href={`${this.state.formUrl}?update=${this.state.editID}`}
-                          >
-                            <Pencil />
-                          </a>
-                          <button type="button" className="btn btn-danger">
-                            <Trash />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <EditCard formUrl={this.state.formUrl}></EditCard>
               )}
               <InfiniteScroll
                 dataLength={this.state.metadatas.length}
@@ -331,83 +268,12 @@ class Catalogue extends Component {
               >
                 {this.state.metadatas.map((metadata, i) => {
                   return (
-                    <div className="col-12" key={metadata.global_id + i}>
-                      <div className="card tempMargin">
-                        <h5 className="card-header">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <a href={`${this.state.formUrl}?read-only=${metadata.global_id}`}>
-                              {metadata.resource_title}
-                            </a>
-                            {!metadata.dataset_dates.published &&
-                              !metadata.dataset_dates.deleted && (
-                                <span className="badge badge-warning badge-pill">waiting</span>
-                              )}
-                            {metadata.dataset_dates.published &&
-                              !metadata.dataset_dates.deleted && (
-                                <span className="badge badge-success badge-pill">published</span>
-                              )}
-                            {metadata.dataset_dates.deleted && (
-                              <span className="badge badge-danger badge-pill">deleted</span>
-                            )}
-                            {this.props.display && this.props.display.editJDD && (
-                              <div className="btn-group" role="group">
-                                <button type="button" className="btn btn-success">
-                                  <Check />
-                                </button>
-                                <a
-                                  className="btn btn-warning"
-                                  href={`${this.state.formUrl}?update=${metadata.global_id}`}
-                                >
-                                  <Pencil />
-                                </a>
-                                <button type="button" className="btn btn-danger">
-                                  <Trash />
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </h5>
-                        <div className="card-body">
-                          <p className="card-text">{this.getLangText(metadata.summary)}</p>
-                          <p className="card-text">
-                            Producteur :
-                            <small className="text-muted">
-                              {metadata.producer.organization_name}
-                            </small>
-                          </p>
-                          <p className="card-text">
-                            global_id : <small className="text-muted"> {metadata.global_id}</small>
-                          </p>
-                          <p className="card-text">
-                            media_id :
-                            {metadata.available_formats.map((ressource, i) => {
-                              return (
-                                <span key={`${ressource.media_id}`}>
-                                  <small className="text-muted"> {ressource.media_id}</small>
-                                  <button
-                                    type="button"
-                                    className="btn btn-success button-margin"
-                                    onClick={(e) => this.downloadFile(ressource)}
-                                  >
-                                    Download <CloudDownload />
-                                  </button>
-                                  <a
-                                    className="btn btn-success button-margin"
-                                    href={`/show/${ressource.media_id}`}
-                                  >
-                                    Visualisation <Eye />
-                                  </a>
-                                </span>
-                              );
-                            })}
-                          </p>
-
-                          <a href="#" className="btn btn-secondary button-margin">
-                            {metadata.theme}
-                          </a>
-                        </div>
-                      </div>
-                    </div>
+                    <MetadataCard
+                      metadata={metadata}
+                      formUrl={this.state.formUrl}
+                      display={this.props.display}
+                      key={metadata.global_id}
+                    ></MetadataCard>
                   );
                 })}
               </InfiniteScroll>
