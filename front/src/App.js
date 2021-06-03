@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
+import CatalogueLicence from './components/catalogue/catalogueLicence';
 import Visualisation from './components/visualisation/visualisation';
 import { createBrowserHistory } from 'history';
 
@@ -123,11 +124,7 @@ class App extends Component {
             />
           </Route>
           <Route path="/licence">
-            <Catalogue
-              display={{ searchbar: false, editJDD: true }}
-              specialSearch={{}}
-              editMode={{}}
-            />
+            <CatalogueLicence display={{ editJDD: true }} editMode={{}} />
           </Route>
           <Route path="/show/:id">
             <Visualisation />
