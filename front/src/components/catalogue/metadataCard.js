@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 
@@ -107,12 +108,11 @@ class MetadataCard extends Component {
                     >
                       Download <CloudDownload />
                     </button>
-                    <a
-                      className="btn btn-success button-margin"
-                      href={`/show/${ressource.media_id}`}
-                    >
-                      Visualisation <Eye />
-                    </a>
+                    <Link to={`/show/${ressource.media_id}`}>
+                      <span className="btn btn-success button-margin">
+                        Visualisation <Eye />
+                      </span>
+                    </Link>
                   </span>
                 );
               })}
