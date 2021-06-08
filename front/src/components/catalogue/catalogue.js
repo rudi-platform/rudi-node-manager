@@ -28,7 +28,6 @@ class Catalogue extends Component {
     this.currentOffset = 0;
     this.PAGE_SIZE = 10;
 
-    // TODO : global/conf
     this.countByConf = filterConf;
   }
 
