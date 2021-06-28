@@ -1,16 +1,15 @@
 const express = require('express');
 const router = new express.Router();
 const sysController = require('../controllers/sysController');
-const authController = require('./../controllers/authController');
+const authControllerPassport = require('./../controllers/authControllerPassport');
 
 router.get('/hash', sysController.getHash);
 router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
 
-router.post('/register', authController.postRegister);
-router.post('/login', authController.postLogin);
-router.post('/forgot-password', authController.postForgot);
-router.post('/reset-password', authController.postReset);
-
+router.post('/register', authControllerPassport.postRegister);
+router.post('/login', authControllerPassport.postLogin);
+router.post('/forgot-password', authControllerPassport.postForgot);
+router.post('/reset-password', authControllerPassport.postReset);
 
 module.exports = router;

@@ -41,24 +41,28 @@ class Visualisation extends Component {
    * get the doc
    */
   handleOnClick() {
-    axios.get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`).then((res) => {
-      console.log(res.data);
-      // TODO : check fileRes.headers.content-type de axios.get(url) ?
-      if (res.data.url) {
-        const options = {
-          csv: res.data.url,
-          csvHeaders: true,
-          csvDelimiter: ';',
-          editable: false,
-          tableOverflow: true,
-          lazyLoading: true,
-          loadingSpin: true,
-        };
-        this.setState({ options });
-        this.el.destroy(this.wrapper.current, false);
-        this.el = jspreadsheet(this.wrapper.current, this.state.options);
-      }
-    });
+    axios
+      .get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`, {
+        headers: { Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('token')).token}` },
+      })
+      .then((res) => {
+        console.log(res.data);
+        // TODO : check fileRes.headers.content-type de axios.get(url) ?
+        if (res.data.url) {
+          const options = {
+            csv: res.data.url,
+            csvHeaders: true,
+            csvDelimiter: ';',
+            editable: false,
+            tableOverflow: true,
+            lazyLoading: true,
+            loadingSpin: true,
+          };
+          this.setState({ options });
+          this.el.destroy(this.wrapper.current, false);
+          this.el = jspreadsheet(this.wrapper.current, this.state.options);
+        }
+      });
   }
 
   /**

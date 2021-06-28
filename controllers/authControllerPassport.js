@@ -1,0 +1,88 @@
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const databaseManager = require('../database');
+
+const registerUser = (data) => {
+  if (!data.password || !data.confirmPassword || data.password !== data.confirmPassword) return;
+  return databaseManager
+    .getUserByUsername(data.username)
+    .then((user) => {
+      // Create new User
+      if (!user) {
+        const newUser = { username: data.username, password: data.password, email: data.email };
+        // Hash password before saving in database
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            return databaseManager
+              .createUser(newUser)
+              .then((user) => {
+                return user;
+              })
+              .catch((err) => {
+                // TODO
+              });
+          });
+        });
+      } else {
+        // TODO : user already exist
+      }
+    })
+    .catch((err) => {
+      // TODO
+    });
+};
+
+exports.postLogin = (req, res, next) => {
+  passport.authenticate('local', function (err, user, info) {
+    if (err) {
+      return res.status(400).json({ errors: err });
+    }
+    if (!user) {
+      return res.status(400).json({ errors: 'No user found' });
+    }
+    req.login(user, { session: false }, function (err) {
+      if (err) {
+        return res.status(400).json({ errors: err });
+      }
+
+      const body = { id: user.id, username: user.username };
+      // FIXME : top secret
+      const token = jwt.sign({ user: body }, 'TOP_SECRET');
+
+      return res.status(200).json({ success: `logged in ${user.username}`, token: token });
+    });
+  })(req, res, next);
+};
+
+exports.postRegister = (req, res, next) => {
+  try {
+    const data = req.body;
+    registerUser(data).then((user) => {
+      // TODO : send mail? random password? temp password? link to first password?
+      res.json(user);
+    });
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+exports.postForgot = (req, res, next) => {
+  try {
+    // TODO
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+exports.postReset = (req, res, next) => {
+  try {
+    // TODO
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+exports.registerUser = registerUser;

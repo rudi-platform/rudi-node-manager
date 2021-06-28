@@ -10,6 +10,8 @@ const apiMedia = require('./routes/routesMedia');
 // Require Config
 const config = require('./config/config');
 
+const passport = require('./utils/passportSetup');
+
 // Create a new express application named 'app'
 const app = express();
 
@@ -32,9 +34,14 @@ app.use(
 
 // Configure the CORs middleware
 app.use(cors());
+
+// Passport middleware
+app.use(passport.initialize());
+
 // Configure app to use route
 app.use('/api/v1/', apiV1);
 app.use('/api/admin/', apiAdmin);
+app.use('/api/secure/', passport.authenticate('jwt', { session: false }), apiAdmin);
 app.use('/api/media/', apiMedia);
 
 // This middleware informs the express application to serve our compiled React files

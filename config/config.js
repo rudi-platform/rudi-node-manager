@@ -43,6 +43,9 @@ if (customExist) {
   if (customConfig.database && customConfig.database.first_user_pwd) {
     config.database.first_user_pwd = customConfig.database.first_user_pwd;
   }
-};
+  if (customConfig.database && customConfig.database.first_user_email) {
+    config.database.first_user_email = customConfig.database.first_user_email;
+  }
+}
 
 module.exports = config;

@@ -1,10 +1,11 @@
 const databaseManager = require('../database');
 const config = require('../config/config');
-const authController = require('../controllers/authController');
+const authControllerPassport = require('../controllers/authControllerPassport');
 const fs = require('fs');
 
-const sqlCreateUsersTable = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,'+
-'username TEXT NOT NULL UNIQUE,password TEXT NOT NULL,salt TEXT NOT NULL);';
+const sqlCreateUsersTable =
+  'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,' +
+  'username TEXT NOT NULL UNIQUE,password TEXT NOT NULL,email TEXT);';
 
 const initFirstUser = () => {
   databaseManager.getUsers().then((rows) => {
@@ -15,8 +16,9 @@ const initFirstUser = () => {
         username: config.database.first_user_name,
         password: config.database.first_user_pwd,
         confirmPassword: config.database.first_user_pwd,
+        email: config.database.first_user_email,
       };
-      authController.registerUser(firstUser);
+      authControllerPassport.registerUser(firstUser);
     }
   });
 };
@@ -38,5 +40,3 @@ try {
   console.error(error);
   throw error;
 }
-
-
