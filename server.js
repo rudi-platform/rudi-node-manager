@@ -11,6 +11,7 @@ const apiMedia = require('./routes/routesMedia');
 const config = require('./config/config');
 
 const passport = require('./utils/passportSetup');
+const initDatabase = require('./database/scripts/initDatabase');
 
 // Create a new express application named 'app'
 const app = express();
@@ -52,6 +53,9 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
     res.sendFile(path.join(__dirname, 'front/build', 'index.html'));
   });
 }
+
+// Init database on startup
+initDatabase.initDatabase();
 
 // Catch any bad requests
 app.get('*', (req, res) => {

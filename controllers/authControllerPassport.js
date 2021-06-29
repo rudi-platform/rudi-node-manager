@@ -1,7 +1,8 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const databaseManager = require('../database');
+const databaseManager = require('../database/database');
+const config = require('../config/config');
 
 const registerUser = (data) => {
   if (!data.password || !data.confirmPassword || data.password !== data.confirmPassword) return;
@@ -22,7 +23,8 @@ const registerUser = (data) => {
                 return user;
               })
               .catch((err) => {
-                // TODO
+                console.log(err);
+                throw err;
               });
           });
         });
@@ -31,7 +33,8 @@ const registerUser = (data) => {
       }
     })
     .catch((err) => {
-      // TODO
+      console.log(err);
+      throw err;
     });
 };
 
@@ -49,8 +52,7 @@ exports.postLogin = (req, res, next) => {
       }
 
       const body = { id: user.id, username: user.username };
-      // FIXME : top secret
-      const token = jwt.sign({ user: body }, 'TOP_SECRET');
+      const token = jwt.sign({ user: body }, config.server.secret_key_JWT);
 
       return res.status(200).json({ success: `logged in ${user.username}`, token: token });
     });

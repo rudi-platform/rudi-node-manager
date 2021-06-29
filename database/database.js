@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
-const config = require('./config/config');
+const config = require('../config/config');
 
 const open = function () {
   return new sqlite3.Database(
@@ -8,9 +8,9 @@ const open = function () {
     sqlite3.OPEN_READWRITE,
     (err) => {
       if (err) {
+        console.error(err);
         console.error(err.message);
       } else {
-        console.log('Connected to the rudy_manager database.');
       }
     },
   );
@@ -20,7 +20,6 @@ const close = function (db) {
     if (err) {
       console.error(err.message);
     }
-    console.log('Close the database connection.');
   });
 };
 
@@ -32,7 +31,6 @@ exports.getUserByUsername = (username) => {
         console.log(err.message);
         reject(err);
       } else {
-        console.log(row);
         resolve(row);
       }
       close(db);
@@ -47,7 +45,6 @@ exports.getUserById = (id) => {
         console.log(err.message);
         reject(err);
       } else {
-        console.log(row);
         resolve(row);
       }
       close(db);
@@ -62,7 +59,6 @@ exports.getUsers = () => {
         console.log(err.message);
         reject(err);
       } else {
-        console.log(rows);
         resolve(rows);
       }
       close(db);
@@ -80,7 +76,7 @@ exports.createUser = (user) => {
           console.log(err.message);
           reject(err);
         } else {
-          console.log(`A row has been inserted with rowid ${this.lastID}`);
+          console.log(`Users : A row has been inserted with rowid ${this.lastID}`);
           resolve({ id: this.lastID });
         }
         close(db);

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
-const databaseManager = require('../database');
+const databaseManager = require('../database/database');
 const passport = require('passport');
+const config = require('../config/config');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
@@ -48,7 +49,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: 'TOP_SECRET',
+      secretOrKey: config.server.secret_key_JWT,
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
     },
     async (token, done) => {

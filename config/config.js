@@ -20,6 +20,11 @@ if (customExist) {
   if (customConfig.server && customConfig.server.listening_port) {
     config.server.listening_port = customConfig.server.listening_port;
   }
+  if (customConfig.server && customConfig.server.secret_key_JWT) {
+    config.server.secret_key_JWT = customConfig.server.secret_key_JWT;
+  }
+
+  // API_RUDI
   if (customConfig.API_RUDI && customConfig.API_RUDI.listening_address) {
     config.API_RUDI.listening_address = customConfig.API_RUDI.listening_address;
   }
@@ -29,6 +34,8 @@ if (customExist) {
   if (customConfig.API_RUDI && customConfig.API_RUDI.media_api) {
     config.API_RUDI.media_api = customConfig.API_RUDI.media_api;
   }
+
+  // formulaire
   if (customConfig.formulaire && customConfig.formulaire.base_url) {
     config.formulaire.base_url = customConfig.formulaire.base_url;
   }
