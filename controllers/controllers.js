@@ -3,7 +3,7 @@ const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 
 const resourcesList = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/resources', {
       params: req.query,
@@ -19,7 +19,7 @@ const resourcesList = (req, res, next) => {
 };
 exports.getResourceById = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/resources/' + id, {
       params: req.query,
@@ -34,7 +34,7 @@ exports.getResourceById = (req, res, next) => {
     });
 };
 exports.postResources = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .post(serveur + '/resources', req.body, {
       headers: {
@@ -50,7 +50,7 @@ exports.postResources = (req, res, next) => {
     });
 };
 exports.putResources = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .put(serveur + '/resources', req.body, {
       headers: {

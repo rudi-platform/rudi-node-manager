@@ -74,7 +74,7 @@ class Catalogue extends Component {
    */
   getInitialData() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/v1/resources`, {
+      .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
         params: this.createParams({ limit: this.PAGE_SIZE, offset: this.currentOffset }),
       })
       .then((res) => {
@@ -84,7 +84,7 @@ class Catalogue extends Component {
     // FIXME : Filtre not working with count_by yet (proposer : { $match: { filter  } }, au début du aggregate?)
     Promise.all(
       this.countByConf.map((count) =>
-        axios.get(`${process.env.PUBLIC_URL}/api/v1/resources`, {
+        axios.get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
           params: this.createParams({ count_by: count.name }),
         }),
       ),
@@ -105,7 +105,7 @@ class Catalogue extends Component {
     return () => {
       this.currentOffset += this.PAGE_SIZE;
       axios
-        .get(`${process.env.PUBLIC_URL}/api/v1/resources`, {
+        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
           params: this.createParams({ limit: this.PAGE_SIZE, offset: this.currentOffset }),
         })
         .then((res) => {

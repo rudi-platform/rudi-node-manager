@@ -3,7 +3,7 @@ const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 
 const contactList = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/contacts', { params: req.query })
     .then((resRUDI) => {
@@ -17,7 +17,7 @@ const contactList = (req, res, next) => {
 };
 exports.getContactById = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/contacts/' + id, { params: req.query })
     .then((resRUDI) => {
@@ -31,7 +31,7 @@ exports.getContactById = (req, res, next) => {
 };
 
 exports.postContact = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .post(serveur + '/contacts', req.body, { headers: { 'Content-Type': 'application/json' } })
     .then((resRUDI) => {
@@ -43,7 +43,7 @@ exports.postContact = (req, res, next) => {
     });
 };
 exports.putContact = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .put(serveur + '/contacts', req.body, { headers: { 'Content-Type': 'application/json' } })
     .then((resRUDI) => {

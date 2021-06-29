@@ -3,7 +3,7 @@ const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 
 const orgaList = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/organizations', { params: req.query })
     .then((resRUDI) => {
@@ -17,7 +17,7 @@ const orgaList = (req, res, next) => {
 };
 exports.getOrgaById = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .get(serveur + '/organizations/' + id, { params: req.query })
     .then((resRUDI) => {
@@ -31,7 +31,7 @@ exports.getOrgaById = (req, res, next) => {
 };
 
 exports.postOrga = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .post(serveur + '/organizations', req.body, { headers: { 'Content-Type': 'application/json' } })
     .then((resRUDI) => {
@@ -44,7 +44,7 @@ exports.postOrga = (req, res, next) => {
 };
 
 exports.putOrga = (req, res, next) => {
-  const serveur = `${config.API_RUDI.listening_address}`;
+  const serveur = `${config.API_RUDI.admin_api}`;
   return axios
     .put(serveur + '/organizations', req.body, { headers: { 'Content-Type': 'application/json' } })
     .then((resRUDI) => {
