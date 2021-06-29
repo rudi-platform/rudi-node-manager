@@ -1,6 +1,7 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 const databaseManager = require('../database/database');
 const config = require('../config/config');
 
@@ -51,10 +52,12 @@ exports.postLogin = (req, res, next) => {
         return res.status(400).json({ errors: err });
       }
 
+      let exp = moment().add(20, 'minutes').format('X');
+      exp = parseInt(exp, 10);
       const body = { id: user.id, username: user.username };
-      const token = jwt.sign({ user: body }, config.server.secret_key_JWT);
+      const token = jwt.sign({ user: body, exp }, config.server.secret_key_JWT);
 
-      return res.status(200).json({ success: `logged in ${user.username}`, token: token });
+      return res.status(200).json({ success: `logged in ${user.username}`, token: token, expires: new Date(exp*1000) });
     });
   })(req, res, next);
 };
