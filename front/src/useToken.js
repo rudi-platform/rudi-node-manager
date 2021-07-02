@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import jwt from 'jsonwebtoken';
+import moment from 'moment';
 
 /**
  * Token hooks
@@ -6,7 +8,6 @@ import { useState } from 'react';
  */
 export default function useToken() {
   const getToken = () => {
-    console.log(JSON.parse('true'));
     const tokenString = sessionStorage.getItem('token');
 
     if (!tokenString || tokenString === 'undefined') {
@@ -14,6 +15,10 @@ export default function useToken() {
     }
 
     const userToken = JSON.parse(tokenString);
+    if (moment.unix(jwt.decode(userToken?.token).exp).diff(moment()) <= 0) {
+      sessionStorage.removeItem('token');
+      return null;
+    }
     return userToken?.token;
   };
 
