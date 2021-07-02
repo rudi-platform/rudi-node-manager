@@ -57,13 +57,11 @@ exports.postLogin = (req, res, next) => {
       const body = { id: user.id, username: user.username };
       const token = jwt.sign({ user: body, exp }, config.server.secret_key_JWT);
 
-      return res
-        .status(200)
-        .json({
-          success: `logged in ${user.username}`,
-          token: token,
-          expires: new Date(exp * 1000),
-        });
+      return res.status(200).json({
+        success: `logged in ${user.username}`,
+        token: token,
+        expires: new Date(exp * 1000),
+      });
     });
   })(req, res, next);
 };

@@ -36,6 +36,10 @@
     transform: rotate(360deg);
   }
 }
+.login-switch {
+  margin: 0 auto;
+  max-width: 320px;
+}
 
 .button-margin {
   margin: 0px 2px;

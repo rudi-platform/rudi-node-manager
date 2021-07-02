@@ -51,7 +51,7 @@ exports.getUserById = (id) => {
     });
   });
 };
-exports.getUsers = () => {
+exports.getUsers = (options) => {
   const db = open();
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM Users', function (err, rows) {
@@ -59,6 +59,11 @@ exports.getUsers = () => {
         console.log(err.message);
         reject(err);
       } else {
+        if (!options || !options.password) {
+          rows.forEach((row) => {
+            delete row.password;
+          });
+        }
         resolve(rows);
       }
       close(db);

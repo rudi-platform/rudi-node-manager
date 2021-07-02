@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
 import CatalogueLicence from './components/catalogue/catalogueLicence';
+import CatalogueUser from './components/users/catalogueUser';
 import Visualisation from './components/visualisation/visualisation';
 import { createBrowserHistory } from 'history';
 import Login from './components/login/login';
+import Register from './components/login/register';
 import useToken from './useToken';
 
 console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
@@ -31,9 +33,37 @@ TODO :
  */
 export default function App() {
   const { token, setToken } = useToken();
-  console.log('token : ', token);
+  const [isLoginOpen, setIsLoginOpen] = useState(true);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
+  const showLoginBox = () => {
+    setIsRegisterOpen(false);
+    setIsLoginOpen(true);
+  };
+
+  const showRegisterBox = () => {
+    setIsLoginOpen(false);
+    setIsRegisterOpen(true);
+  };
   if (!token) {
-    return <Login setToken={setToken} />;
+    return (
+      <div>
+        {isLoginOpen && <Login setToken={setToken} />}
+        {isRegisterOpen && <Register />}
+        <div className="login-switch">
+          {!isLoginOpen && (
+            <span className="badge badge-success badge-pill" onClick={showLoginBox}>
+              Login
+            </span>
+          )}
+          {!isRegisterOpen && (
+            <span className="badge badge-success badge-pill" onClick={showRegisterBox}>
+              Register
+            </span>
+          )}
+        </div>
+      </div>
+    );
   }
   return (
     <Router basename={PUBLIC_URL}>
@@ -139,7 +169,7 @@ export default function App() {
           <div className="tempPaddingTop">Work in progress</div>
         </Route>
         <Route path="/user">
-          <div className="tempPaddingTop">Work in progress</div>
+          <CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />
         </Route>
         <Route path="/conf">
           <div className="tempPaddingTop">Work in progress</div>
