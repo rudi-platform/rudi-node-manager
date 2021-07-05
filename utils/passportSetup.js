@@ -49,7 +49,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: config.server.secret_key_JWT,
+      secretOrKey: config.auth.secret_key_JWT,
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
     },
     async (token, done) => {

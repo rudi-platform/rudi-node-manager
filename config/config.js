@@ -20,8 +20,10 @@ if (customExist) {
   if (customConfig.server && customConfig.server.listening_port) {
     config.server.listening_port = customConfig.server.listening_port;
   }
-  if (customConfig.server && customConfig.server.secret_key_JWT) {
-    config.server.secret_key_JWT = customConfig.server.secret_key_JWT;
+
+  // Auth
+  if (customConfig.auth && customConfig.auth.secret_key_JWT) {
+    config.auth.secret_key_JWT = customConfig.auth.secret_key_JWT;
   }
 
   // API_RUDI

@@ -55,7 +55,7 @@ exports.postLogin = (req, res, next) => {
       let exp = moment().add(20, 'minutes').format('X');
       exp = parseInt(exp, 10);
       const body = { id: user.id, username: user.username };
-      const token = jwt.sign({ user: body, exp }, config.server.secret_key_JWT);
+      const token = jwt.sign({ user: body, exp }, config.auth.secret_key_JWT);
 
       return res.status(200).json({
         success: `logged in ${user.username}`,
