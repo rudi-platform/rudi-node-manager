@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 import MetadataDetail from './components/metadataDetail/metadataDetail';
 import Catalogue from './components/catalogue/catalogue';
 import CatalogueLicence from './components/catalogue/catalogueLicence';
 import CatalogueUser from './components/users/catalogueUser';
+import CatalogueProducer from './components/producer/catalogueProducer';
+import CatalogueContact from './components/contact/catalogueContact';
 import Visualisation from './components/visualisation/visualisation';
 import { createBrowserHistory } from 'history';
 import Login from './components/login/login';
@@ -106,11 +109,13 @@ export default function App() {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link to="/gestion">
-                    <button type="button" className="btn btn-primary button-margin">
-                      Gestion
-                    </button>
-                  </Link>
+                  <DropdownButton id="dropdown-gestion-button" title="Gestion">
+                    <Dropdown.Item href="#/gestion">Metadonnée</Dropdown.Item>
+                    <Dropdown.Item href="/producer">Producteur</Dropdown.Item>
+                    <Dropdown.Item>
+                      <Link to="/contact">Contacts</Link>
+                    </Dropdown.Item>
+                  </DropdownButton>
                 </li>
                 <li className="nav-item">
                   <Link to="/monitoring">
@@ -151,6 +156,20 @@ export default function App() {
         </Route>
         <Route path="/gestion">
           <Catalogue
+            display={{ searchbar: true, editJDD: true }}
+            specialSearch={{}}
+            editMode={{}}
+          />
+        </Route>
+        <Route path="/producer">
+          <CatalogueProducer
+            display={{ searchbar: true, editJDD: true }}
+            specialSearch={{}}
+            editMode={{}}
+          />
+        </Route>
+        <Route path="/contact">
+          <CatalogueContact
             display={{ searchbar: true, editJDD: true }}
             specialSearch={{}}
             editMode={{}}
