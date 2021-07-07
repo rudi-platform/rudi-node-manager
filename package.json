@@ -1,7 +1,7 @@
 {
   "name": "rudi-console-proxy",
   "version": "1.0.0",
-  "description": "",
+  "description": "application d'administration du noeud RUDI",
   "main": "server.js",
   "scripts": {
     "test": "jest --config ./jest.config.json --coverage",
