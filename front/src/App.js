@@ -111,10 +111,8 @@ export default function App() {
                 <li className="nav-item">
                   <DropdownButton id="dropdown-gestion-button" title="Gestion">
                     <Dropdown.Item href="#/gestion">Metadonnée</Dropdown.Item>
-                    <Dropdown.Item href="/producer">Producteur</Dropdown.Item>
-                    <Dropdown.Item>
-                      <Link to="/contact">Contacts</Link>
-                    </Dropdown.Item>
+                    <Dropdown.Item href="#/producer">Producteur</Dropdown.Item>
+                    <Dropdown.Item href="#/contact">Contacts</Dropdown.Item>
                   </DropdownButton>
                 </li>
                 <li className="nav-item">
