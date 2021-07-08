@@ -110,9 +110,15 @@ export default function App() {
                 </li>
                 <li className="nav-item">
                   <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                    <Dropdown.Item href="#/gestion">Metadonnée</Dropdown.Item>
-                    <Dropdown.Item href="#/producer">Producteur</Dropdown.Item>
-                    <Dropdown.Item href="#/contact">Contacts</Dropdown.Item>
+                    <Dropdown.Item href={`${process.env.PUBLIC_URL}/gestion`}>
+                      Metadonnée
+                    </Dropdown.Item>
+                    <Dropdown.Item href={`${process.env.PUBLIC_URL}/producer`}>
+                      Producteur
+                    </Dropdown.Item>
+                    <Dropdown.Item href={`${process.env.PUBLIC_URL}/contact`}>
+                      Contacts
+                    </Dropdown.Item>
                   </DropdownButton>
                 </li>
                 <li className="nav-item">
