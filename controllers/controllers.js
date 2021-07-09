@@ -46,7 +46,7 @@ exports.postResources = (req, res, next) => {
     })
     .catch((error) => {
       error = errorHandler.error(error);
-      res.status(500).send(error);
+      res.status(501).send(error);
     });
 };
 exports.putResources = (req, res, next) => {
