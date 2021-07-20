@@ -6,6 +6,7 @@ const databaseManager = require('../database/database');
 const config = require('../config/config');
 
 const registerUser = (data) => {
+  // TODO : throw error instead
   if (!data.password || !data.confirmPassword || data.password !== data.confirmPassword) return;
   return databaseManager
     .getUserByUsername(data.username)
@@ -14,21 +15,20 @@ const registerUser = (data) => {
       if (!user) {
         const newUser = { username: data.username, password: data.password, email: data.email };
         // Hash password before saving in database
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            return databaseManager
-              .createUser(newUser)
-              .then((user) => {
+        return bcrypt
+          .genSalt(10)
+          .then((salt) => {
+            return bcrypt.hash(newUser.password, salt).then((hash) => {
+              newUser.password = hash;
+              return databaseManager.createUser(newUser).then((user) => {
                 return user;
-              })
-              .catch((err) => {
-                console.log(err);
-                throw err;
               });
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            throw err;
           });
-        });
       } else {
         // TODO : user already exist
       }

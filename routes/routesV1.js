@@ -9,7 +9,8 @@ router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
 
 router.get('/users', usersController.usersList);
-router.get('/users/:id', usersController.getUserById);
+router.get('/users/:username', usersController.getUserByUsername);
+router.delete('/users/:username', usersController.deleteUser);
 
 router.post('/register', authControllerPassport.postRegister);
 router.post('/login', authControllerPassport.postLogin);

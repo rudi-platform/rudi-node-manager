@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 /**
  * Composant : UserCard
@@ -24,6 +25,22 @@ class UserCard extends Component {
   componentDidMount() {}
 
   /**
+   * call for user deletion
+   * @param {*} user connector du fichier
+   */
+  deleteUser(user) {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/v1/users/${user.username}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
+  }
+
+  /**
    * render le composant
    * @return {ReactNode} html du composant
    */
@@ -38,7 +55,11 @@ class UserCard extends Component {
                 <a className="btn btn-warning">
                   <Pencil />
                 </a>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={(e) => this.deleteUser(this.state.user)}
+                >
                   <Trash />
                 </button>
               </div>

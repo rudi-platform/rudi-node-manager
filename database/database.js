@@ -37,10 +37,10 @@ exports.getUserByUsername = (username) => {
     });
   });
 };
-exports.getUserById = (id) => {
+exports.getUserByUsername = (username) => {
   const db = open();
   return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM Users WHERE id = ?`, [id], function (err, row) {
+    db.get(`SELECT * FROM Users WHERE username = ?`, [username], function (err, row) {
       if (err) {
         console.log(err.message);
         reject(err);
@@ -82,11 +82,26 @@ exports.createUser = (user) => {
           reject(err);
         } else {
           console.log(`Users : A row has been inserted with rowid ${this.lastID}`);
-          resolve({ id: this.lastID });
+          resolve({ id: this.lastID, username: user.username });
         }
         close(db);
       },
     );
+  });
+};
+exports.deleteUser = (username) => {
+  const db = open();
+  return new Promise((resolve, reject) => {
+    db.run(`DELETE FROM Users WHERE username = ?`, [username], function (err) {
+      if (err) {
+        console.log(err.message);
+        reject(err);
+      } else {
+        console.log(`Users : A row has been deleted with username ${username}`);
+        resolve({ username: username });
+      }
+      close(db);
+    });
   });
 };
 exports.open = open;

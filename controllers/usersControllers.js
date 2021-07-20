@@ -12,10 +12,22 @@ const usersList = (req, res, next) => {
       res.status(501).json(error);
     });
 };
-exports.getUserById = (req, res, next) => {
-  const { id } = req.params;
+exports.getUserByUsername = (req, res, next) => {
+  const { username } = req.params;
   databaseManager
-    .getUserById(id)
+    .getUserByUsername(username)
+    .then((row) => {
+      res.status(200).json(row);
+    })
+    .catch((err) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
+};
+exports.deleteUser = (req, res, next) => {
+  const { username } = req.params;
+  databaseManager
+    .deleteUser(username)
     .then((row) => {
       res.status(200).json(row);
     })
