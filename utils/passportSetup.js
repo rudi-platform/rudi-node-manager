@@ -4,7 +4,6 @@ const passport = require('passport');
 const config = require('../config/config');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
-const ExtractJWT = require('passport-jwt').ExtractJwt;
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -45,12 +44,19 @@ passport.use(
       });
   }),
 );
+const cookieExtractor = function (req) {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies['authToken'];
+  }
+  return token;
+};
 
 passport.use(
   new JWTstrategy(
     {
       secretOrKey: config.auth.secret_key_JWT,
-      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: cookieExtractor,
     },
     async (token, done) => {
       try {

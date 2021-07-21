@@ -57,11 +57,19 @@ exports.postLogin = (req, res, next) => {
       const body = { id: user.id, username: user.username };
       const token = jwt.sign({ user: body, exp }, config.auth.secret_key_JWT);
 
-      return res.status(200).json({
-        success: `logged in ${user.username}`,
-        token: token,
-        expires: new Date(exp * 1000),
-      });
+      return res
+        .status(200)
+        .cookie('authToken', token, {
+          secure: true,
+          httpOnly: true,
+          expires: new Date(exp * 1000),
+        })
+        .json({
+          success: `logged in ${user.username}`,
+          token: token,
+          expires: new Date(exp * 1000),
+        });
+      // TODO : remove .json() for cookie only?
     });
   })(req, res, next);
 };

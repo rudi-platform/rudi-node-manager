@@ -1,6 +1,7 @@
 // Import dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
 // Require Route
@@ -32,6 +33,7 @@ app.use(
     extended: true,
   }),
 );
+app.use(cookieParser());
 
 // Configure the CORs middleware
 app.use(cors());
