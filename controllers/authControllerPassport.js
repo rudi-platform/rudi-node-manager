@@ -39,6 +39,13 @@ const registerUser = (data) => {
     });
 };
 
+const createToken = (user) => {
+  let exp = moment().add(20, 'minutes').format('X');
+  exp = parseInt(exp, 10);
+  const body = { id: user.id, username: user.username };
+  return { token: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT), exp: exp };
+};
+
 exports.postLogin = (req, res, next) => {
   passport.authenticate('local', function (err, user, info) {
     if (err) {
@@ -52,10 +59,7 @@ exports.postLogin = (req, res, next) => {
         return res.status(400).json({ errors: err });
       }
 
-      let exp = moment().add(20, 'minutes').format('X');
-      exp = parseInt(exp, 10);
-      const body = { id: user.id, username: user.username };
-      const token = jwt.sign({ user: body, exp }, config.auth.secret_key_JWT);
+      const { token, exp } = createToken(user);
 
       return res
         .status(200)
@@ -69,7 +73,7 @@ exports.postLogin = (req, res, next) => {
           token: token,
           expires: new Date(exp * 1000),
         });
-      // TODO : remove .json() for cookie only?
+      // TODO : remove .json() for cookie only? or give refresh token instead
     });
   })(req, res, next);
 };
@@ -103,3 +107,4 @@ exports.postReset = (req, res, next) => {
   }
 };
 exports.registerUser = registerUser;
+exports.createToken = createToken;

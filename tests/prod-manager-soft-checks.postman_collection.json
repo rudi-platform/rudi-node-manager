@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "a6ac5be7-664b-46d4-82b8-33da7a107a64",
-    "name": "rudi-soft-checks",
+    "_postman_id": "ce30624e-e22f-4301-b462-5084af0c4314",
+    "name": "prod-manager-soft-checks",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -81,6 +81,24 @@
                   "const stamp = pm.collectionVariables.get('stamp')",
                   "pm.test(`Delete user with '${stamp}' username`, () => {",
                   "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// create a cookie jar\r",
+                  "const cookieJar = pm.cookies.jar();\r",
+                  "cookieJar.set(pm.environment.get(\"baseUrl\"), 'authToken', pm.environment.get(\"token\"), (error, cookie) => {\r",
+                  "  if (error) {\r",
+                  "    console.error(error);\r",
+                  "  }\r",
+                  "  if (cookie) {\r",
+                  "    console.log(cookie);\r",
+                  "  }\r",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -228,6 +246,24 @@
                 "exec": [
                   "pm.test(\"user 1 deleted\", () => {",
                   "    pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// create a cookie jar\r",
+                  "const cookieJar = pm.cookies.jar();\r",
+                  "cookieJar.set(pm.environment.get(\"baseUrl\"), 'authToken', pm.environment.get(\"token\"), (error, cookie) => {\r",
+                  "  if (error) {\r",
+                  "    console.error(error);\r",
+                  "  }\r",
+                  "  if (cookie) {\r",
+                  "    console.log(cookie);\r",
+                  "  }\r",
                   "});"
                 ],
                 "type": "text/javascript"
