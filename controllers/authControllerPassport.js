@@ -1,9 +1,7 @@
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const moment = require('moment');
 const databaseManager = require('../database/database');
-const config = require('../config/config');
+const utils = require('../utils/utils');
 
 const registerUser = (data) => {
   // TODO : throw error instead
@@ -39,13 +37,6 @@ const registerUser = (data) => {
     });
 };
 
-const createToken = (user) => {
-  let exp = moment().add(20, 'minutes').format('X');
-  exp = parseInt(exp, 10);
-  const body = { id: user.id, username: user.username };
-  return { token: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT), exp: exp };
-};
-
 exports.postLogin = (req, res, next) => {
   passport.authenticate('local', function (err, user, info) {
     if (err) {
@@ -59,7 +50,7 @@ exports.postLogin = (req, res, next) => {
         return res.status(400).json({ errors: err });
       }
 
-      const { token, exp } = createToken(user);
+      const { token, exp } = utils.createToken(user);
 
       return res
         .status(200)
@@ -107,4 +98,3 @@ exports.postReset = (req, res, next) => {
   }
 };
 exports.registerUser = registerUser;
-exports.createToken = createToken;
