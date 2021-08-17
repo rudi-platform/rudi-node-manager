@@ -55,7 +55,7 @@ exports.postLogin = (req, res, next) => {
       return res
         .status(200)
         .cookie('authToken', token, {
-          secure: true,
+          secure: !!process.env.NODE_ENV,
           httpOnly: true,
           expires: new Date(exp * 1000),
         })

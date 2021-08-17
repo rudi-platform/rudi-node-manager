@@ -65,6 +65,50 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Get Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('adminusername', pm.environment.get(\"adminusername\"))\r",
+                  "pm.collectionVariables.set('adminpassword', pm.environment.get(\"adminpassword\"))"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disabledSystemHeaders": {}
+          },
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"{{adminusername}}\",\r\n    \"password\": \"{{adminpassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{v1Url}}/{{login}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{v1Url}}", "{{login}}"]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -89,18 +133,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "// create a cookie jar\r",
-                  "const cookieJar = pm.cookies.jar();\r",
-                  "cookieJar.set(pm.environment.get(\"baseUrl\"), 'authToken', pm.environment.get(\"token\"), (error, cookie) => {\r",
-                  "  if (error) {\r",
-                  "    console.error(error);\r",
-                  "  }\r",
-                  "  if (cookie) {\r",
-                  "    console.log(cookie);\r",
-                  "  }\r",
-                  "});"
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             }
@@ -254,18 +287,7 @@
             {
               "listen": "prerequest",
               "script": {
-                "exec": [
-                  "// create a cookie jar\r",
-                  "const cookieJar = pm.cookies.jar();\r",
-                  "cookieJar.set(pm.environment.get(\"baseUrl\"), 'authToken', pm.environment.get(\"token\"), (error, cookie) => {\r",
-                  "  if (error) {\r",
-                  "    console.error(error);\r",
-                  "  }\r",
-                  "  if (cookie) {\r",
-                  "    console.log(cookie);\r",
-                  "  }\r",
-                  "});"
-                ],
+                "exec": [""],
                 "type": "text/javascript"
               }
             }
@@ -348,6 +370,14 @@
     },
     {
       "key": "softUser1email",
+      "value": ""
+    },
+    {
+      "key": "adminusername",
+      "value": ""
+    },
+    {
+      "key": "adminpassword",
       "value": ""
     }
   ]
