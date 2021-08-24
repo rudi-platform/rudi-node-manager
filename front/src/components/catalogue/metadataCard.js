@@ -18,6 +18,7 @@ class MetadataCard extends Component {
       formUrl: props.formUrl,
       metadata: props.metadata,
     };
+    console.log(this.state.metadata);
   }
 
   /**
@@ -57,15 +58,15 @@ class MetadataCard extends Component {
               <a href={`${this.state.formUrl}?read-only=${this.state.metadata.global_id}`}>
                 {this.state.metadata.resource_title}
               </a>
-              {!this.state.metadata.dataset_dates.published &&
-                !this.state.metadata.dataset_dates.deleted && (
+              {!this.state.metadata.metadata_info.metadata_dates.published &&
+                !this.state.metadata.metadata_info.metadata_dates.deleted && (
                   <span className="badge badge-warning badge-pill">waiting</span>
                 )}
-              {this.state.metadata.dataset_dates.published &&
-                !this.state.metadata.dataset_dates.deleted && (
+              {this.state.metadata.metadata_info.metadata_dates.published &&
+                !this.state.metadata.metadata_info.metadata_dates.deleted && (
                   <span className="badge badge-success badge-pill">published</span>
                 )}
-              {this.state.metadata.dataset_dates.deleted && (
+              {this.state.metadata.metadata_info.metadata_dates.deleted && (
                 <span className="badge badge-danger badge-pill">deleted</span>
               )}
               {this.props.display && this.props.display.editJDD && (
