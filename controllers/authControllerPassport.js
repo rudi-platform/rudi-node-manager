@@ -28,7 +28,7 @@ const registerUser = (data) => {
             throw err;
           });
       } else {
-        // TODO : user already exist
+        return Promise.reject(new Error(`User ${data.username} already exist!`));
       }
     })
     .catch((err) => {
@@ -72,13 +72,17 @@ exports.postLogin = (req, res, next) => {
 exports.postRegister = (req, res, next) => {
   try {
     const data = req.body;
-    registerUser(data).then((user) => {
-      // TODO : send mail? random password? temp password? link to first password?
-      res.json(user);
-    });
+    registerUser(data)
+      .then((user) => {
+        // TODO : send mail? random password? temp password? link to first password?
+        res.json(user);
+      })
+      .catch((err) => {
+        res.status(400).send(err.message);
+      });
   } catch (err) {
-    console.log(err);
-    throw err;
+    console.error(err);
+    res.status(400).send(err);
   }
 };
 exports.postForgot = (req, res, next) => {

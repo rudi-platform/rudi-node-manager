@@ -52,7 +52,7 @@ export default function App() {
     return (
       <div>
         {isLoginOpen && <Login setToken={setToken} />}
-        {isRegisterOpen && <Register />}
+        {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
           {!isLoginOpen && (
             <span className="badge badge-success badge-pill" onClick={showLoginBox}>

@@ -4,17 +4,21 @@ import Button from 'react-bootstrap/Button';
 import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
 
 /**
  * Register component
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Register html component
  */
-export default function Register({ setToken }) {
+export default function Register({ backToLogin }) {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const { toggle, visible } = useGenericModal();
+  const { options, changeOptions } = useGenericModalOptions();
 
   /**
    * is form valid?
@@ -29,15 +33,11 @@ export default function Register({ setToken }) {
    * @return {Promise} Register promise
    */
   function registerUser(credentials) {
-    return axios
-      .post(`${process.env.PUBLIC_URL}/api/v1/register`, JSON.stringify(credentials), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    return axios.post(`${process.env.PUBLIC_URL}/api/v1/register`, JSON.stringify(credentials), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
   /**
@@ -51,11 +51,42 @@ export default function Register({ setToken }) {
       email,
       password,
       confirmPassword,
-    }).then((res) => console.log(res));
+    })
+      .then((res) => {
+        changeOptions({
+          text: `l'utilisateur ${res.data.username} a bien été créé.`,
+          title: 'Action Validé',
+          type: 'success',
+          buttons: [
+            {
+              text: 'Connexion',
+              action: () => {
+                backToLogin();
+              },
+            },
+          ],
+        });
+        toggle();
+      })
+      .catch((error) => {
+        changeOptions({
+          text: `${error.response.data}`,
+          title: 'une erreur est survenue',
+          type: 'error',
+          buttons: [
+            {
+              text: 'Ok',
+              action: () => {},
+            },
+          ],
+        });
+        toggle();
+      });
   }
 
   return (
     <div className="Login">
+      <GenericModal visible={visible} toggle={toggle} options={options}></GenericModal>
       <Form onSubmit={handleSubmit}>
         <Form.Group size="lg" controlId="username">
           <Form.Label>User</Form.Label>
@@ -99,5 +130,5 @@ export default function Register({ setToken }) {
   );
 }
 Register.propTypes = {
-  setToken: PropTypes.func.isRequired,
+  backToLogin: PropTypes.func.isRequired,
 };
