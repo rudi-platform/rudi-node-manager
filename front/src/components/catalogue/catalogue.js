@@ -40,21 +40,93 @@ class Catalogue extends Component {
     this.state.currentFilters.forEach((filter) => Object.assign(baseParams, filter));
     return baseParams;
   }
+
+  /**
+   * verifie si 2 Filtre sont du même type
+   * @param {*} a filtre 1
+   * @param {*} b filtre 2
+   * @return {boolean} true si les 2 filtre sont du même type
+   */
+  isSameFilterType(a, b) {
+    // Create arrays of property names
+    const aProps = Object.getOwnPropertyNames(a);
+    const bProps = Object.getOwnPropertyNames(b);
+
+    // If number of properties is different,
+    // objects are not equivalent
+    if (aProps.length != bProps.length) {
+      return false;
+    }
+    return aProps[0] === bProps[0];
+  }
+
+  /**
+   * verifie si 2 Filtre sont identique
+   * @param {*} a filtre 1
+   * @param {*} b filtre 2
+   * @return {boolean} true si les 2 filtre sont identique
+   */
+  isSameFilter(a, b) {
+    // Create arrays of property names
+    const aProps = Object.getOwnPropertyNames(a);
+    const bProps = Object.getOwnPropertyNames(b);
+
+    // If number of properties is different,
+    // objects are not equivalent
+    if (aProps.length != bProps.length) {
+      return false;
+    }
+    const propName = aProps[0];
+    return a[propName] === b[propName];
+  }
+
   /**
    * ajoute un filter pour la requete
    * @param {*} filterParam element a rajouter
    */
   addToFilter(filterParam) {
-    this.setState(
-      {
-        currentFilters: this.state.currentFilters.concat(filterParam),
-      },
-      () => {
-        this.currentOffset = 0;
-        this.getInitialData();
-      },
+    const filterList = this.state.currentFilters;
+    const indexType = filterList.findIndex((element) =>
+      this.isSameFilterType(element, filterParam),
     );
-    // TODO remove filter ?
+    const index = filterList.findIndex((element) => this.isSameFilter(element, filterParam));
+    // should add
+    if (indexType === -1) {
+      this.setState(
+        {
+          currentFilters: filterList.concat(filterParam),
+        },
+        () => {
+          this.currentOffset = 0;
+          this.getInitialData();
+        },
+      );
+    } else {
+      // should replace/remove
+      if (index > -1) {
+        filterList.splice(index, 1);
+        this.setState(
+          {
+            currentFilters: filterList,
+          },
+          () => {
+            this.currentOffset = 0;
+            this.getInitialData();
+          },
+        );
+      } else {
+        filterList.splice(indexType, 1);
+        this.setState(
+          {
+            currentFilters: filterList.concat(filterParam),
+          },
+          () => {
+            this.currentOffset = 0;
+            this.getInitialData();
+          },
+        );
+      }
+    }
   }
 
   /**
@@ -81,7 +153,6 @@ class Catalogue extends Component {
         const metadatas = res.data;
         this.setState({ metadatas });
       });
-    // FIXME : Filtre not working with count_by yet (proposer : { $match: { filter  } }, au début du aggregate?)
     Promise.all(
       this.countByConf.map((count) =>
         axios.get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
@@ -149,10 +220,20 @@ class Catalogue extends Component {
                 <div className="col-12 border rounded tempMargin">
                   <h5>Trier</h5>
                   <div className="btn-group" role="group" aria-label="sort">
-                    <button type="button" className="btn btn-secondary">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={(e) =>
+                        this.addToFilter({ sort_by: `-metadata_info.metadata_dates.updated` })
+                      }
+                    >
                       Modifié
                     </button>
-                    <button type="button" className="btn btn-secondary">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={(e) => this.addToFilter({ sort_by: `resource_title` })}
+                    >
                       A à Z
                     </button>
 
@@ -168,16 +249,32 @@ class Catalogue extends Component {
                         ...
                       </button>
                       <div className="dropdown-menu" aria-labelledby="sortDrop">
-                        <a className="dropdown-item" href="#">
+                        <a
+                          className="dropdown-item"
+                          onClick={(e) => this.addToFilter({ sort_by: `resource_title` })}
+                        >
                           Alphabétique
                         </a>
-                        <a className="dropdown-item" href="#">
+                        <a
+                          className="dropdown-item"
+                          onClick={(e) => this.addToFilter({ sort_by: `-resource_title` })}
+                        >
                           Anti alphabétique
                         </a>
-                        <a className="dropdown-item" href="#">
+                        <a
+                          className="dropdown-item"
+                          onClick={(e) =>
+                            this.addToFilter({ sort_by: `-metadata_info.metadata_dates.updated` })
+                          }
+                        >
                           Récemment modifiés
                         </a>
-                        <a className="dropdown-item" href="#">
+                        <a
+                          className="dropdown-item"
+                          onClick={(e) =>
+                            this.addToFilter({ sort_by: `metadata_info.metadata_dates.updated` })
+                          }
+                        >
                           Anciennement modifiés
                         </a>
                       </div>

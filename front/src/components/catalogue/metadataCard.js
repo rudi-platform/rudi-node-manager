@@ -18,7 +18,6 @@ class MetadataCard extends Component {
       formUrl: props.formUrl,
       metadata: props.metadata,
     };
-    console.log(this.state.metadata);
   }
 
   /**
