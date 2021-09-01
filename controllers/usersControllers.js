@@ -8,7 +8,7 @@ const usersList = (req, res, next) => {
       res.status(200).json(rows);
     })
     .catch((err) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(err);
       res.status(501).json(error);
     });
 };
@@ -20,7 +20,7 @@ exports.getUserByUsername = (req, res, next) => {
       res.status(200).json(row);
     })
     .catch((err) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(err);
       res.status(501).json(error);
     });
 };
@@ -32,7 +32,7 @@ exports.deleteUser = (req, res, next) => {
       res.status(200).json(row);
     })
     .catch((err) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(err);
       res.status(501).json(error);
     });
 };

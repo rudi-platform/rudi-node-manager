@@ -1,0 +1,69 @@
+const databaseManager = require('../database');
+
+const sqlCreateRoleTable =
+  'CREATE TABLE IF NOT EXISTS Roles (role TEXT PRIMARY KEY NOT NULL UNIQUE,desc TEXT);';
+const sqlCreateUserRoleTable =
+  'CREATE TABLE IF NOT EXISTS User_Roles (userId INTEGER, role TEXT, PRIMARY KEY(userId,role),' +
+  'CONSTRAINT Roles_fk_user_Id FOREIGN KEY (userId) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,' +
+  'CONSTRAINT Roles_fk_role FOREIGN KEY (role) REFERENCES Roles(role) ON UPDATE CASCADE ON DELETE CASCADE);';
+const initialRoles = [
+  { role: 'SuperAdmin', desc: 'a tous les droits' },
+  { role: 'Admin', desc: 'administration' },
+  { role: 'Moniteur', desc: 'acces au monitoring' },
+  { role: 'Gestionnaire', desc: 'gestion avancé des metadonnées' },
+  { role: 'Créateur', desc: 'gestion simple des metadonnées' },
+];
+
+exports.initRolesTable = (db) => {
+  db.get(
+    `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
+    ['table', 'Roles'],
+    function (err, row) {
+      if (err) {
+        console.log(err.message);
+        databaseManager.close(db);
+      } else {
+        if (!row) {
+          db.run(sqlCreateRoleTable, (err) => {
+            if (err) {
+              console.error(err.message);
+              databaseManager.close(db);
+            } else {
+              console.log('Table Created : Roles');
+              databaseManager.close(db);
+              databaseManager.createRoles(initialRoles);
+            }
+          });
+        } else {
+          databaseManager.close(db);
+        }
+      }
+    },
+  );
+};
+exports.initUserRolesTable = (db) => {
+  db.get(
+    `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
+    ['table', 'User_Roles'],
+    function (err, row) {
+      if (err) {
+        console.log(err.message);
+        databaseManager.close(db);
+      } else {
+        if (!row) {
+          db.run(sqlCreateUserRoleTable, (err) => {
+            if (err) {
+              console.error(err.message);
+              databaseManager.close(db);
+            } else {
+              console.log('Table Created : User_Roles');
+              databaseManager.close(db);
+            }
+          });
+        } else {
+          databaseManager.close(db);
+        }
+      }
+    },
+  );
+};

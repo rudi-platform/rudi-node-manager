@@ -1,0 +1,66 @@
+const errorHandler = require('./errorHandler');
+const databaseManager = require('../database/database');
+
+const roleList = (req, res, next) => {
+  databaseManager
+    .getRoles()
+    .then((rows) => {
+      res.status(200).json(rows);
+    })
+    .catch((err) => {
+      error = errorHandler.error(err);
+      res.status(501).json(error);
+    });
+};
+exports.getRoleById = (req, res, next) => {
+  const { role } = req.params;
+  databaseManager
+    .getRoleById(role)
+    .then((row) => {
+      res.status(200).json(row);
+    })
+    .catch((err) => {
+      error = errorHandler.error(err);
+      res.status(501).json(error);
+    });
+};
+
+// User_Roles
+exports.getUserRolesByUsername = (req, res, next) => {
+  const { username } = req.params;
+  databaseManager
+    .getUserRolesByUsername(username)
+    .then((rows) => {
+      res.status(200).json(rows);
+    })
+    .catch((err) => {
+      error = errorHandler.error(err);
+      res.status(501).json(error);
+    });
+};
+exports.deleteUserRole = (req, res, next) => {
+  const { userId, role } = req.params;
+  databaseManager
+    .deleteUserRole(userId, role)
+    .then((row) => {
+      res.status(200).json(row);
+    })
+    .catch((err) => {
+      error = errorHandler.error(err);
+      res.status(501).json(error);
+    });
+};
+exports.postUserRole = (req, res, next) => {
+  const data = req.body;
+  databaseManager
+    .createUserRole(data)
+    .then((row) => {
+      res.status(200).json(row);
+    })
+    .catch((err) => {
+      error = errorHandler.error(err);
+      res.status(501).json(error);
+    });
+};
+
+module.exports.roleList = roleList;

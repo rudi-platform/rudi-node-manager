@@ -3,6 +3,7 @@ const router = new express.Router();
 const sysController = require('../controllers/sysController');
 const authControllerPassport = require('./../controllers/authControllerPassport');
 const usersController = require('../controllers/usersControllers');
+const roleController = require('../controllers/roleController');
 const passport = require('../utils/passportSetup');
 
 router.get('/hash', sysController.getHash);
@@ -21,5 +22,15 @@ router.post('/register', authControllerPassport.postRegister);
 router.post('/login', authControllerPassport.postLogin);
 router.post('/forgot-password', authControllerPassport.postForgot);
 router.post('/reset-password', authControllerPassport.postReset);
+
+router.get('/roles', roleController.roleList);
+router.get('/roles/:role', roleController.getRoleById);
+router.get('/user-roles/:username', roleController.getUserRolesByUsername);
+router.delete(
+  '/user-roles/:userId/:role',
+  passport.authenticate('jwt', { session: false }),
+  roleController.deleteUserRole,
+);
+router.post('/user-roles', roleController.postUserRole);
 
 module.exports = router;
