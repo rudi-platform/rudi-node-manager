@@ -44,6 +44,9 @@
 .button-margin {
   margin: 0px 2px;
 }
+.hideWIP {
+  display: none;
+}
 
 .tempMinHeight {
   min-height: 150px;

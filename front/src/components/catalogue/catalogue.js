@@ -275,7 +275,7 @@ class Catalogue extends Component {
                     </div>
                   </div>
                 </div>
-                <div className="col-12 border rounded tempMargin">
+                <div className="col-12 border rounded tempMargin  hideWIP">
                   <h5>Rechercher</h5>
                   <div className="input-group flex-nowrap">
                     <input
