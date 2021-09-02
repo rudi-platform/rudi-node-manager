@@ -328,7 +328,7 @@ class Catalogue extends Component {
           )}
           <div className="col-9">
             <div className="row">
-              {this.props.display && this.props.display.editJDD && (
+              {this.props.display && this.props.display.editJDD && this.state.formUrl && (
                 <EditCard formUrl={this.state.formUrl}></EditCard>
               )}
               <InfiniteScroll
