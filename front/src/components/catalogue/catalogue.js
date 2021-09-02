@@ -21,7 +21,7 @@ class Catalogue extends Component {
     this.state = {
       metadatas: [],
       countBy: [],
-      currentFilters: [],
+      currentFilters: [{ sort_by: `-updatedAt` }],
       formUrl: '',
       hasMore: true,
     };
@@ -223,9 +223,7 @@ class Catalogue extends Component {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      onClick={(e) =>
-                        this.addToFilter({ sort_by: `-metadata_info.metadata_dates.updated` })
-                      }
+                      onClick={(e) => this.addToFilter({ sort_by: `-updatedAt` })}
                     >
                       Modifié
                     </button>
@@ -263,17 +261,13 @@ class Catalogue extends Component {
                         </a>
                         <a
                           className="dropdown-item"
-                          onClick={(e) =>
-                            this.addToFilter({ sort_by: `-metadata_info.metadata_dates.updated` })
-                          }
+                          onClick={(e) => this.addToFilter({ sort_by: `-updatedAt` })}
                         >
                           Récemment modifiés
                         </a>
                         <a
                           className="dropdown-item"
-                          onClick={(e) =>
-                            this.addToFilter({ sort_by: `metadata_info.metadata_dates.updated` })
-                          }
+                          onClick={(e) => this.addToFilter({ sort_by: `updatedAt` })}
                         >
                           Anciennement modifiés
                         </a>
