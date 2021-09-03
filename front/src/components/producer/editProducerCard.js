@@ -14,6 +14,7 @@ class EditProducerCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      formUrl: props.formUrl,
       editID: '',
     };
 
@@ -42,7 +43,7 @@ class EditProducerCard extends Component {
         <div className="card tempMargin">
           <div className="card-body">
             <div>
-              <a className="btn btn-secondary">
+              <a href={this.state.formUrl} className="btn btn-secondary">
                 Ajouter un Producteur <Plus />
               </a>
             </div>
@@ -56,7 +57,10 @@ class EditProducerCard extends Component {
                   value={this.state.editID}
                   onChange={this.handleChange}
                 />
-                <a className="btn btn-warning">
+                <a
+                  href={`${this.state.formUrl}?update=${this.state.editID}`}
+                  className="btn btn-warning"
+                >
                   <Pencil />
                 </a>
                 <button type="button" className="btn btn-danger">

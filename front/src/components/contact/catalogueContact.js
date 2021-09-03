@@ -31,7 +31,7 @@ class CatalogueContact extends Component {
    */
   componentDidMount() {
     axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      const formUrl = res.data;
+      const formUrl = `${res.data}contacts`;
       this.setState({ formUrl });
     });
 
