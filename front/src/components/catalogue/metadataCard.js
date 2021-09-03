@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import Moment from 'react-moment';
 
 /**
  * Composant : metadataCard
@@ -85,6 +86,12 @@ class MetadataCard extends Component {
                 </div>
               )}
             </div>
+            <small className="text-muted">
+              Modifié le :
+              <Moment format=" DD/MM/YYYY HH:mm:ss">
+                {this.state.metadata.metadata_info.metadata_dates.updated}
+              </Moment>
+            </small>
           </h5>
           <div className="card-body">
             <p className="card-text">{this.getLangText(this.state.metadata.summary)}</p>
