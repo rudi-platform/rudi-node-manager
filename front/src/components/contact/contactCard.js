@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 /**
  * Composant : ContactCard
@@ -17,6 +18,21 @@ class ContactCard extends Component {
       formUrl: props.formUrl,
       contact: props.contact,
     };
+  }
+  /**
+   * call for contact deletion
+   * @param {*} contact contact a suppr
+   */
+  deleteContact(contact) {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/admin/contacts/${contact.contact_id}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
   }
 
   /**
@@ -42,7 +58,11 @@ class ContactCard extends Component {
                 >
                   <Pencil />
                 </a>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={(e) => this.deleteContact(this.state.contact)}
+                >
                   <Trash />
                 </button>
               </div>

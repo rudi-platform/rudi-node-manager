@@ -56,4 +56,19 @@ exports.putOrga = (req, res, next) => {
     });
 };
 
+exports.deleteOrga = (req, res, next) => {
+  const { id } = req.params;
+  const serveur = `${config.API_RUDI.admin_api}`;
+  return axios
+    .delete(serveur + '/organizations/' + id, { params: req.query })
+    .then((resRUDI) => {
+      const orga = resRUDI.data;
+      res.status(200).json(orga);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
+};
+
 module.exports.orgaList = orgaList;

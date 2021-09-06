@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 /**
  * Composant : ProducerCard
@@ -23,6 +24,21 @@ class ProducerCard extends Component {
    * trigger a la création du composant :
    */
   componentDidMount() {}
+  /**
+   * call for organization deletion
+   * @param {*} organization organization a suppr
+   */
+  deleteOrganization(organization) {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${organization.organization_id}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
+  }
 
   /**
    * render le composant
@@ -42,7 +58,11 @@ class ProducerCard extends Component {
                 >
                   <Pencil />
                 </a>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={(e) => this.deleteOrganization(this.state.organization)}
+                >
                   <Trash />
                 </button>
               </div>

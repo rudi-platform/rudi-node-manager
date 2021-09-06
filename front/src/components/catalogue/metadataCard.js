@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
+import axios from 'axios';
 
 /**
  * Composant : metadataCard
@@ -33,6 +34,21 @@ class MetadataCard extends Component {
    * trigger a la création du composant :
    */
   componentDidMount() {}
+  /**
+   * call for metadata deletion
+   * @param {*} metadata metadata a suppr
+   */
+  deleteRessource(metadata) {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/admin/ressources/${metadata.global_id}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
+  }
 
   /**
    * affiche le text en fonction de la langue choisi
@@ -80,7 +96,11 @@ class MetadataCard extends Component {
                   >
                     <Pencil />
                   </a>
-                  <button type="button" className="btn btn-danger">
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={(e) => this.deleteRessource(this.state.metadata)}
+                  >
                     <Trash />
                   </button>
                 </div>

@@ -54,5 +54,19 @@ exports.putContact = (req, res, next) => {
       res.status(501).json(error);
     });
 };
+exports.deleteContact = (req, res, next) => {
+  const { id } = req.params;
+  const serveur = `${config.API_RUDI.admin_api}`;
+  return axios
+    .delete(serveur + '/contacts/' + id, { params: req.query })
+    .then((resRUDI) => {
+      const contact = resRUDI.data;
+      res.status(200).json(contact);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
+};
 
 module.exports.contactList = contactList;

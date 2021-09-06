@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 /**
  * Composant : EditProducerCard
@@ -26,6 +27,20 @@ class EditProducerCard extends Component {
    */
   handleChange(event) {
     this.setState({ editID: event.target.value });
+  }
+  /**
+   * call for organization deletion
+   */
+  deleteOrganization() {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${this.state.editID}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
   }
 
   /**
@@ -63,7 +78,11 @@ class EditProducerCard extends Component {
                 >
                   <Pencil />
                 </a>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={(e) => this.deleteOrganization()}
+                >
                   <Trash />
                 </button>
               </div>

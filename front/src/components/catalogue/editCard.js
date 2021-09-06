@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Plus, Pencil, Trash, Check } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 /**
  * Composant : EditCard
@@ -32,6 +33,20 @@ class EditCard extends Component {
    * trigger a la création du composant :
    */
   componentDidMount() {}
+  /**
+   * call for metadata deletion
+   */
+  deleteRessource() {
+    axios
+      .delete(`${process.env.PUBLIC_URL}/api/admin/ressources/${this.state.editID}`)
+      .then((res) => {
+        // TODO
+      })
+      .catch((e) => {
+        console.log(e);
+        // TODO
+      });
+  }
 
   /**
    * render le composant
@@ -66,7 +81,11 @@ class EditCard extends Component {
                 >
                   <Pencil />
                 </a>
-                <button type="button" className="btn btn-danger">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={(e) => this.deleteRessource()}
+                >
                   <Trash />
                 </button>
               </div>
