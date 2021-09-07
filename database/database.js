@@ -37,23 +37,29 @@ exports.getUserByUsername = (username) => {
     });
   });
 };
-exports.getUsers = (options) => {
+exports.getUsers = () => {
   const db = open();
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM Users', function (err, rows) {
-      if (err) {
-        console.log(err.message);
-        reject(err);
-      } else {
-        if (!options || !options.password) {
-          rows.forEach((row) => {
-            delete row.password;
+    db.all(
+      'SELECT Users.id, Users.username, Users.email, GROUP_CONCAT(User_Roles.role) AS roles ' +
+        'FROM Users LEFT JOIN User_Roles ON User_Roles.userId = Users.id ' +
+        'GROUP BY Users.id;',
+      function (err, rows) {
+        if (err) {
+          console.log(err.message);
+          reject(err);
+        } else {
+          const result = rows.map((row) => {
+            if (row.roles) {
+              row.roles = row.roles.split(',');
+            }
+            return row;
           });
+          resolve(result);
         }
-        resolve(rows);
-      }
-      close(db);
-    });
+        close(db);
+      },
+    );
   });
 };
 exports.createUser = (user) => {
