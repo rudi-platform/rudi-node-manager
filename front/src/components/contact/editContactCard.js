@@ -26,7 +26,10 @@ export default function EditContactCard({ formUrl }) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/admin/contacts/${editID}`)
       .then((res) => {
-        // TODO
+        const options = DefaultOkOption;
+        options.text = `Le Contact ${res.data.contact_name} à été supprimé`;
+        changeOptions(options);
+        toggle();
       })
       .catch((e) => {
         console.log(e);

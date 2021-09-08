@@ -29,7 +29,10 @@ export default function MetadataCard({ formUrl, metadata, display }) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/admin/ressources/${metadata.global_id}`)
       .then((res) => {
-        // TODO
+        const options = DefaultOkOption;
+        options.text = `La Metadonnée ${res.data.resource_title} à été supprimée`;
+        changeOptions(options);
+        toggle();
       })
       .catch((e) => {
         console.log(e);

@@ -26,7 +26,10 @@ export default function EditCard({}) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${editID}`)
       .then((res) => {
-        // TODO
+        const options = DefaultOkOption;
+        options.text = `L'Utilisateur' ${res.data.username} à été supprimé`;
+        changeOptions(options);
+        toggle();
       })
       .catch((e) => {
         console.log(e);

@@ -26,7 +26,10 @@ export default function EditProducerCard({ formUrl }) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${editID}`)
       .then((res) => {
-        // TODO
+        const options = DefaultOkOption;
+        options.text = `Le Producteur ${res.data.organization_name} à été supprimé`;
+        changeOptions(options);
+        toggle();
       })
       .catch((e) => {
         console.log(e);

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Pencil, Trash, Check } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 
 /**
  * Composant : EditCard
@@ -28,7 +28,10 @@ export default function EditCard({ formUrl }) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/admin/ressources/${editID}`)
       .then((res) => {
-        // TODO
+        const options = DefaultOkOption;
+        options.text = `La Metadonnée ${res.data.resource_title} à été supprimée`;
+        changeOptions(options);
+        toggle();
       })
       .catch((e) => {
         console.log(e);
