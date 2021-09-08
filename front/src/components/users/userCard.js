@@ -1,34 +1,21 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
 
 /**
  * Composant : UserCard
  * @return {void}
  */
-class UserCard extends Component {
-  /**
-   * Constructeur
-   * @param {*} props props passés par le parent
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: props.user,
-    };
-  }
-
-  /**
-   * trigger a la création du composant :
-   */
-  componentDidMount() {}
+export default function UserCard({ user, display }) {
+  const { changeOptions, toggle } = React.useContext(ModalContext);
 
   /**
    * call for user deletion
-   * @param {*} user connector du fichier
+   * @param {*} user utilisateur
    */
-  deleteUser(user) {
+  function deleteUser(user) {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${user.username}`)
       .then((res) => {
@@ -36,60 +23,58 @@ class UserCard extends Component {
       })
       .catch((e) => {
         console.log(e);
-        // TODO
+        const options = DefaultErrorOption;
+        options.text = `${e.response.data}`;
+        changeOptions(options);
+        toggle();
       });
   }
-
   /**
-   * render le composant
-   * @return {ReactNode} html du composant
+   * call for user update
+   * @param {*} user utilisateur
    */
-  render() {
-    return (
-      <div className="col-12" key={this.state.user.id}>
-        <div className="card tempMargin">
-          <h5 className="card-header">
-            <div className="d-flex justify-content-between align-items-center">
-              {this.state.user.username}
-              <div className="btn-group" role="group">
-                <a className="btn btn-warning">
-                  <Pencil />
-                </a>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={(e) => this.deleteUser(this.state.user)}
-                >
-                  <Trash />
-                </button>
-              </div>
+  function updateUser(user) {
+    console.log(user);
+    // TODO
+  }
+
+  return (
+    <div className="col-12" key={user.id}>
+      <div className="card tempMargin">
+        <h5 className="card-header">
+          <div className="d-flex justify-content-between align-items-center">
+            {user.username}
+            <div className="btn-group" role="group">
+              <button type="button" className="btn btn-warning" onClick={(e) => updateUser(user)}>
+                <Pencil />
+              </button>
+              <button type="button" className="btn btn-danger" onClick={(e) => deleteUser(user)}>
+                <Trash />
+              </button>
             </div>
-          </h5>
-          <div className="card-body">
-            <p className="card-text">
-              email :<small className="text-muted">{this.state.user.email}</small>
-            </p>
-            {this.state.user.roles && (
-              <p className="card-text">
-                roles :
-                {this.state.user.roles.map((role, i) => {
-                  return (
-                    <span key={`${i}`} className="badge badge-success badge-pill">
-                      {role}
-                    </span>
-                  );
-                })}
-              </p>
-            )}
           </div>
+        </h5>
+        <div className="card-body">
+          <p className="card-text">
+            email :<small className="text-muted">{user.email}</small>
+          </p>
+          {user.roles && (
+            <p className="card-text">
+              {user.roles.map((role, i) => {
+                return (
+                  <span key={`${i}`} className="badge badge-success badge-pill">
+                    {role}
+                  </span>
+                );
+              })}
+            </p>
+          )}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 UserCard.propTypes = {
   user: PropTypes.object,
   display: PropTypes.object,
 };
-
-export default UserCard;

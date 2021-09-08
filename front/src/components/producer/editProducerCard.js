@@ -1,100 +1,78 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
 
 /**
  * Composant : EditProducerCard
- * @return {void}
+ * @return {ReactNode}
  */
-class EditProducerCard extends Component {
-  /**
-   * Constructeur
-   * @param {*} props props passés par le parent
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      formUrl: props.formUrl,
-      editID: '',
-    };
+export default function EditProducerCard({ formUrl }) {
+  const [editID, setEditID] = useState('');
 
-    this.handleChange = this.handleChange.bind(this);
-  }
+  const { changeOptions, toggle } = React.useContext(ModalContext);
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
    */
-  handleChange(event) {
-    this.setState({ editID: event.target.value });
-  }
+  const handleChange = (event) => {
+    setEditID(event.target.value);
+  };
   /**
    * call for organization deletion
    */
-  deleteOrganization() {
+  function deleteOrganization() {
     axios
-      .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${this.state.editID}`)
+      .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${editID}`)
       .then((res) => {
         // TODO
       })
       .catch((e) => {
         console.log(e);
-        // TODO
+        const options = DefaultErrorOption;
+        options.text = `${e.response.data}`;
+        changeOptions(options);
+        toggle();
       });
   }
 
-  /**
-   * trigger a la création du composant :
-   */
-  componentDidMount() {}
-
-  /**
-   * render le composant
-   * @return {ReactNode} html du composant
-   */
-  render() {
-    return (
-      <div className="col-12">
-        <div className="card tempMargin">
-          <div className="card-body">
-            <div>
-              <a href={this.state.formUrl} className="btn btn-secondary">
-                Ajouter un Producteur <Plus />
+  return (
+    <div className="col-12">
+      <div className="card tempMargin">
+        <div className="card-body">
+          <div>
+            <a href={formUrl} className="btn btn-secondary">
+              Ajouter un Producteur <Plus />
+            </a>
+          </div>
+          <div className="card-text">
+            Modifier un Producteur :
+            <div className="btn-group" role="group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="id du producteur"
+                value={editID}
+                onChange={handleChange}
+              />
+              <a href={`${formUrl}?update=${editID}`} className="btn btn-warning">
+                <Pencil />
               </a>
-            </div>
-            <div className="card-text">
-              Modifier un Producteur :
-              <div className="btn-group" role="group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="id du producteur"
-                  value={this.state.editID}
-                  onChange={this.handleChange}
-                />
-                <a
-                  href={`${this.state.formUrl}?update=${this.state.editID}`}
-                  className="btn btn-warning"
-                >
-                  <Pencil />
-                </a>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={(e) => this.deleteOrganization()}
-                >
-                  <Trash />
-                </button>
-              </div>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={(e) => deleteOrganization()}
+              >
+                <Trash />
+              </button>
             </div>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 EditProducerCard.propTypes = {
   formUrl: PropTypes.string,
 };
-
-export default EditProducerCard;

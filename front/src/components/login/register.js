@@ -55,7 +55,7 @@ export default function Register({ backToLogin }) {
       .then((res) => {
         changeOptions({
           text: `l'utilisateur ${res.data.username} a bien été créé.`,
-          title: 'Action Validé',
+          title: 'Action Validée',
           type: 'success',
           buttons: [
             {
