@@ -29,6 +29,7 @@ back_test:
     - nodejs
   script:
     - 'npm run testCI'
+  allow_failure: true
   artifacts:
     when: always
     reports:

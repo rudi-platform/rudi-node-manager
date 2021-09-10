@@ -139,7 +139,6 @@ function getKeyInfo() {
     };
     return keyInfos;
   } catch (err) {
-    log.w(mod, fun, err);
     throw err;
   }
 }
