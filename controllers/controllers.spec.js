@@ -1,6 +1,6 @@
 const { expect } = require('@jest/globals');
 const axios = require('axios');
-const {createRudiToken} = require('../utils/utils')
+const { createRudiToken } = require('../utils/utils');
 const controllers = require('./controllers');
 const { Response } = require('jest-express/lib/response');
 

@@ -10,11 +10,7 @@ router.get('/enum', adminController.getEnum);
 router.get('/licences', adminController.getLicences);
 
 // TODO : propage res.status
-router.get(
-  '/resources',
-  passport.authenticate('jwt', { session: false }),
-  controllers.resourcesList,
-);
+router.get('/resources', controllers.resourcesList);
 router.post(
   '/resources',
   passport.authenticate('jwt', { session: false }),
@@ -32,11 +28,7 @@ router.delete(
   controllers.deleteResource,
 );
 
-router.get(
-  '/organizations',
-  passport.authenticate('jwt', { session: false }),
-  orgaController.orgaList,
-);
+router.get('/organizations', orgaController.orgaList);
 router.post(
   '/organizations',
   passport.authenticate('jwt', { session: false }),
@@ -54,11 +46,7 @@ router.delete(
   orgaController.deleteOrga,
 );
 
-router.get(
-  '/contacts',
-  passport.authenticate('jwt', { session: false }),
-  contactController.contactList,
-);
+router.get('/contacts', contactController.contactList);
 router.post(
   '/contacts',
   passport.authenticate('jwt', { session: false }),
