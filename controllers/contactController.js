@@ -1,11 +1,19 @@
 const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
+const utils = require('../utils/utils');
+
+const serveur = `${config.API_RUDI.listening_address}`;
+const api = `${config.API_RUDI.admin_api}`;
 
 const contactList = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/contacts`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveur + '/contacts', { params: req.query })
+    .get(`${serveur}${url}`, { params: req.query, headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const contacts = resRUDI.data;
       res.status(200).json(contacts);
@@ -17,9 +25,13 @@ const contactList = (req, res, next) => {
 };
 exports.getContactById = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/contacts/${id}`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveur + '/contacts/' + id, { params: req.query })
+    .get(`${serveur}${url}`, { params: req.query, headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const contact = resRUDI.data;
       res.status(200).json(contact);
@@ -31,9 +43,15 @@ exports.getContactById = (req, res, next) => {
 };
 
 exports.postContact = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/contacts`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .post(serveur + '/contacts', req.body, { headers: { 'Content-Type': 'application/json' } })
+    .post(`${serveur}${url}`, req.body, {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    })
     .then((resRUDI) => {
       res.status(200).json(resRUDI.data);
     })
@@ -43,9 +61,15 @@ exports.postContact = (req, res, next) => {
     });
 };
 exports.putContact = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/contacts`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .put(serveur + '/contacts', req.body, { headers: { 'Content-Type': 'application/json' } })
+    .put(`${serveur}${url}`, req.body, {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    })
     .then((resRUDI) => {
       res.status(200).json(resRUDI.data);
     })
@@ -56,9 +80,16 @@ exports.putContact = (req, res, next) => {
 };
 exports.deleteContact = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/contacts/${id}`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .delete(serveur + '/contacts/' + id, { params: req.query })
+    .delete(`${serveur}${url}`, {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
     .then((resRUDI) => {
       const contact = resRUDI.data;
       res.status(200).json(contact);

@@ -10,9 +10,21 @@ router.get('/enum', adminController.getEnum);
 router.get('/licences', adminController.getLicences);
 
 // TODO : propage res.status
-router.get('/resources', controllers.resourcesList);
-router.post('/resources', controllers.postResources);
-router.put('/resources', controllers.putResources);
+router.get(
+  '/resources',
+  passport.authenticate('jwt', { session: false }),
+  controllers.resourcesList,
+);
+router.post(
+  '/resources',
+  passport.authenticate('jwt', { session: false }),
+  controllers.postResources,
+);
+router.put(
+  '/resources',
+  passport.authenticate('jwt', { session: false }),
+  controllers.putResources,
+);
 router.get('/resources/:id', controllers.getResourceById);
 router.delete(
   '/resources/:id',
@@ -20,9 +32,21 @@ router.delete(
   controllers.deleteResource,
 );
 
-router.get('/organizations', orgaController.orgaList);
-router.post('/organizations', orgaController.postOrga);
-router.put('/organizations', orgaController.putOrga);
+router.get(
+  '/organizations',
+  passport.authenticate('jwt', { session: false }),
+  orgaController.orgaList,
+);
+router.post(
+  '/organizations',
+  passport.authenticate('jwt', { session: false }),
+  orgaController.postOrga,
+);
+router.put(
+  '/organizations',
+  passport.authenticate('jwt', { session: false }),
+  orgaController.putOrga,
+);
 router.get('/organizations/:id', orgaController.getOrgaById);
 router.delete(
   '/organizations/:id',
@@ -30,9 +54,21 @@ router.delete(
   orgaController.deleteOrga,
 );
 
-router.get('/contacts', contactController.contactList);
-router.post('/contacts', contactController.postContact);
-router.put('/contacts', contactController.putContact);
+router.get(
+  '/contacts',
+  passport.authenticate('jwt', { session: false }),
+  contactController.contactList,
+);
+router.post(
+  '/contacts',
+  passport.authenticate('jwt', { session: false }),
+  contactController.postContact,
+);
+router.put(
+  '/contacts',
+  passport.authenticate('jwt', { session: false }),
+  contactController.putContact,
+);
 router.get('/contacts/:id', contactController.getContactById);
 router.delete(
   '/contacts/:id',

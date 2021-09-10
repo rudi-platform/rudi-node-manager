@@ -1,12 +1,21 @@
 const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
+const utils = require('../utils/utils');
+
+const serveur = `${config.API_RUDI.listening_address}`;
+const api = `${config.API_RUDI.admin_api}`;
 
 const resourcesList = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/resources`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveur + '/resources', {
+    .get(`${serveur}${url}`, {
       params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRUDI) => {
       const metadatas = resRUDI.data;
@@ -19,10 +28,15 @@ const resourcesList = (req, res, next) => {
 };
 exports.getResourceById = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/resources/${id}`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveur + '/resources/' + id, {
+    .get(`${serveur}${url}`, {
       params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRUDI) => {
       const metadata = resRUDI.data;
@@ -34,11 +48,16 @@ exports.getResourceById = (req, res, next) => {
     });
 };
 exports.postResources = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/resources`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .post(serveur + '/resources', req.body, {
+    .post(`${serveur}${url}`, req.body, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((resRUDI) => {
@@ -50,11 +69,16 @@ exports.postResources = (req, res, next) => {
     });
 };
 exports.putResources = (req, res, next) => {
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/resources`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .put(serveur + '/resources', req.body, {
+    .put(`${serveur}${url}`, req.body, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
     })
     .then((resRUDI) => {
@@ -68,9 +92,16 @@ exports.putResources = (req, res, next) => {
 
 exports.deleteResource = (req, res, next) => {
   const { id } = req.params;
-  const serveur = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/resources/${id}`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .delete(serveur + '/resources/' + id, { params: req.query })
+    .delete(`${serveur}${url}`, {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
     .then((resRUDI) => {
       const metadata = resRUDI.data;
       res.status(200).json(metadata);

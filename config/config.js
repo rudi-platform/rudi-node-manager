@@ -36,6 +36,12 @@ if (customExist) {
   if (customConfig.API_RUDI && customConfig.API_RUDI.media_api) {
     config.API_RUDI.media_api = customConfig.API_RUDI.media_api;
   }
+  if (customConfig.API_RUDI && customConfig.API_RUDI.RUDI_key) {
+    config.API_RUDI.RUDI_key = customConfig.API_RUDI.RUDI_key;
+  }
+  if (customConfig.API_RUDI && customConfig.API_RUDI.manager_id) {
+    config.API_RUDI.manager_id = customConfig.API_RUDI.manager_id;
+  }
 
   // formulaire
   if (customConfig.formulaire && customConfig.formulaire.base_url) {
