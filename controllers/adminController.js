@@ -1,11 +1,19 @@
 const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
+const utils = require('../utils/utils');
+
+const serveur = `${config.API_RUDI.listening_address}`;
+const api = `${config.API_RUDI.admin_api}`;
 
 exports.getEnum = (req, res, next) => {
-  const serveurAdmin = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/enum`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveurAdmin + '/enum')
+    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
@@ -16,9 +24,13 @@ exports.getEnum = (req, res, next) => {
     });
 };
 exports.getLicences = (req, res, next) => {
-  const serveurAdmin = `${config.API_RUDI.admin_api}`;
+  const url = `${api}/licences`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
   return axios
-    .get(serveurAdmin + '/licences')
+    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
