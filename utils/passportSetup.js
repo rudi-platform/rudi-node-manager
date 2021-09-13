@@ -49,6 +49,7 @@ const cookieExtractor = function (req) {
   if (req && req.cookies) {
     token = req.cookies['authToken'];
   }
+  console.log('token : ', token)
   return token;
 };
 
