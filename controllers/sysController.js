@@ -2,7 +2,13 @@ const config = require('../config/config');
 
 exports.getHash = (req, res, next) => {
   try {
-    const hashId = require('child_process').execSync('git rev-parse --short HEAD');
+    let hashId;
+    try {
+      hashId = require('child_process').execSync('git rev-parse --short HEAD');
+    } catch (err) {
+      hashId = config.logging.revision;
+    }
+
     res.status(200).send(`${hashId}`.trim());
   } catch (err) {
     console.log(err);

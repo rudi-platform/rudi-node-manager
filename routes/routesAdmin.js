@@ -11,14 +11,8 @@ router.get('/licences', adminController.getLicences);
 
 // TODO : propage res.status
 router.get('/resources', controllers.resourcesList);
-router.post(
-  '/resources',
-  controllers.postResources,
-);
-router.put(
-  '/resources',
-  controllers.putResources,
-);
+router.post('/resources', controllers.postResources);
+router.put('/resources', controllers.putResources);
 router.get('/resources/:id', controllers.getResourceById);
 router.delete(
   '/resources/:id',
@@ -27,14 +21,8 @@ router.delete(
 );
 
 router.get('/organizations', orgaController.orgaList);
-router.post(
-  '/organizations',
-  orgaController.postOrga,
-);
-router.put(
-  '/organizations',
-  orgaController.putOrga,
-);
+router.post('/organizations', orgaController.postOrga);
+router.put('/organizations', orgaController.putOrga);
 router.get('/organizations/:id', orgaController.getOrgaById);
 router.delete(
   '/organizations/:id',
@@ -43,14 +31,8 @@ router.delete(
 );
 
 router.get('/contacts', contactController.contactList);
-router.post(
-  '/contacts',
-  contactController.postContact,
-);
-router.put(
-  '/contacts',
-  contactController.putContact,
-);
+router.post('/contacts', contactController.postContact);
+router.put('/contacts', contactController.putContact);
 router.get('/contacts/:id', contactController.getContactById);
 router.delete(
   '/contacts/:id',
