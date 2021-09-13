@@ -32,7 +32,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "sqlite3": "^4.2.0",
+    "sqlite3": "^5.0.2",
     "sshpk": "^1.16.1"
   },
   "devDependencies": {
