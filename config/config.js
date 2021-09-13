@@ -52,10 +52,8 @@ if (customExist) {
   if (customConfig.database && customConfig.database.db_directory) {
     config.database.db_directory = customConfig.database.db_directory;
   }
+  
   // Systeme
-  if (customConfig.logging && customConfig.logging.revision) {
-    config.logging.revision = customConfig.logging.revision;
-  }
 }
 
 module.exports = config;

@@ -8,8 +8,9 @@
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
     "startProd": "Set NODE_ENV=production&node server",
-    "server": "nodemon server.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run server\"",
+    "serverWindow": "nodemon server.js --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
+    "serverLinux": "nodemon server.js --exec \"export RUDI_PROD_MANAGER_GIT_REV=\"$(git rev-parse --short HEAD)\"; node \"",
+    "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
     "front:build": "cd front && npm run build",
     "lint": "eslint \"**/*.js\"",
     "prettier": "npx prettier --write ."
