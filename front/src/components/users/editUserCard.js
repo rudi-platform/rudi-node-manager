@@ -41,7 +41,7 @@ export default function EditCard({}) {
   }
 
   return (
-    <div className="col-12">
+    <div className="col-12 hideWIP">
       <div className="card tempMargin">
         <div className="card-body">
           <div>
