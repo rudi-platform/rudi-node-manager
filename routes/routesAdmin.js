@@ -13,12 +13,10 @@ router.get('/licences', adminController.getLicences);
 router.get('/resources', controllers.resourcesList);
 router.post(
   '/resources',
-  passport.authenticate('jwt', { session: false }),
   controllers.postResources,
 );
 router.put(
   '/resources',
-  passport.authenticate('jwt', { session: false }),
   controllers.putResources,
 );
 router.get('/resources/:id', controllers.getResourceById);
@@ -31,12 +29,10 @@ router.delete(
 router.get('/organizations', orgaController.orgaList);
 router.post(
   '/organizations',
-  passport.authenticate('jwt', { session: false }),
   orgaController.postOrga,
 );
 router.put(
   '/organizations',
-  passport.authenticate('jwt', { session: false }),
   orgaController.putOrga,
 );
 router.get('/organizations/:id', orgaController.getOrgaById);
@@ -49,12 +45,10 @@ router.delete(
 router.get('/contacts', contactController.contactList);
 router.post(
   '/contacts',
-  passport.authenticate('jwt', { session: false }),
   contactController.postContact,
 );
 router.put(
   '/contacts',
-  passport.authenticate('jwt', { session: false }),
   contactController.putContact,
 );
 router.get('/contacts/:id', contactController.getContactById);
