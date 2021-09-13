@@ -4,7 +4,7 @@ import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 
 /**
  * Composant : metadataCard
@@ -37,7 +37,7 @@ export default function MetadataCard({ formUrl, metadata, display }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${metadata.global_id}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `La Metadonnée ${res.data.resource_title} à été supprimée`;
+        options.text = `La Metadonnée ${res.data.resource_title} a été supprimée`;
         changeOptions(options);
         toggle();
       })

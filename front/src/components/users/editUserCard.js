@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 
 /**
  * Composant : EditCard
@@ -20,14 +20,13 @@ export default function EditCard({}) {
   };
   /**
    * call for user deletion
-   * @param {*} user utilisateur
    */
   function deleteUser() {
     axios
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `L'Utilisateur' ${res.data.username} à été supprimé`;
+        options.text = `L'Utilisateur' ${res.data.username} a été supprimé`;
         changeOptions(options);
         toggle();
       })

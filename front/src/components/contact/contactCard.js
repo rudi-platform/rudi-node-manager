@@ -2,7 +2,7 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 
 /**
  * Composant : ContactCard
@@ -19,7 +19,7 @@ export default function ContactCard({ contact, formUrl }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/contacts/${contact.contact_id}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `Le Contact ${res.data.contact_name} à été supprimé`;
+        options.text = `Le Contact ${res.data.contact_name} a été supprimé`;
         changeOptions(options);
         toggle();
       })

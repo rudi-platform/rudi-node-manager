@@ -2,7 +2,7 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 
 /**
  * Composant : ProducerCard
@@ -20,7 +20,7 @@ export default function ProducerCard({ formUrl, organization }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${organization.organization_id}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `Le Producteur ${res.data.organization_name} à été supprimé`;
+        options.text = `Le Producteur ${res.data.organization_name} a été supprimé`;
         changeOptions(options);
         toggle();
       })

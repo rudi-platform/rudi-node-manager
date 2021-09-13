@@ -29,7 +29,7 @@ export default function EditCard({ formUrl }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `La Metadonnée ${res.data.resource_title} à été supprimée`;
+        options.text = `La Metadonnée ${res.data.resource_title} a été supprimée`;
         changeOptions(options);
         toggle();
       })

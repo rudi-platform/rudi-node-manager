@@ -2,7 +2,8 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
+import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
 
 /**
  * Composant : UserCard
@@ -10,6 +11,9 @@ import { ModalContext, DefaultErrorOption } from '../modals/ModalContext';
  */
 export default function UserCard({ user, display }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
+
+  const { toggleEdit, visible } = useEditRoleModal();
+  const { options, changeOptionsEdit } = useEditRoleModalOptions();
 
   /**
    * call for user deletion
@@ -20,7 +24,7 @@ export default function UserCard({ user, display }) {
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${user.username}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `L'Utilisateur' ${res.data.username} à été supprimé`;
+        options.text = `L'Utilisateur' ${res.data.username} a été supprimé`;
         changeOptions(options);
         toggle();
       })
@@ -37,8 +41,19 @@ export default function UserCard({ user, display }) {
    * @param {*} user utilisateur
    */
   function updateUser(user) {
-    console.log(user);
-    // TODO
+    axios
+      .get(`${process.env.PUBLIC_URL}/api/v1/roles`)
+      .then((res) => {
+        changeOptionsEdit({ user, roles: res.data });
+        toggleEdit();
+      })
+      .catch((e) => {
+        console.log(e);
+        const options = DefaultErrorOption;
+        options.text = `${e.response.data}`;
+        changeOptions(options);
+        toggle();
+      });
   }
 
   return (
@@ -55,6 +70,11 @@ export default function UserCard({ user, display }) {
                 <Trash />
               </button>
             </div>
+            <EditRoleModal
+              visible={visible}
+              toggleEdit={toggleEdit}
+              options={options}
+            ></EditRoleModal>
           </div>
         </h5>
         <div className="card-body">
