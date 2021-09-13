@@ -27,7 +27,7 @@ export default function MetadataCard({ formUrl, metadata, display }) {
    */
   function deleteRessource(metadata) {
     axios
-      .delete(`${process.env.PUBLIC_URL}/api/admin/ressources/${metadata.global_id}`)
+      .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${metadata.global_id}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `La Metadonnée ${res.data.resource_title} à été supprimée`;
