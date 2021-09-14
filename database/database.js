@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const config = require('../config/config');
 
 const open = function () {
-  return new sqlite3.Database(
+  const db = new sqlite3.Database(
     `${config.database.db_directory}/rudy_manager.db`,
     sqlite3.OPEN_READWRITE,
     (err) => {
@@ -14,6 +14,7 @@ const open = function () {
       }
     },
   );
+  return db.exec("PRAGMA foreign_keys = ON");
 };
 const close = function (db) {
   db.close((err) => {
