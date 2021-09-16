@@ -42,6 +42,8 @@ export default function ProducerCard({ formUrl, organization }) {
             <div className="btn-group" role="group">
               <a
                 href={`${formUrl}?update=${organization.organization_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-warning"
               >
                 <Pencil />

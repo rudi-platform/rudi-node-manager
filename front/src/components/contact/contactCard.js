@@ -39,7 +39,12 @@ export default function ContactCard({ contact, formUrl }) {
           <div className="d-flex justify-content-between align-items-center">
             <a>{contact.contact_name}</a>
             <div className="btn-group" role="group">
-              <a href={`${formUrl}?update=${contact.contact_id}`} className="btn btn-warning">
+              <a
+                href={`${formUrl}?update=${contact.contact_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-warning"
+              >
                 <Pencil />
               </a>
               <button

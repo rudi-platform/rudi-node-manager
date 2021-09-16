@@ -45,7 +45,12 @@ export default function EditProducerCard({ formUrl }) {
       <div className="card tempMargin">
         <div className="card-body">
           <div>
-            <a href={formUrl} className="btn btn-secondary">
+            <a
+              href={formUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+            >
               Ajouter un Producteur <Plus />
             </a>
           </div>
@@ -59,7 +64,12 @@ export default function EditProducerCard({ formUrl }) {
                 value={editID}
                 onChange={handleChange}
               />
-              <a href={`${formUrl}?update=${editID}`} className="btn btn-warning">
+              <a
+                href={`${formUrl}?update=${editID}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-warning"
+              >
                 <Pencil />
               </a>
               <button

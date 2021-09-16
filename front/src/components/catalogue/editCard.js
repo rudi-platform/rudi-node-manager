@@ -47,7 +47,12 @@ export default function EditCard({ formUrl }) {
       <div className="card tempMargin">
         <div className="card-body">
           <div>
-            <a href={formUrl} className="btn btn-secondary">
+            <a
+              href={formUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary"
+            >
               Ajouter un Jeu de Donnée <Plus />
             </a>
           </div>

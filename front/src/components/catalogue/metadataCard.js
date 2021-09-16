@@ -59,7 +59,13 @@ export default function MetadataCard({ formUrl, metadata, display }) {
       <div className="card tempMargin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
-            <a href={`${formUrl}?read-only=${metadata.global_id}`}>{metadata.resource_title}</a>
+            <a
+              href={`${formUrl}?read-only=${metadata.global_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {metadata.resource_title}
+            </a>
             {!metadata.metadata_info.metadata_dates.published &&
               !metadata.metadata_info.metadata_dates.deleted && (
                 <span className="badge badge-warning badge-pill">waiting</span>
@@ -76,7 +82,12 @@ export default function MetadataCard({ formUrl, metadata, display }) {
                 <button type="button" className="btn btn-success">
                   <Check />
                 </button>
-                <a className="btn btn-warning" href={`${formUrl}?update=${metadata.global_id}`}>
+                <a
+                  className="btn btn-warning"
+                  href={`${formUrl}?update=${metadata.global_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Pencil />
                 </a>
                 <button
