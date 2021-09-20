@@ -14,7 +14,7 @@ const open = function () {
       }
     },
   );
-  return db.exec("PRAGMA foreign_keys = ON");
+  return db.exec('PRAGMA foreign_keys = ON');
 };
 const close = function (db) {
   db.close((err) => {

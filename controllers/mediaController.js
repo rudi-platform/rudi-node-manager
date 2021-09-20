@@ -17,6 +17,7 @@ exports.getMediaById = (req, res, next) => {
     });
 };
 
+// Deprecated ? now use direct access
 exports.getDownloadById = (req, res, next) => {
   const { id } = req.params;
   const serveurMedia = `${config.API_RUDI.media_api}`;
