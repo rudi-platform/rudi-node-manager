@@ -20,6 +20,11 @@ router.delete(
 
 router.post('/register', authControllerPassport.postRegister);
 router.post('/login', authControllerPassport.postLogin);
+router.get(
+  '/token',
+  passport.authenticate('jwt', { session: false }),
+  authControllerPassport.getToken,
+);
 router.post('/forgot-password', authControllerPassport.postForgot);
 router.post('/reset-password', authControllerPassport.postReset);
 

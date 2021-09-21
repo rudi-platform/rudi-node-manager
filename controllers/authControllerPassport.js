@@ -101,4 +101,20 @@ exports.postReset = (req, res, next) => {
     throw err;
   }
 };
+
+exports.getToken = (req, res, next) => {
+  const { token, exp } = utils.createToken(req.user);
+  res
+    .status(200)
+    .cookie('authToken', token, {
+      secure: !!process.env.NODE_ENV,
+      httpOnly: true,
+      expires: new Date(exp * 1000),
+    })
+    .json({
+      token: token,
+      expires: new Date(exp * 1000),
+    });
+};
+
 exports.registerUser = registerUser;
