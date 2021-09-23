@@ -4,6 +4,7 @@ const sysController = require('../controllers/sysController');
 const authControllerPassport = require('./../controllers/authControllerPassport');
 const usersController = require('../controllers/usersControllers');
 const roleController = require('../controllers/roleController');
+const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
 
 router.get('/hash', sysController.getHash);
@@ -37,5 +38,21 @@ router.delete(
   roleController.deleteUserRole,
 );
 router.post('/user-roles', roleController.postUserRole);
+
+router.get(
+  '/default-form',
+  passport.authenticate('jwt', { session: false }),
+  adminController.getDefaultForm,
+);
+router.delete(
+  '/default-form',
+  passport.authenticate('jwt', { session: false }),
+  adminController.deleteDefaultForm,
+);
+router.put(
+  '/default-form',
+  passport.authenticate('jwt', { session: false }),
+  adminController.putDefaultForm,
+);
 
 module.exports = router;

@@ -14,7 +14,8 @@ const initialRoles = [
   { role: 'Créateur', desc: 'gestion simple des metadonnées' },
 ];
 
-exports.initRolesTable = (db) => {
+exports.initRolesTable = () => {
+  const db = databaseManager.open();
   db.get(
     `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
     ['table', 'Roles'],
@@ -41,7 +42,8 @@ exports.initRolesTable = (db) => {
     },
   );
 };
-exports.initUserRolesTable = (db) => {
+exports.initUserRolesTable = () => {
+  const db = databaseManager.open();
   db.get(
     `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
     ['table', 'User_Roles'],

@@ -190,7 +190,7 @@ exports.getUserRolesByUsername = (username) => {
           });
         });
       } else {
-        return Promise.reject(new Error(`User ${username} already exist!`));
+        return Promise.reject(new Error(`User ${username} not found!`));
       }
     })
     .catch((err) => {
@@ -236,6 +236,83 @@ const createUserRole = (userRole) => {
   });
 };
 exports.createUserRole = createUserRole;
+
+// Default Form
+exports.getDefaultForm = (user) => {
+  if (user) {
+    const db = open();
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM Default_Form WHERE userId = ?`, [user.id], function (err, row) {
+        if (err) {
+          console.log(err.message);
+          reject(err);
+        } else {
+          resolve(JSON.parse(row.defaultValue));
+        }
+        close(db);
+      });
+    });
+  } else {
+    return Promise.reject(new Error(`Default value for ${user.username} not found!`));
+  }
+};
+exports.deleteDefaultForm = (user) => {
+  const db = open();
+  return new Promise((resolve, reject) => {
+    db.run(`DELETE FROM Default_Form WHERE userId = ?`, [user.id], function (err) {
+      if (err) {
+        console.log(err.message);
+        reject(err);
+      } else {
+        console.log(`Default_Form : A row has been deleted with userId ${user.id}`);
+        resolve({});
+      }
+      close(db);
+    });
+  });
+};
+
+exports.updateDefaultForm = (user, data) => {
+  return this.getDefaultForm(user).then((defaultValue) => {
+    const db = open();
+    if (!defaultValue) {
+      return new Promise((resolve, reject) => {
+        db.run(
+          `INSERT INTO Default_Form(userId,defaultValue) VALUES(?,?)`,
+          [user.id, JSON.stringify(data)],
+          function (err) {
+            if (err) {
+              console.log(err.message);
+              reject(err);
+            } else {
+              console.log(`Default_Form : A row has been inserted with userId ${user.id}`);
+              resolve(data);
+            }
+            close(db);
+          },
+        );
+      });
+    } else {
+      // edit
+      return new Promise((resolve, reject) => {
+        db.run(
+          `UPDATE Default_Form SET defaultValue = ? WHERE userId = ?`,
+          [JSON.stringify(data), user.id],
+          function (err) {
+            if (err) {
+              console.log(err.message);
+              reject(err);
+            } else {
+              console.log(`Default_Form : A row has been edited with userId ${user.id}`);
+              resolve(data);
+            }
+            close(db);
+          },
+        );
+      });
+    }
+  });
+};
 
 // OTHER
 exports.open = open;
