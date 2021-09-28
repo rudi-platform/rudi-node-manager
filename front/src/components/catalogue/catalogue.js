@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import MetadataCard from './metadataCard';
@@ -11,33 +10,56 @@ import { filterConf } from './conf';
  * Composant : Catalogue
  * @return {void}
  */
-class Catalogue extends Component {
-  /**
-   * Constructeur
-   * @param {*} props props passés par le parent
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      metadatas: [],
-      countBy: [],
-      currentFilters: [{ sort_by: `-updatedAt` }],
-      formUrl: '',
-      hasMore: true,
-    };
-    this.currentOffset = 0;
-    this.PAGE_SIZE = 10;
+export default function Catalogue({ display, specialSearch, editMode }) {
+  const [metadatas, setMetadatas] = useState([]);
+  const [countBy, setCountBy] = useState([]);
+  const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }]);
+  const [formUrl, setFormUrl] = useState('');
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 20;
+  const [currentOffset, setCurrentOffset] = useState(-1);
 
-    this.countByConf = filterConf;
-  }
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
+      setFormUrl(`${res.data}`);
+    });
+  }, []);
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+    } else {
+      if (currentOffset < 0) {
+        setCurrentOffset(0);
+      } else {
+        fetchMoreData();
+      }
+    }
+  }, [currentOffset]);
+  useEffect(() => {
+    refresh();
+  }, [currentFilters]);
+
+  const refresh = () => {
+    setHasMore(true);
+    setMetadatas([]);
+    getInitialData();
+
+    if (currentOffset === 0) {
+      setCurrentOffset(-1);
+    } else {
+      setCurrentOffset(0);
+    }
+  };
 
   /**
    * crée l'object params pour la requete
    * @param {*} baseParams base des params
    * @return {*} params enrichis pour la requete
    */
-  createParams(baseParams) {
-    this.state.currentFilters.forEach((filter) => Object.assign(baseParams, filter));
+  function createParams(baseParams) {
+    currentFilters.forEach((filter) => Object.assign(baseParams, filter));
     return baseParams;
   }
 
@@ -47,7 +69,7 @@ class Catalogue extends Component {
    * @param {*} b filtre 2
    * @return {boolean} true si les 2 filtre sont du même type
    */
-  isSameFilterType(a, b) {
+  function isSameFilterType(a, b) {
     // Create arrays of property names
     const aProps = Object.getOwnPropertyNames(a);
     const bProps = Object.getOwnPropertyNames(b);
@@ -66,7 +88,7 @@ class Catalogue extends Component {
    * @param {*} b filtre 2
    * @return {boolean} true si les 2 filtre sont identique
    */
-  isSameFilter(a, b) {
+  function isSameFilter(a, b) {
     // Create arrays of property names
     const aProps = Object.getOwnPropertyNames(a);
     const bProps = Object.getOwnPropertyNames(b);
@@ -84,111 +106,61 @@ class Catalogue extends Component {
    * ajoute un filter pour la requete
    * @param {*} filterParam element a rajouter
    */
-  addToFilter(filterParam) {
-    const filterList = this.state.currentFilters;
-    const indexType = filterList.findIndex((element) =>
-      this.isSameFilterType(element, filterParam),
-    );
-    const index = filterList.findIndex((element) => this.isSameFilter(element, filterParam));
+  function addToFilter(filterParam) {
+    const filterList = currentFilters.slice();
+    const indexType = filterList.findIndex((element) => isSameFilterType(element, filterParam));
+    const index = filterList.findIndex((element) => isSameFilter(element, filterParam));
     // should add
     if (indexType === -1) {
-      this.setState(
-        {
-          currentFilters: filterList.concat(filterParam),
-        },
-        () => {
-          this.currentOffset = 0;
-          this.getInitialData();
-        },
-      );
+      setCurrentFilters(filterList.concat(filterParam));
     } else {
       // should replace/remove
       if (index > -1) {
         filterList.splice(index, 1);
-        this.setState(
-          {
-            currentFilters: filterList,
-          },
-          () => {
-            this.currentOffset = 0;
-            this.getInitialData();
-          },
-        );
+        setCurrentFilters(filterList);
       } else {
         filterList.splice(indexType, 1);
-        this.setState(
-          {
-            currentFilters: filterList.concat(filterParam),
-          },
-          () => {
-            this.currentOffset = 0;
-            this.getInitialData();
-          },
-        );
+        setCurrentFilters(filterList.concat(filterParam));
       }
     }
   }
 
   /**
-   * trigger a la création du composant : get la 1er page du catalogue
-   */
-  componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      const formUrl = res.data;
-      this.setState({ formUrl });
-    });
-
-    this.getInitialData();
-  }
-
-  /**
    * recup la 1er page des metadonnées et les countBy
    */
-  getInitialData() {
-    axios
-      .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
-        params: this.createParams({ limit: this.PAGE_SIZE, offset: this.currentOffset }),
-      })
-      .then((res) => {
-        const metadatas = res.data;
-        this.setState({ metadatas });
-      });
+  function getInitialData() {
     Promise.all(
-      this.countByConf.map((count) =>
+      filterConf.map((count) =>
         axios.get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
-          params: this.createParams({ count_by: count.name }),
+          params: createParams({ count_by: count.name }),
         }),
       ),
     ).then((values) => {
-      const countBy = this.countByConf.map((count, i) => {
+      const countByTemp = filterConf.map((count, i) => {
         count.values = values[i].data;
         return count;
       });
-      this.setState({ countBy });
+      setCountBy(countByTemp);
     });
   }
 
   /**
    * récupere la page suivante
-   * @return {Function} fonction utilisée par InfiniteScroll
    */
-  fetchMoreData() {
-    return () => {
-      this.currentOffset += this.PAGE_SIZE;
-      axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
-          params: this.createParams({ limit: this.PAGE_SIZE, offset: this.currentOffset }),
-        })
-        .then((res) => {
-          const metadatas = res.data;
-          if (metadatas.length === 0) {
-            this.setState({ hasMore: false });
-          }
-          this.setState({
-            metadatas: this.state.metadatas.concat(metadatas),
-          });
-        });
-    };
+  function fetchMoreData() {
+    axios
+      .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
+      })
+      .then((res) => {
+        const datas = res.data;
+
+        // setCurrentOffset(currentOffset+PAGE_SIZE);
+        if (datas.length === 0) {
+          setHasMore(false);
+        }
+        setMetadatas(metadatas.concat(datas));
+      });
   }
 
   /**
@@ -197,7 +169,7 @@ class Catalogue extends Component {
    * @param {*} filterConfig configuration du countBy
    * @return {String} label de l'élément
    */
-  getFilterLabel(filterElement, filterConfig) {
+  function getFilterLabel(filterElement, filterConfig) {
     let result = filterElement[filterConfig.name];
     if (filterConfig.displayName) {
       result = result[filterConfig.displayName];
@@ -206,153 +178,146 @@ class Catalogue extends Component {
   }
 
   // TODO :  sticky-top ?
-  /**
-   * render le composant
-   * @return {ReactNode} html du composant
-   */
-  render() {
-    return (
-      <div className="tempPaddingTop">
-        <div className="row">
-          {this.props.display && this.props.display.searchbar && (
-            <div className="col-3 border rounded  tempAlign">
-              <div className="row">
-                <div className="col-12 border rounded tempMargin">
-                  <h5>Trier</h5>
-                  <div className="btn-group" role="group" aria-label="sort">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={(e) => this.addToFilter({ sort_by: `-updatedAt` })}
-                    >
-                      Modifié
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={(e) => this.addToFilter({ sort_by: `resource_title` })}
-                    >
-                      A à Z
-                    </button>
+  return (
+    <div className="tempPaddingTop">
+      <div className="row">
+        {display && display.searchbar && (
+          <div className="col-3 border rounded  tempAlign">
+            <div className="row">
+              <div className="col-12 border rounded tempMargin">
+                <h5>Trier</h5>
+                <div className="btn-group" role="group" aria-label="sort">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={(e) => addToFilter({ sort_by: `-updatedAt` })}
+                  >
+                    Modifié
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={(e) => addToFilter({ sort_by: `resource_title` })}
+                  >
+                    A à Z
+                  </button>
 
-                    <div className="btn-group" role="group">
-                      <button
-                        id="sortDrop"
-                        type="button"
-                        className="btn btn-secondary dropdown-toggle"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
+                  <div className="btn-group" role="group">
+                    <button
+                      id="sortDrop"
+                      type="button"
+                      className="btn btn-secondary dropdown-toggle"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      ...
+                    </button>
+                    <div className="dropdown-menu" aria-labelledby="sortDrop">
+                      <a
+                        className="dropdown-item"
+                        onClick={(e) => addToFilter({ sort_by: `resource_title` })}
                       >
-                        ...
-                      </button>
-                      <div className="dropdown-menu" aria-labelledby="sortDrop">
-                        <a
-                          className="dropdown-item"
-                          onClick={(e) => this.addToFilter({ sort_by: `resource_title` })}
-                        >
-                          Alphabétique
-                        </a>
-                        <a
-                          className="dropdown-item"
-                          onClick={(e) => this.addToFilter({ sort_by: `-resource_title` })}
-                        >
-                          Anti alphabétique
-                        </a>
-                        <a
-                          className="dropdown-item"
-                          onClick={(e) => this.addToFilter({ sort_by: `-updatedAt` })}
-                        >
-                          Récemment modifiés
-                        </a>
-                        <a
-                          className="dropdown-item"
-                          onClick={(e) => this.addToFilter({ sort_by: `updatedAt` })}
-                        >
-                          Anciennement modifiés
-                        </a>
-                      </div>
+                        Alphabétique
+                      </a>
+                      <a
+                        className="dropdown-item"
+                        onClick={(e) => addToFilter({ sort_by: `-resource_title` })}
+                      >
+                        Anti alphabétique
+                      </a>
+                      <a
+                        className="dropdown-item"
+                        onClick={(e) => addToFilter({ sort_by: `-updatedAt` })}
+                      >
+                        Récemment modifiés
+                      </a>
+                      <a
+                        className="dropdown-item"
+                        onClick={(e) => addToFilter({ sort_by: `updatedAt` })}
+                      >
+                        Anciennement modifiés
+                      </a>
                     </div>
                   </div>
                 </div>
-                <div className="col-12 border rounded tempMargin  hideWIP">
-                  <h5>Rechercher</h5>
-                  <div className="input-group flex-nowrap">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Recherche"
-                      aria-label="Recherche"
-                      aria-describedby="addon-wrapping"
-                    />
-                  </div>
+              </div>
+              <div className="col-12 border rounded tempMargin  hideWIP">
+                <h5>Rechercher</h5>
+                <div className="input-group flex-nowrap">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Recherche"
+                    aria-label="Recherche"
+                    aria-describedby="addon-wrapping"
+                  />
                 </div>
-                <div className="col-12 border rounded tempMargin">
-                  <h5>Filtrer</h5>
-                  <div className="row">
-                    {this.state.countBy.map((filter, i) => {
-                      return (
-                        <div className="col border rounded" key={filter.name}>
-                          <span>{filter.text}</span>
-                          <ul className="list-group">
-                            {filter.values.map((filterValue, i) => {
-                              return (
-                                <li
-                                  className="list-group-item d-flex justify-content-between align-items-center"
-                                  key={this.getFilterLabel(filterValue, filter) + i}
-                                  onClick={(e) =>
-                                    this.addToFilter(filter.toFilterParam(filterValue))
-                                  }
-                                >
-                                  {this.getFilterLabel(filterValue, filter)}
-                                  <span className="badge badge-primary badge-pill">
-                                    {filterValue.count}
-                                  </span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      );
-                    })}
-                  </div>
+              </div>
+              <div className="col-12 border rounded tempMargin">
+                <h5>Filtrer</h5>
+                <div className="row">
+                  {countBy.map((filter, i) => {
+                    return (
+                      <div className="col border rounded" key={filter.name}>
+                        <span>{filter.text}</span>
+                        <ul className="list-group">
+                          {filter.values.map((filterValue, i) => {
+                            return (
+                              <li
+                                className="list-group-item d-flex justify-content-between align-items-center"
+                                key={getFilterLabel(filterValue, filter) + i}
+                                onClick={(e) => addToFilter(filter.toFilterParam(filterValue))}
+                              >
+                                {getFilterLabel(filterValue, filter)}
+                                <span className="badge badge-primary badge-pill">
+                                  {filterValue.count}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          )}
-          <div className="col-9">
-            <div className="row">
-              {this.props.display && this.props.display.editJDD && this.state.formUrl && (
-                <EditCard formUrl={this.state.formUrl}></EditCard>
-              )}
-              <InfiniteScroll
-                dataLength={this.state.metadatas.length}
-                next={this.fetchMoreData()}
-                hasMore={this.state.hasMore}
-                loader={<h4>Loading...</h4>}
-              >
-                {this.state.metadatas.map((metadata, i) => {
-                  return (
-                    <MetadataCard
-                      metadata={metadata}
-                      formUrl={this.state.formUrl}
-                      display={this.props.display}
-                      key={metadata.global_id}
-                    ></MetadataCard>
-                  );
-                })}
-              </InfiniteScroll>
-            </div>
+          </div>
+        )}
+        <div className="col-9">
+          <div className="row">
+            {display && display.editJDD && formUrl && (
+              <EditCard formUrl={formUrl} refresh={refresh}></EditCard>
+            )}
+            <InfiniteScroll
+              dataLength={metadatas.length}
+              next={() => {
+                setCurrentOffset(currentOffset + PAGE_SIZE);
+              }}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+            >
+              {metadatas.map((metadata, i) => {
+                return (
+                  <MetadataCard
+                    metadata={metadata}
+                    formUrl={formUrl}
+                    display={display}
+                    refresh={refresh}
+                    key={metadata.global_id}
+                  ></MetadataCard>
+                );
+              })}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 Catalogue.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
 };
-
-export default withRouter(Catalogue);

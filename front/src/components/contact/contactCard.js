@@ -8,7 +8,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  * Composant : ContactCard
  * @return {ReactNode}
  */
-export default function ContactCard({ contact, formUrl }) {
+export default function ContactCard({ contact, formUrl, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
   /**
    * call for contact deletion
@@ -20,6 +20,14 @@ export default function ContactCard({ contact, formUrl }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `Le Contact ${res.data.contact_name} a été supprimé`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -69,4 +77,5 @@ export default function ContactCard({ contact, formUrl }) {
 ContactCard.propTypes = {
   contact: PropTypes.object,
   formUrl: PropTypes.string,
+  refresh: PropTypes.func,
 };

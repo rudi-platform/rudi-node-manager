@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import EditProducerCard from './editProducerCard';
@@ -10,45 +9,36 @@ import ProducerCard from './producerCard';
  * Composant : CatalogueProducer
  * @return {void}
  */
-class CatalogueProducer extends Component {
-  /**
-   * Constructeur
-   * @param {*} props props passés par le parent
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      organizations: [],
-      formUrl: '',
-      hasMore: true,
-    };
-    this.currentOffset = 0;
-    this.PAGE_SIZE = 20;
-  }
+export default function CatalogueProducer({ display, specialSearch, editMode }) {
+  const [organizations, setOrganizations] = useState([]);
+  const [formUrl, setFormUrl] = useState('');
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 20;
+  const [currentOffset, setCurrentOffset] = useState(0);
 
-  /**
-   * trigger a la création du composant : get la 1er page du CatalogueProducer
-   */
-  componentDidMount() {
+  useEffect(() => {
     axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      const formUrl = `${res.data}organizations`;
-      this.setState({ formUrl });
+      setFormUrl(`${res.data}organizations`);
     });
+    getInitialData();
+  }, []);
 
-    this.getInitialData();
-  }
+  const refresh = () => {
+    setHasMore(true);
+    getInitialData();
+  };
 
   /**
-   * recup la 1er page des metadonnées et les countBy
+   * recup la 1er page des producteurs
    */
-  getInitialData() {
+  function getInitialData() {
     axios
       .get(`${process.env.PUBLIC_URL}/api/admin/organizations`, {
-        params: { limit: this.PAGE_SIZE, offset: this.currentOffset },
+        params: { limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
-        const organizations = res.data;
-        this.setState({ organizations });
+        setCurrentOffset(PAGE_SIZE);
+        setOrganizations(res.data);
       });
   }
 
@@ -56,65 +46,57 @@ class CatalogueProducer extends Component {
    * récupere la page suivante
    * @return {Function} fonction utilisée par InfiniteScroll
    */
-  fetchMoreData() {
+  function fetchMoreData() {
     return () => {
-      this.currentOffset += this.PAGE_SIZE;
       axios
         .get(`${process.env.PUBLIC_URL}/api/admin/organizations`, {
-          params: { limit: this.PAGE_SIZE, offset: this.currentOffset },
+          params: { limit: PAGE_SIZE, offset: currentOffset },
         })
         .then((res) => {
-          const organizations = res.data;
-          if (organizations.length === 0) {
-            this.setState({ hasMore: false });
+          const orgas = res.data;
+
+          setCurrentOffset(currentOffset + PAGE_SIZE);
+          if (orgas.length === 0) {
+            setHasMore(false);
           }
-          this.setState({
-            organizations: this.state.organizations.concat(organizations),
-          });
+          setOrganizations(organizations.concat(orgas));
         });
     };
   }
 
-  /**
-   * render le composant
-   * @return {ReactNode} html du composant
-   */
-  render() {
-    return (
-      <div className="tempPaddingTop">
-        <div className="row">
-          <div className="col-9">
-            <div className="row">
-              {this.props.display && this.props.display.editJDD && this.state.formUrl && (
-                <EditProducerCard formUrl={this.state.formUrl}></EditProducerCard>
-              )}
-              <InfiniteScroll
-                dataLength={this.state.organizations.length}
-                next={this.fetchMoreData()}
-                hasMore={this.state.hasMore}
-                loader={<h4>Loading...</h4>}
-              >
-                {this.state.organizations.map((organization, i) => {
-                  return (
-                    <ProducerCard
-                      organization={organization}
-                      formUrl={this.state.formUrl}
-                      key={organization.organization_id}
-                    ></ProducerCard>
-                  );
-                })}
-              </InfiniteScroll>
-            </div>
+  return (
+    <div className="tempPaddingTop">
+      <div className="row">
+        <div className="col-9">
+          <div className="row">
+            {display && display.editJDD && (
+              <EditProducerCard formUrl={formUrl} refresh={refresh}></EditProducerCard>
+            )}
+            <InfiniteScroll
+              dataLength={organizations.length}
+              next={fetchMoreData()}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+            >
+              {organizations.map((organization, i) => {
+                return (
+                  <ProducerCard
+                    organization={organization}
+                    formUrl={formUrl}
+                    refresh={refresh}
+                    key={`${organization.organization_id}-${i}`}
+                  ></ProducerCard>
+                );
+              })}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 CatalogueProducer.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
 };
-
-export default withRouter(CatalogueProducer);

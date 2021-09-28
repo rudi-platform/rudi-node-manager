@@ -9,7 +9,7 @@ import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../mod
  * Composant : UserCard
  * @return {void}
  */
-export default function UserCard({ user, display }) {
+export default function UserCard({ user, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
 
   const { toggleEdit, visible } = useEditRoleModal();
@@ -25,6 +25,14 @@ export default function UserCard({ user, display }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `L'Utilisateur' ${res.data.username} a été supprimé`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -100,4 +108,5 @@ export default function UserCard({ user, display }) {
 UserCard.propTypes = {
   user: PropTypes.object,
   display: PropTypes.object,
+  refresh: PropTypes.func,
 };

@@ -8,7 +8,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  * Composant : EditCard
  * @return {ReactNode}
  */
-export default function EditCard({ formUrl }) {
+export default function EditCard({ formUrl, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
 
   const [editID, setEditID] = useState('');
@@ -30,6 +30,14 @@ export default function EditCard({ formUrl }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `La Metadonnée ${res.data.resource_title} a été supprimée`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -84,4 +92,5 @@ export default function EditCard({ formUrl }) {
 }
 EditCard.propTypes = {
   formUrl: PropTypes.string,
+  refresh: PropTypes.func,
 };

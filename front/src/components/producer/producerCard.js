@@ -8,7 +8,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  * Composant : ProducerCard
  * @return {ReactNode}
  */
-export default function ProducerCard({ formUrl, organization }) {
+export default function ProducerCard({ formUrl, organization, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
 
   /**
@@ -21,6 +21,14 @@ export default function ProducerCard({ formUrl, organization }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `Le Producteur ${res.data.organization_name} a été supprimé`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -65,4 +73,5 @@ export default function ProducerCard({ formUrl, organization }) {
 ProducerCard.propTypes = {
   organization: PropTypes.object,
   formUrl: PropTypes.string,
+  refresh: PropTypes.func,
 };

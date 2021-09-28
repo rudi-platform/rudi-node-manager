@@ -8,7 +8,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  * Composant : EditProducerCard
  * @return {ReactNode}
  */
-export default function EditProducerCard({ formUrl }) {
+export default function EditProducerCard({ formUrl, refresh }) {
   const [editID, setEditID] = useState('');
 
   const { changeOptions, toggle } = React.useContext(ModalContext);
@@ -28,6 +28,14 @@ export default function EditProducerCard({ formUrl }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `Le Producteur ${res.data.organization_name} a été supprimé`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -88,4 +96,5 @@ export default function EditProducerCard({ formUrl }) {
 }
 EditProducerCard.propTypes = {
   formUrl: PropTypes.string,
+  refresh: PropTypes.func,
 };

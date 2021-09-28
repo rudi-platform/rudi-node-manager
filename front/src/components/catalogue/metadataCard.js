@@ -10,7 +10,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  * Composant : metadataCard
  * @return {ReactNode}
  */
-export default function MetadataCard({ formUrl, metadata, display }) {
+export default function MetadataCard({ formUrl, metadata, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
 
   /**
@@ -38,6 +38,14 @@ export default function MetadataCard({ formUrl, metadata, display }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = `La Metadonnée ${res.data.resource_title} a été supprimée`;
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => {
+              refresh();
+            },
+          },
+        ];
         changeOptions(options);
         toggle();
       })
@@ -157,4 +165,5 @@ MetadataCard.propTypes = {
   metadata: PropTypes.object,
   formUrl: PropTypes.string,
   display: PropTypes.object,
+  refresh: PropTypes.func,
 };
