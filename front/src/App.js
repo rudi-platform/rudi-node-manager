@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App.scss';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -74,8 +74,9 @@ export default function App() {
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="modal-test"></div>
         <header>
-          <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+          <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
             <div className="container-fluid">
+              <img className="icon-navbar" src="/logo_blanc_orange.png" alt="Rudi logo" />
               <button
                 className="navbar-toggler"
                 type="button"
