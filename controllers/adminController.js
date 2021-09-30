@@ -24,6 +24,24 @@ exports.getEnum = (req, res, next) => {
       res.status(501).json(error);
     });
 };
+exports.getThemeByLang = (req, res, next) => {
+  const { lang } = req.params;
+  const url = `${api}/enum/theme/${lang}`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
+  return axios
+    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
+    .then((resRUDI) => {
+      const results = resRUDI.data;
+      res.status(200).json(results);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
+};
 exports.getLicences = (req, res, next) => {
   const url = `${api}/licences`;
   const token = utils.createRudiToken({

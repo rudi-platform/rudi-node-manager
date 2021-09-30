@@ -7,6 +7,7 @@ const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
 
 router.get('/enum', adminController.getEnum);
+router.get('/enum/themes/:lang', adminController.getThemeByLang);
 router.get('/licences', adminController.getLicences);
 
 // TODO : propage res.status
