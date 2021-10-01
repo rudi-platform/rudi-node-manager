@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import axios from 'axios';
 import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import ThemeDisplay from '../other/themeDisplay';
 
 /**
  * Composant : metadataCard
@@ -154,7 +155,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           </p>
 
           <a href="#" className="btn btn-secondary button-margin">
-            {metadata.theme}
+            <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
         </div>
       </div>

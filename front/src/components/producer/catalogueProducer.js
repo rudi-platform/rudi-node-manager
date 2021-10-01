@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import EditProducerCard from './editProducerCard';
 import ProducerCard from './producerCard';
+import { GeneralContext } from '../../generalContext';
 
 /**
  * Composant : CatalogueProducer
@@ -16,12 +17,14 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
   const PAGE_SIZE = 20;
   const [currentOffset, setCurrentOffset] = useState(0);
 
+  const generalConf = useContext(GeneralContext);
+
   useEffect(() => {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      setFormUrl(`${res.data}organizations`);
-    });
     getInitialData();
   }, []);
+  useEffect(() => {
+    setFormUrl(`${generalConf.formUrl}organizations`);
+  }, [generalConf]);
 
   const refresh = () => {
     setHasMore(true);

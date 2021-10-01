@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import EditContactCard from './editContactCard';
 import ContactCard from './contactCard';
+import { GeneralContext } from '../../generalContext';
 
 /**
  * Composant : CatalogueContact
@@ -16,12 +17,15 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
   const PAGE_SIZE = 20;
   const [currentOffset, setCurrentOffset] = useState(0);
 
+  const generalConf = useContext(GeneralContext);
+
   useEffect(() => {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      setFormUrl(`${res.data}contacts`);
-    });
     getInitialData();
   }, []);
+
+  useEffect(() => {
+    setFormUrl(`${generalConf.formUrl}contacts`);
+  }, [generalConf]);
 
   const refresh = () => {
     setHasMore(true);

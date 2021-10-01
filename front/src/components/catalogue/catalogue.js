@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import MetadataCard from './metadataCard';
 import EditCard from './editCard';
 import { filterConf } from './conf';
+import { GeneralContext } from '../../generalContext';
+import ThemeDisplay from '../other/themeDisplay';
 
 /**
  * Composant : Catalogue
@@ -21,11 +23,11 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
   const initialRender = useRef(true);
 
+  const generalConf = useContext(GeneralContext);
+
   useEffect(() => {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      setFormUrl(`${res.data}`);
-    });
-  }, []);
+    setFormUrl(`${generalConf.formUrl}`);
+  }, [generalConf]);
   useEffect(() => {
     if (initialRender.current) {
       initialRender.current = false;
@@ -269,7 +271,12 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                                 key={getFilterLabel(filterValue, filter) + i}
                                 onClick={(e) => addToFilter(filter.toFilterParam(filterValue))}
                               >
-                                {getFilterLabel(filterValue, filter)}
+                                {filter.name === 'theme' && (
+                                  <ThemeDisplay
+                                    value={getFilterLabel(filterValue, filter)}
+                                  ></ThemeDisplay>
+                                )}
+                                {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
                                 <span className="badge badge-primary badge-pill">
                                   {filterValue.count}
                                 </span>
