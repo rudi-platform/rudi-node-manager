@@ -42,9 +42,7 @@ class Visualisation extends Component {
    */
   handleOnClick() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`, {
-        headers: { Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('token')).token}` },
-      })
+      .get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`)
       .then((res) => {
         console.log(res.data);
         // TODO : check fileRes.headers.content-type de axios.get(url) ?
