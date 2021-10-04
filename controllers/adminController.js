@@ -26,7 +26,7 @@ exports.getEnum = (req, res, next) => {
 };
 exports.getThemeByLang = (req, res, next) => {
   const { lang } = req.params;
-  const url = `${api}/enum/theme/${lang}`;
+  const url = `${api}/enum/themes/${lang}`;
   const token = utils.createRudiToken({
     url: url,
     req: req,
