@@ -96,7 +96,11 @@ export default function App() {
           <header>
             <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
               <div className="container-fluid">
-                <img className="icon-navbar" src="/logo_blanc_orange.png" alt="Rudi logo" />
+                <img
+                  className="icon-navbar"
+                  src={`${process.env.PUBLIC_URL}/logo_blanc_orange.png`}
+                  alt="Rudi logo"
+                />
                 <button
                   className="navbar-toggler"
                   type="button"
