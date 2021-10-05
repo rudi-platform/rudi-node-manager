@@ -14,7 +14,10 @@ exports.getEnum = (req, res, next) => {
     req: req,
   });
   return axios
-    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
+    .get(`${serveur}${url}`, {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
