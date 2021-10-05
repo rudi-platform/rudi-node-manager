@@ -5,6 +5,7 @@ import 'jspreadsheet-ce/dist/jspreadsheet.css';
 import { Check } from 'react-bootstrap-icons';
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import ReactJson from 'react-json-view';
 
 /**
  * Composant : Visualisation
@@ -23,6 +24,8 @@ class Visualisation extends Component {
         data: [[]],
         minDimensions: [10, 10],
       },
+      data: null,
+      displayType: 'CSV',
     };
     this.wrapper = React.createRef();
 
@@ -38,28 +41,74 @@ class Visualisation extends Component {
   }
 
   /**
+   * convert CSV string to array
+   * @param {String} str CSV string
+   * @param {String} delimiter delemiter of the cell
+   * @return {*} array of the CSV
+   */
+  csvToArray(str, delimiter = ',') {
+    // TODO : better option => https://www.papaparse.com/ ? https://www.npmjs.com/package/csv-string ?
+    const titles = str.slice(0, str.indexOf('\n')).split(delimiter);
+    const rows = str.slice(str.indexOf('\n') + 1).split('\n');
+    return rows.map((row) => {
+      const values = row.split(delimiter);
+      return titles.reduce((object, curr, i) => ((object[curr] = values[i]), object), {});
+    });
+  }
+  /**
+   * setup the jspreadsheet element
+   * @param {*} res response of the request
+   * @param {*} data array of the CSV
+   */
+  setJSpreadsheet(res, data) {
+    if (data) {
+      const options = {
+        data: data,
+        csvHeaders: true,
+        csvDelimiter: ';',
+        editable: false,
+        tableOverflow: true,
+        lazyLoading: true,
+        loadingSpin: true,
+      };
+      this.setState({ options }, () => {
+        this.el.destroy(this.wrapper.current, false);
+        this.el = jspreadsheet(this.wrapper.current, this.state.options);
+      });
+    }
+  }
+
+  /**
    * get the doc
    */
   handleOnClick() {
     axios
       .get(`${process.env.PUBLIC_URL}/api/media/${this.state.media_id}`)
       .then((res) => {
-        console.log(res.data);
-        // TODO : check fileRes.headers.content-type de axios.get(url) ?
-        if (res.data.url) {
-          const options = {
-            csv: res.data.url,
-            csvHeaders: true,
-            csvDelimiter: ';',
-            editable: false,
-            tableOverflow: true,
-            lazyLoading: true,
-            loadingSpin: true,
-          };
-          this.setState({ options });
-          this.el.destroy(this.wrapper.current, false);
-          this.el = jspreadsheet(this.wrapper.current, this.state.options);
-        }
+        axios.get(`${res.data.url}`).then((res2) => {
+          // TODO : "better" type detection
+          switch (res2.headers['content-type']) {
+            case 'application/json; charset=utf-8':
+              this.setState({ displayType: 'JSON', data: res2.data });
+              break;
+
+            default:
+              try {
+                const array = this.csvToArray(res2.data);
+                this.setState({ displayType: 'CSV', data: null });
+                this.setJSpreadsheet(res, array);
+              } catch (error) {
+                // TODO : error modal
+                console.error(error);
+              }
+
+              break;
+          }
+        });
+      })
+      .catch((err) => {
+        // TODO : error modal
+        console.error(err);
       });
   }
 
@@ -94,7 +143,12 @@ class Visualisation extends Component {
           </button>
         </div>
         <br></br>
-        <div ref={this.wrapper} />
+        {
+          {
+            CSV: <div ref={this.wrapper} />,
+            JSON: <ReactJson src={this.state.data} collapsed={2} />,
+          }[this.state.displayType]
+        }
       </div>
     );
   }
