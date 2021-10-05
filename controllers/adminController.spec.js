@@ -1,14 +1,17 @@
 const { expect } = require('@jest/globals');
 const axios = require('axios');
+const { createRudiToken } = require('../utils/utils');
 const controllers = require('./adminController');
 const { Response } = require('jest-express/lib/response');
 
 jest.mock('axios');
+jest.mock('../utils/utils');
 let response;
 
 describe('AdminController', () => {
   beforeEach(() => {
     response = new Response();
+    createRudiToken.mockImplementation(() => 'token');
   });
 
   afterEach(() => {
@@ -19,7 +22,7 @@ describe('AdminController', () => {
     const data = { global_id: 'global', local_id: 'local', doi: 'string' };
     axios.get.mockImplementation(() => Promise.resolve({ data: data }));
 
-    await controllers.getEnum(null, response, null);
+    await controllers.getEnum({}, response, null);
 
     expect(response.body).toStrictEqual(data);
   });
@@ -32,7 +35,7 @@ describe('AdminController', () => {
     axiosError.toJSON = () => axiosError;
     axios.get.mockImplementation(() => Promise.reject(axiosError));
 
-    await controllers.getEnum(null, response, null);
+    await controllers.getEnum({}, response, null);
 
     expect(response.statusCode).toStrictEqual(501);
   });
