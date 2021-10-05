@@ -2,10 +2,10 @@ const config = require('../config/config');
 
 exports.getHash = (req, res, next) => {
   try {
-    let hashId = process.env.RUDI_PROD_MANAGER_GIT_REV
+    let hashId = process.env.RUDI_PROD_MANAGER_GIT_REV;
     if (!hashId)
       try {
-        hashId = require('child_process').execSync('git rev-parse --short HEAD')
+        hashId = require('child_process').execSync('git rev-parse --short HEAD');
       } catch (err) {
         throw err;
       }
