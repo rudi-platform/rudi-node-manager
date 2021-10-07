@@ -67,6 +67,14 @@ export default function App() {
     }
   }, [token]);
 
+  /**
+   * logout
+   */
+  function logout() {
+    setToken(null);
+    // TODO : /logout => set cookie with expire date in the past?
+  }
+
   if (!token) {
     return (
       <div>
@@ -168,6 +176,15 @@ export default function App() {
                           Configuration
                         </button>
                       </Link>
+                    </li>
+                    <li className="nav-item">
+                      <button
+                        type="button"
+                        className="btn btn-secondary button-margin"
+                        onClick={() => logout()}
+                      >
+                        Logout
+                      </button>
                     </li>
                   </ul>
                 </div>
