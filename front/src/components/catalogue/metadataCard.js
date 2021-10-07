@@ -6,6 +6,7 @@ import Moment from 'react-moment';
 import axios from 'axios';
 import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
 import ThemeDisplay from '../other/themeDisplay';
+import FileSizeDisplay from '../other/fileSizeDisplay';
 
 /**
  * Composant : metadataCard
@@ -69,6 +70,13 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
     // TODO
     return langObjectArray[0].text;
   }
+  /**
+   * calcule la taille total des fichiers
+   * @return {Number} taille totale
+   */
+  function getTotalFileSize() {
+    return metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0);
+  }
 
   return (
     <div className="col-12" key={metadata.global_id}>
@@ -116,12 +124,15 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               </div>
             )}
           </div>
-          <small className="text-muted">
-            Modifié le :
-            <Moment format=" DD/MM/YYYY HH:mm:ss">
-              {metadata.metadata_info.metadata_dates.updated}
-            </Moment>
-          </small>
+          <span>
+            <small className="text-muted">
+              Modifié le :
+              <Moment format=" DD/MM/YYYY HH:mm:ss">
+                {metadata.metadata_info.metadata_dates.updated}
+              </Moment>
+            </small>
+            <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
+          </span>
         </h5>
         <div className="card-body">
           <p className="card-text">{getLangText(metadata.summary)}</p>
@@ -131,12 +142,13 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           <p className="card-text">
             global_id : <small className="text-muted"> {metadata.global_id}</small>
           </p>
-          <p className="card-text">
+          <span className="card-text">
             media_id :
             {metadata.available_formats.map((ressource, i) => {
               return (
-                <span key={`${ressource.media_id}`}>
-                  <small className="text-muted"> {ressource.media_id}</small>
+                <div key={`${ressource.media_id}`}>
+                  <small className="text-muted"> {ressource.media_id} </small>
+                  <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
                   <button
                     type="button"
                     className="btn btn-success button-margin"
@@ -149,10 +161,10 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                       Visualisation <Eye />
                     </span>
                   </Link>
-                </span>
+                </div>
               );
             })}
-          </p>
+          </span>
 
           <a href="#" className="btn btn-secondary button-margin">
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
