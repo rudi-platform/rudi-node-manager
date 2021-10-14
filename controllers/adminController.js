@@ -66,7 +66,7 @@ exports.getLicences = (req, res, next) => {
 // Default Value for formulaire
 exports.getDefaultForm = (req, res, next) => {
   const user = req.user;
-  databaseManager
+  return databaseManager
     .getDefaultForm(user)
     .then((rows) => {
       res.status(200).json(rows);
@@ -78,7 +78,7 @@ exports.getDefaultForm = (req, res, next) => {
 };
 exports.deleteDefaultForm = (req, res, next) => {
   const user = req.user;
-  databaseManager
+  return databaseManager
     .deleteDefaultForm(user)
     .then((row) => {
       res.status(200).json(row);
@@ -92,7 +92,7 @@ exports.putDefaultForm = (req, res, next) => {
   const data = req.body;
   const user = req.user;
 
-  databaseManager
+  return databaseManager
     .updateDefaultForm(user, data)
     .then((row) => {
       res.status(200).json(row);

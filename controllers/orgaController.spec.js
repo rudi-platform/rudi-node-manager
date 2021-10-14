@@ -109,4 +109,25 @@ describe('OrgaController', () => {
 
     expect(response.statusCode).toStrictEqual(501);
   });
+  test('deleteOrga should return data', async () => {
+    const data = { global_id: 'global', local_id: 'local', doi: 'string' };
+    axios.delete.mockImplementation(() => Promise.resolve({ data: data }));
+
+    await controllers.deleteOrga({ params: { id: 'aaaa' } }, response, null);
+
+    expect(response.body).toStrictEqual(data);
+  });
+  test('deleteOrga should return error', async () => {
+    const error = new Error('Error: Request failed with status code 500');
+    let axiosError = {
+      status: 500,
+      response: { error },
+    };
+    axiosError.toJSON = () => axiosError;
+    axios.delete.mockImplementation(() => Promise.reject(axiosError));
+
+    await controllers.deleteOrga({ params: { id: 'aaaa' } }, response, null);
+
+    expect(response.statusCode).toStrictEqual(501);
+  });
 });
