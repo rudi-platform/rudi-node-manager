@@ -26,6 +26,11 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   authControllerPassport.getToken,
 );
+router.get(
+  '/logout',
+  passport.authenticate('jwt', { session: false }),
+  authControllerPassport.logout,
+);
 router.post('/forgot-password', authControllerPassport.postForgot);
 router.post('/reset-password', authControllerPassport.postReset);
 

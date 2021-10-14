@@ -47,7 +47,7 @@ export default function Login({ setToken }) {
     loginUser({
       username,
       password,
-    }).then((res) => setToken(res.data));
+    }).then((res) => setToken());
   }
 
   return (

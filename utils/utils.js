@@ -12,7 +12,11 @@ const createToken = (user) => {
   let exp = moment().add(20, 'minutes').format('X');
   exp = parseInt(exp, 10);
   const body = { id: user.id, username: user.username };
-  return { token: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT), exp: exp };
+  return {
+    authToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
+    publicToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    exp: exp,
+  };
 };
 const createRudiToken = (payload) => {
   return createRudiApiToken(payload);

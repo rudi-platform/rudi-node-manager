@@ -50,18 +50,23 @@ exports.postLogin = (req, res, next) => {
         return res.status(400).json({ errors: err });
       }
 
-      const { token, exp } = utils.createToken(user);
+      const { authToken, publicToken, exp } = utils.createToken(user);
 
       return res
         .status(200)
-        .cookie('authToken', token, {
+        .cookie('authToken', authToken, {
           secure: !!process.env.NODE_ENV,
           httpOnly: true,
           expires: new Date(exp * 1000),
         })
+        .cookie('publicToken', publicToken, {
+          secure: !!process.env.NODE_ENV,
+          httpOnly: false,
+          expires: new Date(exp * 1000),
+        })
         .json({
           success: `logged in ${user.username}`,
-          token: token,
+          token: publicToken,
           expires: new Date(exp * 1000),
         });
       // TODO : remove .json() for cookie only? or give refresh token instead
@@ -102,17 +107,37 @@ exports.postReset = (req, res, next) => {
   }
 };
 
-exports.getToken = (req, res, next) => {
-  const { token, exp } = utils.createToken(req.user);
+exports.logout = (req, res, next) => {
   res
     .status(200)
-    .cookie('authToken', token, {
+    .cookie('authToken', null, {
+      secure: !!process.env.NODE_ENV,
+      httpOnly: true,
+      expires: new Date(0),
+    })
+    .cookie('publicToken', null, {
+      secure: !!process.env.NODE_ENV,
+      httpOnly: false,
+      expires: new Date(0),
+    })
+    .json({});
+};
+exports.getToken = (req, res, next) => {
+  const { authToken, publicToken, exp } = utils.createToken(req.user);
+  res
+    .status(200)
+    .cookie('authToken', authToken, {
       secure: !!process.env.NODE_ENV,
       httpOnly: true,
       expires: new Date(exp * 1000),
     })
+    .cookie('publicToken', publicToken, {
+      secure: !!process.env.NODE_ENV,
+      httpOnly: false,
+      expires: new Date(exp * 1000),
+    })
     .json({
-      token: token,
+      token: authToken,
       expires: new Date(exp * 1000),
     });
 };

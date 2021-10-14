@@ -37,7 +37,7 @@ TODO :
  * @return {ReactNode} main html or login component
  */
 export default function App() {
-  const { token, setToken } = useToken();
+  const { token, updateToken } = useToken();
   const [isLoginOpen, setIsLoginOpen] = useState(true);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [generalConf, setGeneralConf] = useState({});
@@ -71,14 +71,15 @@ export default function App() {
    * logout
    */
   function logout() {
-    setToken(null);
-    // TODO : /logout => set cookie with expire date in the past?
+    axios.get(`${process.env.PUBLIC_URL}/api/v1/logout`).then((res) => {
+      updateToken();
+    });
   }
 
   if (!token) {
     return (
       <div>
-        {isLoginOpen && <Login setToken={setToken} />}
+        {isLoginOpen && <Login setToken={updateToken} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
           {!isLoginOpen && (
