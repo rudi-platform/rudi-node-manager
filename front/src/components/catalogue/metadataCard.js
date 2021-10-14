@@ -148,6 +148,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               return (
                 <div key={`${ressource.media_id}`}>
                   <small className="text-muted"> {ressource.media_id} </small>
+                  <small> {ressource.media_name} </small>
                   <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
                   <button
                     type="button"
