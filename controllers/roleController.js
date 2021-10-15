@@ -2,7 +2,7 @@ const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 
 const roleList = (req, res, next) => {
-  databaseManager
+  return databaseManager
     .getRoles()
     .then((rows) => {
       res.status(200).json(rows);
@@ -14,7 +14,7 @@ const roleList = (req, res, next) => {
 };
 exports.getRoleById = (req, res, next) => {
   const { role } = req.params;
-  databaseManager
+  return databaseManager
     .getRoleById(role)
     .then((row) => {
       res.status(200).json(row);
@@ -28,9 +28,10 @@ exports.getRoleById = (req, res, next) => {
 // User_Roles
 exports.getUserRolesByUsername = (req, res, next) => {
   const { username } = req.params;
-  databaseManager
+  return databaseManager
     .getUserRolesByUsername(username)
     .then((rows) => {
+      console.log('result : ', rows);
       res.status(200).json(rows);
     })
     .catch((err) => {
@@ -40,7 +41,7 @@ exports.getUserRolesByUsername = (req, res, next) => {
 };
 exports.deleteUserRole = (req, res, next) => {
   const { userId, role } = req.params;
-  databaseManager
+  return databaseManager
     .deleteUserRole(userId, role)
     .then((row) => {
       res.status(200).json(row);
@@ -52,7 +53,7 @@ exports.deleteUserRole = (req, res, next) => {
 };
 exports.postUserRole = (req, res, next) => {
   const data = req.body;
-  databaseManager
+  return databaseManager
     .createUserRole(data)
     .then((row) => {
       res.status(200).json(row);
