@@ -179,7 +179,7 @@ exports.getUserRolesByUsername = (username) => {
       if (user) {
         const db = open();
         return new Promise((resolve, reject) => {
-          db.get(`SELECT * FROM User_Roles WHERE userId = ?`, [user.id], function (err, rows) {
+          db.all(`SELECT * FROM User_Roles WHERE userId = ?`, [user.id], function (err, rows) {
             if (err) {
               console.log(err.message);
               reject(err);

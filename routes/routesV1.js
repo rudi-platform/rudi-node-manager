@@ -6,16 +6,29 @@ const usersController = require('../controllers/usersControllers');
 const roleController = require('../controllers/roleController');
 const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
+const { checkRolePerm } = require('../utils/roleCheck');
 
 router.get('/hash', sysController.getHash);
 router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
 
-router.get('/users', usersController.usersList);
-router.get('/users/:username', usersController.getUserByUsername);
+router.get(
+  '/users',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  usersController.usersList,
+);
+router.get(
+  '/users/:username',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  usersController.getUserByUsername,
+);
+// TODO protect superAdmin
 router.delete(
   '/users/:username',
   passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
   usersController.deleteUser,
 );
 
@@ -34,15 +47,36 @@ router.get(
 router.post('/forgot-password', authControllerPassport.postForgot);
 router.post('/reset-password', authControllerPassport.postReset);
 
-router.get('/roles', roleController.roleList);
-router.get('/roles/:role', roleController.getRoleById);
-router.get('/user-roles/:username', roleController.getUserRolesByUsername);
+router.get(
+  '/roles',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  roleController.roleList,
+);
+router.get(
+  '/roles/:role',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  roleController.getRoleById,
+);
+router.get(
+  '/user-roles/:username',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  roleController.getUserRolesByUsername,
+);
 router.delete(
   '/user-roles/:userId/:role',
   passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
   roleController.deleteUserRole,
 );
-router.post('/user-roles', roleController.postUserRole);
+router.post(
+  '/user-roles',
+  passport.authenticate('jwt', { session: false }),
+  checkRolePerm('Admin'),
+  roleController.postUserRole,
+);
 
 router.get(
   '/default-form',

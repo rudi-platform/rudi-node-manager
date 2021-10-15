@@ -31,7 +31,6 @@ exports.getUserRolesByUsername = (req, res, next) => {
   return databaseManager
     .getUserRolesByUsername(username)
     .then((rows) => {
-      console.log('result : ', rows);
       res.status(200).json(rows);
     })
     .catch((err) => {
