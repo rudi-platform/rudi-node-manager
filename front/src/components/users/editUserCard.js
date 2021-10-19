@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : EditCard
@@ -9,6 +10,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  */
 export default function EditCard({}) {
   const [editID, setEditID] = useState('');
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   const { changeOptions, toggle } = React.useContext(ModalContext);
   /**
@@ -31,11 +33,7 @@ export default function EditCard({}) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 

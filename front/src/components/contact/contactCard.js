@@ -2,7 +2,8 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : ContactCard
@@ -10,6 +11,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  */
 export default function ContactCard({ contact, formUrl, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
   /**
    * call for contact deletion
    * @param {*} contact contact a suppr
@@ -32,11 +34,7 @@ export default function ContactCard({ contact, formUrl, refresh }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 

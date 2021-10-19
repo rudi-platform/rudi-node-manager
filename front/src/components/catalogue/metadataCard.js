@@ -4,9 +4,10 @@ import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : metadataCard
@@ -14,20 +15,26 @@ import FileSizeDisplay from '../other/fileSizeDisplay';
  */
 export default function MetadataCard({ formUrl, metadata, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   /**
    * download le fichier via media_id
    * @param {*} ressource connector du fichier
    */
   function downloadFile(ressource) {
-    axios.get(`${ressource.connector.url}`, { responseType: 'blob' }).then((response) => {
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${ressource.media_name}`);
-      document.body.appendChild(link);
-      link.click();
-    });
+    axios
+      .get(`${ressource.connector.url}`, { responseType: 'blob' })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${ressource.media_name}`);
+        document.body.appendChild(link);
+        link.click();
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
+      });
   }
 
   /**
@@ -52,11 +59,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 

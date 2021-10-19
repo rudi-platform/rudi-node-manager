@@ -1,91 +1,77 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { withRouter } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import LicenceCard from './licenceCard';
 import EditCard from './editCard';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : CatalogueLicence
- * @return {void}
+ * @return {ReactNode}
  */
-class CatalogueLicence extends Component {
-  /**
-   * Constructeur
-   * @param {*} props props passés par le parent
-   */
-  constructor(props) {
-    super(props);
-    this.state = {
-      metadatas: [],
-      formUrl: '',
-      hasMore: false,
-    };
-  }
+export default function CatalogueLicence({ display, specialSearch, editMode }) {
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  /**
-   * trigger a la création du composant : get la 1er page du catalogue
-   */
-  componentDidMount() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).then((res) => {
-      const formUrl = res.data;
-      this.setState({ formUrl });
-    });
+  const [metadatas, setMetadatas] = useState([]);
+  const [formUrl, setFormUrl] = useState('');
+  const [hasMore] = useState(false);
 
-    this.getInitialData();
-  }
-
+  useEffect(() => {
+    axios
+      .get(`${process.env.PUBLIC_URL}/api/v1/formUrl`)
+      .then((res) => {
+        setFormUrl(res.data);
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
+      });
+    getInitialData();
+  }, []);
   /**
    * recup la 1er page des metadonnées
    */
-  getInitialData() {
-    axios.get(`${process.env.PUBLIC_URL}/api/admin/licences`).then((res) => {
-      const metadatas = res.data;
-      this.setState({ metadatas });
-    });
+  function getInitialData() {
+    axios
+      .get(`${process.env.PUBLIC_URL}/api/admin/licences`)
+      .then((res) => {
+        setMetadatas(res.data);
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
+      });
   }
 
-  /**
-   * render le composant
-   * @return {ReactNode} html du composant
-   */
-  render() {
-    return (
-      <div className="tempPaddingTop">
-        <div className="row">
-          <div className="col-9">
-            <div className="row">
-              {this.props.display && this.props.display.editJDD && this.state.formUrl && (
-                <EditCard formUrl={this.state.formUrl}></EditCard>
-              )}
-              <InfiniteScroll
-                dataLength={this.state.metadatas.length}
-                hasMore={this.state.hasMore}
-                loader={<h4>Loading...</h4>}
-              >
-                {this.state.metadatas.map((metadata, i) => {
-                  return (
-                    <LicenceCard
-                      metadata={metadata}
-                      formUrl={this.state.formUrl}
-                      display={this.props.display}
-                      key={metadata.global_id}
-                    ></LicenceCard>
-                  );
-                })}
-              </InfiniteScroll>
-            </div>
+  return (
+    <div className="tempPaddingTop">
+      <div className="row">
+        <div className="col-9">
+          <div className="row">
+            {display && display.editJDD && formUrl && <EditCard formUrl={formUrl}></EditCard>}
+            <InfiniteScroll
+              dataLength={metadatas.length}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+            >
+              {metadatas.map((metadata, i) => {
+                return (
+                  <LicenceCard
+                    metadata={metadata}
+                    formUrl={formUrl}
+                    display={display}
+                    key={metadata.concept_id}
+                  ></LicenceCard>
+                );
+              })}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 CatalogueLicence.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
 };
-
-export default withRouter(CatalogueLicence);

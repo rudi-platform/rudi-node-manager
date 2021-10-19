@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import EditProducerCard from './editProducerCard';
 import ProducerCard from './producerCard';
 import { GeneralContext } from '../../generalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : CatalogueProducer
@@ -18,6 +19,7 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
   const [currentOffset, setCurrentOffset] = useState(0);
 
   const generalConf = useContext(GeneralContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   useEffect(() => {
     getInitialData();
@@ -42,6 +44,9 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
       .then((res) => {
         setCurrentOffset(PAGE_SIZE);
         setOrganizations(res.data);
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
       });
   }
 
@@ -63,6 +68,9 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
             setHasMore(false);
           }
           setOrganizations(organizations.concat(orgas));
+        })
+        .catch((e) => {
+          defaultErrorHandler(e);
         });
     };
   }

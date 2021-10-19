@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : EditProducerCard
@@ -12,6 +13,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
   const [editID, setEditID] = useState('');
 
   const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
@@ -40,11 +42,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 

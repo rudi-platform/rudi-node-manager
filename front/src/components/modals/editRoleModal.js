@@ -4,7 +4,8 @@ import Button from 'react-bootstrap/Button';
 import PropTypes from 'prop-types';
 import { Plus, Trash } from 'react-bootstrap-icons';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * EditRoleModal component
@@ -13,6 +14,7 @@ import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/Mod
  */
 export default function EditRoleModal({ visible, toggleEdit, options }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   const isInUserRole = (role, user) => {
     return user.roles ? user.roles.findIndex((element) => element === role.role) : -1;
@@ -37,11 +39,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 
@@ -72,11 +70,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 

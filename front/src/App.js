@@ -29,7 +29,6 @@ TODO :
 - responsive
 - filtre/sort/search
 - remove key={...+i} when possible
-- catch error on axios call
 */
 
 /**

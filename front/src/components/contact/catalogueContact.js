@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import EditContactCard from './editContactCard';
 import ContactCard from './contactCard';
 import { GeneralContext } from '../../generalContext';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : CatalogueContact
@@ -18,6 +19,7 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
   const [currentOffset, setCurrentOffset] = useState(0);
 
   const generalConf = useContext(GeneralContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   useEffect(() => {
     getInitialData();
@@ -43,6 +45,9 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
       .then((res) => {
         setCurrentOffset(PAGE_SIZE);
         setContacts(res.data);
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
       });
   }
 
@@ -64,6 +69,9 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
             setHasMore(false);
           }
           setContacts(contacts.concat(conts));
+        })
+        .catch((e) => {
+          defaultErrorHandler(e);
         });
     };
   }

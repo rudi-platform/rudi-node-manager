@@ -7,10 +7,11 @@ import EditCard from './editCard';
 import { filterConf } from './conf';
 import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : Catalogue
- * @return {void}
+ * @return {ReactNode}
  */
 export default function Catalogue({ display, specialSearch, editMode }) {
   const [metadatas, setMetadatas] = useState([]);
@@ -24,6 +25,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   const initialRender = useRef(true);
 
   const generalConf = useContext(GeneralContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   useEffect(() => {
     setFormUrl(`${generalConf.formUrl}`);
@@ -137,13 +139,17 @@ export default function Catalogue({ display, specialSearch, editMode }) {
           params: createParams({ count_by: count.name }),
         }),
       ),
-    ).then((values) => {
-      const countByTemp = filterConf.map((count, i) => {
-        count.values = values[i].data;
-        return count;
+    )
+      .then((values) => {
+        const countByTemp = filterConf.map((count, i) => {
+          count.values = values[i].data;
+          return count;
+        });
+        setCountBy(countByTemp);
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
       });
-      setCountBy(countByTemp);
-    });
   }
 
   /**
@@ -162,6 +168,9 @@ export default function Catalogue({ display, specialSearch, editMode }) {
           setHasMore(false);
         }
         setMetadatas(metadatas.concat(datas));
+      })
+      .catch((e) => {
+        defaultErrorHandler(e);
       });
   }
 

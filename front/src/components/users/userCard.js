@@ -2,18 +2,20 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultErrorOption, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : UserCard
- * @return {void}
+ * @return {ReactNode}
  */
 export default function UserCard({ user, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
 
   const { toggleEdit, visible } = useEditRoleModal();
   const { options, changeOptionsEdit } = useEditRoleModalOptions();
+  const { defaultErrorHandler } = useDefaultErrorHandler();
 
   /**
    * call for user deletion
@@ -37,11 +39,7 @@ export default function UserCard({ user, display, refresh }) {
         toggle();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
   /**
@@ -56,11 +54,7 @@ export default function UserCard({ user, display, refresh }) {
         toggleEdit();
       })
       .catch((e) => {
-        console.log(e);
-        const options = DefaultErrorOption;
-        options.text = `${e.response.data}`;
-        changeOptions(options);
-        toggle();
+        defaultErrorHandler(e);
       });
   }
 
