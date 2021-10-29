@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
 // Require Route
 const apiV1 = require('./routes/routesV1');
 const apiAdmin = require('./routes/routesAdmin');
@@ -19,7 +20,7 @@ const initDatabase = require('./database/scripts/initDatabase');
 
 // Create a new express application named 'app'
 const app = express();
-
+app.use(helmet());
 // Set our backend port to be either an environment variable or port 5000
 const port = config.server.listening_port || 5000;
 
