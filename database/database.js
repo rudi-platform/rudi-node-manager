@@ -1,15 +1,18 @@
 const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
 const config = require('../config/config');
+const log = require('../utils/logger');
+const mod = 'database';
 
 const open = function () {
+  const fun = 'open';
   const db = new sqlite3.Database(
     `${config.database.db_directory}/rudy_manager.db`,
     sqlite3.OPEN_READWRITE,
     (err) => {
       if (err) {
-        console.error(err);
-        console.error(err.message);
+        log.e(mod, fun, err);
+        log.e(mod, fun, err.message);
       } else {
       }
     },
@@ -17,19 +20,21 @@ const open = function () {
   return db.exec('PRAGMA foreign_keys = ON');
 };
 const close = function (db) {
+  const fun = 'close';
   db.close((err) => {
     if (err) {
-      console.error(err.message);
+      log.e(mod, fun, err.message);
     }
   });
 };
 
 exports.getUserByUsername = (username) => {
+  const fun = 'getUserByUsername';
   const db = open();
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM Users WHERE username = ?`, [username], function (err, row) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
         resolve(row);
@@ -39,6 +44,7 @@ exports.getUserByUsername = (username) => {
   });
 };
 exports.getUsers = () => {
+  const fun = 'getUsers';
   const db = open();
   return new Promise((resolve, reject) => {
     db.all(
@@ -47,7 +53,7 @@ exports.getUsers = () => {
         'GROUP BY Users.id;',
       function (err, rows) {
         if (err) {
-          console.log(err.message);
+          log.e(mod, fun, err.message);
           reject(err);
         } else {
           const result = rows.map((row) => {
@@ -64,6 +70,7 @@ exports.getUsers = () => {
   });
 };
 exports.createUser = (user) => {
+  const fun = 'createUser';
   const db = open();
   return new Promise((resolve, reject) => {
     db.serialize(function () {
@@ -72,10 +79,10 @@ exports.createUser = (user) => {
         [user.username, user.password, user.email],
         function (err) {
           if (err) {
-            console.log(err.message);
+            log.e(mod, fun, err.message);
             reject(err);
           } else {
-            console.log(`Users : A row has been inserted with rowid ${this.lastID}`);
+            log.i(mod, fun, `Users : A row has been inserted with rowid ${this.lastID}`);
             const id = this.lastID;
 
             // TODO : replace by count SELECT COUNT (*) FROM Users;
@@ -84,7 +91,7 @@ exports.createUser = (user) => {
               ['SuperAdmin'],
               function (err, result) {
                 if (err) {
-                  console.log(err.message);
+                  log.e(mod, fun, err.message);
                   reject(err);
                 } else {
                   if (result && result['COUNT (*)'] < 1) {
@@ -93,7 +100,7 @@ exports.createUser = (user) => {
                         resolve({ id: this.lastID, username: user.username });
                       })
                       .catch((err) => {
-                        console.log(err.message);
+                        log.e(mod, fun, err.message);
                         reject(err);
                       });
                   } else {
@@ -110,14 +117,15 @@ exports.createUser = (user) => {
   });
 };
 exports.deleteUser = (username) => {
+  const fun = 'deleteUser';
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM Users WHERE username = ?`, [username], function (err) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
-        console.log(`Users : A row has been deleted with username ${username}`);
+        log.i(mod, fun, `Users : A row has been deleted with username ${username}`);
         resolve({ username: username });
       }
       close(db);
@@ -127,16 +135,17 @@ exports.deleteUser = (username) => {
 
 // ROLES
 exports.createRoles = (roles) => {
+  const fun = 'createRoles';
   const db = open();
   return new Promise((resolve, reject) => {
     db.serialize(function () {
       roles.forEach((role) => {
         db.run(`INSERT INTO Roles(role,desc) VALUES(?,?)`, [role.role, role.desc], function (err) {
           if (err) {
-            console.log(err.message);
+            log.e(mod, fun, err.message);
             reject(err);
           } else {
-            console.log(`Roles : A row has been inserted with name ${role.role}`);
+            log.i(mod, fun, `Roles : A row has been inserted with name ${role.role}`);
           }
         });
       });
@@ -146,11 +155,12 @@ exports.createRoles = (roles) => {
   });
 };
 exports.getRoles = () => {
+  const fun = 'getRoles';
   const db = open();
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM Roles', function (err, rows) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
         resolve(rows);
@@ -160,11 +170,12 @@ exports.getRoles = () => {
   });
 };
 exports.getRoleById = (role) => {
+  const fun = 'getRoleById';
   const db = open();
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM Roles WHERE role = ?`, [role], function (err, row) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
         resolve(row);
@@ -174,6 +185,7 @@ exports.getRoleById = (role) => {
   });
 };
 exports.getUserRolesByUsername = (username) => {
+  const fun = 'getUserRolesByUsername';
   return this.getUserByUsername(username)
     .then((user) => {
       if (user) {
@@ -181,7 +193,7 @@ exports.getUserRolesByUsername = (username) => {
         return new Promise((resolve, reject) => {
           db.all(`SELECT * FROM User_Roles WHERE userId = ?`, [user.id], function (err, rows) {
             if (err) {
-              console.log(err.message);
+              log.e(mod, fun, err.message);
               reject(err);
             } else {
               resolve(rows);
@@ -194,19 +206,24 @@ exports.getUserRolesByUsername = (username) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      log.e(mod, fun, err);
       throw err;
     });
 };
 exports.deleteUserRole = (userId, role) => {
+  const fun = 'deleteUserRole';
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM User_Roles WHERE userId = ? AND role = ?`, [userId, role], function (err) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
-        console.log(`User_Roles : A row has been deleted with userId ${userId} and role ${role}`);
+        log.i(
+          mod,
+          fun,
+          `User_Roles : A row has been deleted with userId ${userId} and role ${role}`,
+        );
         resolve({ userId, role });
       }
       close(db);
@@ -215,6 +232,7 @@ exports.deleteUserRole = (userId, role) => {
 };
 
 const createUserRole = (userRole) => {
+  const fun = 'createUserRole';
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(
@@ -222,10 +240,12 @@ const createUserRole = (userRole) => {
       [userRole.userId, userRole.role],
       function (err) {
         if (err) {
-          console.log(err.message);
+          log.e(mod, fun, err.message);
           reject(err);
         } else {
-          console.log(
+          log.i(
+            mod,
+            fun,
             `User_Roles : A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
           );
           resolve(userRole);
@@ -239,12 +259,13 @@ exports.createUserRole = createUserRole;
 
 // Default Form
 exports.getDefaultForm = (user) => {
+  const fun = 'getDefaultForm';
   if (user) {
     const db = open();
     return new Promise((resolve, reject) => {
       db.get(`SELECT * FROM Default_Form WHERE userId = ?`, [user.id], function (err, row) {
         if (err) {
-          console.log(err.message);
+          log.e(mod, fun, err.message);
           reject(err);
         } else {
           resolve(JSON.parse(row.defaultValue));
@@ -257,14 +278,15 @@ exports.getDefaultForm = (user) => {
   }
 };
 exports.deleteDefaultForm = (user) => {
+  const fun = 'deleteDefaultForm';
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM Default_Form WHERE userId = ?`, [user.id], function (err) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         reject(err);
       } else {
-        console.log(`Default_Form : A row has been deleted with userId ${user.id}`);
+        log.i(mod, fun, `Default_Form : A row has been deleted with userId ${user.id}`);
         resolve({});
       }
       close(db);
@@ -273,6 +295,7 @@ exports.deleteDefaultForm = (user) => {
 };
 
 exports.updateDefaultForm = (user, data) => {
+  const fun = 'updateDefaultForm';
   return this.getDefaultForm(user).then((defaultValue) => {
     const db = open();
     if (!defaultValue) {
@@ -282,10 +305,10 @@ exports.updateDefaultForm = (user, data) => {
           [user.id, JSON.stringify(data)],
           function (err) {
             if (err) {
-              console.log(err.message);
+              log.e(mod, fun, err.message);
               reject(err);
             } else {
-              console.log(`Default_Form : A row has been inserted with userId ${user.id}`);
+              log.i(mod, fun, `Default_Form : A row has been inserted with userId ${user.id}`);
               resolve(data);
             }
             close(db);
@@ -300,10 +323,10 @@ exports.updateDefaultForm = (user, data) => {
           [JSON.stringify(data), user.id],
           function (err) {
             if (err) {
-              console.log(err.message);
+              log.e(mod, fun, err.message);
               reject(err);
             } else {
-              console.log(`Default_Form : A row has been edited with userId ${user.id}`);
+              log.i(mod, fun, `Default_Form : A row has been edited with userId ${user.id}`);
               resolve(data);
             }
             close(db);
@@ -318,10 +341,11 @@ exports.updateDefaultForm = (user, data) => {
 exports.open = open;
 exports.close = close;
 exports.openOrCreateDB = () => {
+  const fun = 'openOrCreateDB';
   return new sqlite3.Database(`${config.database.db_directory}/rudy_manager.db`, (err) => {
     if (err) {
-      console.error(err);
+      log.e(mod, fun, err);
     }
-    console.log('Creation of (or Connected to) the rudy_manager database.');
+    log.v(mod, fun, 'Creation of (or Connected to) the rudy_manager database.');
   });
 };

@@ -1,4 +1,6 @@
 const databaseManager = require('../database');
+const log = require('../../utils/logger');
+const mod = 'database';
 
 const sqlCreateRoleTable =
   'CREATE TABLE IF NOT EXISTS Roles (role TEXT PRIMARY KEY NOT NULL UNIQUE,desc TEXT);';
@@ -15,22 +17,23 @@ const initialRoles = [
 ];
 
 exports.initRolesTable = () => {
+  const fun = 'initRolesTable';
   const db = databaseManager.open();
   db.get(
     `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
     ['table', 'Roles'],
     function (err, row) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         databaseManager.close(db);
       } else {
         if (!row) {
           db.run(sqlCreateRoleTable, (err) => {
             if (err) {
-              console.error(err.message);
+              log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              console.log('Table Created : Roles');
+              log.i(mod, fun, 'Table Created : Roles');
               databaseManager.close(db);
               databaseManager.createRoles(initialRoles);
             }
@@ -43,22 +46,23 @@ exports.initRolesTable = () => {
   );
 };
 exports.initUserRolesTable = () => {
+  const fun = 'initUserRolesTable';
   const db = databaseManager.open();
   db.get(
     `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
     ['table', 'User_Roles'],
     function (err, row) {
       if (err) {
-        console.log(err.message);
+        log.e(mod, fun, err.message);
         databaseManager.close(db);
       } else {
         if (!row) {
           db.run(sqlCreateUserRoleTable, (err) => {
             if (err) {
-              console.error(err.message);
+              log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              console.log('Table Created : User_Roles');
+              log.i(mod, fun, 'Table Created : User_Roles');
               databaseManager.close(db);
             }
           });

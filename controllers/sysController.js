@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const log = require('../utils/logger');
 
 exports.getHash = (req, res, next) => {
   try {
@@ -12,7 +13,7 @@ exports.getHash = (req, res, next) => {
 
     res.status(200).send(`${hashId}`.trim());
   } catch (err) {
-    console.log(err);
+    log.e('', '', err);
     throw err;
   }
 };
@@ -20,7 +21,7 @@ exports.getFormUrl = (req, res, next) => {
   try {
     res.status(200).json(config.formulaire.base_url);
   } catch (err) {
-    console.log(err);
+    log.e('', '', err);
     throw err;
   }
 };
@@ -28,7 +29,7 @@ exports.getTest = (req, res, next) => {
   try {
     res.status(200).json('test');
   } catch (err) {
-    console.log(err);
+    log.e('', '', err);
     throw err;
   }
 };

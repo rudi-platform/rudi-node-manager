@@ -10,6 +10,9 @@ const apiAdmin = require('./routes/routesAdmin');
 const apiMedia = require('./routes/routesMedia');
 // Require Config
 const config = require('./config/config');
+const log = require('./utils/logger');
+
+const mod = 'server';
 
 const passport = require('./utils/passportSetup');
 const initDatabase = require('./database/scripts/initDatabase');
@@ -22,7 +25,7 @@ const port = config.server.listening_port || 5000;
 
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, res, next) => {
-  console.log(`Request_Endpoint: ${req.method} ${req.url}`);
+  log.v(mod, '', `Request_Endpoint: ${req.method} ${req.url}`);
   next();
 });
 
@@ -67,4 +70,4 @@ app.get('*', (req, res) => {
 });
 
 // Configure our server to listen on the port defiend by our port variable
-app.listen(port, () => console.log(`BACK_END_SERVICE_PORT: ${port}`));
+app.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`));

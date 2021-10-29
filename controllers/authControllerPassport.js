@@ -2,8 +2,11 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const databaseManager = require('../database/database');
 const utils = require('../utils/utils');
+const log = require('../utils/logger');
+const mod = 'authController';
 
 const registerUser = (data) => {
+  const fun = 'registerUser';
   // TODO : throw error instead
   if (!data.password || !data.confirmPassword || data.password !== data.confirmPassword) return;
   return databaseManager
@@ -24,7 +27,7 @@ const registerUser = (data) => {
             });
           })
           .catch((err) => {
-            console.log(err);
+            log.e(mod, fun, err);
             throw err;
           });
       } else {
@@ -32,7 +35,7 @@ const registerUser = (data) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      log.e(mod, fun, err);
       throw err;
     });
 };
@@ -75,6 +78,7 @@ exports.postLogin = (req, res, next) => {
 };
 
 exports.postRegister = (req, res, next) => {
+  const fun = 'postRegister';
   try {
     const data = req.body;
     registerUser(data)
@@ -86,23 +90,25 @@ exports.postRegister = (req, res, next) => {
         res.status(400).send(err.message);
       });
   } catch (err) {
-    console.error(err);
+    log.e(mod, fun, err);
     res.status(400).send(err);
   }
 };
 exports.postForgot = (req, res, next) => {
+  const fun = 'postForgot';
   try {
     // TODO
   } catch (err) {
-    console.log(err);
+    log.e(mod, fun, err);
     throw err;
   }
 };
 exports.postReset = (req, res, next) => {
+  const fun = 'postReset';
   try {
     // TODO
   } catch (err) {
-    console.log(err);
+    log.e(mod, fun, err);
     throw err;
   }
 };
