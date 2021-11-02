@@ -55,11 +55,13 @@ exports.postLogin = (req, res, next) => {
 
       const { authToken, publicToken, exp } = utils.createToken(user);
 
+      // sameSite: 'Lax' ?
       return res
         .status(200)
         .cookie('authToken', authToken, {
           secure: !!process.env.NODE_ENV,
           httpOnly: true,
+          sameSite: 'Strict',
           expires: new Date(exp * 1000),
         })
         .cookie('publicToken', publicToken, {
@@ -119,6 +121,7 @@ exports.logout = (req, res, next) => {
     .cookie('authToken', null, {
       secure: !!process.env.NODE_ENV,
       httpOnly: true,
+      sameSite: 'Strict',
       expires: new Date(0),
     })
     .cookie('publicToken', null, {
@@ -135,6 +138,7 @@ exports.getToken = (req, res, next) => {
     .cookie('authToken', authToken, {
       secure: !!process.env.NODE_ENV,
       httpOnly: true,
+      sameSite: 'Strict',
       expires: new Date(exp * 1000),
     })
     .cookie('publicToken', publicToken, {
