@@ -20,7 +20,6 @@ const initDatabase = require('./database/scripts/initDatabase');
 
 // Create a new express application named 'app'
 const app = express();
-app.use(helmet());
 // Set our backend port to be either an environment variable or port 5000
 const port = config.server.listening_port || 5000;
 
@@ -29,6 +28,14 @@ app.use((req, res, next) => {
   log.v(mod, '', `Request_Endpoint: ${req.method} ${req.url}`);
   next();
 });
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 
 // Configure the bodyParser middleware
 app.use(bodyParser.json());
