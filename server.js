@@ -28,14 +28,17 @@ app.use((req, res, next) => {
   log.v(mod, '', `Request_Endpoint: ${req.method} ${req.url}`);
   next();
 });
-app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: true,
-    directives: {
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+      reportOnly: true,
     },
-  },
-}));
+  }),
+);
 
 // Configure the bodyParser middleware
 app.use(bodyParser.json());
