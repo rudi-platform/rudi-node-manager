@@ -33,9 +33,8 @@ app.use(
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
       },
-      reportOnly: true,
     },
   }),
 );
