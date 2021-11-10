@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
 
 /**
  * Login component
@@ -13,6 +14,9 @@ import axios from 'axios';
 export default function Login({ setToken }) {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
+
+  const { toggle, visible } = useGenericModal();
+  const { options, changeOptions } = useGenericModalOptions();
 
   /**
    * is form valid?
@@ -34,7 +38,18 @@ export default function Login({ setToken }) {
         },
       })
       .catch((error) => {
-        console.log(error);
+        changeOptions({
+          text: `Echec de connexion`,
+          title: 'une erreur est survenue',
+          type: 'error',
+          buttons: [
+            {
+              text: 'Ok',
+              action: () => {},
+            },
+          ],
+        });
+        toggle();
       });
   }
 
@@ -52,6 +67,7 @@ export default function Login({ setToken }) {
 
   return (
     <div className="Login">
+      <GenericModal visible={visible} toggle={toggle} options={options}></GenericModal>
       <Form onSubmit={handleSubmit}>
         <Form.Group size="lg" controlId="email">
           <Form.Label>User</Form.Label>
