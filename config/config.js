@@ -25,6 +25,9 @@ if (customExist) {
   if (customConfig.auth && customConfig.auth.secret_key_JWT) {
     config.auth.secret_key_JWT = customConfig.auth.secret_key_JWT;
   }
+  if (customConfig.auth && customConfig.auth.token_expire) {
+    config.auth.token_expire = customConfig.auth.token_expire;
+  }
 
   // API_RUDI
   if (customConfig.API_RUDI && customConfig.API_RUDI.listening_address) {

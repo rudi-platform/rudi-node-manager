@@ -9,7 +9,7 @@ const KTYP = 'ktyp';
 const PRVK = 'prvk';
 
 const createToken = (user) => {
-  let exp = moment().add(20, 'minutes').format('X');
+  let exp = moment().add(config.auth.token_expire, 'minutes').format('X');
   exp = parseInt(exp, 10);
   const body = { id: user.id, username: user.username };
   return {
