@@ -66,7 +66,6 @@ passport.use(
     },
     async (token, done) => {
       try {
-        // TODO : authorisation
         return done(null, token.user);
       } catch (error) {
         done(error);

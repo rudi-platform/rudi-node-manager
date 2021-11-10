@@ -11,6 +11,7 @@ exports.checkRolePerm = (role) => (req, res, next) => {
       if (rows.findIndex((elem) => elem.role === role || elem.role === 'SuperAdmin') >= 0) {
         next();
       } else {
+        log.w(mod, fun, `Forbidden access by ${username} at ${req.method} ${req.url}`);
         res.status(403).json('Forbidden');
       }
     })
