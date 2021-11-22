@@ -112,4 +112,25 @@ exports.deleteResource = (req, res, next) => {
     });
 };
 
+exports.getReports = (req, res, next) => {
+  const url = `${api}/report`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
+  return axios
+    .get(`${serveur}${url}`, {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((resRUDI) => {
+      const reports = resRUDI.data;
+      res.status(200).json(reports);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error);
+      res.status(501).json(error);
+    });
+};
+
 module.exports.resourcesList = resourcesList;

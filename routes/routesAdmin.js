@@ -21,6 +21,8 @@ router.delete(
   controllers.deleteResource,
 );
 
+router.get('/report', controllers.getReports);
+
 router.get('/organizations', orgaController.orgaList);
 router.post('/organizations', orgaController.postOrga);
 router.put('/organizations', orgaController.putOrga);

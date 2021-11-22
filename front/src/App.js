@@ -16,6 +16,7 @@ import useToken from './useToken';
 import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
 import axios from 'axios';
+import Monitoring from './components/monitoring/monitoring';
 
 console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
 // TODO : move to util.js
@@ -156,7 +157,7 @@ export default function App() {
                         </Dropdown.Item>
                       </DropdownButton>
                     </li>
-                    <li className="nav-item hideWIP">
+                    <li className="nav-item">
                       <Link to="/monitoring">
                         <button type="button" className="btn btn-primary button-margin">
                           Monitoring
@@ -233,7 +234,7 @@ export default function App() {
               <Visualisation />
             </Route>
             <Route path="/monitoring">
-              <div className="tempPaddingTop">Work in progress</div>
+              <Monitoring />
             </Route>
             <Route path="/user">
               <CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />
