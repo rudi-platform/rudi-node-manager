@@ -34,6 +34,7 @@ app.use(
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
+        'connect-src': ["'self'", `${config.API_RUDI.media_api}`],
       },
     },
   }),
