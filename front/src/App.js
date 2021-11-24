@@ -157,7 +157,7 @@ export default function App() {
                         </Dropdown.Item>
                       </DropdownButton>
                     </li>
-                    <li className="nav-item">
+                    <li className="nav-item hideWIP">
                       <Link to="/monitoring">
                         <button type="button" className="btn btn-primary button-margin">
                           Monitoring
