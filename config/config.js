@@ -29,6 +29,11 @@ if (customExist) {
     config.auth.token_expire = customConfig.auth.token_expire;
   }
 
+  // Security
+  if (customConfig.security && customConfig.security.trusted_domain) {
+    config.security.trusted_domain = customConfig.security.trusted_domain;
+  }
+
   // API_RUDI
   if (customConfig.API_RUDI && customConfig.API_RUDI.listening_address) {
     config.API_RUDI.listening_address = customConfig.API_RUDI.listening_address;
