@@ -68,7 +68,7 @@ export default function EditCard({ formUrl, refresh }) {
               <input
                 type="text"
                 className="form-control"
-                placeholder="id du jeu de donnée"
+                placeholder="global_id"
                 value={editID}
                 onChange={handleChange}
               />
