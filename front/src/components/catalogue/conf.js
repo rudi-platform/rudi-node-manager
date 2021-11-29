@@ -17,6 +17,14 @@ export const filterConf = [
     },
   },
   {
+    name: 'keywords',
+    text: 'Mots clés :',
+    values: [],
+    toFilterParam: (elem) => {
+      return { keywords: `{\"$in\":[\"${elem.keywords}\"]}` };
+    },
+  },
+  {
     name: 'resource_languages',
     text: 'Language :',
     values: [],

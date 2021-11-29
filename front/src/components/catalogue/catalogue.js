@@ -107,6 +107,15 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   }
 
   /**
+   * verifie si 1 Filtre est selectionné
+   * @param {*} filterParam filtre to test
+   * @return {boolean} true si le filtre est séléctionné
+   */
+  function isSelectedFilter(filterParam) {
+    return currentFilters.findIndex((element) => isSameFilter(element, filterParam)) >= 0;
+  }
+
+  /**
    * ajoute un filter pour la requete
    * @param {*} filterParam element a rajouter
    */
@@ -286,7 +295,13 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                                   ></ThemeDisplay>
                                 )}
                                 {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
-                                <span className="badge badge-primary badge-pill">
+                                <span
+                                  className={`badge ${
+                                    isSelectedFilter(filter.toFilterParam(filterValue))
+                                      ? 'badge-success'
+                                      : 'badge-primary'
+                                  } badge-pill`}
+                                >
                                   {filterValue.count}
                                 </span>
                               </li>
