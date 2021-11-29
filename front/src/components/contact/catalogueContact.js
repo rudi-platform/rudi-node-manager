@@ -57,7 +57,6 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     return () => {
-      currentOffset += PAGE_SIZE;
       axios
         .get(`${process.env.PUBLIC_URL}/api/admin/contacts`, {
           params: { limit: PAGE_SIZE, offset: currentOffset },
