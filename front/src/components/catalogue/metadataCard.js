@@ -23,7 +23,10 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   function downloadFile(ressource) {
     axios
-      .get(`${ressource.connector.url}`, { responseType: 'blob' })
+      .get(`${ressource.connector.url}`, {
+        responseType: 'blob',
+        headers: { 'media-access-method': 'Direct' },
+      })
       .then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
