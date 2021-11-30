@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -46,6 +46,27 @@ export default function EditProducerCard({ formUrl, refresh }) {
       });
   }
 
+  /**
+   * call for confirmation before organization deletion
+   */
+  function triggerDeleteOrganization() {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression du Producteur ${editID}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteOrganization();
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
   return (
     <div className="col-12">
       <div className="card tempMargin">
@@ -66,7 +87,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
               <input
                 type="text"
                 className="form-control"
-                placeholder="id du producteur"
+                placeholder="organization_id"
                 value={editID}
                 onChange={handleChange}
               />
@@ -81,7 +102,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => deleteOrganization()}
+                onClick={(e) => triggerDeleteOrganization()}
               >
                 <Trash />
               </button>

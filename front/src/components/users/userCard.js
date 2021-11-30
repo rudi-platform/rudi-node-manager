@@ -2,7 +2,7 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
@@ -42,6 +42,30 @@ export default function UserCard({ user, display, refresh }) {
         defaultErrorHandler(e);
       });
   }
+
+  /**
+   * call for confirmation before user deletion
+   * @param {*} user user a suppr
+   */
+  function triggerDeleteUser(user) {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression de l'utilisateur ${user.username}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteUser(user);
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
+
   /**
    * call for user update
    * @param {*} user utilisateur
@@ -68,7 +92,11 @@ export default function UserCard({ user, display, refresh }) {
               <button type="button" className="btn btn-warning" onClick={(e) => updateUser(user)}>
                 <Pencil />
               </button>
-              <button type="button" className="btn btn-danger" onClick={(e) => deleteUser(user)}>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={(e) => triggerDeleteUser(user)}
+              >
                 <Trash />
               </button>
             </div>

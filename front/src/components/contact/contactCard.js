@@ -2,7 +2,7 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -37,6 +37,28 @@ export default function ContactCard({ contact, formUrl, refresh }) {
         defaultErrorHandler(e);
       });
   }
+  /**
+   * call for confirmation before contact deletion
+   * @param {*} contact contact a suppr
+   */
+  function triggerDeleteContact(contact) {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression du contact ${contact.contact_name}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteContact(contact);
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
 
   return (
     <div className="col-12" key={contact.contact_id}>
@@ -56,7 +78,7 @@ export default function ContactCard({ contact, formUrl, refresh }) {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => deleteContact(contact)}
+                onClick={(e) => triggerDeleteContact(contact)}
               >
                 <Trash />
               </button>
@@ -64,6 +86,9 @@ export default function ContactCard({ contact, formUrl, refresh }) {
           </div>
         </h5>
         <div className="card-body">
+          <p className="card-text">
+            contact_id :<small className="text-muted">{contact.contact_id}</small>
+          </p>
           {contact.organization_name && (
             <p className="card-text">
               organisation :<small className="text-muted">{contact.organization_name}</small>

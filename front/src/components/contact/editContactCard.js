@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -46,6 +46,28 @@ export default function EditContactCard({ formUrl, refresh }) {
       });
   }
 
+  /**
+   * call for confirmation before contact deletion
+   */
+  function triggerDeleteContact() {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression du contact ${editID}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteContact();
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
+
   return (
     <div className="col-12">
       <div className="card tempMargin">
@@ -66,7 +88,7 @@ export default function EditContactCard({ formUrl, refresh }) {
               <input
                 type="text"
                 className="form-control"
-                placeholder="id du Contact"
+                placeholder="contact_id"
                 value={editID}
                 onChange={handleChange}
               />
@@ -78,7 +100,11 @@ export default function EditContactCard({ formUrl, refresh }) {
               >
                 <Pencil />
               </a>
-              <button type="button" className="btn btn-danger" onClick={(e) => deleteContact()}>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={(e) => triggerDeleteContact()}
+              >
                 <Trash />
               </button>
             </div>

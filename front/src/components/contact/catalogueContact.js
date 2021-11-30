@@ -40,7 +40,7 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
   function getInitialData() {
     axios
       .get(`${process.env.PUBLIC_URL}/api/admin/contacts`, {
-        params: { limit: PAGE_SIZE, offset: currentOffset },
+        params: { limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
         setCurrentOffset(PAGE_SIZE);

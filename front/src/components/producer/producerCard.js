@@ -2,7 +2,7 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -38,7 +38,28 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
         defaultErrorHandler(e);
       });
   }
-
+  /**
+   * call for confirmation before organization deletion
+   * @param {*} organization organization a suppr
+   */
+  function triggerDeleteOrganization(organization) {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression du Producteur ${organization.organization_name}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteOrganization(organization);
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
   return (
     <div className="col-12" key={organization.organization_id}>
       <div className="card tempMargin">
@@ -57,13 +78,18 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => deleteOrganization(organization)}
+                onClick={(e) => triggerDeleteOrganization(organization)}
               >
                 <Trash />
               </button>
             </div>
           </div>
         </h5>
+        <div className="card-body">
+          <p className="card-text">
+            organization_id :<small className="text-muted">{organization.organization_id}</small>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Pencil, Trash, Check } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -47,6 +47,27 @@ export default function EditCard({ formUrl, refresh }) {
         defaultErrorHandler(e);
       });
   }
+  /**
+   * call for confirmation before metadata deletion
+   */
+  function triggerDeleteRessource() {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression de la metadonné ${editID}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteRessource();
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
 
   return (
     <div className="col-12">
@@ -78,7 +99,11 @@ export default function EditCard({ formUrl, refresh }) {
               <a className="btn btn-warning" href={`${formUrl}?update=${editID}`}>
                 <Pencil />
               </a>
-              <button type="button" className="btn btn-danger" onClick={(e) => deleteRessource()}>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={(e) => triggerDeleteRessource()}
+              >
                 <Trash />
               </button>
             </div>

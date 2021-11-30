@@ -38,8 +38,19 @@ const DefaultOkOption = {
     },
   ],
 };
+const DefaultConfirmOption = {
+  text: `Confirmez vous l'action?`,
+  title: 'Confirmation',
+  type: 'confirm',
+  buttons: [
+    {
+      text: 'Oui',
+      action: () => {},
+    },
+  ],
+};
 ModalProvider.propTypes = {
   children: PropTypes.node,
 };
 
-export { ModalContext, ModalProvider, DefaultErrorOption, DefaultOkOption };
+export { ModalContext, ModalProvider, DefaultErrorOption, DefaultOkOption, DefaultConfirmOption };

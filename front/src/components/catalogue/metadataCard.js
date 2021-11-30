@@ -4,7 +4,7 @@ import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
@@ -65,6 +65,28 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         defaultErrorHandler(e);
       });
   }
+  /**
+   * call for confirmation before metadata deletion
+   * @param {*} metadata metadata a suppr
+   */
+  function triggerDeleteRessource(metadata) {
+    const options = DefaultConfirmOption;
+    options.text = `Confirmez vous la suppression de la metadonné ${metadata.resource_title}?`;
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => {
+          deleteRessource(metadata);
+        },
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
 
   /**
    * affiche le text en fonction de la langue choisi
@@ -123,7 +145,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                 <button
                   type="button"
                   className="btn btn-danger"
-                  onClick={(e) => deleteRessource(metadata)}
+                  onClick={(e) => triggerDeleteRessource(metadata)}
                 >
                   <Trash />
                 </button>
