@@ -225,7 +225,7 @@ export default function App() {
               />
             </Route>
             <Route path="/licence">
-              <CatalogueLicence display={{ editJDD: true }} editMode={{}} />
+              <CatalogueLicence display={{ editJDD: false }} editMode={{}} />
             </Route>
             <Route path="/show/:id">
               <Visualisation />

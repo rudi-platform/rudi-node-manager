@@ -3,7 +3,6 @@ import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import LicenceCard from './licenceCard';
-import EditCard from './editCard';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
@@ -47,7 +46,6 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
       <div className="row">
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && formUrl && <EditCard formUrl={formUrl}></EditCard>}
             <InfiniteScroll
               dataLength={metadatas.length}
               hasMore={hasMore}
