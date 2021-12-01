@@ -152,7 +152,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               </div>
             )}
           </div>
-          <span>
+          <div>
             <small className="text-muted">
               Modifié le :
               <Moment format=" DD/MM/YYYY HH:mm:ss">
@@ -160,7 +160,17 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               </Moment>
             </small>
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
-          </span>
+          </div>
+          {metadata.metadata_info.metadata_dates.published && (
+            <div>
+              <small className="text-muted">
+                Publié le :
+                <Moment format=" DD/MM/YYYY HH:mm:ss">
+                  {metadata.metadata_info.metadata_dates.published}
+                </Moment>
+              </small>
+            </div>
+          )}
         </h5>
         <div className="card-body">
           <p className="card-text">{getLangText(metadata.summary)}</p>
