@@ -100,13 +100,21 @@ function Visualisation({ match }) {
                 setVisuOption({ displayType: 'JSON', data: res2.data });
                 break;
 
-              default:
+              case 'text/csv':
+              case 'application/vnd.oasis.opendocument.spreadsheet':
+              case 'application/vnd.ms-excel':
+              case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 try {
                   const array = csvToArray(res2.data);
                   setVisuOption({ displayType: 'CSV', data: array });
                 } catch (error) {
                   defaultErrorHandler(error);
                 }
+                break;
+              default:
+                defaultErrorHandler({
+                  message: `le type ${res2.headers['content-type']} n'est pas supporté`,
+                });
 
                 break;
             }
