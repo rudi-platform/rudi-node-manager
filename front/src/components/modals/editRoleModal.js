@@ -34,7 +34,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
           1,
         );
         const options = DefaultOkOption;
-        options.text = `Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`;
+        options.text = [`Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`];
         changeOptions(options);
         toggle();
       })
@@ -65,7 +65,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         }
         user.roles.push(role.role);
         const options = DefaultOkOption;
-        options.text = `Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`;
+        options.text = [`Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`];
         changeOptions(options);
         toggle();
       })

@@ -20,7 +20,12 @@ export default function GenericModal({ visible, toggle, options }) {
             {options.title}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>{options.text}</Modal.Body>
+        <Modal.Body>
+          {options.text &&
+            options.text.map((text, i) => {
+              return <p key={`text-${i}`}>{text}</p>;
+            })}
+        </Modal.Body>
         <Modal.Footer>
           {options.buttons &&
             options.buttons.map((buttonOption, i) => {

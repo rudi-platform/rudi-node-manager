@@ -28,7 +28,7 @@ export default function EditCard({}) {
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `L'Utilisateur' ${res.data.username} a été supprimé`;
+        options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];
         changeOptions(options);
         toggle();
       })

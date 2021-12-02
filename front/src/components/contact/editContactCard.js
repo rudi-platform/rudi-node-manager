@@ -29,7 +29,7 @@ export default function EditContactCard({ formUrl, refresh }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/contacts/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `Le Contact ${res.data.contact_name} a été supprimé`;
+        options.text = [`Le Contact ${res.data.contact_name} a été supprimé`];
         options.buttons = [
           {
             text: 'Ok',
@@ -51,7 +51,7 @@ export default function EditContactCard({ formUrl, refresh }) {
    */
   function triggerDeleteContact() {
     const options = DefaultConfirmOption;
-    options.text = `Confirmez vous la suppression du contact ${editID}?`;
+    options.text = [`Confirmez vous la suppression du contact ${editID}?`];
     options.buttons = [
       {
         text: 'Oui',

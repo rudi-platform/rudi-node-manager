@@ -31,7 +31,7 @@ export default function EditCard({ formUrl, refresh }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `La Metadonnée ${res.data.resource_title} a été supprimée`;
+        options.text = [`La Metadonnée ${res.data.resource_title} a été supprimée`];
         options.buttons = [
           {
             text: 'Ok',
@@ -52,7 +52,7 @@ export default function EditCard({ formUrl, refresh }) {
    */
   function triggerDeleteRessource() {
     const options = DefaultConfirmOption;
-    options.text = `Confirmez vous la suppression de la metadonné ${editID}?`;
+    options.text = [`Confirmez vous la suppression de la metadonné ${editID}?`];
     options.buttons = [
       {
         text: 'Oui',

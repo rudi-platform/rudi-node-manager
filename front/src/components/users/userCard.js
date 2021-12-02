@@ -26,7 +26,7 @@ export default function UserCard({ user, display, refresh }) {
       .delete(`${process.env.PUBLIC_URL}/api/v1/users/${user.username}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `L'Utilisateur' ${res.data.username} a été supprimé`;
+        options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];
         options.buttons = [
           {
             text: 'Ok',
@@ -49,7 +49,7 @@ export default function UserCard({ user, display, refresh }) {
    */
   function triggerDeleteUser(user) {
     const options = DefaultConfirmOption;
-    options.text = `Confirmez vous la suppression de l'utilisateur ${user.username}?`;
+    options.text = [`Confirmez vous la suppression de l'utilisateur ${user.username}?`];
     options.buttons = [
       {
         text: 'Oui',

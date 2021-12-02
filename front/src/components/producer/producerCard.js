@@ -22,7 +22,7 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${organization.organization_id}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = `Le Producteur ${res.data.organization_name} a été supprimé`;
+        options.text = [`Le Producteur ${res.data.organization_name} a été supprimé`];
         options.buttons = [
           {
             text: 'Ok',
@@ -44,7 +44,9 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
    */
   function triggerDeleteOrganization(organization) {
     const options = DefaultConfirmOption;
-    options.text = `Confirmez vous la suppression du Producteur ${organization.organization_name}?`;
+    options.text = [
+      `Confirmez vous la suppression du Producteur ${organization.organization_name}?`,
+    ];
     options.buttons = [
       {
         text: 'Oui',
