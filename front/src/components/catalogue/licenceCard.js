@@ -41,16 +41,19 @@ export default function LicenceCard({ metadata, formUrl, display }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            id :<small className="text-muted">{metadata.concept_id}</small>
+            id : <small className="text-muted">{metadata.concept_id}</small>
           </p>
           <p className="card-text">
-            code :<small className="text-muted">{metadata.concept_code}</small>
+            code : <small className="text-muted">{metadata.concept_code}</small>
           </p>
           <p className="card-text">
             role : <small className="text-muted"> {metadata.concept_role}</small>
           </p>
           <p className="card-text">
-            uri : <small className="text-muted"> {metadata.concept_uri}</small>
+            uri :{' '}
+            <small className="text-muted">
+              <a href={metadata.concept_uri}> {metadata.concept_uri}</a>
+            </small>
           </p>
         </div>
       </div>
