@@ -263,12 +263,16 @@ exports.getDefaultForm = (user) => {
   if (user) {
     const db = open();
     return new Promise((resolve, reject) => {
-      db.get(`SELECT * FROM Default_Form WHERE userId = ?`, [user.id], function (err, row) {
+      db.all(`SELECT * FROM Default_Value_Form WHERE userId = ?`, [user.id], function (err, rows) {
         if (err) {
           log.e(mod, fun, err.message);
           reject(err);
         } else {
-          resolve(JSON.parse(row.defaultValue));
+          resolve(
+            rows.map((row) => {
+              return { name: row.name, defaultValue: JSON.parse(row.defaultValue) };
+            }),
+          );
         }
         close(db);
       });
@@ -277,38 +281,75 @@ exports.getDefaultForm = (user) => {
     return Promise.reject(new Error(`Default value for ${user.username} not found!`));
   }
 };
-exports.deleteDefaultForm = (user) => {
+exports.getDefaultFormWithName = (user, name) => {
+  const fun = 'getDefaultFormWithName';
+  if (user) {
+    const db = open();
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT * FROM Default_Value_Form WHERE userId = ? and name = ?`,
+        [user.id, name],
+        function (err, row) {
+          if (err) {
+            log.e(mod, fun, err.message);
+            reject(err);
+          } else {
+            resolve(JSON.parse(row.defaultValue));
+          }
+          close(db);
+        },
+      );
+    });
+  } else {
+    return Promise.reject(
+      new Error(`Default value for ${user.username} and name : ${name} not found!`),
+    );
+  }
+};
+exports.deleteDefaultForm = (user, name) => {
   const fun = 'deleteDefaultForm';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM Default_Form WHERE userId = ?`, [user.id], function (err) {
-      if (err) {
-        log.e(mod, fun, err.message);
-        reject(err);
-      } else {
-        log.i(mod, fun, `Default_Form : A row has been deleted with userId ${user.id}`);
-        resolve({});
-      }
-      close(db);
-    });
+    db.run(
+      `DELETE FROM Default_Value_Form WHERE userId = ? AND name = ?`,
+      [user.id, name],
+      function (err) {
+        if (err) {
+          log.e(mod, fun, err.message);
+          reject(err);
+        } else {
+          log.i(
+            mod,
+            fun,
+            `Default_Value_Form : A row has been deleted with userId ${user.id} and name : ${name}`,
+          );
+          resolve({});
+        }
+        close(db);
+      },
+    );
   });
 };
 
 exports.updateDefaultForm = (user, data) => {
   const fun = 'updateDefaultForm';
-  return this.getDefaultForm(user).then((defaultValue) => {
+  return this.getDefaultFormWithName(user, data.name).then((defaultValue) => {
     const db = open();
     if (!defaultValue) {
       return new Promise((resolve, reject) => {
         db.run(
-          `INSERT INTO Default_Form(userId,defaultValue) VALUES(?,?)`,
-          [user.id, JSON.stringify(data)],
+          `INSERT INTO Default_Value_Form(userId,name,defaultValue) VALUES(?,?,?)`,
+          [user.id, data.name, JSON.stringify(data.defaultValue)],
           function (err) {
             if (err) {
               log.e(mod, fun, err.message);
               reject(err);
             } else {
-              log.i(mod, fun, `Default_Form : A row has been inserted with userId ${user.id}`);
+              log.i(
+                mod,
+                fun,
+                `Default_Value_Form : A row has been inserted with userId ${user.id} and name : ${data.name}`,
+              );
               resolve(data);
             }
             close(db);
@@ -319,14 +360,18 @@ exports.updateDefaultForm = (user, data) => {
       // edit
       return new Promise((resolve, reject) => {
         db.run(
-          `UPDATE Default_Form SET defaultValue = ? WHERE userId = ?`,
-          [JSON.stringify(data), user.id],
+          `UPDATE Default_Value_Form SET defaultValue = ? WHERE userId = ? and name = ?`,
+          [JSON.stringify(data.defaultValue), user.id, data.name],
           function (err) {
             if (err) {
               log.e(mod, fun, err.message);
               reject(err);
             } else {
-              log.i(mod, fun, `Default_Form : A row has been edited with userId ${user.id}`);
+              log.i(
+                mod,
+                fun,
+                `Default_Value_Form : A row has been edited with userId ${user.id} and name : ${data.name}`,
+              );
               resolve(data);
             }
             close(db);

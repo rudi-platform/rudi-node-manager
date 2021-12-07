@@ -78,8 +78,9 @@ exports.getDefaultForm = (req, res, next) => {
 };
 exports.deleteDefaultForm = (req, res, next) => {
   const user = req.user;
+  const { name } = req.params;
   return databaseManager
-    .deleteDefaultForm(user)
+    .deleteDefaultForm(user, name)
     .then((row) => {
       res.status(200).json(row);
     })

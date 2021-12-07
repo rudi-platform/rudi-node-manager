@@ -84,7 +84,7 @@ router.get(
   adminController.getDefaultForm,
 );
 router.delete(
-  '/default-form',
+  '/default-form/:name',
   passport.authenticate('jwt', { session: false }),
   adminController.deleteDefaultForm,
 );
