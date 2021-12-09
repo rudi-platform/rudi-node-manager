@@ -11,6 +11,8 @@ cache:
 
 back_npm:
   stage: npm_install
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
   script:
@@ -18,6 +20,8 @@ back_npm:
 
 front_npm:
   stage: npm_install
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
   script:
@@ -25,6 +29,8 @@ front_npm:
 
 back_test:
   stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
   script:
@@ -38,6 +44,8 @@ back_test:
 
 lint:
   stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
   script:
