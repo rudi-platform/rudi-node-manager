@@ -8,6 +8,7 @@ import { filterConf } from './conf';
 import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { Search } from 'react-bootstrap-icons';
 
 /**
  * Composant : Catalogue
@@ -23,6 +24,16 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   const [currentOffset, setCurrentOffset] = useState(-1);
 
   const initialRender = useRef(true);
+  const searchText = useRef(null);
+  const isSearchMode = () => {
+    return searchText.current.value && searchText.current.value.length > 0;
+  };
+  const searchMode = () => {
+    if (isSearchMode()) {
+      return `/search`;
+    }
+    return '';
+  };
 
   const generalConf = useContext(GeneralContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
@@ -63,6 +74,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * @return {*} params enrichis pour la requete
    */
   function createParams(baseParams) {
+    baseParams[searchText.current.value] = '';
     currentFilters.forEach((filter) => Object.assign(baseParams, filter));
     return baseParams;
   }
@@ -144,7 +156,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   function getInitialData() {
     Promise.all(
       filterConf.map((count) =>
-        axios.get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        axios.get(`${process.env.PUBLIC_URL}/api/admin/resources${searchMode()}`, {
           params: createParams({ count_by: count.name }),
         }),
       ),
@@ -166,17 +178,20 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+      .get(`${process.env.PUBLIC_URL}/api/admin/resources${searchMode()}`, {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {
-        const datas = res.data;
-
-        // setCurrentOffset(currentOffset+PAGE_SIZE);
+        let datas;
+        if (isSearchMode()) {
+          datas = res.data.items;
+        } else {
+          datas = res.data;
+        }
         if (datas.length === 0) {
           setHasMore(false);
         }
-        setMetadatas(metadatas.concat(datas));
+        setMetadatas((metadatas) => metadatas.concat(datas));
       })
       .catch((e) => {
         defaultErrorHandler(e);
@@ -262,16 +277,21 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="col-12 border rounded tempMargin  hideWIP">
+              <div className="col-12 border rounded tempMargin">
                 <h5>Rechercher</h5>
                 <div className="input-group flex-nowrap">
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Recherche"
+                    ref={searchText}
                     aria-label="Recherche"
                     aria-describedby="addon-wrapping"
                   />
+                  <button type="button" className="btn btn-success" onClick={(e) => refresh()}>
+                    {' '}
+                    <Search />
+                  </button>
                 </div>
               </div>
               <div className="col-12 border rounded tempMargin">

@@ -118,15 +118,15 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             >
               {metadata.resource_title}
             </a>
-            {!metadata.metadata_info.metadata_dates.published &&
-              !metadata.metadata_info.metadata_dates.deleted && (
+            {!metadata.metadata_info.metadata_dates?.published &&
+              !metadata.metadata_info.metadata_dates?.deleted && (
                 <span className="badge badge-warning badge-pill">waiting</span>
               )}
-            {metadata.metadata_info.metadata_dates.published &&
-              !metadata.metadata_info.metadata_dates.deleted && (
+            {metadata.metadata_info.metadata_dates?.published &&
+              !metadata.metadata_info.metadata_dates?.deleted && (
                 <span className="badge badge-success badge-pill">published</span>
               )}
-            {metadata.metadata_info.metadata_dates.deleted && (
+            {metadata.metadata_info.metadata_dates?.deleted && (
               <span className="badge badge-danger badge-pill">deleted</span>
             )}
             {display && display.editJDD && (
@@ -152,16 +152,20 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               </div>
             )}
           </div>
+
           <div>
-            <small className="text-muted">
-              Modifié le :
-              <Moment format=" DD/MM/YYYY HH:mm:ss">
-                {metadata.metadata_info.metadata_dates.updated}
-              </Moment>
-            </small>
+            {metadata.metadata_info.metadata_dates?.updated && (
+              <small className="text-muted">
+                Modifié le :
+                <Moment format=" DD/MM/YYYY HH:mm:ss">
+                  {metadata.metadata_info.metadata_dates.updated}
+                </Moment>
+              </small>
+            )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
           </div>
-          {metadata.metadata_info.metadata_dates.published && (
+
+          {metadata.metadata_info.metadata_dates?.published && (
             <div>
               <small className="text-muted">
                 Publié le :
