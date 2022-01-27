@@ -33,7 +33,12 @@ exports.initRolesTable = () => {
               log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              log.i(mod, fun, 'Table Created : Roles');
+              log.i(
+                mod,
+                fun,
+                'Table Created : Roles',
+                log.getContext(null, { opType: 'init_table_roles' }),
+              );
               databaseManager.close(db);
               databaseManager.createRoles(initialRoles);
             }
@@ -62,7 +67,12 @@ exports.initUserRolesTable = () => {
               log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              log.i(mod, fun, 'Table Created : User_Roles');
+              log.i(
+                mod,
+                fun,
+                'Table Created : User_Roles',
+                log.getContext(null, { opType: 'init_table_userRoles' }),
+              );
               databaseManager.close(db);
             }
           });

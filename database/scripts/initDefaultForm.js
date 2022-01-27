@@ -24,7 +24,12 @@ exports.initDefaultFormTable = () => {
               log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              log.i(mod, fun, 'Table Created : Default_Value_Form');
+              log.i(
+                mod,
+                fun,
+                'Table Created : Default_Value_Form',
+                log.getContext(null, { opType: 'init_table_defaultForm' }),
+              );
               databaseManager.close(db);
             }
           });

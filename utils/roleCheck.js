@@ -12,6 +12,12 @@ exports.checkRolePerm = (role) => (req, res, next) => {
         next();
       } else {
         log.w(mod, fun, `Forbidden access by ${username} at ${req.method} ${req.url}`);
+        log.sysWarn(
+          mod,
+          fun,
+          `Forbidden access by ${username} at ${req.method} ${req.url}`,
+          log.getContext(req, { opType: 'get_hash', statusCode: 403 }),
+        );
         res.status(403).json('Forbidden');
       }
     })

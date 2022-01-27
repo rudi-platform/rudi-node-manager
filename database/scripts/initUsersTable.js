@@ -23,7 +23,12 @@ exports.initUsersTable = () => {
               log.e(mod, fun, err.message);
               databaseManager.close(db);
             } else {
-              log.i(mod, fun, 'Table Created : Users');
+              log.i(
+                mod,
+                fun,
+                'Table Created : Users',
+                log.getContext(null, { opType: 'init_table_users' }),
+              );
               databaseManager.close(db);
             }
           });

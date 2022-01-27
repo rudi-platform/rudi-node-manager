@@ -19,7 +19,7 @@ const orgaList = (req, res, next) => {
       res.status(200).json(organizations);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'get_producers' });
       res.status(501).json(error);
     });
 };
@@ -37,7 +37,7 @@ exports.getOrgaById = (req, res, next) => {
       res.status(200).json(organization);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'get_producer', id: `producer+${id}` });
       res.status(501).json(error);
     });
 };
@@ -56,7 +56,7 @@ exports.postOrga = (req, res, next) => {
       res.status(200).json(resRUDI.data);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'post_producer' });
       res.status(501).json(error);
     });
 };
@@ -75,7 +75,10 @@ exports.putOrga = (req, res, next) => {
       res.status(200).json(resRUDI.data);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, {
+        opType: 'put_producer',
+        id: `producer+${req.body.organization_id}`,
+      });
       res.status(501).json(error);
     });
 };
@@ -97,7 +100,7 @@ exports.deleteOrga = (req, res, next) => {
       res.status(200).json(orga);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'delete_producer', id: `producer+${id}` });
       res.status(501).json(error);
     });
 };

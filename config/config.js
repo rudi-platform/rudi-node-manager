@@ -62,6 +62,40 @@ if (customExist) {
   }
 
   // Systeme
+
+  // logging
+  if (customConfig.logging && customConfig.logging.log_dir) {
+    config.logging.log_dir = customConfig.logging.log_dir;
+  }
+
+  // Syslog
+  if (customConfig.syslog && customConfig.syslog.syslog_level) {
+    config.syslog.syslog_level = customConfig.syslog.syslog_level;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_host) {
+    config.syslog.syslog_host = customConfig.syslog.syslog_host;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_port) {
+    config.syslog.syslog_port = customConfig.syslog.syslog_port;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_facility) {
+    config.syslog.syslog_facility = customConfig.syslog.syslog_facility;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_protocol) {
+    config.syslog.syslog_protocol = customConfig.syslog.syslog_protocol;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_type) {
+    config.syslog.syslog_type = customConfig.syslog.syslog_type;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_socket) {
+    config.syslog.syslog_socket = customConfig.syslog.syslog_socket;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_node_name) {
+    config.syslog.syslog_node_name = customConfig.syslog.syslog_node_name;
+  }
+  if (customConfig.syslog && customConfig.syslog.syslog_dir) {
+    config.syslog.syslog_dir = customConfig.syslog.syslog_dir;
+  }
 }
 
 module.exports = config;

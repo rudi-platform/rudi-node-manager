@@ -19,7 +19,7 @@ const contactList = (req, res, next) => {
       res.status(200).json(contacts);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'get_contacts' });
       res.status(501).json(error);
     });
 };
@@ -37,7 +37,7 @@ exports.getContactById = (req, res, next) => {
       res.status(200).json(contact);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'get_contact', id: `contact+${id}` });
       res.status(501).json(error);
     });
 };
@@ -56,7 +56,7 @@ exports.postContact = (req, res, next) => {
       res.status(200).json(resRUDI.data);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'post_contact' });
       res.status(501).json(error);
     });
 };
@@ -74,7 +74,10 @@ exports.putContact = (req, res, next) => {
       res.status(200).json(resRUDI.data);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, {
+        opType: 'put_contact',
+        id: `contact+${req.body.contact_id}`,
+      });
       res.status(501).json(error);
     });
 };
@@ -95,7 +98,7 @@ exports.deleteContact = (req, res, next) => {
       res.status(200).json(contact);
     })
     .catch((error) => {
-      error = errorHandler.error(error);
+      error = errorHandler.error(error, req, { opType: 'delete_contact', id: `contact+${id}` });
       res.status(501).json(error);
     });
 };

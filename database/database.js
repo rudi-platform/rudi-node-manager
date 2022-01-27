@@ -82,7 +82,12 @@ exports.createUser = (user) => {
             log.e(mod, fun, err.message);
             reject(err);
           } else {
-            log.i(mod, fun, `Users : A row has been inserted with rowid ${this.lastID}`);
+            log.i(
+              mod,
+              fun,
+              `Users : A row has been inserted with rowid ${this.lastID}`,
+              log.getContext(null, { opType: 'post_user' }),
+            );
             const id = this.lastID;
 
             // TODO : replace by count SELECT COUNT (*) FROM Users;
@@ -125,7 +130,12 @@ exports.deleteUser = (username) => {
         log.e(mod, fun, err.message);
         reject(err);
       } else {
-        log.i(mod, fun, `Users : A row has been deleted with username ${username}`);
+        log.i(
+          mod,
+          fun,
+          `Users : A row has been deleted with username ${username}`,
+          log.getContext(null, { opType: 'delete_user' }),
+        );
         resolve({ username: username });
       }
       close(db);
@@ -145,7 +155,12 @@ exports.createRoles = (roles) => {
             log.e(mod, fun, err.message);
             reject(err);
           } else {
-            log.i(mod, fun, `Roles : A row has been inserted with name ${role.role}`);
+            log.i(
+              mod,
+              fun,
+              `Roles : A row has been inserted with name ${role.role}`,
+              log.getContext(null, { opType: 'add_role' }),
+            );
           }
         });
       });
@@ -223,6 +238,7 @@ exports.deleteUserRole = (userId, role) => {
           mod,
           fun,
           `User_Roles : A row has been deleted with userId ${userId} and role ${role}`,
+          log.getContext(null, { opType: 'delete_userRole' }),
         );
         resolve({ userId, role });
       }
@@ -247,6 +263,7 @@ const createUserRole = (userRole) => {
             mod,
             fun,
             `User_Roles : A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
+            log.getContext(null, { opType: 'post_userRole' }),
           );
           resolve(userRole);
         }
@@ -322,6 +339,7 @@ exports.deleteDefaultForm = (user, name) => {
             mod,
             fun,
             `Default_Value_Form : A row has been deleted with userId ${user.id} and name : ${name}`,
+            log.getContext(null, { opType: 'delete_defaultForm' }),
           );
           resolve({});
         }
@@ -349,6 +367,7 @@ exports.updateDefaultForm = (user, data) => {
                 mod,
                 fun,
                 `Default_Value_Form : A row has been inserted with userId ${user.id} and name : ${data.name}`,
+                log.getContext(null, { opType: 'post_defaultForm' }),
               );
               resolve(data);
             }
@@ -371,6 +390,7 @@ exports.updateDefaultForm = (user, data) => {
                 mod,
                 fun,
                 `Default_Value_Form : A row has been edited with userId ${user.id} and name : ${data.name}`,
+                log.getContext(null, { opType: 'put_defaultForm' }),
               );
               resolve(data);
             }
