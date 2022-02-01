@@ -67,6 +67,9 @@ if (customExist) {
   if (customConfig.logging && customConfig.logging.log_dir) {
     config.logging.log_dir = customConfig.logging.log_dir;
   }
+  if (customConfig.logging && customConfig.logging.app_name) {
+    config.logging.app_name = customConfig.logging.app_name;
+  }
 
   // Syslog
   if (customConfig.syslog && customConfig.syslog.syslog_level) {

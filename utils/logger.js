@@ -26,13 +26,13 @@ exports.getContext = (req, options = {}) => {
   if (!req) {
     ctx.auth = {
       userId: '',
-      clientApp: config.API_RUDI.manager_id,
+      clientApp: config.logging.app_name,
       reqIP: [],
     };
   } else {
     ctx.auth = {
       userId: req.user ? req.user.id : '',
-      clientApp: config.API_RUDI.manager_id,
+      clientApp: config.logging.app_name,
       reqIP: [req.ip, ...extractIpRedirections(req)],
     };
   }
