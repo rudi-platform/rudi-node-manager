@@ -86,7 +86,7 @@ function getRudiLoggerOptions() {
 }
 
 const syslog = new rudiLogger.RudiLogger(
-  config.API_RUDI.manager_id,
+  config.logging.app_name,
   sysController.getHashFun,
   getRudiLoggerOptions(),
 );
