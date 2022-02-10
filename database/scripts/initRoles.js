@@ -12,7 +12,7 @@ const initialRoles = [
   { role: 'SuperAdmin', desc: 'a tous les droits' },
   { role: 'Admin', desc: 'administration' },
   { role: 'Moniteur', desc: 'acces au monitoring' },
-  { role: 'Gestionnaire', desc: 'gestion avancé des metadonnées' },
+  { role: 'Gestionnaire', desc: 'gestion avancée des metadonnées' },
   { role: 'Créateur', desc: 'gestion simple des metadonnées' },
 ];
 

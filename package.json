@@ -16,8 +16,8 @@
     "prettier": "npx prettier --write .",
     "quality": "npm run prettier && npm run lint -- --fix"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Yann Porret <yporret@micropole.com>",
+  "license": "EUPL-1.2",
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
