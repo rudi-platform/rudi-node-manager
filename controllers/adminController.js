@@ -103,3 +103,24 @@ exports.putDefaultForm = (req, res, next) => {
       res.status(501).json(error);
     });
 };
+
+exports.getVersion = (req, res, next) => {
+  const url = `/api/version`;
+  const token = utils.createRudiToken({
+    url: url,
+    req: req,
+  });
+  return axios
+    .get(`${serveur}${url}`, {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((resRUDI) => {
+      const reports = resRUDI.data;
+      res.status(200).json(reports);
+    })
+    .catch((error) => {
+      error = errorHandler.error(error, req, { opType: 'get_version' });
+      res.status(501).json(error);
+    });
+};

@@ -43,4 +43,6 @@ router.delete(
   contactController.deleteContact,
 );
 
+router.get('/version', adminController.getVersion);
+
 module.exports = router;
