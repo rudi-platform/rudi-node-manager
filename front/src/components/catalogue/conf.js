@@ -10,7 +10,7 @@ export const filterConf = [
   },
   {
     name: 'theme',
-    text: 'Theme :',
+    text: 'Thème :',
     values: [],
     toFilterParam: (elem) => {
       return { theme: `"${elem.theme}"` };
@@ -18,15 +18,15 @@ export const filterConf = [
   },
   {
     name: 'keywords',
-    text: 'Mots clés :',
+    text: 'Mots-clés :',
     values: [],
     toFilterParam: (elem) => {
-      return { keywords: `{\"$in\":[\"${elem.keywords}\"]}` };
+      return { keywords: `"${elem.keywords}"` };
     },
   },
   {
     name: 'resource_languages',
-    text: 'Language :',
+    text: 'Langage :',
     values: [],
     toFilterParam: (elem) => {
       return { resource_languages: `"${elem.resource_languages}"` };
