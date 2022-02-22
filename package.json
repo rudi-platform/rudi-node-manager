@@ -1,5 +1,5 @@
 {
-  "name": "rudi-console-proxy",
+  "name": "rudi-prodmanager",
   "version": "1.0.0",
   "description": "application d'administration du noeud RUDI",
   "main": "server.js",
