@@ -151,7 +151,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   }
 
   /**
-   * recup la 1er page des metadonnées et les countBy
+   * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
     Promise.all(

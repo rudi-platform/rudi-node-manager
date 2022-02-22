@@ -39,7 +39,7 @@ export default function Login({ setToken }) {
       })
       .catch((error) => {
         changeOptions({
-          text: `Echec de connexion`,
+          text: [`Echec de connexion`],
           title: 'une erreur est survenue',
           type: 'error',
           buttons: [

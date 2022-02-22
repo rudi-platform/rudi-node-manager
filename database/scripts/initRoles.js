@@ -12,8 +12,8 @@ const initialRoles = [
   { role: 'SuperAdmin', desc: 'a tous les droits' },
   { role: 'Admin', desc: 'administration' },
   { role: 'Moniteur', desc: 'acces au monitoring' },
-  { role: 'Gestionnaire', desc: 'gestion avancée des metadonnées' },
-  { role: 'Créateur', desc: 'gestion simple des metadonnées' },
+  { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
+  { role: 'Créateur', desc: 'gestion simple des métadonnées' },
 ];
 
 exports.initRolesTable = () => {

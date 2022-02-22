@@ -49,7 +49,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
       .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${metadata.global_id}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = [`La Metadonnée ${res.data.resource_title} a été supprimée`];
+        options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`];
         options.buttons = [
           {
             text: 'Ok',
@@ -71,7 +71,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   function triggerDeleteRessource(metadata) {
     const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression de la metadonné ${metadata.resource_title}?`];
+    options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`];
     options.buttons = [
       {
         text: 'Oui',

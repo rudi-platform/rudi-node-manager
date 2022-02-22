@@ -20,7 +20,7 @@ export default function CatalogueUser({ editMode, display }) {
   };
 
   /**
-   * recup la 1er page des metadonnées et les countBy
+   * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
     axios

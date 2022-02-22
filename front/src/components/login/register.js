@@ -54,7 +54,7 @@ export default function Register({ backToLogin }) {
     })
       .then((res) => {
         changeOptions({
-          text: `l'utilisateur ${res.data.username} a bien été créé.`,
+          text: [`L'utilisateur '${res.data.username}' a bien été créé.`],
           title: 'Action Validée',
           type: 'success',
           buttons: [
@@ -70,7 +70,7 @@ export default function Register({ backToLogin }) {
       })
       .catch((error) => {
         changeOptions({
-          text: `${error.response.data}`,
+          text: [`${error.response.data}`],
           title: 'une erreur est survenue',
           type: 'error',
           buttons: [
