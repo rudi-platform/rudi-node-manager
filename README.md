@@ -1,4 +1,20 @@
-# RUDI console proxy
+# Unit tests
 
-TODO : node 15.14
-script de pilotage de deploy
+npm run test
+
+# Dev
+
+## Install
+
+npm install
+cd front; npm install
+
+## Run
+
+npm run serverLinux | serverWindow
+npm run front
+
+# Prod
+
+npm install
+npm run startProd
