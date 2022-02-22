@@ -28,7 +28,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
     getInitialData();
   }, []);
   /**
-   * recup la 1er page des metadonnées
+   * recup la 1er page des métadonnéees
    */
   function getInitialData() {
     axios

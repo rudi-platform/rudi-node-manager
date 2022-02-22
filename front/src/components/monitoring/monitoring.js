@@ -64,7 +64,7 @@ function Monitoring({}) {
           <div className="card">
             <h5 className="card-header">
               <div className="d-flex justify-content-between align-items-center">
-                <span>Total Metadonnées :</span>
+                <span>Total Métadonnéees :</span>
               </div>
             </h5>
             <div className="card-body">
@@ -103,7 +103,7 @@ function Monitoring({}) {
                 <div className="card">
                   <h5 className="card-header">
                     <div className="d-flex justify-content-between align-items-center">
-                      <span>Metadonnées &quot;{status.storage_status}&quot; :</span>
+                      <span>Métadonnéees &quot;{status.storage_status}&quot; :</span>
                     </div>
                   </h5>
                   <div className="card-body">
@@ -126,7 +126,7 @@ function Monitoring({}) {
                 <div className="card">
                   <h5 className="card-header">
                     <div className="d-flex justify-content-between align-items-center">
-                      <span>Metadonnées par {prod.producer.organization_name} :</span>
+                      <span>Métadonnéees par {prod.producer.organization_name} :</span>
                     </div>
                   </h5>
                   <div className="card-body">
