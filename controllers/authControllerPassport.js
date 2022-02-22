@@ -31,7 +31,7 @@ const registerUser = (data) => {
             throw err;
           });
       } else {
-        return Promise.reject(new Error(`User ${data.username} already exist!`));
+        return Promise.reject(new Error(`User '${data.username}' already exists!`));
       }
     })
     .catch((err) => {

@@ -70,8 +70,8 @@ export default function Register({ backToLogin }) {
       })
       .catch((error) => {
         changeOptions({
-          text: [`${error.response.data}`],
-          title: 'une erreur est survenue',
+          text: ['' + error.response.data],
+          title: 'Une erreur est survenue',
           type: 'error',
           buttons: [
             {
