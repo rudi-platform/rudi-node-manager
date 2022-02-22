@@ -126,12 +126,24 @@ const rplog = function (logLevel, srcMod, srcFun, msg, context) {
 // END RUDILOGGER configuration
 
 const LOG_DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss SSS';
+const noCycle = () => {
+  const seen = new WeakSet();
+  return (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return;
+      }
+      seen.add(value);
+    }
+    return value;
+  };
+};
 const logWhere = (srcMod, srcFun) => {
   return !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`;
 };
 
 const displayStr = (srcMod, srcFun, msg) => {
-  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? msg : '<-'}`;
+  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? JSON.stringify(msg, noCycle()) : '<-'}`;
 };
 const createLogLine = (level, srcMod, srcFun, msg) => {
   return `${moment().format(LOG_DATE_FORMAT)} ${level} ${displayStr(srcMod, srcFun, msg)}`;
