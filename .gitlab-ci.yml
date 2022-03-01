@@ -1,6 +1,7 @@
 stages:
   - npm_install
   - test
+  - build
   - quality
 
 # This folder is cached between builds
@@ -9,23 +10,47 @@ cache:
     - node_modules/
     - front/node_modules/
 
-back_npm:
-  stage: npm_install
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  tags:
-    - nodejs
-  script:
-    - npm install
-
+# Front
 front_npm:
   stage: npm_install
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
+  variables:
+    NODE_ENV: development
   script:
     - cd front && npm install
+
+#
+# Back
+back_npm:
+  stage: npm_install
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  tags:
+    - nodejs
+  variables:
+    NODE_ENV: development
+  script:
+    - npm install
+
+build_front:
+  stage: build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  tags:
+    - nodejs
+  variables:
+    NODE_ENV: development
+    PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
+  script:
+    - cd front && npm run build
+  artifacts:
+    name: 'ProdManager-front-$-PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
+    paths:
+      - front/build/
+    expire_in: 10 week
 
 back_test:
   stage: test
@@ -42,6 +67,7 @@ back_test:
       junit:
         - junit.xml
 
+# Global
 lint:
   stage: quality
   rules:
