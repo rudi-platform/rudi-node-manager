@@ -94,9 +94,29 @@ function Visualisation({ match }) {
         axios
           .get(`${res.data.url}`)
           .then((res2) => {
-            // TODO : "better" type detection
-            switch (res2.headers['content-type']) {
-              case 'application/json; charset=utf-8':
+              // TODO : "better" type detection
+            var mimestr = res2.headers['content-type'];
+            var mimetype = mimetype.split(";");
+            if (mimetype.length > 1) {
+                mimestr = mimetype[0].trim().toLowerCase();
+                const charset = mimetype[1].trim().toLowerCase();
+                switch (charset) {
+                case "charset=utf-8":
+                case "charset=us-ascii":
+                case "charset=iso-8859-1":
+                case "charset=iso-8859-15":
+                    break;
+                default:
+                    defaultErrorHandler({
+                        message: `l'encodage ${charset} n'est pas supporté`,
+                    });
+                    mimestr = "";
+                    break;
+                }
+            }
+            switch (mimestr) {
+              case 'application/geo+json':
+              case 'application/json':
                 setVisuOption({ displayType: 'JSON', data: res2.data });
                 break;
 
@@ -113,7 +133,7 @@ function Visualisation({ match }) {
                 break;
               default:
                 defaultErrorHandler({
-                  message: `le type ${res2.headers['content-type']} n'est pas supporté`,
+                  message: `le type ${mimestr} n'est pas supporté`,
                 });
 
                 break;

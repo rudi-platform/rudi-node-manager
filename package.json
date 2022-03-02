@@ -19,6 +19,7 @@
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",
   "dependencies": {
+    "@aqmo.org/rudi_logger": "^1.1.1",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
@@ -34,7 +35,6 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "rudilogger": "git+https://deployment:V77s-5gnZM6PR_ihMRsN@gitlab.aqmo.org/rudidev/rudilogger.git#shared",
     "sqlite3": "^5.0.2",
     "sshpk": "^1.16.1"
   },

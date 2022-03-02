@@ -1,5 +1,5 @@
 const moment = require('moment');
-const rudiLogger = require('rudilogger');
+const rudiLogger = require('@aqmo.org/rudi_logger');
 const config = require('../config/config');
 const sysController = require('../controllers/sysController');
 
@@ -63,7 +63,7 @@ function getRudiLoggerOptions() {
       transports = 2;
       break;
     case 'unix':
-      transports = 4;
+      transports = 5;
       path = config.syslog.syslog_socket;
       break;
   }
