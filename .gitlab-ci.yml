@@ -1,14 +1,20 @@
 stages:
   - npm_install
-  - test
   - build
   - quality
 
 # This folder is cached between builds
-cache:
-  paths:
+default:
+  cache:
+    paths:
     - node_modules/
     - front/node_modules/
+  before_script:
+    - |
+      {
+        echo "@aqmo.org:registry=${CI_API_V4_URL}/projects/59/packages/npm/"
+        echo "${CI_API_V4_URL#https?}/projects/59/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+      } | tee -a .npmrc
 
 # Front
 front_npm:
@@ -51,21 +57,6 @@ build_front:
     paths:
       - front/build/
     expire_in: 10 week
-
-back_test:
-  stage: test
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  tags:
-    - nodejs
-  script:
-    - 'npm run testCI'
-  allow_failure: true
-  artifacts:
-    when: always
-    reports:
-      junit:
-        - junit.xml
 
 # Global
 lint:
