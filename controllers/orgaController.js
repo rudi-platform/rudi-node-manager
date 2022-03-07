@@ -20,7 +20,11 @@ const orgaList = (req, res, next) => {
     })
     .catch((error) => {
       error = errorHandler.error(error, req, { opType: 'get_producers' });
-      res.status(501).json(error);
+      try {
+        res.status(501).json(error);
+      } catch (e) {
+        res.status(501).json(error.toString());
+      }
     });
 };
 exports.getOrgaById = (req, res, next) => {

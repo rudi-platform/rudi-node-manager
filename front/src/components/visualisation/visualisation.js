@@ -94,27 +94,26 @@ function Visualisation({ match }) {
         axios
           .get(`${res.data.url}`)
           .then((res2) => {
-              // TODO : "better" type detection
-            var mimestr = res2.headers['content-type'];
-            var mimetype = mimetype.split(";");
-            if (mimetype.length > 1) {
-                mimestr = mimetype[0].trim().toLowerCase();
-                const charset = mimetype[1].trim().toLowerCase();
-                switch (charset) {
-                case "charset=utf-8":
-                case "charset=us-ascii":
-                case "charset=iso-8859-1":
-                case "charset=iso-8859-15":
-                    break;
+            const mediaMimeStr = res2.headers['content-type']; // Ex: 'application/json; charset=utf-8'
+            const mediaMimeElements = mediaMimeStr.split(';');
+            const mediaMime = mediaMimeElements[0].trim().toLowerCase();
+
+            if (mediaMimeElements.length > 1) {
+              const mediaCharset = mediaMimeElements[1].trim().toLowerCase();
+              switch (mediaCharset) {
+                case 'charset=utf-8':
+                case 'charset=us-ascii':
+                case 'charset=iso-8859-1':
+                case 'charset=iso-8859-15':
+                  break;
                 default:
-                    defaultErrorHandler({
-                        message: `l'encodage ${charset} n'est pas supporté`,
-                    });
-                    mimestr = "";
-                    break;
-                }
+                  defaultErrorHandler({
+                    message: `l'encodage ${mediaCharset} n'est pas supporté`,
+                  });
+                  break;
+              }
             }
-            switch (mimestr) {
+            switch (mediaMime) {
               case 'application/geo+json':
               case 'application/json':
                 setVisuOption({ displayType: 'JSON', data: res2.data });
@@ -133,7 +132,7 @@ function Visualisation({ match }) {
                 break;
               default:
                 defaultErrorHandler({
-                  message: `le type ${mimestr} n'est pas supporté`,
+                  message: `le type ${mediaMimeStr} n'est pas supporté`,
                 });
 
                 break;

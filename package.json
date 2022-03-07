@@ -1,7 +1,7 @@
 {
   "name": "rudi-prodmanager",
   "version": "1.0.0",
-  "description": "application d'administration du noeud RUDI",
+  "description": "Application d'administration du noeud RUDI",
   "main": "server.js",
   "scripts": {
     "test": "jest --config ./jest.config.json --coverage",
@@ -11,6 +11,7 @@
     "serverWindow": "nodemon server.js --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --exec \"export RUDI_PROD_MANAGER_GIT_REV=\"$(git rev-parse --short HEAD)\"; node \"",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
+    "devO": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverLinux\"",
     "front:build": "cd front && npm run build",
     "lint": "eslint \"**/*.js\"",
     "prettier": "npx prettier --write .",
@@ -19,7 +20,7 @@
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/rudi_logger": "^1.1.1",
+    "@aqmo.org/rudi_logger": "^1.1.2",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
@@ -39,6 +40,7 @@
     "sshpk": "^1.16.1"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
     "eslint": "^7.22.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.3.0",
