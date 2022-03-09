@@ -1,6 +1,6 @@
 {
-  "short_name": "rudi-proxy",
-  "name": "Rudi proxy Manager",
+  "short_name": "rudi-node",
+  "name": "Rudi Producer Node Manager",
   "icons": [
     {
       "src": "cropped-logo_petit.png",
