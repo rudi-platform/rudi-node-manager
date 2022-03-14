@@ -117,7 +117,7 @@ exports.getVersion = (req, res, next) => {
     })
     .then((resRUDI) => {
       const reports = resRUDI.data;
-      res.status(200).json(reports);
+      res.status(200).send(reports);
     })
     .catch((error) => {
       error = errorHandler.error(error, req, { opType: 'get_version' });
