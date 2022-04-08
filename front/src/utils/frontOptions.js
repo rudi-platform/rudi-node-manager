@@ -3,7 +3,6 @@
 // ------------------------------------------------------------------------------------------------
 export const OPT_PUBLIC_URL = 'REACT_APP_URL';
 export const OPT_DEFAULT_PUBLIC_URL = 'PUBLIC_URL';
-export const OPT_GIT_HASH = 'REACT_APP_GIT_REV';
 export const OPT_NODE_ENV = 'NODE_ENV';
 export const OPT_TAG = 'REACT_APP_TAG';
 // export const OPT_USER_CONF = 'REACT_APP_USER_CONF';
@@ -19,7 +18,6 @@ export const OPT_TAG = 'REACT_APP_TAG';
 export const OPTIONS = [
   OPT_PUBLIC_URL,
   OPT_DEFAULT_PUBLIC_URL,
-  OPT_GIT_HASH,
   OPT_NODE_ENV,
   OPT_TAG,
   // OPT_USER_CONF,
