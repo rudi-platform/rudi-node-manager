@@ -1,7 +1,7 @@
 const moment = require('moment');
 const rudiLogger = require('@aqmo.org/rudi_logger');
 const config = require('../config/config');
-const sysController = require('../controllers/sysController');
+const { getAppOptions, OPT_GIT_HASH } = require('../config/appOptions');
 
 /**
  * build ips array from the request
@@ -63,7 +63,7 @@ function getRudiLoggerOptions() {
       transports = 2;
       break;
     case 'unix':
-      transports = 5;
+      transports = 4;
       path = config.syslog.syslog_socket;
       break;
   }
@@ -87,7 +87,7 @@ function getRudiLoggerOptions() {
 
 const syslog = new rudiLogger.RudiLogger(
   config.logging.app_name,
-  sysController.getHashFun,
+  getAppOptions(OPT_GIT_HASH),
   getRudiLoggerOptions(),
 );
 

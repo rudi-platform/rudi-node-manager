@@ -5,6 +5,9 @@ import axios from 'axios';
 import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : UserCard
@@ -23,7 +26,7 @@ export default function UserCard({ user, display, refresh }) {
    */
   function deleteUser(user) {
     axios
-      .delete(`${process.env.PUBLIC_URL}/api/v1/users/${user.username}`)
+      .delete(`${PUBLIC_URL}/api/v1/users/${user.username}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];
@@ -72,7 +75,7 @@ export default function UserCard({ user, display, refresh }) {
    */
   function updateUser(user) {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/v1/roles`)
+      .get(`${PUBLIC_URL}/api/v1/roles`)
       .then((res) => {
         changeOptionsEdit({ user, roles: res.data });
         toggleEdit();

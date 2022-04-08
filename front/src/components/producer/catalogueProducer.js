@@ -6,6 +6,9 @@ import EditProducerCard from './editProducerCard';
 import ProducerCard from './producerCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : CatalogueProducer
@@ -38,7 +41,7 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
    */
   function getInitialData() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/admin/organizations`, {
+      .get(`${PUBLIC_URL}/api/admin/organizations`, {
         params: { limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
@@ -57,7 +60,7 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
   function fetchMoreData() {
     return () => {
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/organizations`, {
+        .get(`${PUBLIC_URL}/api/admin/organizations`, {
           params: { limit: PAGE_SIZE, offset: currentOffset },
         })
         .then((res) => {

@@ -5,6 +5,9 @@ import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Login component
@@ -32,7 +35,7 @@ export default function Login({ setToken }) {
    */
   function loginUser(credentials) {
     return axios
-      .post(`${process.env.PUBLIC_URL}/api/v1/login`, JSON.stringify(credentials), {
+      .post(`${PUBLIC_URL}/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },

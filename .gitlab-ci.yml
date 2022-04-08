@@ -7,8 +7,8 @@ stages:
 default:
   cache:
     paths:
-    - node_modules/
-    - front/node_modules/
+      - node_modules/
+      - front/node_modules/
   before_script:
     - |
       {
@@ -48,8 +48,9 @@ build_front:
   tags:
     - nodejs
   variables:
-    NODE_ENV: development
+    NODE_ENV: production
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
+    REACT_APP_TAG: '2.0'
   script:
     - cd front && npm run build
   artifacts:

@@ -6,6 +6,9 @@ import EditContactCard from './editContactCard';
 import ContactCard from './contactCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : CatalogueContact
@@ -39,7 +42,7 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
    */
   function getInitialData() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/admin/contacts`, {
+      .get(`${PUBLIC_URL}/api/admin/contacts`, {
         params: { limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
@@ -58,7 +61,7 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
   function fetchMoreData() {
     return () => {
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/contacts`, {
+        .get(`${PUBLIC_URL}/api/admin/contacts`, {
           params: { limit: PAGE_SIZE, offset: currentOffset },
         })
         .then((res) => {

@@ -1,11 +1,12 @@
 const fs = require('fs');
 const ini = require('ini');
+const { getAppOptions, OPT_USER_CONF } = require('./appOptions');
 const defaultConfigFile = './rudi_console_proxy.ini';
-const customConfigFile = './rudi_console_proxy_custom.ini';
+const customConfigFile = getAppOptions(OPT_USER_CONF, './rudi_console_proxy_custom.ini');
 let customExist;
 let customConfig;
 try {
-  customExist = fs.statSync('./rudi_console_proxy_custom.ini').isFile();
+  customExist = fs.statSync(customConfigFile).isFile();
 } catch (error) {
   customExist = false;
 }

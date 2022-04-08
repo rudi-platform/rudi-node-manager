@@ -1,3 +1,4 @@
+const { getAppOptions, OPT_GIT_HASH } = require('../config/appOptions');
 const config = require('../config/config');
 const log = require('../utils/logger');
 const mod = 'sysController';
@@ -14,15 +15,12 @@ exports.getHash = (req, res, next) => {
   }
 };
 exports.getHashFun = () => {
-  let hashId = process.env.RUDI_PROD_MANAGER_GIT_REV;
-  if (!hashId) {
-    try {
-      hashId = require('child_process').execSync('git rev-parse --short HEAD');
-    } catch (err) {
-      throw err;
-    }
+  const hashId = getAppOptions(OPT_GIT_HASH);
+  try {
+    return hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD');
+  } catch (err) {
+    throw err;
   }
-  return hashId;
 };
 exports.getFormUrl = (req, res, next) => {
   try {

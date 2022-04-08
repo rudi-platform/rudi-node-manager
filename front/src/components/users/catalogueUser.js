@@ -5,6 +5,9 @@ import PropTypes from 'prop-types';
 import UserCard from './userCard';
 import EditUserCard from './editUserCard';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : CatalogueUser
@@ -24,7 +27,7 @@ export default function CatalogueUser({ editMode, display }) {
    */
   function getInitialData() {
     axios
-      .get(`${process.env.PUBLIC_URL}/api/v1/users`)
+      .get(`${PUBLIC_URL}/api/v1/users`)
       .then((res) => {
         const userFromAPI = res.data;
         setUser(userFromAPI);

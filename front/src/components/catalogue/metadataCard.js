@@ -8,6 +8,9 @@ import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/M
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : metadataCard
@@ -46,7 +49,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   function deleteRessource(metadata) {
     axios
-      .delete(`${process.env.PUBLIC_URL}/api/admin/resources/${metadata.global_id}`)
+      .delete(`${PUBLIC_URL}/api/admin/resources/${metadata.global_id}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`];

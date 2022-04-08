@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : Monitoring
@@ -11,35 +14,35 @@ function Monitoring({}) {
   useEffect(() => {
     Promise.all([
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        .get(`${PUBLIC_URL}/api/admin/resources`, {
           params: { count_by: 'metadata_info.api_version' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        .get(`${PUBLIC_URL}/api/admin/resources`, {
           params: { count_by: 'storage_status' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        .get(`${PUBLIC_URL}/api/admin/resources`, {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/resources`, {
+        .get(`${PUBLIC_URL}/api/admin/resources`, {
           params: { count_by: 'producer' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`${process.env.PUBLIC_URL}/api/admin/report`, {
+        .get(`${PUBLIC_URL}/api/admin/report`, {
           params: { count_by: 'integration_status' },
         })
         .catch((e) => {

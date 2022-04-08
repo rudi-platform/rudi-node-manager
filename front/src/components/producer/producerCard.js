@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getPublicUrl } from '../../utils/frontOptions';
+
+const PUBLIC_URL = getPublicUrl();
 
 /**
  * Composant : ProducerCard
@@ -19,7 +22,7 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
    */
   function deleteOrganization(organization) {
     axios
-      .delete(`${process.env.PUBLIC_URL}/api/admin/organizations/${organization.organization_id}`)
+      .delete(`${PUBLIC_URL}/api/admin/organizations/${organization.organization_id}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`Le Producteur ${res.data.organization_name} a été supprimé`];

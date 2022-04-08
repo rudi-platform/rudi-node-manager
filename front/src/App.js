@@ -17,10 +17,13 @@ import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
+import { getFrontOptions, getPublicUrl, OPT_TAG } from './utils/frontOptions';
 
-console.log('process.env.PUBLIC_URL : ', process.env.PUBLIC_URL);
 // TODO : move to util.js
-export const PUBLIC_URL = process.env.PUBLIC_URL;
+export const PUBLIC_URL = getPublicUrl();
+export const VERSION_TAG = getFrontOptions(OPT_TAG)
+// console.log('PUBLIC_URL : ', PUBLIC_URL);
+
 export const history = createBrowserHistory({
   basename: PUBLIC_URL,
 });
@@ -55,10 +58,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(`${process.env.PUBLIC_URL}/api/v1/formUrl`).catch((e) => {
+        axios.get(`${PUBLIC_URL}/api/v1/formUrl`).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`${process.env.PUBLIC_URL}/api/admin/enum/themes/fr`).catch((e) => {
+        axios.get(`${PUBLIC_URL}/api/admin/enum/themes/fr`).catch((e) => {
           return { data: {} };
         }),
       ]).then((values) => {
@@ -71,7 +74,7 @@ export default function App() {
    * logout
    */
   function logout() {
-    axios.get(`${process.env.PUBLIC_URL}/api/v1/logout`).then((res) => {
+    axios.get(`${PUBLIC_URL}/api/v1/logout`).then((res) => {
       updateToken();
     });
   }
@@ -97,7 +100,7 @@ export default function App() {
     );
   }
   return (
-    <Router basename={PUBLIC_URL}>
+    <Router>
       <ModalProvider>
         <GeneralContext.Provider value={generalConf}>
           <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -107,7 +110,7 @@ export default function App() {
               <div className="container-fluid">
                 <img
                   className="icon-navbar"
-                  src={`${process.env.PUBLIC_URL}/logo_blanc_orange.png`}
+                  src={`${PUBLIC_URL}/logo_blanc_orange.png`}
                   alt="Rudi logo"
                 />
                 <button
@@ -118,6 +121,8 @@ export default function App() {
                   aria-controls="navbarCollapse"
                   aria-expanded="false"
                   aria-label="Toggle navigation"
+                  margin-right="0"
+                  margin-left="auto"
                 >
                   <span className="navbar-toggler-icon"></span>
                 </button>
@@ -146,15 +151,9 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item href={`${process.env.PUBLIC_URL}/gestion`}>
-                          Métadonnée
-                        </Dropdown.Item>
-                        <Dropdown.Item href={`${process.env.PUBLIC_URL}/producer`}>
-                          Producteur
-                        </Dropdown.Item>
-                        <Dropdown.Item href={`${process.env.PUBLIC_URL}/contact`}>
-                          Contacts
-                        </Dropdown.Item>
+                        <Dropdown.Item href={`${PUBLIC_URL}/gestion`}>Métadonnée</Dropdown.Item>
+                        <Dropdown.Item href={`${PUBLIC_URL}/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item href={`${PUBLIC_URL}/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
@@ -190,6 +189,7 @@ export default function App() {
                   </ul>
                 </div>
               </div>
+              <div float="right" style={{color:'white', fontSize:'50%'}}>v.{VERSION_TAG}</div>
             </nav>
           </header>
 
