@@ -12,7 +12,8 @@
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
     "front:build": "cd front && npm run build",
-    "lint": "eslint \"**/*.js\"",
+    "lintBack": "eslint \"**/*.js\"",
+    "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc.json --no-ignore",
     "prettier": "npx prettier --write .",
     "quality": "npm run prettier && npm run lint -- --fix",
     "cleanup": "rm -fR ./node_modules ./package-lock.json  ./yarn.lock"
@@ -21,6 +22,7 @@
   "license": "EUPL-1.2",
   "dependencies": {
     "@aqmo.org/rudi_logger": "^1.1.2",
+    "@babel/preset-react": "^7.16.7",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
@@ -42,6 +44,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/eslint-parser": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
     "eslint": "^7.22.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.3.0",

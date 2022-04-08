@@ -17,7 +17,7 @@ default:
       } | tee -a .npmrc
 
 # Front
-front_npm:
+install_front:
   stage: npm_install
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -30,7 +30,7 @@ front_npm:
 
 #
 # Back
-back_npm:
+install_back:
   stage: npm_install
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -59,12 +59,22 @@ build_front:
       - front/build/
     expire_in: 10 week
 
-# Global
-lint:
+# Quality: back
+lint_back:
   stage: quality
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - nodejs
   script:
-    - npm run lint
+    - npm run lintBack
+
+# Quality: front
+lint_front:
+  stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  tags:
+    - nodejs
+  script:
+    - npm run lintFront

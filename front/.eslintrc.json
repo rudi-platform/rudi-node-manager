@@ -1,9 +1,10 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "./node_modules/*", "./build/*"],
   "extends": ["../.eslintrc.json", "plugin:react/recommended"],
   "parserOptions": {
     "sourceType": "module"
   },
-  "plugins": ["react"]
+  "plugins": ["react"],
+  "root": true
 }
