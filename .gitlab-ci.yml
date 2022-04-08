@@ -48,7 +48,7 @@ build_front:
   tags:
     - nodejs
   variables:
-    NODE_ENV: production
+    NODE_ENV: development
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: '2.0'
   script:
