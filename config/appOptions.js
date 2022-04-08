@@ -2,11 +2,9 @@
 // Extract command line arguments
 
 // ------------------------------------------------------------------------------------------------
-exports.OPT_PUBLIC_URL = 'publicUrl';
+exports.OPT_USER_CONF = 'conf';
 exports.OPT_GIT_HASH = 'hash';
 exports.OPT_NODE_ENV = 'nodeEnv';
-exports.OPT_TAG = 'tag';
-exports.OPT_USER_CONF = 'conf';
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -22,11 +20,6 @@ exports.OPTIONS = {
     cli: '--conf',
     env: 'RUDI_PROD_MANAGER_USER_CONF',
   },
-  [this.OPT_TAG]: {
-    text: 'Tag of the RUDI Producer Node',
-    cli: '--tag',
-    env: 'RUDI_PROD_MANAGER_TAG',
-  },
   [this.OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: '--hash',
@@ -36,11 +29,6 @@ exports.OPTIONS = {
     text: 'Node environment: production | development',
     cli: '--node_env',
     env: 'NODE_ENV',
-  },
-  [this.OPT_PUBLIC_URL]: {
-    text: 'Public URL for the front module',
-    cli: '--url',
-    env: 'PUBLIC_URL',
   },
 };
 // if (argv.indexOf('--opts') > -1) {
@@ -82,7 +70,7 @@ process.argv.map((cliArg) => {
 // ------------------------------------------------------------------------------------------------
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
-console.log('Extracted conf values:')
+console.log('Extracted conf values:');
 const appOptionsValues = {};
 Object.keys(this.OPTIONS).map(
   (opt) => (appOptionsValues[opt] = cliOptionsValues[opt] || process.env[this.OPTIONS[opt].env]),
