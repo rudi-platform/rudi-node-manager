@@ -3,7 +3,6 @@
 // ------------------------------------------------------------------------------------------------
 export const OPT_PUBLIC_URL = 'REACT_APP_URL';
 export const OPT_DEFAULT_PUBLIC_URL = 'PUBLIC_URL';
-export const OPT_NODE_ENV = 'NODE_ENV';
 export const OPT_TAG = 'REACT_APP_TAG';
 // export const OPT_USER_CONF = 'REACT_APP_USER_CONF';
 
@@ -16,20 +15,19 @@ export const OPT_TAG = 'REACT_APP_TAG';
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
 export const OPTIONS = [
-  OPT_PUBLIC_URL,
   OPT_DEFAULT_PUBLIC_URL,
-  OPT_NODE_ENV,
+  OPT_PUBLIC_URL,
   OPT_TAG,
-  // OPT_USER_CONF,
 ];
 
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
+/* 
 console.log('= Extract command line arguments =');
-console.log('process.env.REACT_APP_URL: ' + process.env.REACT_APP_URL);
-console.log('process.env.PUBLIC_URL: ' + process.env.PUBLIC_URL);
-
+console.log('REACT_APP_URL: ' + process.env.REACT_APP_URL);
+console.log('PUBLIC_URL: ' + process.env.PUBLIC_URL);
+ */
 // ------------------------------------------------------------------------------------------------
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
