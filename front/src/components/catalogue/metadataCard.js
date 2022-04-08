@@ -24,6 +24,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    * download le fichier via media_id
    * @param {*} ressource connector du fichier
    */
+  /* 
   function downloadFile(ressource) {
     axios
       .get(`${ressource.connector.url}`, {
@@ -42,7 +43,8 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         defaultErrorHandler(e);
       });
   }
-
+   */
+  
   /**
    * call for metadata deletion
    * @param {*} metadata metadata a suppr
@@ -198,9 +200,11 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                   <button
                     type="button"
                     className="btn btn-success button-margin"
-                    onClick={(e) => downloadFile(ressource)}
+                    // onClick={(e) => downloadFile(ressource)}
                   >
-                    Download <CloudDownload />
+                    <a id="downloadMedia" title="Click to dowload" href={ressource.connector.url}>
+                      Download <CloudDownload />
+                    </a>
                   </button>
                   <Link to={`/show/${ressource.media_id}`}>
                     <span className="btn btn-success button-margin">

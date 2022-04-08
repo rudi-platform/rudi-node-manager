@@ -2,6 +2,7 @@ const { expect } = require('@jest/globals');
 const axios = require('axios');
 const controllers = require('./sysController');
 const { Response } = require('jest-express/lib/response');
+const { getHashFun } = require('../config/appOptions');
 
 jest.mock('axios');
 let response;
@@ -16,7 +17,7 @@ describe('SysController', () => {
   });
 
   test('getHash should return data', async () => {
-    await controllers.getHash(null, response, null);
+    await getHashFun(null, response, null);
 
     expect(response.statusCode).toStrictEqual(200);
     expect(response.body).not.toBeNull();
