@@ -16,7 +16,7 @@ default:
         echo "${CI_API_V4_URL#https?}/projects/59/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
       } | tee -a .npmrc
 
-# Front
+# npm install (Front)
 install_front:
   stage: npm_install
   rules:
@@ -28,8 +28,7 @@ install_front:
   script:
     - cd front && npm install
 
-#
-# Back
+# npm install (Back)
 install_back:
   stage: npm_install
   rules:
@@ -40,24 +39,6 @@ install_back:
     NODE_ENV: development
   script:
     - npm install
-
-build_front:
-  stage: build
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  tags:
-    - nodejs
-  variables:
-    NODE_ENV: development
-    PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
-    REACT_APP_TAG: '2.0'
-  script:
-    - cd front && npm run build
-  artifacts:
-    name: 'ProdManager-front-$-PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
-    paths:
-      - front/build/
-    expire_in: 10 week
 
 # Quality: back
 lint_back:
@@ -78,3 +59,22 @@ lint_front:
     - nodejs
   script:
     - npm run lintFront
+
+# Build front
+build_front:
+  stage: build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  tags:
+    - nodejs
+  variables:
+    NODE_ENV: development
+    PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
+    REACT_APP_TAG: '2.0'
+  script:
+    - cd front && npm run build
+  artifacts:
+    name: 'ProdManager-front-$-PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
+    paths:
+      - front/build/
+    expire_in: 10 week
