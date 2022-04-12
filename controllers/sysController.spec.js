@@ -2,7 +2,7 @@ const { expect } = require('@jest/globals');
 const axios = require('axios');
 const controllers = require('./sysController');
 const { Response } = require('jest-express/lib/response');
-const { getHashFun } = require('../config/appOptions');
+const { getHashFun } = require('../config/backOptions');
 
 jest.mock('axios');
 let response;

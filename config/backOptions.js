@@ -60,7 +60,7 @@ process.argv.map((cliArg) => {
       // console.log('• appOptForCli: ' + appOptForCli);
       if (cliArg.startsWith(appOptForCli)) {
         cliOptionsValues[appOpt] = cliArg.substring(appOptForCli.length);
-        console.log('\t- ' + appOpt + ': ' + cliOptionsValues[appOpt]);
+        // console.log('    (cli) ' + appOpt + ': ' + cliOptionsValues[appOpt]);
       }
     }
   });
@@ -71,14 +71,20 @@ process.argv.map((cliArg) => {
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
 console.log('Extracted conf values:');
-const appOptionsValues = {};
-Object.keys(this.OPTIONS).map(
-  (opt) => (appOptionsValues[opt] = cliOptionsValues[opt] || process.env[this.OPTIONS[opt].env]),
-);
+const backOptionsValues = {};
+Object.keys(this.OPTIONS).map((opt) => {
+  if (cliOptionsValues[opt]) {
+    backOptionsValues[opt] = cliOptionsValues[opt];
+    console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt]);
+  } else {
+    const envVar = this.OPTIONS[opt].env;
+    if (process.env[envVar]) {
+      backOptionsValues[opt] = process.env[envVar];
+      console.log('    (env) ' + opt + ' => ' + backOptionsValues[opt]);
+    }
+  }
+});
 
-Object.keys(appOptionsValues).map((key) =>
-  appOptionsValues[key] ? console.log('    ' + key + ' => ' + appOptionsValues[key]) : '',
-);
 console.log('--------------------------------------------------------------');
 
 /**
@@ -87,11 +93,11 @@ console.log('--------------------------------------------------------------');
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-exports.getAppOptions = (opt, altValue) =>
-  opt ? appOptionsValues[opt] || altValue : appOptionsValues;
+exports.getBackOptions = (opt, altValue) =>
+  opt ? backOptionsValues[opt] || altValue : backOptionsValues;
 
 exports.getHashFun = () => {
-  const hashId = this.getAppOptions(this.OPT_GIT_HASH);
+  const hashId = this.getBackOptions(this.OPT_GIT_HASH);
   try {
     return hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD');
   } catch (err) {

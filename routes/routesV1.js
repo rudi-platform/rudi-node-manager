@@ -7,7 +7,7 @@ const roleController = require('../controllers/roleController');
 const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
 const { checkRolePerm } = require('../utils/roleCheck');
-const { getHashFun } = require('../config/appOptions');
+const { getHashFun } = require('../config/backOptions');
 
 router.get('/hash', getHashFun);
 router.get('/formUrl', sysController.getFormUrl);
