@@ -151,9 +151,9 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item href={`${PUBLIC_URL}/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item href={`${PUBLIC_URL}/producer`}>Producteur</Dropdown.Item>
-                        <Dropdown.Item href={`${PUBLIC_URL}/contact`}>Contacts</Dropdown.Item>
+                        <Dropdown.Item href="/gestion">Métadonnée</Dropdown.Item>
+                        <Dropdown.Item href="/producer">Producteur</Dropdown.Item>
+                        <Dropdown.Item href="/contact">Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
