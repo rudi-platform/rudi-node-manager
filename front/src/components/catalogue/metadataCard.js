@@ -44,7 +44,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
       });
   }
    */
-  
+
   /**
    * call for metadata deletion
    * @param {*} metadata metadata a suppr

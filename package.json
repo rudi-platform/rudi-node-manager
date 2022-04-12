@@ -15,7 +15,7 @@
     "lintBack": "eslint \"**/*.js\"",
     "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc.json --no-ignore",
     "prettier": "npx prettier --write .",
-    "quality": "npm run prettier && npm run lint -- --fix",
+    "quality": "npm run prettier && npm run lintBack -- --fix",
     "cleanup": "rm -fR ./node_modules ./package-lock.json  ./yarn.lock"
   },
   "author": "Yann Porret <yporret@micropole.com>",

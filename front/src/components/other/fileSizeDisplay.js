@@ -34,8 +34,9 @@ export default function FileSizeDisplay({ number }) {
 
     return numberString + ' ' + unit;
   }
-
-  return <span className="badge badge-primary badge-pill">{getLabel()}</span>;
+  if (number)
+    return <span className="badge badge-primary badge-pill button-margin">{getLabel()}</span>;
+  return '';
 }
 FileSizeDisplay.propTypes = {
   number: PropTypes.number,

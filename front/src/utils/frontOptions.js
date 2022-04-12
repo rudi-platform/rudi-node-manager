@@ -14,11 +14,9 @@ export const OPT_TAG = 'REACT_APP_TAG';
 // 'file': option given through the configuration file
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
-export const OPTIONS = [
-  OPT_DEFAULT_PUBLIC_URL,
-  OPT_PUBLIC_URL,
-  OPT_TAG,
-];
+const OPTIONS = [OPT_DEFAULT_PUBLIC_URL, OPT_PUBLIC_URL, OPT_TAG];
+
+const frontOptions = {};
 
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
@@ -39,9 +37,15 @@ console.log('PUBLIC_URL: ' + process.env.PUBLIC_URL);
  * @return {String} Value for the option
  */
 export const getFrontOptions = (opt, altValue) => {
-  const frontOption = opt ? process.env[opt] : OPTIONS;
-  // console.log('\t- ' + opt + '=' + frontOption);
-  return frontOption;
+  if (!opt) return OPTIONS;
+  if (frontOptions[opt]) return frontOptions[opt];
+  const optVal = process.env[opt];
+  if (optVal) {
+    frontOptions[opt] = optVal;
+    console.log('\t- ' + opt + '=' + optVal);
+  }
+  return optVal;
 };
 
-export const getPublicUrl = () => getFrontOptions(OPT_PUBLIC_URL) || getFrontOptions(OPT_DEFAULT_PUBLIC_URL);
+export const getPublicUrl = () =>
+  getFrontOptions(OPT_PUBLIC_URL) || getFrontOptions(OPT_DEFAULT_PUBLIC_URL);

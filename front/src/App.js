@@ -21,7 +21,7 @@ import { getFrontOptions, getPublicUrl, OPT_TAG } from './utils/frontOptions';
 
 // TODO : move to util.js
 export const PUBLIC_URL = getPublicUrl();
-export const VERSION_TAG = getFrontOptions(OPT_TAG)
+export const VERSION_TAG = getFrontOptions(OPT_TAG);
 // console.log('PUBLIC_URL : ', PUBLIC_URL);
 
 export const history = createBrowserHistory({
@@ -189,7 +189,9 @@ export default function App() {
                   </ul>
                 </div>
               </div>
-              <div float="right" style={{color:'white', fontSize:'50%'}}>v.{VERSION_TAG}</div>
+              <div float="right" style={{ color: 'white', fontSize: '50%' }}>
+                v.{VERSION_TAG}
+              </div>
             </nav>
           </header>
 
