@@ -5,6 +5,7 @@
 exports.OPT_USER_CONF = 'conf';
 exports.OPT_GIT_HASH = 'hash';
 exports.OPT_NODE_ENV = 'nodeEnv';
+exports.OPT_BACK_PATH = 'backPath';
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -29,6 +30,11 @@ exports.OPTIONS = {
     text: 'Node environment: production | development',
     cli: '--node_env',
     env: 'NODE_ENV',
+  },
+  [this.OPT_BACK_PATH]: {
+    text: 'Back-end path',
+    cli: '--back_path',
+    env: 'PUBLIC_URL',
   },
 };
 // if (argv.indexOf('--opts') > -1) {

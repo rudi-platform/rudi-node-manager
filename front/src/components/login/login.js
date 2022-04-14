@@ -7,6 +7,7 @@ import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
 import { getBackUrl } from '../../utils/frontOptions';
 
+const BACK_URL = getBackUrl()
 /**
  * Login component
  * @param {*} param0 (token hooks)
@@ -37,7 +38,7 @@ export default function Login({ setToken }) {
   function loginUser(credentials) {
     // console.log('-- loginUser');
     return axios
-      .post(`${getBackUrl()}/api/v1/login`, JSON.stringify(credentials), {
+      .post(`${BACK_URL}/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },
