@@ -5,9 +5,7 @@ import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
-import { getPublicUrl } from '../../utils/frontOptions';
-
-const PUBLIC_URL = getPublicUrl();
+import { getBackUrl } from '../../utils/frontOptions';
 
 /**
  * Login component
@@ -15,6 +13,8 @@ const PUBLIC_URL = getPublicUrl();
  * @return {ReactNode} Login html component
  */
 export default function Login({ setToken }) {
+  console.log('-- Login');
+
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
@@ -26,6 +26,7 @@ export default function Login({ setToken }) {
    * @return {Boolean} return true is the form is valid
    */
   function validateForm() {
+    console.log('-- validateForm: ');
     return username.length > 0 && password.length > 0;
   }
   /**
@@ -34,8 +35,9 @@ export default function Login({ setToken }) {
    * @return {Promise} login promise
    */
   function loginUser(credentials) {
+    console.log('-- loginUser');
     return axios
-      .post(`${PUBLIC_URL}/api/v1/login`, JSON.stringify(credentials), {
+      .post(`${getBackUrl()}/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -61,11 +63,15 @@ export default function Login({ setToken }) {
    * @param {*} event
    */
   function handleSubmit(event) {
+    console.log('-- handleSubmit');
     event.preventDefault();
     loginUser({
       username,
       password,
-    }).then((res) => setToken());
+    }).then((res) => {
+      console.log('res: ' + JSON.stringify(res));
+      setToken();
+    });
   }
 
   return (

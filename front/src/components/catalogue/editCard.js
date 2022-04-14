@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getPublicUrl } from '../../utils/frontOptions';
+import { getBackUrl } from '../../utils/frontOptions';
 
-const PUBLIC_URL = getPublicUrl();
+const BACK_URL = getBackUrl();
 
 /**
  * Composant : EditCard
@@ -31,7 +31,7 @@ export default function EditCard({ formUrl, refresh }) {
    */
   function deleteRessource() {
     axios
-      .delete(`${PUBLIC_URL}/api/admin/resources/${editID}`)
+      .delete(`${BACK_URL}/api/admin/resources/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`];

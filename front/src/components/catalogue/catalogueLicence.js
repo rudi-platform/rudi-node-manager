@@ -4,9 +4,9 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import LicenceCard from './licenceCard';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getPublicUrl } from '../../utils/frontOptions';
+import { getBackUrl } from '../../utils/frontOptions';
 
-const PUBLIC_URL = getPublicUrl();
+const BACK_URL = getBackUrl();
 
 /**
  * Composant : CatalogueLicence
@@ -21,7 +21,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
 
   useEffect(() => {
     axios
-      .get(`${PUBLIC_URL}/api/v1/formUrl`)
+      .get(`${BACK_URL}/api/v1/formUrl`)
       .then((res) => {
         setFormUrl(res.data);
       })
@@ -35,7 +35,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
    */
   function getInitialData() {
     axios
-      .get(`${PUBLIC_URL}/api/admin/licences`)
+      .get(`${BACK_URL}/api/admin/licences`)
       .then((res) => {
         setMetadatas(res.data);
       })

@@ -6,9 +6,9 @@ import { Plus, Trash } from 'react-bootstrap-icons';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getPublicUrl } from '../../utils/frontOptions';
+import { getBackUrl } from '../../utils/frontOptions';
 
-const PUBLIC_URL = getPublicUrl();
+const BACK_URL = getBackUrl();
 
 /**
  * EditRoleModal component
@@ -30,7 +30,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
    */
   function deleteUserRole(role, user) {
     axios
-      .delete(`${PUBLIC_URL}/api/v1/user-roles/${user.id}/${role.role}`)
+      .delete(`${BACK_URL}/api/v1/user-roles/${user.id}/${role.role}`)
       .then((res) => {
         user.roles.splice(
           user.roles.findIndex((element) => element === role.role),
@@ -54,7 +54,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
   function addUserRole(role, user) {
     axios
       .post(
-        `${PUBLIC_URL}/api/v1/user-roles`,
+        `${BACK_URL}/api/v1/user-roles`,
         JSON.stringify({ userId: user.id, role: role.role }),
         {
           headers: {

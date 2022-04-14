@@ -5,29 +5,26 @@ import { useState } from 'react';
  * @return {*} Token hooks
  */
 export default function useToken() {
+  console.log('-- useToken');
+
   const getCookie = (name) => {
-    try {
-      return document.cookie
-        .split('; ')
-        .find((row) => row.startsWith(name))
-        .split('=')[1];
-    } catch (error) {
-      // console.log(error)
-      return null;
-    }
+    // console.log('-- getCookie');
+    return document.cookie
+      ?.split('; ')
+      ?.find((row) => row.startsWith(`${name}`))
+      ?.split('=')[1];
   };
   const getToken = () => {
-    return getCookie('publicToken');
+    console.log('-- getToken');
+    getCookie('publicToken');
   };
 
   const [token, setToken] = useState(getToken());
 
-  const saveToken = () => {
+  const updateToken = () => {
+    console.log('-- saveToken');
     setToken(getCookie('publicToken'));
   };
 
-  return {
-    updateToken: saveToken,
-    token,
-  };
+  return { token, updateToken };
 }

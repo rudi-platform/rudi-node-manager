@@ -7,9 +7,9 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import ReactJson from 'react-json-view';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getPublicUrl } from '../../utils/frontOptions';
+import { getBackUrl } from '../../utils/frontOptions';
 
-const PUBLIC_URL = getPublicUrl();
+const BACK_URL = getBackUrl();
 
 /**
  * Composant : Visualisation
@@ -92,7 +92,7 @@ function Visualisation({ match }) {
    */
   function handleOnClick() {
     axios
-      .get(`${PUBLIC_URL}/api/media/${mediaId}`)
+      .get(`${BACK_URL}/media/${mediaId}`)
       .then((res) => {
         axios
           .get(`${res.data.url}`)

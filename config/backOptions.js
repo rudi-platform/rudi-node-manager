@@ -104,3 +104,5 @@ exports.getHashFun = () => {
     throw err;
   }
 };
+
+exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV);

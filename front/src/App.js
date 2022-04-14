@@ -17,16 +17,16 @@ import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
-import { getFrontOptions, getPublicUrl, OPT_TAG } from './utils/frontOptions';
+import { getFrontOptions, OPT_TAG, getBackUrl, getFrontPath } from './utils/frontOptions';
 
-// TODO : move to util.js
-export const PUBLIC_URL = getPublicUrl();
-export const VERSION_TAG = getFrontOptions(OPT_TAG);
-// console.log('PUBLIC_URL : ', PUBLIC_URL);
+const FRONT_PATH = getFrontPath();
+const BACK_URL = getBackUrl();
+const VERSION_TAG = getFrontOptions(OPT_TAG);
 
 export const history = createBrowserHistory({
-  basename: PUBLIC_URL,
+  basename: FRONT_PATH,
 });
+
 /*
 TODO :
 - sticky filtre
@@ -40,6 +40,8 @@ TODO :
  * @return {ReactNode} main html or login component
  */
 export default function App() {
+  console.log('-- App');
+
   const { token, updateToken } = useToken();
   const [isLoginOpen, setIsLoginOpen] = useState(true);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -58,10 +60,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(`${PUBLIC_URL}/api/v1/formUrl`).catch((e) => {
+        axios.get(`${BACK_URL}/api/v1/formUrl`).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`${PUBLIC_URL}/api/admin/enum/themes/fr`).catch((e) => {
+        axios.get(`${BACK_URL}/api/admin/enum/themes/fr`).catch((e) => {
           return { data: {} };
         }),
       ]).then((values) => {
@@ -74,7 +76,7 @@ export default function App() {
    * logout
    */
   function logout() {
-    axios.get(`${PUBLIC_URL}/api/v1/logout`).then((res) => {
+    axios.get(`${BACK_URL}/api/v1/logout`).then((res) => {
       updateToken();
     });
   }
@@ -110,7 +112,7 @@ export default function App() {
               <div className="container-fluid">
                 <img
                   className="icon-navbar"
-                  src={`${PUBLIC_URL}/logo_blanc_orange.png`}
+                  src={`${FRONT_PATH}/logo_blanc_orange.png`}
                   alt="Rudi logo"
                 />
                 <button
@@ -151,9 +153,9 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item href="/gestion">Métadonnée</Dropdown.Item>
-                        <Dropdown.Item href="/producer">Producteur</Dropdown.Item>
-                        <Dropdown.Item href="/contact">Contacts</Dropdown.Item>
+                        <Dropdown.Item href={`/gestion`}>Métadonnée</Dropdown.Item>
+                        <Dropdown.Item href={`/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item href={`/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">

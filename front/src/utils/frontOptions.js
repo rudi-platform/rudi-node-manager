@@ -1,10 +1,9 @@
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
-export const OPT_PUBLIC_URL = 'REACT_APP_URL';
-export const OPT_DEFAULT_PUBLIC_URL = 'PUBLIC_URL';
+export const OPT_FRONT_PATH = 'PUBLIC_URL';
+export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
 export const OPT_TAG = 'REACT_APP_TAG';
-// export const OPT_USER_CONF = 'REACT_APP_USER_CONF';
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -14,7 +13,7 @@ export const OPT_TAG = 'REACT_APP_TAG';
 // 'file': option given through the configuration file
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
-const OPTIONS = [OPT_DEFAULT_PUBLIC_URL, OPT_PUBLIC_URL, OPT_TAG];
+const OPTIONS = [OPT_FRONT_PATH, OPT_TAG];
 
 const frontOptions = {};
 
@@ -24,7 +23,7 @@ const frontOptions = {};
 /* 
 console.log('= Extract command line arguments =');
 console.log('REACT_APP_URL: ' + process.env.REACT_APP_URL);
-console.log('PUBLIC_URL: ' + process.env.PUBLIC_URL);
+console.log('FRONT_PATH: ' + process.env.FRONT_PATH);
  */
 // ------------------------------------------------------------------------------------------------
 // Extracted conf values
@@ -47,5 +46,17 @@ export const getFrontOptions = (opt, altValue) => {
   return optVal;
 };
 
-export const getPublicUrl = () =>
-  getFrontOptions(OPT_PUBLIC_URL) || getFrontOptions(OPT_DEFAULT_PUBLIC_URL);
+export const getFrontPath = () => {
+  ensureIsFound(OPT_FRONT_PATH);
+  return getFrontOptions(OPT_FRONT_PATH);
+};
+
+export const getBackUrl = () => {
+  ensureIsFound(OPT_BACK_URL);
+  return getFrontOptions(OPT_BACK_URL);
+};
+
+const ensureIsFound = (varName) => {
+  if (!getFrontOptions(varName))
+    throw new Error(`This environment variable should be defined: ${varName}`);
+};

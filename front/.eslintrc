@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@babel/eslint-parser",
   "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "./node_modules/*", "./build/*"],
-  "extends": ["../.eslintrc.json", "plugin:react/recommended"],
+  "extends": ["../.eslintrc", "plugin:react/recommended"],
   "parserOptions": {
     "sourceType": "module",
     "ecmaFeatures": {

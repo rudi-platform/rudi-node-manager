@@ -26,6 +26,7 @@ const port = config.server.listening_port || 5000;
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, res, next) => {
   log.sysInfo(mod, '', `Request_Endpoint: ${req.method} ${req.url}`, log.getContext(req, {}));
+  // console.log(JSON.stringify(req))
   next();
 });
 app.use(
