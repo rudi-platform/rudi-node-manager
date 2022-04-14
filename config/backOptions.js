@@ -71,13 +71,13 @@ process.argv.map((cliArg) => {
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
 console.log('Extracted conf values:');
-const appOptionsValues = {};
+const backOptionsValues = {};
 Object.keys(this.OPTIONS).map(
-  (opt) => (appOptionsValues[opt] = cliOptionsValues[opt] || process.env[this.OPTIONS[opt].env]),
+  (opt) => (backOptionsValues[opt] = cliOptionsValues[opt] || process.env[this.OPTIONS[opt].env]),
 );
 
-Object.keys(appOptionsValues).map((key) =>
-  appOptionsValues[key] ? console.log('    ' + key + ' => ' + appOptionsValues[key]) : '',
+Object.keys(backOptionsValues).map((key) =>
+  backOptionsValues[key] ? console.log('    ' + key + ' => ' + backOptionsValues[key]) : '',
 );
 console.log('--------------------------------------------------------------');
 
@@ -87,11 +87,11 @@ console.log('--------------------------------------------------------------');
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-exports.getAppOptions = (opt, altValue) =>
-  opt ? appOptionsValues[opt] || altValue : appOptionsValues;
+exports.getBackOptions = (opt, altValue) =>
+  opt ? backOptionsValues[opt] || altValue : backOptionsValues;
 
 exports.getHashFun = () => {
-  const hashId = this.getAppOptions(this.OPT_GIT_HASH);
+  const hashId = this.getBackOptions(this.OPT_GIT_HASH);
   try {
     return hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD');
   } catch (err) {
