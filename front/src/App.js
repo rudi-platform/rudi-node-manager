@@ -35,6 +35,16 @@ TODO :
 - remove key={...+i} when possible
 */
 
+function displayVersion() {
+  return !VERSION_TAG ? (
+    ''
+  ) : (
+    <div float="right" style={{ color: 'white', fontSize: '50%' }}>
+      v.{VERSION_TAG}
+    </div>
+  );
+}
+
 /**
  * Main App component
  * @return {ReactNode} main html or login component
@@ -154,7 +164,9 @@ export default function App() {
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item href={`${getFrontPath()}/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item href={`${getFrontPath()}/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item href={`${getFrontPath()}/producer`}>
+                          Producteur
+                        </Dropdown.Item>
                         <Dropdown.Item href={`${getFrontPath()}/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
@@ -191,9 +203,7 @@ export default function App() {
                   </ul>
                 </div>
               </div>
-              <div float="right" style={{ color: 'white', fontSize: '50%' }}>
-                v.{VERSION_TAG}
-              </div>
+              {displayVersion()}
             </nav>
           </header>
 

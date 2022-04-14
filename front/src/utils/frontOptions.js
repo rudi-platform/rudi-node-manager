@@ -43,16 +43,16 @@ export const getFrontOptions = (opt, altValue) => {
     frontOptions[opt] = optVal;
     console.log('\t- ' + opt + '=' + optVal);
   }
-  return optVal;
+  return optVal || '';
 };
 
 export const getFrontPath = () => {
-  ensureIsFound(OPT_FRONT_PATH);
+  // ensureIsFound(OPT_FRONT_PATH);
   return getFrontOptions(OPT_FRONT_PATH);
 };
 
 export const getBackUrl = () => {
-  ensureIsFound(OPT_BACK_URL);
+  // ensureIsFound(OPT_BACK_URL);
   return getFrontOptions(OPT_BACK_URL);
 };
 
