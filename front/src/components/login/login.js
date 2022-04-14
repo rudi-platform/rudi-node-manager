@@ -35,7 +35,7 @@ export default function Login({ setToken }) {
    */
   function loginUser(credentials) {
     return axios
-      .post(`${PUBLIC_URL}/api/v1/login`, JSON.stringify(credentials), {
+      .post(`/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },
