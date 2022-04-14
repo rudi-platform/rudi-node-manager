@@ -50,7 +50,7 @@ function displayVersion() {
  * @return {ReactNode} main html or login component
  */
 export default function App() {
-  console.log('-- App');
+  // console.log('-- App');
 
   const { token, updateToken } = useToken();
   const [isLoginOpen, setIsLoginOpen] = useState(true);

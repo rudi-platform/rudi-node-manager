@@ -53,10 +53,10 @@ export const getFrontPath = () => {
 
 export const getBackUrl = () => {
   // ensureIsFound(OPT_BACK_URL);
-  return getFrontOptions(OPT_BACK_URL);
+  return getFrontOptions(OPT_FRONT_PATH);
 };
 
-const ensureIsFound = (varName) => {
-  if (!getFrontOptions(varName))
-    throw new Error(`This environment variable should be defined: ${varName}`);
-};
+// const ensureIsFound = (varName) => {
+//   if (!getFrontOptions(varName))
+//     throw new Error(`This environment variable should be defined: ${varName}`);
+// };

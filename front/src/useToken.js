@@ -5,7 +5,7 @@ import { useState } from 'react';
  * @return {*} Token hooks
  */
 export default function useToken() {
-  console.log('-- useToken');
+  // console.log('-- useToken');
 
   const getCookie = (name) => {
     // console.log('-- getCookie');
@@ -15,14 +15,14 @@ export default function useToken() {
       ?.split('=')[1];
   };
   const getToken = () => {
-    console.log('-- getToken');
+    // console.log('-- getToken');
     getCookie('publicToken');
   };
 
   const [token, setToken] = useState(getToken());
 
   const updateToken = () => {
-    console.log('-- saveToken');
+    // console.log('-- saveToken');
     setToken(getCookie('publicToken'));
   };
 

@@ -13,7 +13,7 @@ import { getBackUrl } from '../../utils/frontOptions';
  * @return {ReactNode} Login html component
  */
 export default function Login({ setToken }) {
-  console.log('-- Login');
+  // console.log('-- Login');
 
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +26,7 @@ export default function Login({ setToken }) {
    * @return {Boolean} return true is the form is valid
    */
   function validateForm() {
-    console.log('-- validateForm: ');
+    // console.log('-- validateForm: ');
     return username.length > 0 && password.length > 0;
   }
   /**
@@ -35,7 +35,7 @@ export default function Login({ setToken }) {
    * @return {Promise} login promise
    */
   function loginUser(credentials) {
-    console.log('-- loginUser');
+    // console.log('-- loginUser');
     return axios
       .post(`${getBackUrl()}/api/v1/login`, JSON.stringify(credentials), {
         headers: {
@@ -63,13 +63,13 @@ export default function Login({ setToken }) {
    * @param {*} event
    */
   function handleSubmit(event) {
-    console.log('-- handleSubmit');
+    // console.log('-- handleSubmit');
     event.preventDefault();
     loginUser({
       username,
       password,
     }).then((res) => {
-      console.log('res: ' + JSON.stringify(res));
+      // console.log('res: ' + JSON.stringify(res));
       setToken();
     });
   }
