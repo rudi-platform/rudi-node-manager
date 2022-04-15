@@ -9,9 +9,6 @@ import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
-// import { getBackUrl } from '../../utils/frontOptions';
-
-// const BACK_URL = getBackUrl();
 
 /**
  * Composant : Catalogue
@@ -166,7 +163,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
     Promise.all(
       filterConf.map((count) =>
-        axios.get(`/api/admin/resources${searchMode()}`, {
+        axios.get(`api/admin/resources${searchMode()}`, {
           params: createParams({ count_by: count.name }),
         }),
       ),
@@ -188,7 +185,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     axios
-      .get(`/api/admin/resources${searchMode()}`, {
+      .get(`api/admin/resources${searchMode()}`, {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {

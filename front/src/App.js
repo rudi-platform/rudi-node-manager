@@ -58,10 +58,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(`/api/v1/formUrl`).catch((e) => {
+        axios.get(`api/v1/formUrl`).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`/api/admin/enum/themes/fr`).catch((e) => {
+        axios.get(`api/admin/enum/themes/fr`).catch((e) => {
           return { data: {} };
         }),
       ]).then((values) => {
@@ -90,7 +90,7 @@ export default function App() {
   function logout() {
     // console.log('-- logout');
 
-    axios.get(`/api/v1/logout`).then((res) => {
+    axios.get(`api/v1/logout`).then((res) => {
       updateToken();
     });
   }
@@ -124,7 +124,7 @@ export default function App() {
           <header>
             <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
               <div className="container-fluid">
-                <img className="icon-navbar" src={`/logo_blanc_orange.png`} alt="Rudi logo" />
+                <img className="icon-navbar" src={`logo_blanc_orange.png`} alt="Rudi logo" />
                 <button
                   className="navbar-toggler"
                   type="button"
@@ -141,21 +141,21 @@ export default function App() {
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                   <ul className="navbar-nav me-auto mb-2 mb-md-0">
                     <li className="nav-item">
-                      <Link to={`/`}>
+                      <Link to={`${getFrontPath()}`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Catalogue
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={`/licence`}>
+                      <Link to={`${getFrontPath()}/licence`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Licence
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={`/show`}>
+                      <Link to={`show`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Visualisation
                         </button>
@@ -163,27 +163,27 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item as={Link} to={`/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item as={Link} to={`/producer`}>Producteur</Dropdown.Item>
-                        <Dropdown.Item as={Link} to={`/contact`}>Contacts</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`${getFrontPath()}/gestion`}>Métadonnée</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to={`/monitoring`}>
+                      <Link to={`${getFrontPath()}/monitoring`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Monitoring
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={`/user`}>
+                      <Link to={`${getFrontPath()}/user`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Utilisateur
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to={`/conf`}>
+                      <Link to={`${getFrontPath()}/conf`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Configuration
                         </button>
@@ -208,50 +208,50 @@ export default function App() {
           <div id="root"></div>
 
           <Switch>
-            <Route exact path="/">
+            <Route exact path={`${getFrontPath()}`}>
               <Catalogue
                 display={{ searchbar: true, editJDD: false }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path="/gestion">
+            <Route path={`${getFrontPath()}/gestion`}>
               <Catalogue
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path="/producer">
+            <Route path={`${getFrontPath()}/producer`}>
               <CatalogueProducer
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path="/contact">
+            <Route path={`${getFrontPath()}/contact`}>
               <CatalogueContact
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path="/licence">
+            <Route path={`${getFrontPath()}/licence`}>
               <CatalogueLicence display={{ editJDD: false }} editMode={{}} />
             </Route>
-            <Route path="/show/:id">
+            <Route path={`${getFrontPath()}/show/:id`}>
               <Visualisation />
             </Route>
-            <Route path="/show">
+            <Route path={`${getFrontPath()}/show`}>
               <Visualisation />
             </Route>
-            <Route path="/monitoring">
+            <Route path={`${getFrontPath()}/monitoring`}>
               <Monitoring />
             </Route>
-            <Route path="/user">
+            <Route path={`${getFrontPath()}/user`}>
               <CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />
             </Route>
-            <Route path="/conf">
+            <Route path={`${getFrontPath()}/conf`}>
               <div className="tempPaddingTop">Work in progress</div>
             </Route>
           </Switch>

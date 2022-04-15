@@ -3,9 +3,6 @@ import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-// import { getBackUrl } from '../../utils/frontOptions';
-
-// const BACK_URL = getBackUrl();
 
 /**
  * Composant : EditCard
@@ -28,7 +25,7 @@ export default function EditCard({}) {
    */
   function deleteUser() {
     axios
-      .delete(`/api/v1/users/${editID}`)
+      .delete(`api/v1/users/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];

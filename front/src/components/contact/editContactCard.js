@@ -4,9 +4,6 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-// import { getBackUrl } from '../../utils/frontOptions';
-
-// const BACK_URL = getBackUrl();
 
 /**
  * Composant : EditContactCard
@@ -29,7 +26,7 @@ export default function EditContactCard({ formUrl, refresh }) {
    */
   function deleteContact() {
     axios
-      .delete(`/api/admin/contacts/${editID}`)
+      .delete(`api/admin/contacts/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`Le Contact ${res.data.contact_name} a été supprimé`];

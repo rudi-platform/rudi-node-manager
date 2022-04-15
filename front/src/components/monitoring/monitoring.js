@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { getBackUrl } from '../../utils/frontOptions';
-
-// const BACK_URL = getBackUrl();
 
 /**
  * Composant : Monitoring
@@ -14,35 +11,35 @@ function Monitoring({}) {
   useEffect(() => {
     Promise.all([
       axios
-        .get(`/api/admin/resources`, {
+        .get(`api/admin/resources`, {
           params: { count_by: 'metadata_info.api_version' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`/api/admin/resources`, {
+        .get(`api/admin/resources`, {
           params: { count_by: 'storage_status' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`/api/admin/resources`, {
+        .get(`api/admin/resources`, {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`/api/admin/resources`, {
+        .get(`api/admin/resources`, {
           params: { count_by: 'producer' },
         })
         .catch((e) => {
           return { data: [] };
         }),
       axios
-        .get(`/api/admin/report`, {
+        .get(`api/admin/report`, {
           params: { count_by: 'integration_status' },
         })
         .catch((e) => {
