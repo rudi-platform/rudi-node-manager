@@ -14,7 +14,7 @@
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
     "front:build": "cd front && npm run build",
     "lintBack": "eslint \"**/*.js\"",
-    "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc.json --no-ignore",
+    "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc --no-ignore",
     "prettier": "npx prettier --write .",
     "quality": "npm run prettier && npm run lintBack -- --fix",
     "cleanup": "rm -fR ./node_modules ./package-lock.json  ./yarn.lock"
