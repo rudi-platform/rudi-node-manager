@@ -53,7 +53,7 @@ export const getFrontPath = () => {
 
 export const getBackUrl = () => {
   // ensureIsFound(OPT_BACK_URL);
-  return getFrontOptions(OPT_FRONT_PATH);
+  return getFrontOptions(OPT_BACK_URL);
 };
 
 // const ensureIsFound = (varName) => {

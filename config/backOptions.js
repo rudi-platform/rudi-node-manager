@@ -16,6 +16,11 @@ exports.OPT_BACK_PATH = 'backPath';
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
 exports.OPTIONS = {
+  [this.OPT_NODE_ENV]: {
+    text: 'Node environment: production | development',
+    cli: '--node_env',
+    env: 'NODE_ENV',
+  },
   [this.OPT_USER_CONF]: {
     text: 'Path for user conf file',
     cli: '--conf',
@@ -26,15 +31,10 @@ exports.OPTIONS = {
     cli: '--hash',
     env: 'RUDI_PROD_MANAGER_GIT_REV',
   },
-  [this.OPT_NODE_ENV]: {
-    text: 'Node environment: production | development',
-    cli: '--node_env',
-    env: 'NODE_ENV',
-  },
   [this.OPT_BACK_PATH]: {
     text: 'Back-end path',
     cli: '--back_path',
-    env: 'PUBLIC_URL',
+    env: 'RUDI_PROD_MANAGER_BACK_PATH',
   },
 };
 // if (argv.indexOf('--opts') > -1) {
@@ -112,3 +112,4 @@ exports.getHashFun = () => {
 };
 
 exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV);
+// exports.getBackPath=()=> this.getBackOptions(this.OPT_BACK_PATH);

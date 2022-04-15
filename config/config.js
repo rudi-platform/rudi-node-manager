@@ -71,6 +71,9 @@ if (customExist) {
   if (customConfig.logging && customConfig.logging.app_name) {
     config.logging.app_name = customConfig.logging.app_name;
   }
+  if (customConfig.logging && customConfig.logging.debug) {
+    config.logging.debug = customConfig.logging.debug;
+  }
 
   // Syslog
   if (customConfig.syslog && customConfig.syslog.syslog_level) {
@@ -101,5 +104,8 @@ if (customExist) {
     config.syslog.syslog_dir = customConfig.syslog.syslog_dir;
   }
 }
+
+
+if (config.logging.debug) console.log(config);
 
 module.exports = config;

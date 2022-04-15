@@ -22,7 +22,7 @@ export default function useToken() {
   const [token, setToken] = useState(getToken());
 
   const updateToken = () => {
-    // console.log('-- saveToken');
+    console.log('-- saveToken');
     setToken(getCookie('publicToken'));
   };
 

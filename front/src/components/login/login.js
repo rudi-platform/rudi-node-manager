@@ -5,9 +5,8 @@ import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
-import { getBackUrl } from '../../utils/frontOptions';
+// import { getFrontPath } from '../../utils/frontOptions';
 
-const BACK_URL = getBackUrl()
 /**
  * Login component
  * @param {*} param0 (token hooks)
@@ -27,7 +26,7 @@ export default function Login({ setToken }) {
    * @return {Boolean} return true is the form is valid
    */
   function validateForm() {
-    // console.log('-- validateForm: ');
+    console.log(`-- validateForm: ${username.length > 0 && password.length > 0}`);
     return username.length > 0 && password.length > 0;
   }
   /**
@@ -36,16 +35,17 @@ export default function Login({ setToken }) {
    * @return {Promise} login promise
    */
   function loginUser(credentials) {
-    // console.log('-- loginUser');
+    console.log('-- loginUser');
     return axios
-      .post(`${BACK_URL}/api/v1/login`, JSON.stringify(credentials), {
+      .post(`/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },
       })
       .catch((error) => {
+        const errMsg = error == 'No user found' ? 'Utilisateur inconnnu' : `Echec de connexion`;
         changeOptions({
-          text: [`Echec de connexion`],
+          text: [errMsg],
           title: 'une erreur est survenue',
           type: 'error',
           buttons: [
@@ -70,7 +70,7 @@ export default function Login({ setToken }) {
       username,
       password,
     }).then((res) => {
-      // console.log('res: ' + JSON.stringify(res));
+      console.log('-- handleSubmit res: ' + JSON.stringify(res));
       setToken();
     });
   }

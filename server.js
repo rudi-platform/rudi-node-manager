@@ -57,10 +57,10 @@ app.use(cors());
 app.use(passport.initialize());
 
 // Configure app to use route
-app.use('/api/v1/', apiV1);
-app.use('/api/admin/', apiAdmin);
-app.use('/api/secure/', passport.authenticate('jwt', { session: false }), apiAdmin);
-app.use('/api/media/', apiMedia);
+app.use(`/api/v1/`, apiV1);
+app.use(`/api/admin/`, apiAdmin);
+app.use(`/api/secure/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+app.use(`/api/media/`, apiMedia);
 
 // This middleware informs the express application to serve our compiled React files
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
