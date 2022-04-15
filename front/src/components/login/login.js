@@ -5,6 +5,7 @@ import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import { getFrontPath } from '../../utils/frontOptions';
 // import { getFrontPath } from '../../utils/frontOptions';
 
 /**
@@ -37,7 +38,7 @@ export default function Login({ setToken }) {
   function loginUser(credentials) {
     // console.log('-- loginUser');
     return axios
-      .post(`/api/v1/login`, JSON.stringify(credentials), {
+      .post(`${getFrontPath()}/api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
         },
