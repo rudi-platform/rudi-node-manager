@@ -164,8 +164,8 @@ export default function App() {
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item as={Link} to={`${getFrontPath()}/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item as={Link} to={`producer`}>Producteur</Dropdown.Item>
-                        <Dropdown.Item as={Link} to={`contact`}>Contacts</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`${getFrontPath()}/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`${getFrontPath()}/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
