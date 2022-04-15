@@ -90,7 +90,7 @@ export default function App() {
   function logout() {
     // console.log('-- logout');
 
-    axios.get(`api/v1/logout`).then((res) => {
+    axios.get(`${getFrontPath()}/api/v1/logout`).then((res) => {
       updateToken();
     });
   }
