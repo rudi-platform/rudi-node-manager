@@ -19,8 +19,6 @@ import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
 import { getFrontOptions, OPT_TAG, getFrontPath } from './utils/frontOptions';
 
-// const FRONT_PATH = getFrontPath();
-// const BACK_URL = getBackUrl();
 const VERSION_TAG = getFrontOptions(OPT_TAG);
 
 export const history = createBrowserHistory({
@@ -34,20 +32,6 @@ TODO :
 - filtre/sort/search
 - remove key={...+i} when possible
 */
-
-/**
- * Returns the code to display the version tag (if defined)
- * @return {ReactNode} the code to display the version tag (if defined)
- */
-function displayVersion() {
-  return !VERSION_TAG ? (
-    ''
-  ) : (
-    <div float="right" style={{ color: 'white', fontSize: '80%' }}>
-      v.{VERSION_TAG}
-    </div>
-  );
-}
 
 /**
  * Main App component
@@ -85,6 +69,20 @@ export default function App() {
       });
     }
   }, [token]);
+
+  /**
+   * Returns the code to display the version tag (if defined)
+   * @return {ReactNode} the code to display the version tag (if defined)
+   */
+  function displayVersion() {
+    return !VERSION_TAG ? (
+      ''
+    ) : (
+      <div float="right" style={{ color: 'white', fontSize: '80%' }}>
+        v.{VERSION_TAG}
+      </div>
+    );
+  }
 
   /**
    * logout
@@ -143,21 +141,21 @@ export default function App() {
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                   <ul className="navbar-nav me-auto mb-2 mb-md-0">
                     <li className="nav-item">
-                      <Link to="/">
+                      <Link to={`/`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Catalogue
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to="/licence">
+                      <Link to={`/licence`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Licence
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to="/show/">
+                      <Link to={`/show`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Visualisation
                         </button>
@@ -165,27 +163,27 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item href={`/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item href={`/producer`}>Producteur</Dropdown.Item>
-                        <Dropdown.Item href={`/contact`}>Contacts</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`/gestion`}>Métadonnée</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item as={Link} to={`/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to="/monitoring">
+                      <Link to={`/monitoring`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Monitoring
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to="/user">
+                      <Link to={`/user`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Utilisateur
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to="/conf">
+                      <Link to={`/conf`}>
                         <button type="button" className="btn btn-primary button-margin">
                           Configuration
                         </button>

@@ -8,9 +8,7 @@ import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/M
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-// import { getBackUrl } from '../../utils/frontOptions';
-
-// const BACK_URL = getBackUrl();
+// import { getFrontPath } from '../../utils/frontOptions';
 
 /**
  * Composant : metadataCard
