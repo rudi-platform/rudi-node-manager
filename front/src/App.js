@@ -17,14 +17,14 @@ import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
-import { getFrontOptions, OPT_TAG, getBackUrl, getFrontPath } from './utils/frontOptions';
+import { getFrontOptions, OPT_TAG, getFrontPath } from './utils/frontOptions';
 
-const FRONT_PATH = getFrontPath();
-const BACK_URL = getBackUrl();
+// const FRONT_PATH = getFrontPath();
+// const BACK_URL = getBackUrl();
 const VERSION_TAG = getFrontOptions(OPT_TAG);
 
 export const history = createBrowserHistory({
-  basename: FRONT_PATH,
+  basename: getFrontPath(),
 });
 
 /*
@@ -35,11 +35,15 @@ TODO :
 - remove key={...+i} when possible
 */
 
+/**
+ * Returns the code to display the version tag (if defined)
+ * @return {ReactNode} the code to display the version tag (if defined)
+ */
 function displayVersion() {
   return !VERSION_TAG ? (
     ''
   ) : (
-    <div float="right" style={{ color: 'white', fontSize: '50%' }}>
+    <div float="right" style={{ color: 'white', fontSize: '80%' }}>
       v.{VERSION_TAG}
     </div>
   );
@@ -70,10 +74,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(`${BACK_URL}/api/v1/formUrl`).catch((e) => {
+        axios.get(`/api/v1/formUrl`).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`${BACK_URL}/api/admin/enum/themes/fr`).catch((e) => {
+        axios.get(`/api/admin/enum/themes/fr`).catch((e) => {
           return { data: {} };
         }),
       ]).then((values) => {
@@ -86,7 +90,9 @@ export default function App() {
    * logout
    */
   function logout() {
-    axios.get(`${BACK_URL}/api/v1/logout`).then((res) => {
+    // console.log('-- logout');
+
+    axios.get(`/api/v1/logout`).then((res) => {
       updateToken();
     });
   }
@@ -120,11 +126,7 @@ export default function App() {
           <header>
             <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
               <div className="container-fluid">
-                <img
-                  className="icon-navbar"
-                  src={`${FRONT_PATH}/logo_blanc_orange.png`}
-                  alt="Rudi logo"
-                />
+                <img className="icon-navbar" src={`/logo_blanc_orange.png`} alt="Rudi logo" />
                 <button
                   className="navbar-toggler"
                   type="button"
@@ -163,11 +165,9 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item href={`${getFrontPath()}/gestion`}>Métadonnée</Dropdown.Item>
-                        <Dropdown.Item href={`${getFrontPath()}/producer`}>
-                          Producteur
-                        </Dropdown.Item>
-                        <Dropdown.Item href={`${getFrontPath()}/contact`}>Contacts</Dropdown.Item>
+                        <Dropdown.Item href={`/gestion`}>Métadonnée</Dropdown.Item>
+                        <Dropdown.Item href={`/producer`}>Producteur</Dropdown.Item>
+                        <Dropdown.Item href={`/contact`}>Contacts</Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">

@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import UserCard from './userCard';
 import EditUserCard from './editUserCard';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getBackUrl } from '../../utils/frontOptions';
+// import { getBackUrl } from '../../utils/frontOptions';
 
-const BACK_URL = getBackUrl();
+// const BACK_URL = getBackUrl();
 
 /**
  * Composant : CatalogueUser
@@ -27,7 +27,7 @@ export default function CatalogueUser({ editMode, display }) {
    */
   function getInitialData() {
     axios
-      .get(`${BACK_URL}/api/v1/users`)
+      .get(`/api/v1/users`)
       .then((res) => {
         const userFromAPI = res.data;
         setUser(userFromAPI);

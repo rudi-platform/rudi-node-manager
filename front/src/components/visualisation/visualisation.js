@@ -7,9 +7,9 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import ReactJson from 'react-json-view';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getBackUrl } from '../../utils/frontOptions';
+// import { getBackUrl } from '../../utils/frontOptions';
 
-const BACK_URL = getBackUrl();
+// const BACK_URL = getBackUrl();
 
 /**
  * Composant : Visualisation

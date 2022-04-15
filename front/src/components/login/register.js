@@ -5,9 +5,9 @@ import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
-import { getBackUrl } from '../../utils/frontOptions';
+// import { getBackUrl } from '../../utils/frontOptions';
 
-const BACK_URL = getBackUrl();
+// const BACK_URL = getBackUrl();
 
 /**
  * Register component
@@ -36,7 +36,7 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   function registerUser(credentials) {
-    return axios.post(`${BACK_URL}/api/v1/register`, JSON.stringify(credentials), {
+    return axios.post(`/api/v1/register`, JSON.stringify(credentials), {
       headers: {
         'Content-Type': 'application/json',
       },

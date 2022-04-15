@@ -9,15 +9,16 @@ import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
-import { getBackUrl } from '../../utils/frontOptions';
+// import { getBackUrl } from '../../utils/frontOptions';
 
-const BACK_URL = getBackUrl();
+// const BACK_URL = getBackUrl();
 
 /**
  * Composant : Catalogue
  * @return {ReactNode}
  */
 export default function Catalogue({ display, specialSearch, editMode }) {
+  // console.log('-- Catalogue')
   const [metadatas, setMetadatas] = useState([]);
   const [countBy, setCountBy] = useState([]);
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }]);
@@ -42,6 +43,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
   useEffect(() => {
+    // console.log(`-- Catalogue: ${generalConf.formUrl}`)
     setFormUrl(`${generalConf.formUrl}`);
   }, [generalConf]);
   useEffect(() => {
@@ -56,6 +58,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
     }
   }, [currentOffset]);
   useEffect(() => {
+    // console.log('-- useEffect: refresh')
+
     refresh();
   }, [currentFilters]);
 
@@ -63,6 +67,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
     setHasMore(true);
     setMetadatas([]);
     getInitialData();
+    // console.log('-- gotInitialData')
 
     if (currentOffset === 0) {
       setCurrentOffset(-1);
@@ -157,9 +162,11 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
+    // console.log('-- getInitialData')
+
     Promise.all(
       filterConf.map((count) =>
-        axios.get(`${BACK_URL}/api/admin/resources${searchMode()}`, {
+        axios.get(`/api/admin/resources${searchMode()}`, {
           params: createParams({ count_by: count.name }),
         }),
       ),
@@ -181,7 +188,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     axios
-      .get(`${BACK_URL}/api/admin/resources${searchMode()}`, {
+      .get(`/api/admin/resources${searchMode()}`, {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {

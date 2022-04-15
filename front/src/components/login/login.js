@@ -26,7 +26,7 @@ export default function Login({ setToken }) {
    * @return {Boolean} return true is the form is valid
    */
   function validateForm() {
-    console.log(`-- validateForm: ${username.length > 0 && password.length > 0}`);
+    // console.log(`-- validateForm: ${username.length > 0 && password.length > 0}`);
     return username.length > 0 && password.length > 0;
   }
   /**
@@ -35,7 +35,7 @@ export default function Login({ setToken }) {
    * @return {Promise} login promise
    */
   function loginUser(credentials) {
-    console.log('-- loginUser');
+    // console.log('-- loginUser');
     return axios
       .post(`/api/v1/login`, JSON.stringify(credentials), {
         headers: {
@@ -70,7 +70,7 @@ export default function Login({ setToken }) {
       username,
       password,
     }).then((res) => {
-      console.log('-- handleSubmit res: ' + JSON.stringify(res));
+      // console.log('-- handleSubmit res: ' + JSON.stringify(res));
       setToken();
     });
   }
