@@ -14,17 +14,12 @@ export default function useToken() {
       ?.find((row) => row.startsWith(`${name}`))
       ?.split('=')[1];
   };
-  const getToken = () => {
-    // console.log('-- getToken');
-    getCookie('publicToken');
-  };
+
+  const getToken = () => getCookie('publicToken');
 
   const [token, setToken] = useState(getToken());
 
-  const updateToken = () => {
-    // console.log('-- saveToken');
-    setToken(getCookie('publicToken'));
-  };
+  const updateToken = () => setToken(getCookie('publicToken'));
 
   return { token, updateToken };
 }
