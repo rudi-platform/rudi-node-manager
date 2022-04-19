@@ -12,7 +12,7 @@ import { Check, ExclamationTriangleFill } from 'react-bootstrap-icons';
 export default function GenericModal({ visible, toggle, options }) {
   return (
     <>
-      <Modal show={visible} onHide={toggle}>
+      <Modal show={visible} onHide={toggle} animation={false}>
         <Modal.Header closeButton>
           <Modal.Title>
             {options.type === 'success' && <Check color="green" />}

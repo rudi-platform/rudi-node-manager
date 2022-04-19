@@ -45,10 +45,10 @@ exports.postLogin = (req, res, next) => {
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', function (err, user, info) {
     if (err) {
-      return res.status(400).json({ errors: err });
+      return res.status(400).send(err);
     }
     if (!user) {
-      return res.status(400).json({ errors: 'No user found' });
+      return res.status(401).send('No user found');
     }
     req.login(user, { session: false }, function (err) {
       if (err) {

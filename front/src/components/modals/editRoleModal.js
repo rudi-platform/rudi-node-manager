@@ -72,7 +72,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
 
   return (
     <>
-      <Modal show={visible} onHide={toggleEdit}>
+      <Modal show={visible} onHide={toggleEdit} animation={false}>
         <Modal.Header closeButton>
           <Modal.Title>Edition des Roles de {options.user && options.user.username}</Modal.Title>
         </Modal.Header>

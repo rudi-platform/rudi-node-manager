@@ -86,7 +86,7 @@ export default function Register({ backToLogin }) {
 
   return (
     <div className="Login">
-      <GenericModal visible={visible} toggle={toggle} options={options}></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options}animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
         <Form.Group size="lg" controlId="username">
           <Form.Label>User</Form.Label>
