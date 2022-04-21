@@ -42,7 +42,10 @@ export default function Login({ setToken }) {
         },
       })
       .catch((error) => {
-        const errMsg = error.response?.data == 'No user found' ? 'Login ou mot de passe incorect' : `Echec de connexion`;
+        const errMsg =
+          error.response?.data == 'No user found'
+            ? 'Login ou mot de passe incorect'
+            : `Echec de connexion`;
         changeOptions({
           text: [errMsg],
           title: 'Une erreur est survenue',
@@ -76,7 +79,12 @@ export default function Login({ setToken }) {
 
   return (
     <div className="Login">
-      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
+      <GenericModal
+        visible={visible}
+        toggle={toggle}
+        options={options}
+        animation={false}
+      ></GenericModal>
       <Form onSubmit={handleSubmit}>
         <Form.Group size="lg" controlId="email">
           <Form.Label>User</Form.Label>

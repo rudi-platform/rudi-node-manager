@@ -1,14 +1,9 @@
 {
   "root": true,
-  "parser": "@babel/eslint-parser",
   "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "./node_modules/*", "./build/*"],
-  "extends": ["google", "prettier", "plugin:react/recommended"],
+  "extends": ["google", "prettier", "plugin:react/recommended", "../.eslintrc"],
   "parserOptions": {
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 12
+    "sourceType": "module"
   },
   "plugins": ["react"],
   "settings": {

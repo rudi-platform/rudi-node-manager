@@ -56,7 +56,7 @@ exports.postLogin = (req, res, next) => {
       }
 
       const { authToken, publicToken, exp } = utils.createToken(user);
-      const isNodeEnvDefined = !!getNodeEnv()
+      const isNodeEnvDefined = !!getNodeEnv();
 
       // sameSite: 'Lax' ?
       return res
