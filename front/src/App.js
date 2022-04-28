@@ -155,7 +155,7 @@ export default function App() {
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={`show`}>
+                      <Link to={getFrontPath(`show`)}>
                         <button type="button" className="btn btn-primary button-margin">
                           Visualisation
                         </button>

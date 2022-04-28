@@ -46,9 +46,10 @@ export const getFrontOptions = (opt, altValue) => {
   return optVal || '';
 };
 
-export const getFrontPath = (suffix) => `${getFrontOptions(OPT_FRONT_PATH)}/${suffix}`;
-export const getBackUrl = (suffix) => `${getFrontOptions(OPT_BACK_URL)}/${suffix}`;
-
+export const getFrontPath = (suffix) =>
+  `${getFrontOptions(OPT_FRONT_PATH)}${!suffix ? '' : `/${suffix}`}`;
+export const getBackUrl = (suffix) =>
+  `${getFrontOptions(OPT_BACK_URL)}${!suffix ? '' : `/${suffix}`}`;
 
 // const ensureIsFound = (varName) => {
 //   if (!getFrontOptions(varName))

@@ -8,6 +8,7 @@ import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/M
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { getFrontPath } from '../../utils/frontOptions';
 // import { getFrontPath } from '../../utils/frontOptions';
 
 /**
@@ -204,7 +205,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                       Download <CloudDownload />
                     </a>
                   </button>
-                  <Link to={`/show/${ressource.media_id}`}>
+                  <Link to={getFrontPath(`show/${ressource.media_id}`)}>
                     <span className="btn btn-success button-margin">
                       Visualisation <Eye />
                     </span>
