@@ -4,7 +4,7 @@ const mod = 'sysController';
 
 exports.getFormUrl = (req, res, next) => {
   try {
-    res.status(200).json(config.formulaire.base_url);
+    res.status(200).send(config.formulaire.base_url);
   } catch (err) {
     log.e('', '', err);
     log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_formUrl' }));
@@ -13,7 +13,7 @@ exports.getFormUrl = (req, res, next) => {
 };
 exports.getTest = (req, res, next) => {
   try {
-    res.status(200).json('test');
+    res.status(200).send('test');
   } catch (err) {
     log.e('', '', err);
     throw err;

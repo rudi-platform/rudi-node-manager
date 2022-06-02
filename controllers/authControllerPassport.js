@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const databaseManager = require('../database/database');
 const utils = require('../utils/utils');
 const log = require('../utils/logger');
-const { getNodeEnv } = require('../config/backOptions');
+const { isDevEnv } = require('../config/backOptions');
 const mod = 'authController';
 
 const registerUser = (data) => {
@@ -56,19 +56,19 @@ exports.postLogin = (req, res, next) => {
       }
 
       const { authToken, publicToken, exp } = utils.createToken(user);
-      const isNodeEnvDefined = !!getNodeEnv();
+      const shouldSecure = !isDevEnv();
 
       // sameSite: 'Lax' ?
       return res
         .status(200)
         .cookie('authToken', authToken, {
-          secure: isNodeEnvDefined,
+          secure: shouldSecure,
           httpOnly: true,
           sameSite: 'Strict',
           expires: new Date(exp * 1000),
         })
         .cookie('publicToken', publicToken, {
-          secure: isNodeEnvDefined,
+          secure: shouldSecure,
           httpOnly: false,
           expires: new Date(exp * 1000),
         })

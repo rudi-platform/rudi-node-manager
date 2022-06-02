@@ -102,14 +102,15 @@ console.log('--------------------------------------------------------------');
 exports.getBackOptions = (opt, altValue) =>
   opt ? backOptionsValues[opt] || altValue : backOptionsValues;
 
-exports.getHashFun = () => {
-  const hashId = this.getBackOptions(this.OPT_GIT_HASH);
+exports.getHashFun = (req, res, next) => {
   try {
-    return hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD');
+    const hashId = this.getBackOptions(this.OPT_GIT_HASH);
+    res.status(200).send(hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD'));
   } catch (err) {
     throw err;
   }
 };
 
 exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV);
+exports.isDevEnv = () => this.getNodeEnv() === 'development';
 // exports.getBackPath=()=> this.getBackOptions(this.OPT_BACK_PATH);

@@ -1,6 +1,7 @@
+const mod = 'roleCheck';
+
 const databaseManager = require('../database/database');
 const log = require('./logger');
-const mod = 'utils';
 
 exports.checkRolePerm = (role) => (req, res, next) => {
   const fun = 'checkRolePerm';
