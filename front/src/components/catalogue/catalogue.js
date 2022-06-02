@@ -27,7 +27,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   const initialRender = useRef(true);
   const searchText = useRef(null);
   const isSearchMode = () => {
-    return searchText.current.value && searchText.current.value.length > 0;
+    return searchText.current?.value && searchText.current.value?.length > 0;
   };
   const searchMode = () => {
     if (isSearchMode()) {

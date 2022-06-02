@@ -17,6 +17,7 @@ const mod = 'server';
 
 const passport = require('./utils/passportSetup');
 const initDatabase = require('./database/scripts/initDatabase');
+const { getNodeEnv } = require('./config/backOptions');
 
 // Create a new express application named 'app'
 const app = express();
@@ -58,7 +59,13 @@ app.use(passport.initialize());
 
 // Configure app to use route
 app.use(`/api/v1/`, apiV1);
-app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+if (getNodeEnv() === 'development') {
+  app.use(`/api/admin/`, apiAdmin);
+  app.use(`/api/secure/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+} else {
+  app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+}
+
 app.use(`/api/media/`, apiMedia);
 
 // This middleware informs the express application to serve our compiled React files
@@ -76,7 +83,7 @@ initDatabase.initDatabase();
 // Catch any bad requests
 app.get('*', (req, res) => {
   res.status(200).json({
-    msg: 'Catch All',
+    msg: 'Not found',
   });
 });
 
