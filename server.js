@@ -57,14 +57,13 @@ app.use(cors());
 // Passport middleware
 app.use(passport.initialize());
 
-// Configure app to use route
+// Configure app to use routes
 app.use(`/api/v1/`, apiV1);
-if (isDevEnv()) {
-  app.use(`/api/admin/`, apiAdmin);
-} else {
-  app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
-}
 app.use(`/api/media/`, apiMedia);
+
+if (isDevEnv()) app.use(`/api/admin/`, apiAdmin);
+else app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
