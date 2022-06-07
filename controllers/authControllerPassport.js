@@ -1,10 +1,13 @@
+const mod = 'authController';
+
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const databaseManager = require('../database/database');
 const utils = require('../utils/utils');
 const log = require('../utils/logger');
+
 const { isDevEnv } = require('../config/backOptions');
-const mod = 'authController';
+const SHOULD_SECURE = !isDevEnv();
 
 const registerUser = (data) => {
   const fun = 'registerUser';
@@ -56,19 +59,18 @@ exports.postLogin = (req, res, next) => {
       }
 
       const { authToken, publicToken, exp } = utils.createToken(user);
-      const shouldSecure = !isDevEnv();
 
       // sameSite: 'Lax' ?
       return res
         .status(200)
         .cookie('authToken', authToken, {
-          secure: shouldSecure,
+          secure: SHOULD_SECURE,
           httpOnly: true,
           sameSite: 'Strict',
           expires: new Date(exp * 1000),
         })
         .cookie('publicToken', publicToken, {
-          secure: shouldSecure,
+          secure: SHOULD_SECURE,
           httpOnly: false,
           expires: new Date(exp * 1000),
         })
@@ -122,13 +124,13 @@ exports.logout = (req, res, next) => {
   res
     .status(200)
     .cookie('authToken', null, {
-      secure: !!process.env.NODE_ENV,
+      secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(0),
     })
     .cookie('publicToken', null, {
-      secure: !!process.env.NODE_ENV,
+      secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(0),
     })
@@ -139,13 +141,13 @@ exports.getToken = (req, res, next) => {
   res
     .status(200)
     .cookie('authToken', authToken, {
-      secure: !!process.env.NODE_ENV,
+      secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(exp * 1000),
     })
     .cookie('publicToken', publicToken, {
-      secure: !!process.env.NODE_ENV,
+      secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(exp * 1000),
     })
