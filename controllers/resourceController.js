@@ -2,34 +2,37 @@ const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 const utils = require('../utils/utils');
+const { getObjectList } = require('./genericController');
 
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
 
-const resourcesList = (req, res, next) => {
-  const url = `${api}/resources`;
-  const token = utils.createRudiToken({
-    url: url,
-    req: req,
-  });
-  return axios
-    .get(`${serveur}${url}`, {
-      params: req.query,
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then((resRUDI) => {
-      const metadatas = resRUDI.data;
-      res.status(200).json(metadatas);
-    })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_metadatas' });
-      res.status(501).json(error);
-    });
-};
+exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 'resources')
+
+// {
+//   const url = `${api}/resources`;
+//   const token = utils.createRudiApiToken({
+//     url: url,
+//     req: req,
+//   });
+//   return axios
+//     .get(`${serveur}${url}`, {
+//       params: req.query,
+//       headers: { Authorization: `Bearer ${token}` },
+//     })
+//     .then((resRUDI) => {
+//       const metadatas = resRUDI.data;
+//       res.status(200).json(metadatas);
+//     })
+//     .catch((error) => {
+//       error = errorHandler.error(error, req, { opType: 'get_metadatas' });
+//       res.status(501).json(error);
+//     });
+// };
 exports.getResourceById = (req, res, next) => {
   const { id } = req.params;
   const url = `${api}/resources/${id}`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -49,7 +52,7 @@ exports.getResourceById = (req, res, next) => {
 };
 exports.postResources = (req, res, next) => {
   const url = `${api}/resources`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -70,7 +73,7 @@ exports.postResources = (req, res, next) => {
 };
 exports.putResources = (req, res, next) => {
   const url = `${api}/resources`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -96,7 +99,7 @@ exports.putResources = (req, res, next) => {
 exports.deleteResource = (req, res, next) => {
   const { id } = req.params;
   const url = `${api}/resources/${id}`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -117,7 +120,7 @@ exports.deleteResource = (req, res, next) => {
 
 exports.getReports = (req, res, next) => {
   const url = `${api}/report`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -135,5 +138,3 @@ exports.getReports = (req, res, next) => {
       res.status(501).json(error);
     });
 };
-
-module.exports.resourcesList = resourcesList;

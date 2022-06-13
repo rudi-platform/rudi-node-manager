@@ -9,6 +9,12 @@ const log = require('../utils/logger');
 const { isDevEnv } = require('../config/backOptions');
 const SHOULD_SECURE = !isDevEnv();
 
+const AUTH_TOKEN = 'authToken'
+const PUBLIC_TOKEN = 'publicToken'
+
+exports.AUTH_TOKEN = AUTH_TOKEN
+exports.PUBLIC_TOKEN = PUBLIC_TOKEN
+
 const registerUser = (data) => {
   const fun = 'registerUser';
   // TODO : throw error instead
@@ -63,20 +69,21 @@ exports.postLogin = (req, res, next) => {
       // sameSite: 'Lax' ?
       return res
         .status(200)
-        .cookie('authToken', authToken, {
+        .cookie(AUTH_TOKEN, authToken, {
           secure: SHOULD_SECURE,
           httpOnly: true,
           sameSite: 'Strict',
           expires: new Date(exp * 1000),
         })
-        .cookie('publicToken', publicToken, {
+        .cookie(PUBLIC_TOKEN, publicToken, {
           secure: SHOULD_SECURE,
           httpOnly: false,
           expires: new Date(exp * 1000),
         })
         .json({
-          success: `logged in ${user.username}`,
+          success: `logged as ${user.username}`,
           token: publicToken,
+          authToken: authToken,
           expires: new Date(exp * 1000),
         });
       // TODO : remove .json() for cookie only? or give refresh token instead
@@ -123,13 +130,13 @@ exports.postReset = (req, res, next) => {
 exports.logout = (req, res, next) => {
   res
     .status(200)
-    .cookie('authToken', null, {
+    .cookie(AUTH_TOKEN, null, {
       secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(0),
     })
-    .cookie('publicToken', null, {
+    .cookie(PUBLIC_TOKEN, null, {
       secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(0),
@@ -140,13 +147,13 @@ exports.getToken = (req, res, next) => {
   const { authToken, publicToken, exp } = utils.createToken(req.user);
   res
     .status(200)
-    .cookie('authToken', authToken, {
+    .cookie(AUTH_TOKEN, authToken, {
       secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(exp * 1000),
     })
-    .cookie('publicToken', publicToken, {
+    .cookie(PUBLIC_TOKEN, publicToken, {
       secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(exp * 1000),

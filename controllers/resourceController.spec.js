@@ -1,7 +1,7 @@
 const { expect } = require('@jest/globals');
 const axios = require('axios');
-const { createRudiToken } = require('../utils/utils');
-const controllers = require('./controllers');
+const { createRudiApiToken } = require('../utils/utils');
+const controllers = require('./resourceController');
 const { Response } = require('jest-express/lib/response');
 
 jest.mock('axios');
@@ -11,7 +11,7 @@ let response;
 describe('Controllers', () => {
   beforeEach(() => {
     response = new Response();
-    createRudiToken.mockImplementation(() => 'token');
+    createRudiApiToken.mockImplementation(() => 'token');
   });
 
   afterEach(() => {

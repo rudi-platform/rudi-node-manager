@@ -8,20 +8,6 @@ const axios = require('axios');
 const KTYP = 'ktyp';
 const PRVK = 'prvk';
 
-const createToken = (user) => {
-  let exp = moment().add(config.auth.token_expire, 'minutes').format('X');
-  exp = parseInt(exp, 10);
-  const body = { id: user.id, username: user.username };
-  return {
-    authToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
-    publicToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    exp: exp,
-  };
-};
-const createRudiToken = (payload) => {
-  return createRudiApiToken(payload);
-};
-
 /**
  * Retrieve the string that states which algorithm was used for the
  * private/public key pair.
@@ -80,7 +66,18 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
-const createRudiApiToken = (jwtPayload) => {
+exports.createToken = (user) => {
+  let exp = moment().add(config.auth.token_expire, 'minutes').format('X');
+  exp = parseInt(exp, 10);
+  const body = { id: user.id, username: user.username };
+  return {
+    authToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
+    publicToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    exp: exp,
+  };
+};
+
+exports.createRudiApiToken = (jwtPayload) => {
   try {
     const keyInfo = getKeyInfo();
     const keyType = keyInfo[KTYP];
@@ -157,6 +154,3 @@ const convertEncoding = (data, fromEncoding, toEncoding) => {
     throw err;
   }
 };
-
-exports.createToken = createToken;
-exports.createRudiToken = createRudiToken;

@@ -411,6 +411,6 @@ exports.openOrCreateDB = () => {
     if (err) {
       log.e(mod, fun, err);
     }
-    log.v(mod, fun, 'Creation of (or Connected to) the rudy_manager database.');
+    log.v(mod, fun, 'Creation of (or Connected to) the rudi_manager database.');
   });
 };

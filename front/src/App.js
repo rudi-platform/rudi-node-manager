@@ -18,6 +18,7 @@ import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
 import { getFrontOptions, OPT_TAG, getFrontPath } from './utils/frontOptions';
+import CataloguePubKeys from './components/pub_key/cataloguePubKeys';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
 
@@ -163,7 +164,7 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item as={Link} to={getFrontPath('gestion')}>
+                        <Dropdown.Item as={Link} to={getFrontPath('metadata')}>
                           Métadonnée
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getFrontPath('producer')}>
@@ -171,6 +172,9 @@ export default function App() {
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getFrontPath('contact')}>
                           Contacts
+                        </Dropdown.Item>{' '}
+                        <Dropdown.Item as={Link} to={getFrontPath('pub_key')}>
+                          Clés
                         </Dropdown.Item>
                       </DropdownButton>
                     </li>
@@ -221,7 +225,7 @@ export default function App() {
                 editMode={{}}
               />
             </Route>
-            <Route path={getFrontPath('gestion')}>
+            <Route path={getFrontPath('metadata')}>
               <Catalogue
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
@@ -237,6 +241,13 @@ export default function App() {
             </Route>
             <Route path={getFrontPath('contact')}>
               <CatalogueContact
+                display={{ searchbar: true, editJDD: true }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            </Route>{' '}
+            <Route path={getFrontPath('pub_key')}>
+              <CataloguePubKeys
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}

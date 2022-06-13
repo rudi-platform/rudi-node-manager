@@ -1,6 +1,6 @@
 const { expect } = require('@jest/globals');
 const axios = require('axios');
-const { createRudiToken } = require('../utils/utils');
+const { createRudiApiToken } = require('../utils/utils');
 const databaseManager = require('../database/database');
 const controllers = require('./adminController');
 const { Response } = require('jest-express/lib/response');
@@ -13,7 +13,7 @@ let response;
 describe('AdminController', () => {
   beforeEach(() => {
     response = new Response();
-    createRudiToken.mockImplementation(() => 'token');
+    createRudiApiToken.mockImplementation(() => 'token');
   });
 
   afterEach(() => {

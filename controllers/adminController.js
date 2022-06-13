@@ -9,7 +9,7 @@ const api = `${config.API_RUDI.admin_api}`;
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -30,7 +30,7 @@ exports.getEnum = (req, res, next) => {
 exports.getThemeByLang = (req, res, next) => {
   const { lang } = req.params;
   const url = `${api}/enum/themes/${lang}`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -47,7 +47,7 @@ exports.getThemeByLang = (req, res, next) => {
 };
 exports.getLicences = (req, res, next) => {
   const url = `${api}/licences`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });
@@ -106,7 +106,7 @@ exports.putDefaultForm = (req, res, next) => {
 
 exports.getVersion = (req, res, next) => {
   const url = `/api/version`;
-  const token = utils.createRudiToken({
+  const token = utils.createRudiApiToken({
     url: url,
     req: req,
   });

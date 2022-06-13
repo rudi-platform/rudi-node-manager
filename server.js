@@ -61,8 +61,7 @@ app.use(passport.initialize());
 app.use(`/api/v1/`, apiV1);
 app.use(`/api/media/`, apiMedia);
 
-if (isDevEnv()) app.use(`/api/admin/`, apiAdmin);
-else app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
 
 
 // This middleware informs the express application to serve our compiled React files
