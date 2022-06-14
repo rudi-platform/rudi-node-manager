@@ -41,7 +41,14 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
 
 const checkObjectType = (req, res, fun, objectType) => {
   if (!OBJECT_TYPES[objectType])
-    return raiseError(req, res, new Error('Object type unkown: '+objectType), 400, fun, objectType);
+    return raiseError(
+      req,
+      res,
+      new Error('Object type unkown: ' + objectType),
+      400,
+      fun,
+      objectType,
+    );
   return;
 };
 
@@ -90,6 +97,31 @@ exports.getObjectById = (req, res, next) => {
       res.status(200).json(rudiObj);
     })
     .catch((error) => raiseError(req, res, error, 501, fun, objectType, id));
+};
+
+exports.postObject = (req, res, next) => {
+  const fun = 'post_object';
+  const { objectType } = req.params;
+  checkObjectType(req, res, fun, objectType);
+
+  const url = `${api}/${objectType}`;
+  const token = utils.createRudiApiToken({
+    url: url,
+    req: req,
+  });
+  return axios
+    .post(`${serveur}${url}`, req.body, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((resRudiApi) => {
+      res.status(200).json(resRudiApi.data);
+    })
+    .catch((error) =>
+      raiseError(req, res, error, 501, fun, objectType, req.body[OBJECT_TYPES[objectType].id]),
+    );
 };
 
 exports.putObject = (req, res, next) => {

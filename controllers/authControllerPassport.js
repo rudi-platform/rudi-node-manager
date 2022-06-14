@@ -9,11 +9,11 @@ const log = require('../utils/logger');
 const { isDevEnv } = require('../config/backOptions');
 const SHOULD_SECURE = !isDevEnv();
 
-const AUTH_TOKEN = 'authToken'
-const PUBLIC_TOKEN = 'publicToken'
+const AUTH_TOKEN = 'authToken';
+const PUBLIC_TOKEN = 'publicToken';
 
-exports.AUTH_TOKEN = AUTH_TOKEN
-exports.PUBLIC_TOKEN = PUBLIC_TOKEN
+exports.AUTH_TOKEN = AUTH_TOKEN;
+exports.PUBLIC_TOKEN = PUBLIC_TOKEN;
 
 const registerUser = (data) => {
   const fun = 'registerUser';
@@ -50,6 +50,21 @@ const registerUser = (data) => {
     });
 };
 
+const authTokenOpts = (exp) => {
+  return {
+    secure: SHOULD_SECURE,
+    httpOnly: true,
+    sameSite: 'Strict',
+    expires: new Date(exp * 1000),
+  };
+};
+const publicTokenOpts = (exp) => {
+  return {
+    secure: SHOULD_SECURE,
+    httpOnly: false,
+    expires: new Date(exp * 1000),
+  };
+};
 exports.postLogin = (req, res, next) => {
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', function (err, user, info) {
@@ -69,17 +84,8 @@ exports.postLogin = (req, res, next) => {
       // sameSite: 'Lax' ?
       return res
         .status(200)
-        .cookie(AUTH_TOKEN, authToken, {
-          secure: SHOULD_SECURE,
-          httpOnly: true,
-          sameSite: 'Strict',
-          expires: new Date(exp * 1000),
-        })
-        .cookie(PUBLIC_TOKEN, publicToken, {
-          secure: SHOULD_SECURE,
-          httpOnly: false,
-          expires: new Date(exp * 1000),
-        })
+        .cookie(AUTH_TOKEN, authToken, authTokenOpts(exp))
+        .cookie(PUBLIC_TOKEN, publicToken, publicTokenOpts(exp))
         .json({
           success: `logged as ${user.username}`,
           token: publicToken,

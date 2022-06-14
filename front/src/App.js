@@ -17,13 +17,13 @@ import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
-import { getFrontOptions, OPT_TAG, getFrontPath } from './utils/frontOptions';
+import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import CataloguePubKeys from './components/pub_key/cataloguePubKeys';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
 
 export const history = createBrowserHistory({
-  basename: getFrontPath(),
+  basename: getBackUrl(),
 });
 
 /*
@@ -90,9 +90,10 @@ export default function App() {
    */
   function logout() {
     // console.log('-- logout');
-
-    axios.get(getFrontPath('api/v1/logout')).then((res) => {
+    axios.get(getBackUrl('/api/v1/logout')).then((res) => {
       updateToken();
+      res.clearCookie('publicToken', { secure: true, httpOnly: false });
+      res.end()
     });
   }
 
@@ -142,21 +143,21 @@ export default function App() {
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                   <ul className="navbar-nav me-auto mb-2 mb-md-0">
                     <li className="nav-item">
-                      <Link to={getFrontPath()}>
+                      <Link to={getBackUrl()}>
                         <button type="button" className="btn btn-primary button-margin">
                           Catalogue
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={getFrontPath('licence')}>
+                      <Link to={getBackUrl('/licence')}>
                         <button type="button" className="btn btn-primary button-margin">
                           Licence
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={getFrontPath(`show`)}>
+                      <Link to={getBackUrl('/show')}>
                         <button type="button" className="btn btn-primary button-margin">
                           Visualisation
                         </button>
@@ -164,36 +165,36 @@ export default function App() {
                     </li>
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item as={Link} to={getFrontPath('metadata')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('/metadata')}>
                           Métadonnée
                         </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getFrontPath('producer')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('/producer')}>
                           Producteur
                         </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getFrontPath('contact')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('/contact')}>
                           Contacts
                         </Dropdown.Item>{' '}
-                        <Dropdown.Item as={Link} to={getFrontPath('pub_key')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('/pub_key')}>
                           Clés
                         </Dropdown.Item>
                       </DropdownButton>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to={getFrontPath('monitoring')}>
+                      <Link to={getBackUrl('/monitoring')}>
                         <button type="button" className="btn btn-primary button-margin">
                           Monitoring
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item">
-                      <Link to={getFrontPath('user')}>
+                      <Link to={getBackUrl('/user')}>
                         <button type="button" className="btn btn-primary button-margin">
                           Utilisateur
                         </button>
                       </Link>
                     </li>
                     <li className="nav-item hideWIP">
-                      <Link to={getFrontPath('conf')}>
+                      <Link to={getBackUrl('/conf')}>
                         <button type="button" className="btn btn-primary button-margin">
                           Configuration
                         </button>
@@ -218,57 +219,57 @@ export default function App() {
           <div id="root"></div>
 
           <Switch>
-            <Route exact path={getFrontPath()}>
+            <Route exact path={getBackUrl()}>
               <Catalogue
                 display={{ searchbar: true, editJDD: false }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path={getFrontPath('metadata')}>
+            <Route path={getBackUrl('/metadata')}>
               <Catalogue
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path={getFrontPath('producer')}>
+            <Route path={getBackUrl('/producer')}>
               <CatalogueProducer
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path={getFrontPath('contact')}>
+            <Route path={getBackUrl('/contact')}>
               <CatalogueContact
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>{' '}
-            <Route path={getFrontPath('pub_key')}>
+            <Route path={getBackUrl('/pub_key')}>
               <CataloguePubKeys
                 display={{ searchbar: true, editJDD: true }}
                 specialSearch={{}}
                 editMode={{}}
               />
             </Route>
-            <Route path={getFrontPath('licence')}>
+            <Route path={getBackUrl('/licence')}>
               <CatalogueLicence display={{ editJDD: false }} editMode={{}} />
             </Route>
-            <Route path={getFrontPath('show/:id')}>
+            <Route path={getBackUrl('/show/:id')}>
               <Visualisation />
             </Route>
-            <Route path={getFrontPath('show')}>
+            <Route path={getBackUrl('/show')}>
               <Visualisation />
             </Route>
-            <Route path={getFrontPath('monitoring')}>
+            <Route path={getBackUrl('/monitoring')}>
               <Monitoring />
             </Route>
-            <Route path={getFrontPath('user')}>
+            <Route path={getBackUrl('/user')}>
               <CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />
             </Route>
-            <Route path={getFrontPath('conf')}>
+            <Route path={getBackUrl('/conf')}>
               <div className="tempPaddingTop">Work in progress</div>
             </Route>
           </Switch>

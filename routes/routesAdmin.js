@@ -3,6 +3,7 @@ const router = new express.Router();
 const adminController = require('../controllers/adminController');
 const {
   getObjectList,
+  postObject,
   putObject,
   getObjectById,
   deleteObject,
@@ -16,7 +17,7 @@ router.get('/version', adminController.getVersion);
 
 // TODO : propage res.status
 router.get(`/:objectType`, getObjectList);
-router.post(`/:objectType`, putObject);
+router.post(`/:objectType`, postObject);
 router.put(`/:objectType`, putObject);
 router.get(`/:objectType/:id`, getObjectById);
 router.delete(`/:objectType/:id`, deleteObject);

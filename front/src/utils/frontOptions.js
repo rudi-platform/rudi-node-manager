@@ -2,7 +2,7 @@
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
 export const OPT_FRONT_PATH = 'PUBLIC_URL';
-export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
+// export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
 export const OPT_TAG = 'REACT_APP_TAG';
 
 // ------------------------------------------------------------------------------------------------
@@ -46,10 +46,7 @@ export const getFrontOptions = (opt, altValue) => {
   return optVal || '';
 };
 
-export const getFrontPath = (suffix) =>
-  `${getFrontOptions(OPT_FRONT_PATH)}${!suffix ? '' : `/${suffix}`}`;
-export const getBackUrl = (suffix) =>
-  `${getFrontOptions(OPT_BACK_URL)}${!suffix ? '' : `/${suffix}`}`;
+export const getBackUrl = (suffix) => `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? suffix : ''}`;
 
 // const ensureIsFound = (varName) => {
 //   if (!getFrontOptions(varName))
