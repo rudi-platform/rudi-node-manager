@@ -1,7 +1,7 @@
 const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 
-const usersList = (req, res, next) => {
+exports.getUsersList = (req, res, next) => {
   databaseManager
     .getUsers()
     .then((rows) => {
@@ -36,5 +36,3 @@ exports.deleteUser = (req, res, next) => {
       res.status(501).json(error);
     });
 };
-
-module.exports.usersList = usersList;

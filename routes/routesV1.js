@@ -17,7 +17,7 @@ router.get(
   '/users',
   passport.authenticate('jwt', { session: false }),
   checkRolePerm('Admin'),
-  usersController.usersList,
+  usersController.getUsersList,
 );
 router.get(
   '/users/:username',

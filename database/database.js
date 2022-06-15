@@ -270,6 +270,13 @@ const createUserRole = (userRole) => {
         close(db);
       },
     );
+  }).catch((err) => {
+    if (err.message.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
+      return 'Role already assigned to user';
+    if (err.message.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
+      return 'User or role not found';
+    console.error(err.message);
+    return err;
   });
 };
 exports.createUserRole = createUserRole;
