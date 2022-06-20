@@ -26,7 +26,7 @@ export default function EditPubKeyCard({ formUrl, refresh }) {
    */
   function deletePubKey() {
     axios
-      .delete(`api/admin/public_keys/${editID}`)
+      .delete(`api/admin/pub_keys/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`La clé publique ${res.data.name} a été retirée`];
