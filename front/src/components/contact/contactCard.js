@@ -62,7 +62,7 @@ export default function ContactCard({ contact, formUrl, refresh }) {
 
   return (
     <div className="col-12" key={contact.contact_id}>
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{contact.contact_name}</a>

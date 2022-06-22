@@ -38,8 +38,8 @@ export default function EditCard({}) {
   }
 
   return (
-    <div className="col-12 hideWIP">
-      <div className="card tempMargin">
+    <div className="col-12 hide-wip">
+      <div className="card temp-margin">
         <div className="card-body">
           <div>
             <a className="btn btn-secondary">

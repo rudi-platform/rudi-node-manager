@@ -62,7 +62,7 @@ export default function PubKeyCard({ pubKey, formUrl, refresh }) {
 
   return (
     <div className="col-12" key={pubKey.name}>
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{pubKey.name}</a>

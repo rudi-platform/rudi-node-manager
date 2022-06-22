@@ -112,7 +112,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
 
   return (
     <div className="col-12" key={metadata.global_id}>
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a
@@ -183,41 +183,31 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         <div className="card-body">
           <p className="card-text">{getLangText(metadata.summary)}</p>
           <p className="card-text">
-            Producteur :<small className="text-muted">{metadata.producer.organization_name}</small>
+            Producteur : <span className="text-muted">{metadata.producer?.organization_name}</span>
           </p>
-          <p className="card-text">
-            global_id : <small className="text-muted"> {metadata.global_id}</small>
-          </p>
+          <a href="#" className="btn btn-secondary temp-margin">
+            <ThemeDisplay value={metadata.theme}></ThemeDisplay>
+          </a>
           <span className="card-text">
-            media_id :
             {metadata.available_formats.map((ressource, i) => {
               return (
                 <div key={`${ressource.media_id}`}>
-                  <small className="text-muted"> {ressource.media_id} </small>
-                  <small> {ressource.media_name} </small>
-                  <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
-                  <button
-                    type="button"
-                    className="btn btn-success button-margin"
-                    // onClick={(e) => downloadFile(ressource)}
-                  >
-                    <a id="downloadMedia" title="Click to dowload" href={ressource.connector.url}>
-                      Download <CloudDownload />
-                    </a>
-                  </button>
                   <Link to={getBackUrl(`/show/${ressource.media_id}`)}>
-                    <span className="btn btn-success button-margin">
-                      Visualisation <Eye />
+                    <span className="btn btn-success" title="Aperçu">
+                      <Eye />
                     </span>
                   </Link>
+                  <button type="button" className="btn btn-success button-margin">
+                    <a id="downloadMedia" title="Télécharger" href={ressource.connector.url}>
+                      <CloudDownload />
+                    </a>
+                  </button>
+                  <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
+                  <span className=""><a href={ressource.connector.url}>{ressource.media_name}</a></span>
                 </div>
               );
             })}
           </span>
-
-          <a href="#" className="btn btn-secondary button-margin">
-            <ThemeDisplay value={metadata.theme}></ThemeDisplay>
-          </a>
         </div>
       </div>
     </div>

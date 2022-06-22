@@ -188,7 +188,7 @@ body {
 }
 
 .button-margin {
-  margin: 0px 4px;
+  margin: 1px 4px;
 }
 .bg-navbar {
   background-color: theme-color('navbar');
@@ -196,20 +196,24 @@ body {
 .icon-navbar {
   height: 40px;
 }
-.hideWIP {
+.hide-wip {
   display: none;
 }
 .badge-monitoring {
   display: block;
 }
 
-.tempMinHeight {
+.temp-min-height {
   min-height: 150px;
 }
 
-.tempAlign {
+.temp-align {
   align-self: flex-start;
 }
-.tempMargin {
+.temp-margin {
   margin-bottom: 5px;
+}
+.align-right {
+  margin-right: 0;
+  margin-left: auto;
 }

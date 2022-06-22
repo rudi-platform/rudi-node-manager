@@ -4,7 +4,7 @@ export const filterConf = [
     text: 'Thème :',
     values: [],
     toFilterParam: (elem) => {
-      return { theme: `"${elem.theme}"` };
+      return { theme: `"${elem?.theme}"` };
     },
   },
   {
@@ -12,7 +12,7 @@ export const filterConf = [
     text: 'Mots-clés :',
     values: [],
     toFilterParam: (elem) => {
-      return { keywords: `"${elem.keywords}"` };
+      return { keywords: `"${elem?.keywords}"` };
     },
   },
   {
@@ -21,15 +21,15 @@ export const filterConf = [
     text: 'Source :',
     values: [],
     toFilterParam: (elem) => {
-      return { 'producer.organization_name': `"${elem.producer.organization_name}"` };
+      return { 'producer.organization_name': `"${elem.producer?.organization_name}"` };
     },
   },
-  {
-    name: 'resource_languages',
-    text: 'Langage :',
-    values: [],
-    toFilterParam: (elem) => {
-      return { resource_languages: `"${elem.resource_languages}"` };
-    },
-  },
+  // {
+  //   name: 'resource_languages',
+  //   text: 'Langage :',
+  //   values: [],
+  //   toFilterParam: (elem) => {
+  //     return { resource_languages: `"${elem?.resource_languages}"` };
+  //   },
+  // },
 ];

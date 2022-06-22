@@ -72,7 +72,7 @@ export default function EditCard({ formUrl, refresh }) {
 
   return (
     <div className="col-12">
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <div className="card-body">
           <div>
             <a

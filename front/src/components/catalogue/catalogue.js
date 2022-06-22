@@ -224,9 +224,9 @@ export default function Catalogue({ display, specialSearch, editMode }) {
     <div className="tempPaddingTop">
       <div className="row">
         {display && display.searchbar && (
-          <div className="col-3 border rounded  tempAlign">
+          <div className="col-3 border rounded  temp-align">
             <div className="row">
-              <div className="col-12 border rounded tempMargin">
+              <div className="col-12 border rounded temp-margin">
                 <h5>Trier</h5>
                 <div className="btn-group" role="group" aria-label="sort">
                   <button
@@ -284,7 +284,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="col-12 border rounded tempMargin">
+              <div className="col-12 border rounded temp-margin">
                 <h5>Rechercher</h5>
                 <div className="input-group flex-nowrap">
                   <input
@@ -301,7 +301,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </button>
                 </div>
               </div>
-              <div className="col-12 border rounded tempMargin">
+              <div className="col-12 border rounded temp-margin">
                 <h5>Filtrer</h5>
                 <div className="row">
                   {countBy.map((filter, i) => {

@@ -85,7 +85,7 @@ export default function UserCard({ user, display, refresh }) {
 
   return (
     <div className="col-12" key={user.id}>
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             {user.username}

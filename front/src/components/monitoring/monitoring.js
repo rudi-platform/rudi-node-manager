@@ -126,7 +126,7 @@ function Monitoring({}) {
                 <div className="card">
                   <h5 className="card-header">
                     <div className="d-flex justify-content-between align-items-center">
-                      <span>Métadonnéees par {prod.producer.organization_name} :</span>
+                      <span>Métadonnéees par {prod.producer?.organization_name} :</span>
                     </div>
                   </h5>
                   <div className="card-body">

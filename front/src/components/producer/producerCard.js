@@ -64,7 +64,7 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
   }
   return (
     <div className="col-12" key={organization.organization_id}>
-      <div className="card tempMargin">
+      <div className="card temp-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{organization.organization_name}</a>
