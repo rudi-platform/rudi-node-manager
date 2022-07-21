@@ -8,7 +8,7 @@ import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 const API_PUB_URL = 'api/admin/pub_keys'
-const formPubKeysUrl = 'publicKey'
+const formPubKeysUrl = 'pub_keys'
 
 /**
  * Composant : CataloguePubKey
