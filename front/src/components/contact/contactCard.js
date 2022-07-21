@@ -87,20 +87,20 @@ export default function ContactCard({ contact, formUrl, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            contact_id :<small className="text-muted">{contact.contact_id}</small>
+            contact_id : <small className="text-muted">{contact.contact_id}</small>
           </p>
           {contact.organization_name && (
             <p className="card-text">
-              organisation :<small className="text-muted">{contact.organization_name}</small>
+              organisation : <small className="text-muted">{contact.organization_name}</small>
             </p>
           )}
           {contact.role && (
             <p className="card-text">
-              role :<small className="text-muted">{contact.role}</small>
+              role : <small className="text-muted">{contact.role}</small>
             </p>
           )}
           <p className="card-text">
-            email :<small className="text-muted">{contact.email}</small>
+            email : <small className="text-muted">{contact.email}</small>
           </p>
         </div>
       </div>

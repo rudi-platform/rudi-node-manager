@@ -7,7 +7,7 @@ import PubKeyCard from './pubKeyCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-const pubKeysUrl = 'pub_keys'
+const pubKeysUrl = 'publicKey'
 
 /**
  * Composant : CataloguePubKey

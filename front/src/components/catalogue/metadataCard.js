@@ -124,14 +124,14 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             </a>
             {!metadata.metadata_info.metadata_dates?.published &&
               !metadata.metadata_info.metadata_dates?.deleted && (
-                <span className="badge badge-warning badge-pill">waiting</span>
+                <span className="badge badge-warning badge-pill">En attente</span>
               )}
             {metadata.metadata_info.metadata_dates?.published &&
               !metadata.metadata_info.metadata_dates?.deleted && (
-                <span className="badge badge-success badge-pill">published</span>
+                <span className="badge badge-success badge-pill">Publié</span>
               )}
             {metadata.metadata_info.metadata_dates?.deleted && (
-              <span className="badge badge-danger badge-pill">deleted</span>
+              <span className="badge badge-danger badge-pill">Supprimé</span>
             )}
             {display && display.editJDD && (
               <div className="btn-group" role="group">

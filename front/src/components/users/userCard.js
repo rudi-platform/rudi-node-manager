@@ -110,7 +110,7 @@ export default function UserCard({ user, display, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            email :<small className="text-muted">{user.email}</small>
+            email : <small className="text-muted">{user.email}</small>
           </p>
           {user.roles && (
             <p className="card-text">

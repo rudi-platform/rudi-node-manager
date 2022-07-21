@@ -89,7 +89,7 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            organization_id :<small className="text-muted">{organization.organization_id}</small>
+            organization_id : <small className="text-muted">{organization.organization_id}</small>
           </p>
         </div>
       </div>

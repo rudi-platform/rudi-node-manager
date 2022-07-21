@@ -212,11 +212,17 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * @return {String} label de l'élément
    */
   function getFilterLabel(filterElement, filterConfig) {
-    let result = filterElement[filterConfig.name];
-    if (filterConfig.displayName) {
-      result = result[filterConfig.displayName];
+    try {
+      // console.log(filterElement)
+      // console.log(filterConfig)
+      let result = filterElement[filterConfig?.name] || 'ERR: "name" not found';
+      if (filterConfig?.displayName && result[filterConfig?.displayName]) {
+        result = result[filterConfig.displayName];
+      }
+      return result;
+    } catch (err) {
+      defaultErrorHandler(err);
     }
-    return result;
   }
 
   // TODO :  sticky-top ?

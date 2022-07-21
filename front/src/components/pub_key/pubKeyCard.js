@@ -87,24 +87,24 @@ export default function PubKeyCard({ pubKey, formUrl, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            name :<small className="text-muted">{pubKey.name}</small>
+            name : <small className="text-muted">{pubKey.name}</small>
           </p>
           <p className="card-text">
-            url :<small className="text-muted">{pubKey.url}</small>
+            url : <small className="text-muted">{pubKey.url}</small>
           </p>
           {pubKey.prop && (
             <p className="card-text">
-              prop :<small className="text-muted">{pubKey.prop}</small>
+              prop : <small className="text-muted">{pubKey.prop}</small>
             </p>
           )}
           <p className="card-text">
-            pem :<small className="text-muted">{pubKey.pem}</small>
+            pem : <small className="text-muted">{pubKey.pem}</small>
           </p>
           <p className="card-text">
-            key :<small className="text-muted">{pubKey.key}</small>
+            key : <small className="text-muted">{pubKey.key}</small>
           </p>
           <p className="card-text">
-            type :<small className="text-muted">{pubKey.type}</small>
+            type : <small className="text-muted">{pubKey.type}</small>
           </p>
         </div>
       </div>
