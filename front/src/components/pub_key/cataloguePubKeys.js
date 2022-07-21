@@ -7,7 +7,8 @@ import PubKeyCard from './pubKeyCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-const pubKeysUrl = 'publicKey'
+const API_PUB_URL = 'api/admin/pub_keys'
+const formPubKeysUrl = 'publicKey'
 
 /**
  * Composant : CataloguePubKey
@@ -28,7 +29,7 @@ export default function CataloguePubKeys({ display, specialSearch, editMode }) {
   }, []);
 
   useEffect(() => {
-    setFormUrl(`${generalConf.formUrl}${pubKeysUrl}`);
+    setFormUrl(`${generalConf.formUrl}${formPubKeysUrl}`);
   }, [generalConf]);
 
   const refresh = () => {
@@ -41,7 +42,7 @@ export default function CataloguePubKeys({ display, specialSearch, editMode }) {
    */
   function getInitialData() {
     axios
-      .get(`api/admin/${pubKeysUrl}`, {
+      .get(API_PUB_URL, {
         params: { limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
@@ -60,7 +61,7 @@ export default function CataloguePubKeys({ display, specialSearch, editMode }) {
   function fetchMoreData() {
     return () => {
       axios
-        .get(`api/admin/${pubKeysUrl}`, {
+        .get(API_PUB_URL, {
           params: { limit: PAGE_SIZE, offset: currentOffset },
         })
         .then((res) => {
