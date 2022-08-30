@@ -63,7 +63,6 @@ app.use(`/api/media/`, apiMedia);
 
 app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
 
-
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
@@ -78,11 +77,7 @@ if (!isDevEnv()) {
 initDatabase.initDatabase();
 
 // Catch any bad requests
-app.get('*', (req, res) => {
-  res.status(200).json({
-    msg: 'Not found',
-  });
-});
+app.get('*', (req, res) => res.status(404).send(`Route '${req.method} ${req.url}' not found`));
 
 // Configure our server to listen on the port defiend by our port variable
 app.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}));

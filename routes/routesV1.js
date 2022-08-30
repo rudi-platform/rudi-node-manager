@@ -8,15 +8,10 @@ const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
 const { checkRolePerm } = require('../utils/roleCheck');
 const { getHashFun } = require('../config/backOptions');
-const { v4: uuidv4 } = require('uuid');
 
 router.get('/hash', getHashFun);
 router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
-router.get('/uuid', (req, res) => {
-  const id = uuidv4();
-  return id;
-});
 
 router.get(
   '/users',
