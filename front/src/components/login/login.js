@@ -44,7 +44,7 @@ export default function Login({ setToken }) {
       .catch((error) => {
         const errMsg =
           error.response?.data == 'No user found'
-            ? 'Login ou mot de passe incorect'
+            ? 'Utilisateur ou mot de passe incorrect'
             : `Echec de connexion`;
         changeOptions({
           text: [errMsg],
@@ -92,6 +92,7 @@ export default function Login({ setToken }) {
             autoFocus
             type="text"
             value={username}
+            autoComplete="username"
             onChange={(e) => setUserName(e.target.value)}
           />
         </Form.Group>
@@ -100,6 +101,7 @@ export default function Login({ setToken }) {
           <Form.Control
             type="password"
             value={password}
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>

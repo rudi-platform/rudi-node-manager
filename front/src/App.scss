@@ -134,6 +134,7 @@ $theme-colors: (
   warning: #fec10b,
   danger: #a3333d,
   navbar: #004680,
+  restricted: #ffd3cd
 );
 
 // Import Bootstrap and its default variables
@@ -210,10 +211,32 @@ body {
 .temp-align {
   align-self: flex-start;
 }
+
 .temp-margin {
   margin-bottom: 5px;
 }
-.align-right {
-  margin-right: 0;
-  margin-left: auto;
+
+.on-right {
+  float: right;
+}
+
+.checkbox {
+  margin: 0 0 0 20px;
+}
+
+.margin-down {
+  margin: 1rem 0 0 0;
+}
+
+.inline {
+  display: inline;
+}
+
+.spaced {
+  margin: 5px;
+  padding: 5px;
+}
+
+.restricted{
+  background-color: #ffdddd;
 }

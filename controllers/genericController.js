@@ -40,22 +40,18 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
 }
 
 const checkObjectType = (req, res, fun, objectType) => {
-  if (!OBJECT_TYPES[objectType])
-    return raiseError(
-      req,
-      res,
-      new Error('Object type unkown: ' + objectType),
-      400,
-      fun,
-      objectType,
-    );
-  return;
+  if (!OBJECT_TYPES[objectType]) {
+    raiseError(req, res, new Error('Object type unkown: ' + objectType), 400, fun, objectType);
+    return false;
+  }
+  return true;
 };
 
 exports.getObjectList = (req, res, next) => {
   const fun = 'get_objects';
   const { objectType } = req.params;
-  checkObjectType(req, res, fun, objectType);
+
+  if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
   const token = utils.createRudiApiToken({
@@ -80,7 +76,7 @@ exports.getObjectList = (req, res, next) => {
 exports.getObjectById = (req, res, next) => {
   const fun = 'get_object_by_id';
   const { objectType, id } = req.params;
-  checkObjectType(req, res, fun, objectType);
+  if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
   const token = utils.createRudiApiToken({
@@ -102,7 +98,7 @@ exports.getObjectById = (req, res, next) => {
 exports.postObject = (req, res, next) => {
   const fun = 'post_object';
   const { objectType } = req.params;
-  checkObjectType(req, res, fun, objectType);
+  if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
   const token = utils.createRudiApiToken({
@@ -127,7 +123,7 @@ exports.postObject = (req, res, next) => {
 exports.putObject = (req, res, next) => {
   const fun = 'put_object';
   const { objectType } = req.params;
-  checkObjectType(req, res, fun, objectType);
+  if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
   const token = utils.createRudiApiToken({
@@ -152,7 +148,7 @@ exports.putObject = (req, res, next) => {
 exports.deleteObject = (req, res, next) => {
   const fun = 'del_object';
   const { objectType, id } = req.params;
-  checkObjectType(req, res, fun, objectType);
+  if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
   const token = utils.createRudiApiToken({

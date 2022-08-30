@@ -90,11 +90,7 @@ export default function App() {
    */
   function logout() {
     // console.log('-- logout');
-    axios.get(getBackUrl('/api/v1/logout')).then((res) => {
-      updateToken();
-      res.clearCookie('publicToken', { secure: true, httpOnly: false });
-      res.end()
-    });
+    axios.get(getBackUrl('/api/v1/logout')).then((res) => updateToken());
   }
 
   if (!token) {

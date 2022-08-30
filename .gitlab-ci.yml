@@ -65,6 +65,8 @@ build_front:
   stage: build
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "release"'
+    # - if: '$CI_COMMIT_BRANCH =~ /^release.*$/i'
   tags:
     - nodejs
   variables:

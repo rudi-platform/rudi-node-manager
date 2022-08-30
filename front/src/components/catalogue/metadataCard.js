@@ -110,10 +110,19 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
     return metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0);
   }
 
+  /**
+   * Check if the metadata has restricted access
+   * @param {*} metadata
+   * @returns
+   */
+  function isRestricted(metadata) {
+    return !!metadata?.access_condition?.confidentiality?.restricted_access;
+  }
+
   return (
     <div className="col-12" key={metadata.global_id}>
       <div className="card temp-margin">
-        <h5 className="card-header">
+        <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
               href={`${formUrl}?read-only=${metadata.global_id}`}
@@ -138,14 +147,18 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                 <button type="button" className="btn btn-success">
                   <Check />
                 </button>
-                <a
-                  className="btn btn-warning"
-                  href={`${formUrl}?update=${metadata.global_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Pencil />
-                </a>
+                {isRestricted(metadata) ? (
+                  ''
+                ) : (
+                  <a
+                    className="btn btn-warning"
+                    href={`${formUrl}?update=${metadata.global_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Pencil />
+                  </a>
+                )}
                 <button
                   type="button"
                   className="btn btn-danger"
@@ -203,7 +216,9 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                     </a>
                   </button>
                   <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
-                  <span className=""><a href={ressource.connector.url}>{ressource.media_name}</a></span>
+                  <span className="">
+                    <a href={ressource.connector.url}>{ressource.media_name}</a>
+                  </span>
                 </div>
               );
             })}

@@ -232,7 +232,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         {display && display.searchbar && (
           <div className="col-3 border rounded  temp-align">
             <div className="row">
-              <div className="col-12 border rounded temp-margin">
+              <div className="spaced col-12 border rounded temp-margin">
                 <h5>Trier</h5>
                 <div className="btn-group" role="group" aria-label="sort">
                   <button
@@ -305,6 +305,17 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                     {' '}
                     <Search />
                   </button>
+                </div>
+                <div>
+                  <div className="on-right">
+                    <label htmlFor="ext_search_on">Étendre la recherche</label>
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      id="ext_search_on"
+                      name="ext_search_on"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="col-12 border rounded temp-margin">
