@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = new express.Router();
 const adminController = require('../controllers/adminController');
 const {
@@ -21,6 +22,5 @@ router.post(`/:objectType`, postObject);
 router.put(`/:objectType`, putObject);
 router.get(`/:objectType/:id`, getObjectById);
 router.delete(`/:objectType/:id`, deleteObject);
-
 
 module.exports = router;

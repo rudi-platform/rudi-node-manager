@@ -6,12 +6,17 @@ const usersController = require('../controllers/usersControllers');
 const roleController = require('../controllers/roleController');
 const adminController = require('../controllers/adminController');
 const passport = require('../utils/passportSetup');
+const { v4: uuidv4 } = require('uuid');
+
 const { checkRolePerm } = require('../utils/roleCheck');
 const { getHashFun } = require('../config/backOptions');
 
 router.get('/hash', getHashFun);
 router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
+router.get('/uuid', passport.authenticate('jwt', { session: false }), (req, res, next) =>
+  res.status(200).send(uuidv4()),
+);
 
 router.get(
   '/users',
