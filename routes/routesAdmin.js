@@ -1,4 +1,5 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 
 const router = new express.Router();
 const adminController = require('../controllers/adminController');
@@ -15,6 +16,7 @@ router.get('/enum', adminController.getEnum);
 router.get('/enum/themes/:lang', adminController.getThemeByLang);
 router.get('/licences', adminController.getLicences);
 router.get('/version', adminController.getVersion);
+router.get('/uuid', (req, res, next) => res.status(200).send(uuidv4()));
 
 // TODO : propage res.status
 router.get(`/:objectType`, getObjectList);
