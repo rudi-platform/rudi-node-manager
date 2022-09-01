@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.scss';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Catalogue from './components/catalogue/catalogue';
@@ -169,7 +169,7 @@ export default function App() {
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getBackUrl('/contact')}>
                           Contacts
-                        </Dropdown.Item>{' '}
+                        </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getBackUrl('/pub_key')}>
                           Clés
                         </Dropdown.Item>
@@ -214,61 +214,73 @@ export default function App() {
 
           <div id="root"></div>
 
-          <Switch>
-            <Route exact path={getBackUrl()}>
-              <Catalogue
-                display={{ searchbar: true, editJDD: false }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            </Route>
-            <Route path={getBackUrl('/metadata')}>
-              <Catalogue
-                display={{ searchbar: true, editJDD: true }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            </Route>
-            <Route path={getBackUrl('/producer')}>
-              <CatalogueProducer
-                display={{ searchbar: true, editJDD: true }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            </Route>
-            <Route path={getBackUrl('/contact')}>
-              <CatalogueContact
-                display={{ searchbar: true, editJDD: true }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            </Route>{' '}
-            <Route path={getBackUrl('/pub_key')}>
-              <CataloguePubKeys
-                display={{ searchbar: true, editJDD: true }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            </Route>
-            <Route path={getBackUrl('/licence')}>
-              <CatalogueLicence display={{ editJDD: false }} editMode={{}} />
-            </Route>
-            <Route path={getBackUrl('/show/:id')}>
-              <Visualisation />
-            </Route>
-            <Route path={getBackUrl('/show')}>
-              <Visualisation />
-            </Route>
-            <Route path={getBackUrl('/monitoring')}>
-              <Monitoring />
-            </Route>
-            <Route path={getBackUrl('/user')}>
-              <CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />
-            </Route>
-            <Route path={getBackUrl('/conf')}>
-              <div className="tempPaddingTop">Work in progress</div>
-            </Route>
-          </Switch>
+          <Routes>
+            <Route
+              path={getBackUrl()}
+              element={
+                <Catalogue
+                  display={{ searchbar: true, editJDD: false }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
+              path={getBackUrl('/metadata')}
+              element={
+                <Catalogue
+                  display={{ searchbar: true, editJDD: true }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
+              path={getBackUrl('/producer')}
+              element={
+                <CatalogueProducer
+                  display={{ searchbar: true, editJDD: true }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
+              path={getBackUrl('/contact')}
+              element={
+                <CatalogueContact
+                  display={{ searchbar: true, editJDD: true }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
+              path={getBackUrl('/pub_key')}
+              element={
+                <CataloguePubKeys
+                  display={{ searchbar: true, editJDD: true }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
+              path={getBackUrl('/licence')}
+              element={<CatalogueLicence display={{ editJDD: false }} editMode={{}} />}
+            />
+            <Route path={getBackUrl('/show/:id')} element={<Visualisation />} />
+            <Route path={getBackUrl('/show')} element={<Visualisation />} />
+            <Route path={getBackUrl('/monitoring')} element={<Monitoring />} />
+            <Route
+              path={getBackUrl('/user')}
+              element={<CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />}
+            />
+            <Route
+              path={getBackUrl('/conf')}
+              element={<div className="tempPaddingTop">Work in progress</div>}
+            />
+          </Routes>
         </GeneralContext.Provider>
       </ModalProvider>
     </Router>

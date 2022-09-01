@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { withRouter } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import jspreadsheet from 'jspreadsheet-ce';
 import 'jspreadsheet-ce/dist/jspreadsheet.css';
 import { Check } from 'react-bootstrap-icons';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import ReactJson from 'react-json-view';
+import ReactJson from '@textea/json-viewer';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { useParams } from 'react-router-dom';
 
 /**
  * Composant : Visualisation
  * @return {ReactNode}
  */
-function Visualisation({ match }) {
-  const [mediaId, setMediaId] = useState(match.params.id ? match.params.id : '');
+function Visualisation() {
+  const { id } = useParams();
+  // console.log(JSON.stringify(id));
+  const [mediaId, setMediaId] = useState(id ? id : '');
   const [visuOption, setVisuOption] = useState({ displayType: 'CSV', data: null });
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  const wrapper = React.createRef();
+  const wrapper = React.useRef();
   const [el, setEl] = useState(null);
 
   useEffect(() => {
@@ -89,17 +92,21 @@ function Visualisation({ match }) {
    */
   function handleOnClick() {
     axios
-      .get(`/media/${mediaId}`)
+      .get(`/api/admin/media/${mediaId}`)
       .then((res) => {
+        const mediaUrl = res.data?.connector?.url;
+        if (!mediaUrl) return;
         axios
-          .get(`${res.data.url}`)
+          .get(`${mediaUrl}`)
           .then((res2) => {
-            const mediaMimeStr = res2.headers['content-type']; // Ex: 'application/json; charset=utf-8'
+            // const mediaMimeStr = res2.headers['content-type']; // Ex: 'application/json; charset=utf-8'
+            const mediaMimeStr = res.data?.file_type;
+            // console.log(mediaMimeStr);
             const mediaMimeElements = mediaMimeStr.split(';');
             const mediaMime = mediaMimeElements[0].trim().toLowerCase();
 
             if (mediaMimeElements.length > 1) {
-              const mediaCharset = mediaMimeElements[1].trim().toLowerCase();
+              const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8';
               switch (mediaCharset) {
                 case 'charset=utf-8':
                 case 'charset=us-ascii':
@@ -116,6 +123,7 @@ function Visualisation({ match }) {
             switch (mediaMime) {
               case 'application/geo+json':
               case 'application/json':
+              case 'text/json':
                 setVisuOption({ displayType: 'JSON', data: res2.data });
                 break;
 
@@ -130,6 +138,25 @@ function Visualisation({ match }) {
                   defaultErrorHandler(error);
                 }
                 break;
+
+              case 'text/plain':
+              case 'text/css':
+                try {
+                  setVisuOption({ displayType: 'TXT', data: res2.data });
+                } catch (error) {
+                  defaultErrorHandler(error);
+                }
+                break;
+              case 'image/jpg':
+              case 'image/jpeg':
+              case 'image/png':
+                try {
+                  setVisuOption({ displayType: 'IMG', data: mediaUrl });
+                } catch (error) {
+                  defaultErrorHandler(error);
+                }
+                break;
+
               default:
                 defaultErrorHandler({
                   message: `le type ${mediaMimeStr} n'est pas supporté`,
@@ -166,7 +193,9 @@ function Visualisation({ match }) {
       {
         {
           CSV: <div ref={wrapper} />,
-          JSON: <ReactJson src={visuOption.data} collapsed={2} />,
+          JSON: <ReactJson ref={wrapper} src={visuOption.data} collapsed={2} />,
+          TXT: <div className="body">{visuOption.data}</div>,
+          IMG: <img alt="image" ref={wrapper} className="image90" src={visuOption.data} />,
         }[visuOption.displayType]
       }
     </div>
@@ -174,4 +203,4 @@ function Visualisation({ match }) {
 }
 Visualisation.propTypes = { match: PropTypes.object };
 
-export default withRouter(Visualisation);
+export default Visualisation;

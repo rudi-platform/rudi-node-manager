@@ -134,7 +134,7 @@ $theme-colors: (
   warning: #fec10b,
   danger: #a3333d,
   navbar: #004680,
-  restricted: #ffd3cd
+  restricted: #ffd3cd,
 );
 
 // Import Bootstrap and its default variables
@@ -237,6 +237,19 @@ body {
   padding: 5px;
 }
 
-.restricted{
+.restricted {
   background-color: #ffdddd;
+}
+
+.image70 {
+  width: 70%;
+}
+
+.image100 {
+  width: 100%;
+}
+
+.image90 {
+  width: 90%;
+  margin: 3%;
 }

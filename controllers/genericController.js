@@ -10,6 +10,7 @@ const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
   organizations: { url: 'organizations', id: 'organization_id' },
   contacts: { url: 'contacts', id: 'contact_id' },
+  media: { url: 'media', id: 'media_id' },
   pub_keys: { url: 'pub_keys', id: 'name' },
   reports: { url: 'reports', id: 'report_id' },
 };
@@ -52,6 +53,7 @@ exports.getObjectList = (req, res, next) => {
   const { objectType } = req.params;
 
   if (!checkObjectType(req, res, fun, objectType)) return;
+  if(objectType==='media') return
 
   const url = `${api}/${objectType}`;
   const token = utils.createRudiApiToken({

@@ -24,18 +24,15 @@ export default function Login({ setToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  function validateForm() {
-    // console.log(`-- validateForm: ${username.length > 0 && password.length > 0}`);
-    return username.length > 0 && password.length > 0;
-  }
+  const validateForm = () => username.length > 0 && password.length > 0;
+
   /**
    * call server to log user
    * @param {*} credentials
    * @return {Promise} login promise
    */
-  function loginUser(credentials) {
-    // console.log('-- loginUser');
-    return axios
+  const loginUser = (credentials) =>
+    axios
       .post(`api/v1/login`, JSON.stringify(credentials), {
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +56,6 @@ export default function Login({ setToken }) {
         });
         toggle();
       });
-  }
 
   /**
    * handle submit login form
@@ -105,7 +101,7 @@ export default function Login({ setToken }) {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
-        <Button block size="lg" type="submit" disabled={!validateForm()}>
+        <Button block="true" size="lg" type="submit" disabled={!validateForm()}>
           Login
         </Button>
       </Form>

@@ -122,7 +122,7 @@ export default function Register({ backToLogin }) {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Group>
-        <Button block size="lg" type="submit" disabled={!validateForm()}>
+        <Button block="true" size="lg" type="submit" disabled={!validateForm()}>
           Register
         </Button>
       </Form>

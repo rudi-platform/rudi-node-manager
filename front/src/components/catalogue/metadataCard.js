@@ -113,7 +113,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
   /**
    * Check if the metadata has restricted access
    * @param {*} metadata
-   * @returns
+   * @return {boolean} True if letadata has restricted access
    */
   function isRestricted(metadata) {
     return !!metadata?.access_condition?.confidentiality?.restricted_access;
