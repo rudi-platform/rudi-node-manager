@@ -230,9 +230,9 @@ export default function Catalogue({ display, specialSearch, editMode }) {
     <div className="tempPaddingTop">
       <div className="row">
         {display && display.searchbar && (
-          <div className="col-3 border rounded  temp-align">
+          <div className="col-3 rounded temp-align">
             <div className="row">
-              <div className="spaced col-12 border rounded temp-margin">
+              <div className="temp-pad col-12 border rounded temp-margin">
                 <h5>Trier</h5>
                 <div className="btn-group" role="group" aria-label="sort">
                   <button
@@ -290,7 +290,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="col-12 border rounded temp-margin">
+              <div className="temp-pad col-12 border rounded temp-margin">
                 <h5>Rechercher</h5>
                 <div className="input-group flex-nowrap">
                   <input
@@ -318,9 +318,9 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="col-12 border rounded temp-margin">
+              <div className="temp-pad col-12 border rounded temp-margin">
                 <h5>Filtrer</h5>
-                <div className="row">
+                <div className="row no-row-margin">
                   {countBy.map((filter, i) => {
                     return (
                       <div className="col border rounded" key={filter.name}>
@@ -329,7 +329,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                           {filter.values.map((filterValue, i) => {
                             return (
                               <li
-                                className="list-group-item d-flex justify-content-between align-items-center"
+                                className="no-row-margin temp-pad list-group-item 
+                                d-flex justify-content-between align-items-center"
                                 key={getFilterLabel(filterValue, filter) + i}
                                 onClick={(e) => addToFilter(filter.toFilterParam(filterValue))}
                               >

@@ -76,13 +76,7 @@ export default function App() {
    * @return {ReactNode} the code to display the version tag (if defined)
    */
   function displayVersion() {
-    return !VERSION_TAG ? (
-      ''
-    ) : (
-      <div float="right" style={{ color: 'white', fontSize: '80%' }}>
-        v.{VERSION_TAG}
-      </div>
-    );
+    return !VERSION_TAG ? '' : <div className="version">v.{VERSION_TAG}</div>;
   }
 
   /**

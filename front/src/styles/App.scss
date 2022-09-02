@@ -1,4 +1,4 @@
-@import './font.scss';
+@import './fonts.scss';
 
 //----- Colors
 $primary: #004680;
@@ -33,6 +33,7 @@ body {
   font-family: 'Montserrat', var(--font-family-sans-serif);
   color: $primary;
 }
+
 .App {
   text-align: center;
 }
@@ -71,9 +72,15 @@ body {
     transform: rotate(360deg);
   }
 }
+
 .login-switch {
   margin: 0 auto;
   max-width: 320px;
+}
+
+.tempPaddingTop {
+  padding-top: 60px;
+  margin-left: 20px;
 }
 
 .button-margin {
@@ -101,7 +108,18 @@ body {
 }
 
 .temp-margin {
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+}
+
+.no-row-margin {
+  margin: 0 -11px;
+}
+.no-border{
+  border-width: 0px;
+}
+
+.temp-pad {
+  padding: 5px 10px;
 }
 
 .on-right {
@@ -132,12 +150,16 @@ body {
 .image70 {
   width: 70%;
 }
-
 .image100 {
   width: 100%;
 }
-
 .image90 {
   width: 90%;
   margin: 3%;
+}
+
+.version {
+  color: $header-font;
+  font-size: 80%;
+  float: right;
 }
