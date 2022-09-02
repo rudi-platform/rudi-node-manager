@@ -133,7 +133,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             </a>
             {!metadata.metadata_info.metadata_dates?.published &&
               !metadata.metadata_info.metadata_dates?.deleted && (
-                <span className="badge badge-warning badge-pill">En attente</span>
+                <span className="badge-warning badge-pill badge">En attente</span>
               )}
             {metadata.metadata_info.metadata_dates?.published &&
               !metadata.metadata_info.metadata_dates?.deleted && (

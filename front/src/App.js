@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.scss';
+import './styles/App.scss';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
