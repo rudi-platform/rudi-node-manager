@@ -82,6 +82,9 @@ function Visualisation() {
         tableOverflow: true,
         lazyLoading: true,
         loadingSpin: true,
+        includeHeadersOnDownload: true,
+        parseTableAutoCellType: true,
+        parseTableFirstRowAsHeader:true
       };
       setEl(jspreadsheet(wrapper.current, options));
     }
