@@ -70,7 +70,7 @@ lint_front:
 
 # Build front
 build_front:
-  stage: build
+  stage: build_front
   rules:
     - when: manual
     - if: '$CI_COMMIT_BRANCH == "release"'
