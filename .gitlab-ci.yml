@@ -1,6 +1,7 @@
 stages:
-  - npm_install
-  - build
+  - npm_install_back
+  - npm_install_front
+  - build_front
   - quality
 
 # This folder is cached between builds
@@ -16,9 +17,24 @@ default:
         echo "${CI_API_V4_URL#https?}/projects/59/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
       } | tee -a .npmrc
 
+# npm install (Back)
+install_back:
+  stage: npm_install_back
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: manual
+  tags:
+    - nodejs
+  variables:
+    NODE_ENV: development
+  script:
+    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
+    - npm install
+
 # npm install (Front)
 install_front:
-  stage: npm_install
+  stage: npm_install_front
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
@@ -30,24 +46,12 @@ install_front:
   script:
     - cd front && npm install
 
-# npm install (Back)
-install_back:
-  stage: npm_install
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  tags:
-    - nodejs
-  variables:
-    NODE_ENV: development
-  script:
-    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
-    - npm install
-
 # Quality: back
 lint_back:
   stage: quality
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
   tags:
     - nodejs
   script:
@@ -58,6 +62,7 @@ lint_front:
   stage: quality
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
   tags:
     - nodejs
   script:
@@ -68,8 +73,6 @@ build_front:
   stage: build
   rules:
     - when: manual
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: always
     # - if: '$CI_COMMIT_BRANCH =~ /^release.*$/i'
