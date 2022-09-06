@@ -21,6 +21,8 @@ install_front:
   stage: npm_install
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: manual
   tags:
     - nodejs
   variables:
@@ -38,6 +40,7 @@ install_back:
   variables:
     NODE_ENV: development
   script:
+    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
     - npm install
 
 # Quality: back
@@ -64,9 +67,14 @@ lint_front:
 build_front:
   stage: build
   rules:
+    - when: manual
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
     - if: '$CI_COMMIT_BRANCH == "release"'
+      when: always
     # - if: '$CI_COMMIT_BRANCH =~ /^release.*$/i'
+  needs:
+    - install_front
   tags:
     - nodejs
   variables:
