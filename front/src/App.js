@@ -118,15 +118,13 @@ export default function App() {
               <div className="container-fluid">
                 <img className="icon-navbar" src={`logo_blanc_orange.png`} alt="Rudi logo" />
                 <button
-                  className="navbar-toggler"
+                  className="navbar-toggler align-right"
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarCollapse"
                   aria-controls="navbarCollapse"
                   aria-expanded="false"
                   aria-label="Toggle navigation"
-                  margin-right="0"
-                  margin-left="auto"
                 >
                   <span className="navbar-toggler-icon"></span>
                 </button>
