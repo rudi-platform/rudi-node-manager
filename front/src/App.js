@@ -75,9 +75,24 @@ export default function App() {
    * Returns the code to display the version tag (if defined)
    * @return {ReactNode} the code to display the version tag (if defined)
    */
-  function displayVersion() {
-    return !VERSION_TAG ? '' : <div className="version">v.{VERSION_TAG}</div>;
-  }
+  const displayVersion = () => (!VERSION_TAG ? '' : <div className="version">v.{VERSION_TAG}</div>);
+
+  /**
+   *
+   * @param {*} destUrl
+   * @param {*} buttonText
+   * @param {*} hide
+   * @return {ReactNode}
+   */
+  const navItem = (destUrl, buttonText, hide = false) => (
+    <li className={hide ? 'nav-item hide-wip' : 'nav-item'}>
+      <Link to={getBackUrl(destUrl)}>
+        <button type="button" className="btn btn-primary">
+          {buttonText}
+        </button>
+      </Link>
+    </li>
+  );
 
   /**
    * logout
@@ -94,12 +109,12 @@ export default function App() {
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
           {!isLoginOpen && (
-            <span className="badge badge-success badge-pill" onClick={showLoginBox}>
+            <span className="badge rounded-pill text-bg-success" onClick={showLoginBox}>
               Login
             </span>
           )}
           {!isRegisterOpen && (
-            <span className="badge badge-success badge-pill" onClick={showRegisterBox}>
+            <span className="badge rounded-pill text-bg-success" onClick={showRegisterBox}>
               Register
             </span>
           )}
@@ -116,7 +131,11 @@ export default function App() {
           <header>
             <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
               <div className="container-fluid">
-                <img className="icon-navbar" src={`logo_blanc_orange.png`} alt="Rudi logo" />
+                <img
+                  className="icon-navbar logo-margin"
+                  src={`logo_blanc_orange.png`}
+                  alt="Rudi logo"
+                />
                 <button
                   className="navbar-toggler align-right"
                   type="button"
@@ -130,34 +149,17 @@ export default function App() {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                   <ul className="navbar-nav me-auto mb-2 mb-md-0">
-                    <li className="nav-item">
-                      <Link to={getBackUrl()}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Catalogue
-                        </button>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to={getBackUrl('/licence')}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Licence
-                        </button>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to={getBackUrl('/show')}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Visualisation
-                        </button>
-                      </Link>
-                    </li>
+                    {navItem('', 'Catalogue')}
+                    {navItem('/licence', 'Licence')}
+                    {navItem('/show', 'Visualisation')}
+
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item as={Link} to={getBackUrl('/metadata')}>
-                          Métadonnée
+                          Métadonnées
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getBackUrl('/producer')}>
-                          Producteur
+                          Producteurs
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={getBackUrl('/contact')}>
                           Contacts
@@ -167,33 +169,13 @@ export default function App() {
                         </Dropdown.Item>
                       </DropdownButton>
                     </li>
-                    <li className="nav-item hide-wip">
-                      <Link to={getBackUrl('/monitoring')}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Monitoring
-                        </button>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to={getBackUrl('/user')}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Utilisateur
-                        </button>
-                      </Link>
-                    </li>
-                    <li className="nav-item hide-wip">
-                      <Link to={getBackUrl('/conf')}>
-                        <button type="button" className="btn btn-primary button-margin">
-                          Configuration
-                        </button>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <button
-                        type="button"
-                        className="btn btn-secondary button-margin"
-                        onClick={() => logout()}
-                      >
+
+                    {navItem('/monitoring', 'Monitoring', 'hide')}
+                    {navItem('/user', 'Utilisateurs')}
+                    {navItem('/conf', 'Configuration', 'hide')}
+
+                    <li className="nav-item center">
+                      <button type="button" className="btn btn-secondary" onClick={() => logout()}>
                         Logout
                       </button>
                     </li>

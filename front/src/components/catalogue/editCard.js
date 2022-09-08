@@ -74,18 +74,18 @@ export default function EditCard({ formUrl, refresh }) {
     <div className="col-12">
       <div className="card temp-margin">
         <div className="card-body">
-          <div>
+          <div className="inline" >
             <a
               href={formUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
             >
-              Ajouter un Jeu de Donnée <Plus />
+              Ajouter un jeu de données <Plus />
             </a>
           </div>
-          <div className="card-text">
-            Modifier un Jeu de donnée :
+          <div className="inline card-text on-right">
+            Modifier un jeu de données :
             <div className="btn-group" role="group">
               <input
                 type="text"

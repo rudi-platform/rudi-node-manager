@@ -116,7 +116,7 @@ export default function UserCard({ user, display, refresh }) {
             <p className="card-text">
               {user.roles.map((role, i) => {
                 return (
-                  <span key={`${i}`} className="badge badge-success badge-pill">
+                  <span key={`${i}`} className="badge rounded-pill text-bg-success">
                     {role}
                   </span>
                 );

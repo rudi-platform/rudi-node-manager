@@ -232,8 +232,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         {display && display.searchbar && (
           <div className="col-3 rounded temp-align">
             <div className="row">
-              <div className="temp-pad col-12 border rounded temp-margin">
-                <h4>Trier</h4>
+              <div className="left-hand-blocks">
+                <div className="label-lv1">Trier</div>
                 <div className="btn-group" role="group" aria-label="sort">
                   <button
                     type="button"
@@ -290,8 +290,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="temp-pad col-12 border rounded temp-margin">
-                <h4>Rechercher</h4>
+              <div className="left-hand-blocks">
+                <div className="label-lv1">Rechercher</div>
                 <div className="input-group flex-nowrap">
                   <input
                     type="text"
@@ -318,19 +318,18 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   </div>
                 </div>
               </div>
-              <div className="temp-pad col-12 border rounded temp-margin">
-                <h4>Filtrer</h4>
+              <div className="left-hand-blocks">
+                <div className="label-lv1">Filtrer</div>
                 <div className="row no-row-margin">
                   {countBy.map((filter, i) => {
                     return (
                       <div className="col border rounded" key={filter.name}>
-                        <span>{filter.text}</span>
+                        <div className="label-lv2">{filter.text}</div>
                         <ul className="list-group">
                           {filter.values.map((filterValue, i) => {
                             return (
                               <li
-                                className="no-row-margin temp-pad list-group-item 
-                                d-flex justify-content-between align-items-center"
+                                className="filter-items"
                                 key={getFilterLabel(filterValue, filter) + i}
                                 onClick={(e) => addToFilter(filter.toFilterParam(filterValue))}
                               >
@@ -341,11 +340,11 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                                 )}
                                 {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
                                 <span
-                                  className={`badge ${
+                                  className={`badge rounded-pill text-bg-${
                                     isSelectedFilter(filter.toFilterParam(filterValue))
-                                      ? 'badge-success'
-                                      : 'badge-primary'
-                                  } badge-pill`}
+                                      ? 'success'
+                                      : 'primary'
+                                  }`}
                                 >
                                   {filterValue.count}
                                 </span>

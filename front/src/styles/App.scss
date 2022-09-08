@@ -29,9 +29,13 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
   @return map-get($theme-colors, $key);
 }
 
+$marginSides: 20px;
+
 //----- CSS
 body {
   font-family: 'Montserrat', $font-family-sans-serif;
+  height: 100%;
+  font-size: 14px;
   color: $primary;
 }
 
@@ -58,7 +62,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(1rem + 2vmin);
 }
 
 .App-link {
@@ -73,6 +77,11 @@ body {
     transform: rotate(360deg);
   }
 }
+a {
+  background-color: initial;
+  color: #004680;
+  text-decoration: none;
+}
 
 .login-switch {
   margin: 0 auto;
@@ -81,24 +90,23 @@ body {
 
 .tempPaddingTop {
   padding-top: 60px;
-  margin-left: 20px;
+  padding-bottom: 60px;
+  margin-left: $marginSides;
+  margin-right: $marginSides;
 }
 
-.button-margin {
-  margin: 1px 4px;
-}
 .bg-navbar {
   background-color: $navbar;
 }
+
 .icon-navbar {
   height: 40px;
+  margin: 0px 40px 0px 15px;
 }
 .hide-wip {
   display: none;
 }
-.badge-monitoring {
-  display: block;
-}
+
 // ¨
 .temp-min-height {
   min-height: 150px;
@@ -163,9 +171,72 @@ body {
   width: 90%;
   margin: 3%;
 }
-
+.center {
+  margin: auto;
+}
 .version {
   color: $header-font;
-  font-size: 80%;
+  font-size: 0.7em;
   float: right;
+  margin: 0px $marginSides;
+}
+
+.button-margin {
+  margin: 1px 4px;
+}
+
+.label-lv1 {
+  font-size: 1.4em;
+  font-weight: 500;
+  padding: 0em 0.2em;
+}
+.label-lv2 {
+  font-size: 1.1em;
+  font-weight: 500;
+  padding: 0.4em;
+}
+
+// Designing specific parts
+.status-pill {
+  @extend .badge;
+  @extend .rounded-pill;
+  margin-right: 10px;
+  margin-left: auto;
+}
+
+.file-size-pill {
+  @extend .badge;
+  @extend .rounded-pill;
+  margin: 0 1em;
+}
+
+.badge-monitoring {
+  @extend .badge;
+  @extend .rounded-pill;
+  @extend .text-bg-primary;
+  display: block;
+  margin-left: 50px;
+}
+
+.btn-primary {
+  font-size: 1.1em;
+  font-weight: 500;
+  margin: 0 5px;
+}
+
+.filter-items {
+  @extend .no-row-margin;
+  @extend .temp-pad;
+  @extend .list-group-item;
+  @extend .d-flex;
+  @extend .justify-content-between;
+  @extend .align-items-center;
+}
+
+.left-hand-blocks {
+  @extend .temp-pad;
+  @extend .col-12;
+  @extend .border;
+  @extend .rounded;
+  @extend .temp-margin;
 }

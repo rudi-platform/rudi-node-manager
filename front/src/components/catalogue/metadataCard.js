@@ -46,9 +46,8 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
 
   /**
    * call for metadata deletion
-   * @param {*} metadata metadata a suppr
    */
-  function deleteRessource(metadata) {
+  function deleteRessource() {
     axios
       .delete(`api/admin/resources/${metadata.global_id}`)
       .then((res) => {
@@ -65,23 +64,19 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
   /**
    * call for confirmation before metadata deletion
    * @param {*} metadata metadata a suppr
    */
-  function triggerDeleteRessource(metadata) {
+  const triggerDeleteRessource = () => {
     const options = DefaultConfirmOption;
     options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`];
     options.buttons = [
       {
         text: 'Oui',
-        action: () => {
-          deleteRessource(metadata);
-        },
+        action: () => deleteRessource(),
       },
       {
         text: 'Non',
@@ -90,7 +85,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
     ];
     changeOptions(options);
     toggle();
-  }
+  };
 
   /**
    * affiche le text en fonction de la langue choisi
@@ -98,25 +93,35 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    * @param {String} lang langue selectionnée
    * @return {String} text dans la langue appropriée
    */
-  function getLangText(langObjectArray, lang) {
-    // TODO
-    return langObjectArray[0].text;
-  }
+  const getLangText = (langObjectArray, lang) => langObjectArray[0].text;
+
   /**
    * calcule la taille total des fichiers
    * @return {Number} taille totale
    */
-  function getTotalFileSize() {
-    return metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0);
-  }
+  const getTotalFileSize = () =>
+    metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0);
 
   /**
    * Check if the metadata has restricted access
    * @param {*} metadata
    * @return {boolean} True if letadata has restricted access
    */
-  function isRestricted(metadata) {
-    return !!metadata?.access_condition?.confidentiality?.restricted_access;
+  const isRestricted = (metadata) =>
+    !!metadata?.access_condition?.confidentiality?.restricted_access;
+
+  const metaDates = metadata.metadata_info.metadata_dates;
+  /**
+   * Display the metadata status
+   * @return {html} A round pill that shows the status
+   */
+  function displayStatus() {
+    const displaySpan = (level, text) => (
+      <span className={'status-pill text-bg-' + level} id="status-pill">{text}</span>
+    );
+    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'En attente');
+    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié');
+    if (metaDates?.deleted) return displaySpan('danger', 'Supprimé');
   }
 
   return (
@@ -131,17 +136,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             >
               {metadata.resource_title}
             </a>
-            {!metadata.metadata_info.metadata_dates?.published &&
-              !metadata.metadata_info.metadata_dates?.deleted && (
-                <span className="badge-warning badge-pill badge">En attente</span>
-              )}
-            {metadata.metadata_info.metadata_dates?.published &&
-              !metadata.metadata_info.metadata_dates?.deleted && (
-                <span className="badge badge-success badge-pill">Publié</span>
-              )}
-            {metadata.metadata_info.metadata_dates?.deleted && (
-              <span className="badge badge-danger badge-pill">Supprimé</span>
-            )}
+            {displayStatus()}
             {display && display.editJDD && (
               <div className="btn-group" role="group">
                 <button type="button" className="btn btn-success">
@@ -162,7 +157,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                 <button
                   type="button"
                   className="btn btn-danger"
-                  onClick={(e) => triggerDeleteRessource(metadata)}
+                  onClick={(e) => triggerDeleteRessource()}
                 >
                   <Trash />
                 </button>
@@ -171,24 +166,18 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           </div>
 
           <div>
-            {metadata.metadata_info.metadata_dates?.updated && (
+            {metaDates?.updated && (
               <small className="text-muted">
-                Modifié le :
-                <Moment format=" DD/MM/YYYY HH:mm:ss">
-                  {metadata.metadata_info.metadata_dates.updated}
-                </Moment>
+                Modifié le :<Moment format=" DD/MM/YYYY HH:mm:ss">{metaDates.updated}</Moment>
               </small>
             )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
           </div>
 
-          {metadata.metadata_info.metadata_dates?.published && (
+          {metaDates?.published && (
             <div>
               <small className="text-muted">
-                Publié le :
-                <Moment format=" DD/MM/YYYY HH:mm:ss">
-                  {metadata.metadata_info.metadata_dates.published}
-                </Moment>
+                Publié le :<Moment format=" DD/MM/YYYY HH:mm:ss">{metaDates.published}</Moment>
               </small>
             </div>
           )}
