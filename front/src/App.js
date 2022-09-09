@@ -110,12 +110,12 @@ export default function App() {
         <div className="login-switch">
           {!isLoginOpen && (
             <span className="badge rounded-pill text-bg-success" onClick={showLoginBox}>
-              Login
+              Accéder à l‘application
             </span>
           )}
           {!isRegisterOpen && (
             <span className="badge rounded-pill text-bg-success" onClick={showRegisterBox}>
-              Register
+              Créer un compte
             </span>
           )}
         </div>

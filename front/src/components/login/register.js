@@ -84,47 +84,46 @@ export default function Register({ backToLogin }) {
       });
   }
 
+  const formGroup = (id, label, val, type, onChangeMethod) => {
+    return (
+      <div className="login-form">
+        <Form.Group size="lg" controlId={id}>
+          <Form.Label>{label}</Form.Label>
+          <Form.Control
+            autoFocus
+            type={type}
+            value={val}
+            onChange={(e) => onChangeMethod(e.target.value)}
+          />
+        </Form.Group>{' '}
+      </div>
+    );
+  };
+
   return (
     <div className="Login">
-      <GenericModal visible={visible} toggle={toggle} options={options}animation={false}></GenericModal>
+      <GenericModal
+        visible={visible}
+        toggle={toggle}
+        options={options}
+        animation={false}
+      ></GenericModal>
       <Form onSubmit={handleSubmit}>
-        <Form.Group size="lg" controlId="username">
-          <Form.Label>User</Form.Label>
-          <Form.Control
-            autoFocus
-            type="text"
-            value={username}
-            onChange={(e) => setUserName(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group size="lg" controlId="email">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            autoFocus
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group size="lg" controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group size="lg" controlId="confirmPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Button block="true" size="lg" type="submit" disabled={!validateForm()}>
-          Register
-        </Button>
+        {formGroup('username', 'Nom', username, 'text', setUserName)}
+        {formGroup('email', 'E-mail', email, 'text', setEmail)}
+        {formGroup('password', 'Mot de passe', password, 'password', setPassword)}
+        {formGroup(
+          'confirmPassword',
+          'Confirmation du mot de passe',
+          confirmPassword,
+          'password',
+          setConfirmPassword,
+        )}
+        <div className="login-button">
+          <Button block="true" size="lg" type="submit" disabled={!validateForm()}>
+            Créer le compte
+          </Button>
+        </div>
       </Form>
     </div>
   );

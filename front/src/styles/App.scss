@@ -221,7 +221,7 @@ a {
 .btn-primary {
   font-size: 1.1em;
   font-weight: 500;
-  margin: 0 5px;
+  margin: 5px 5px;
 }
 
 .filter-items {
@@ -239,4 +239,13 @@ a {
   @extend .border;
   @extend .rounded;
   @extend .temp-margin;
+}
+
+.login-button {
+  @extend .d-grid;
+  margin: 1.5rem -5px;
+}
+
+.login-form {
+  margin-top: 1rem;
 }

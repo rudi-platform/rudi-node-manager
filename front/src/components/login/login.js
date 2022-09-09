@@ -24,7 +24,7 @@ export default function Login({ setToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const validateForm = () => username.length > 0 && password.length > 0;
+  const isFormValid = () => username.length > 0 && password.length > 0;
 
   /**
    * call server to log user
@@ -82,28 +82,34 @@ export default function Login({ setToken }) {
         animation={false}
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
-        <Form.Group size="lg" controlId="email">
-          <Form.Label>User</Form.Label>
-          <Form.Control
-            autoFocus
-            type="text"
-            value={username}
-            autoComplete="username"
-            onChange={(e) => setUserName(e.target.value)}
-          />
-        </Form.Group>
-        <Form.Group size="lg" controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            autoComplete="current-password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Form.Group>
-        <Button block="true" size="lg" type="submit" disabled={!validateForm()}>
-          Login
-        </Button>
+        <div className="login-form">
+          <Form.Group size="lg" controlId="usr">
+            <Form.Label>Nom</Form.Label>
+            <Form.Control
+              autoFocus
+              type="text"
+              value={username}
+              autoComplete="username"
+              onChange={(e) => setUserName(e.target.value)}
+            />
+          </Form.Group>
+        </div>
+        <div className="login-form">
+          <Form.Group size="lg" controlId="pwd">
+            <Form.Label>Mot de passe</Form.Label>
+            <Form.Control
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+        </div>
+        <div className="login-button">
+          <Button type="submit" disabled={!isFormValid()}>
+            Accéder à l‘application
+          </Button>
+        </div>
       </Form>
     </div>
   );
