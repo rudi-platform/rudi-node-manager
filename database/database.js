@@ -1,9 +1,18 @@
+const mod = 'db';
+
+// ---- External dependencies -----
 const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
+
+// ---- Internal dependencies -----
 const config = require('../config/config');
 const log = require('../utils/logger');
-const mod = 'database';
 
+// ---- Constants -----
+const TBL_USERS = 'Users';
+const TBL_USER_ROLES = 'User_Roles';
+
+// ---- Functions -----
 const open = function () {
   const fun = 'open';
   const db = new sqlite3.Database(
@@ -22,17 +31,16 @@ const open = function () {
 const close = function (db) {
   const fun = 'close';
   db.close((err) => {
-    if (err) {
-      log.e(mod, fun, err.message);
-    }
+    if (err) log.e(mod, fun, err.message);
   });
 };
 
+// ---- Controllers -----
 exports.getUserByUsername = (username) => {
   const fun = 'getUserByUsername';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM Users WHERE username = ?`, [username], function (err, row) {
+    db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], function (err, row) {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
@@ -43,14 +51,15 @@ exports.getUserByUsername = (username) => {
     });
   });
 };
+
 exports.getUsers = () => {
   const fun = 'getUsers';
   const db = open();
   return new Promise((resolve, reject) => {
     db.all(
-      'SELECT Users.id, Users.username, Users.email, GROUP_CONCAT(User_Roles.role) AS roles ' +
-        'FROM Users LEFT JOIN User_Roles ON User_Roles.userId = Users.id ' +
-        'GROUP BY Users.id;',
+      `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role) ` +
+        `AS roles FROM ${TBL_USERS} LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id ` +
+        `GROUP BY ${TBL_USERS}.id;`,
       function (err, rows) {
         if (err) {
           log.e(mod, fun, err.message);
@@ -73,11 +82,11 @@ exports.createUser = (user) => {
   const fun = 'createUser';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.serialize(function () {
+    db.serialize(() => {
       db.run(
-        `INSERT INTO Users(username,password,email) VALUES(?,?,?)`,
+        `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
         [user.username, user.password, user.email],
-        function (err) {
+        (err) => {
           if (err) {
             log.e(mod, fun, err.message);
             reject(err);
@@ -85,14 +94,14 @@ exports.createUser = (user) => {
             log.i(
               mod,
               fun,
-              `Users : A row has been inserted with rowid ${this.lastID}`,
+              `${TBL_USERS} : A row has been inserted with rowid ${this.lastID}`,
               log.getContext(null, { opType: 'post_user' }),
             );
             const id = this.lastID;
 
-            // TODO : replace by count SELECT COUNT (*) FROM Users;
+            // TODO : replace by count SELECT COUNT (*) FROM ${USER_TABLE};
             db.get(
-              `SELECT COUNT (*) FROM User_Roles WHERE role = ?`,
+              `SELECT COUNT (*) FROM ${TBL_USER_ROLES} WHERE role = ?`,
               ['SuperAdmin'],
               function (err, result) {
                 if (err) {
@@ -121,11 +130,38 @@ exports.createUser = (user) => {
     });
   });
 };
+exports.updatePassword = (username, password) => {
+  const fun = 'updatePassword';
+  const db = open();
+  return new Promise((resolve, reject) => {
+    // db.serialize(() => { // Needed for consecutive transactions
+    db.run(
+      `UPDATE ${TBL_USERS} SET password = ? WHERE username = ?`,
+      [password, username],
+      (err) => {
+        if (err) {
+          log.e(mod, fun, err.message);
+          reject(err.message);
+        } else {
+          log.i(
+            mod,
+            fun,
+            `${TBL_USERS}: password reset for user '${username}'`,
+            log.getContext(null, { opType: 'put_password' }),
+          );
+          resolve({ username: username });
+        }
+        close(db);
+      },
+    );
+    // });
+  });
+};
 exports.deleteUser = (username) => {
   const fun = 'deleteUser';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM Users WHERE username = ?`, [username], function (err) {
+    db.run(`DELETE FROM ${TBL_USERS} WHERE username = ?`, [username], function (err) {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
@@ -133,7 +169,7 @@ exports.deleteUser = (username) => {
         log.i(
           mod,
           fun,
-          `Users : A row has been deleted with username ${username}`,
+          `${TBL_USERS} : A row has been deleted with username ${username}`,
           log.getContext(null, { opType: 'delete_user' }),
         );
         resolve({ username: username });
@@ -206,15 +242,19 @@ exports.getUserRolesByUsername = (username) => {
       if (user) {
         const db = open();
         return new Promise((resolve, reject) => {
-          db.all(`SELECT * FROM User_Roles WHERE userId = ?`, [user.id], function (err, rows) {
-            if (err) {
-              log.e(mod, fun, err.message);
-              reject(err);
-            } else {
-              resolve(rows);
-            }
-            close(db);
-          });
+          db.all(
+            `SELECT * FROM ${TBL_USER_ROLES} WHERE userId = ?`,
+            [user.id],
+            function (err, rows) {
+              if (err) {
+                log.e(mod, fun, err.message);
+                reject(err);
+              } else {
+                resolve(rows);
+              }
+              close(db);
+            },
+          );
         });
       } else {
         return Promise.reject(new Error(`User ${username} not found!`));
@@ -229,21 +269,25 @@ exports.deleteUserRole = (userId, role) => {
   const fun = 'deleteUserRole';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM User_Roles WHERE userId = ? AND role = ?`, [userId, role], function (err) {
-      if (err) {
-        log.e(mod, fun, err.message);
-        reject(err);
-      } else {
-        log.i(
-          mod,
-          fun,
-          `User_Roles : A row has been deleted with userId ${userId} and role ${role}`,
-          log.getContext(null, { opType: 'delete_userRole' }),
-        );
-        resolve({ userId, role });
-      }
-      close(db);
-    });
+    db.run(
+      `DELETE FROM ${TBL_USER_ROLES} WHERE userId = ? AND role = ?`,
+      [userId, role],
+      function (err) {
+        if (err) {
+          log.e(mod, fun, err.message);
+          reject(err);
+        } else {
+          log.i(
+            mod,
+            fun,
+            `${TBL_USER_ROLES} : A row has been deleted with userId ${userId} and role ${role}`,
+            log.getContext(null, { opType: 'delete_userRole' }),
+          );
+          resolve({ userId, role });
+        }
+        close(db);
+      },
+    );
   });
 };
 
@@ -252,7 +296,7 @@ const createUserRole = (userRole) => {
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(
-      `INSERT INTO User_Roles(userId,role) VALUES(?,?)`,
+      `INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`,
       [userRole.userId, userRole.role],
       function (err) {
         if (err) {
@@ -262,7 +306,7 @@ const createUserRole = (userRole) => {
           log.i(
             mod,
             fun,
-            `User_Roles : A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
+            `${TBL_USER_ROLES} : A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
             log.getContext(null, { opType: 'post_userRole' }),
           );
           resolve(userRole);

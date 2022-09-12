@@ -83,11 +83,6 @@ a {
   text-decoration: none;
 }
 
-.login-switch {
-  margin: 0 auto;
-  max-width: 320px;
-}
-
 .tempPaddingTop {
   padding-top: 60px;
   padding-bottom: 60px;
@@ -241,11 +236,25 @@ a {
   @extend .temp-margin;
 }
 
-.login-button {
-  @extend .d-grid;
-  margin: 1.5rem -5px;
-}
-
 .login-form {
   margin-top: 1rem;
+}
+
+.login-switch {
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+.login-button {
+  @extend .d-grid;
+  @extend .btn;
+  @extend .gap-2;
+  margin: 1.5em -6.5px 0em -6.5px;
+}
+.login-pill {
+  @extend .d-grid;
+  @extend .d-md-block;
+  @extend .btn;
+  @extend .gap-2;
+  margin: 0.5em 6px 0.5em 6px;
 }

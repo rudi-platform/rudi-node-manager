@@ -6,8 +6,8 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
 
-export const btnColor = 'warning';
-export const btnText = 'Créer un compte';
+export const btnColor = 'secondary';
+export const btnText = 'Modifier le mot de passe';
 
 export const showPill = (condition, showState) =>
   condition ? (
@@ -23,11 +23,11 @@ export const showPill = (condition, showState) =>
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Register html component
  */
-export default function Register({ backToLogin }) {
+export default function ChangePwd({ backToLogin }) {
   const [username, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPwd] = useState('');
+  const [newPassword, setNewPwd] = useState('');
+  const [confirmNewPassword, setConfirmNewPwd] = useState('');
 
   const { toggle, visible } = useGenericModal();
   const { options, changeOptions } = useGenericModalOptions();
@@ -36,15 +36,21 @@ export default function Register({ backToLogin }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const isFormValid = () => username.length > 0 && password.length > 0;
+  const isFormValid = () =>
+    username.length > 0 &&
+    password.length > 0 &&
+    newPassword.length > 0 &&
+    confirmNewPassword.length > 0 &&
+    password != newPassword &&
+    newPassword == confirmNewPassword;
 
   /**
    * call server to Register user
    * @param {*} credentials
    * @return {Promise} Register promise
    */
-  const registerUser = (credentials) =>
-    axios.post(`api/v1/register`, JSON.stringify(credentials), {
+  const putPassword = (credentials) =>
+    axios.put(`api/v1/change-password`, JSON.stringify(credentials), {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -56,15 +62,16 @@ export default function Register({ backToLogin }) {
    */
   function handleSubmit(event) {
     event.preventDefault();
-    registerUser({
+    putPassword({
       username,
-      email,
       password,
-      confirmPassword,
+      newPassword,
+      confirmNewPassword,
     })
       .then((res) => {
+        console.log(res);
         changeOptions({
-          text: [`L'utilisateur '${res.data.username}' a bien été créé.`],
+          text: [`Le mot de passe a bien été changé pour l'utilisateur '${res.data.username}'`],
           title: 'Action Validée',
           type: 'success',
           buttons: [
@@ -120,14 +127,14 @@ export default function Register({ backToLogin }) {
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
         {formGroup('username', 'Nom', username, 'text', setUserName)}
-        {formGroup('email', 'E-mail', email, 'text', setEmail)}
-        {formGroup('password', 'Mot de passe', password, 'password', setPassword)}
+        {formGroup('password', 'Mot de passe actuel', password, 'password', setPwd)}
+        {formGroup('password', 'Nouveau mot de passe', newPassword, 'password', setNewPwd)}
         {formGroup(
-          'confirmPassword',
-          'Confirmation du mot de passe',
-          confirmPassword,
           'password',
-          setConfirmPassword,
+          'Confirmation du mot de passe',
+          confirmNewPassword,
+          'password',
+          setConfirmNewPwd,
         )}
         <div className="login-button">
           <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
@@ -138,6 +145,6 @@ export default function Register({ backToLogin }) {
     </div>
   );
 }
-Register.propTypes = {
+ChangePwd.propTypes = {
   backToLogin: PropTypes.func.isRequired,
 };

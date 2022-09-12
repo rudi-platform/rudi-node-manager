@@ -10,8 +10,8 @@ import CatalogueProducer from './components/producer/catalogueProducer';
 import CatalogueContact from './components/contact/catalogueContact';
 import Visualisation from './components/visualisation/visualisation';
 import { createBrowserHistory } from 'history';
-import Login from './components/login/login';
-import Register from './components/login/register';
+import Login, { showPill as showPillLogin } from './components/login/login';
+import Register, { showPill as showPillRegister } from './components/login/register';
 import useToken from './useToken';
 import { ModalProvider } from './components/modals/ModalContext';
 import { GeneralContext } from './generalContext';
@@ -19,6 +19,7 @@ import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
 import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import CataloguePubKeys from './components/pub_key/cataloguePubKeys';
+import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
 
@@ -43,16 +44,25 @@ export default function App() {
 
   const { token, updateToken } = useToken();
   const [isLoginOpen, setIsLoginOpen] = useState(true);
+  const [isChgPwdOpen, setIsChgPwdOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [generalConf, setGeneralConf] = useState({});
 
   const showLoginBox = () => {
-    setIsRegisterOpen(false);
     setIsLoginOpen(true);
+    setIsChgPwdOpen(false);
+    setIsRegisterOpen(false);
+  };
+
+  const showChgPwdBox = () => {
+    setIsLoginOpen(false);
+    setIsChgPwdOpen(true);
+    setIsRegisterOpen(false);
   };
 
   const showRegisterBox = () => {
     setIsLoginOpen(false);
+    setIsChgPwdOpen(false);
     setIsRegisterOpen(true);
   };
 
@@ -106,18 +116,12 @@ export default function App() {
     return (
       <div>
         {isLoginOpen && <Login setToken={updateToken} />}
+        {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
-          {!isLoginOpen && (
-            <span className="badge rounded-pill text-bg-success" onClick={showLoginBox}>
-              Accéder à l‘application
-            </span>
-          )}
-          {!isRegisterOpen && (
-            <span className="badge rounded-pill text-bg-success" onClick={showRegisterBox}>
-              Créer un compte
-            </span>
-          )}
+          {showPillLogin(!isLoginOpen, showLoginBox)}
+          {showPillChgPwd(!isChgPwdOpen, showChgPwdBox)}
+          {showPillRegister(!isRegisterOpen, showRegisterBox)}
         </div>
       </div>
     );

@@ -36,3 +36,14 @@ exports.deleteUser = (req, res, next) => {
       res.status(501).json(error);
     });
 };
+
+// exports.putPassword = (req, res, next) => {
+//   const { username, password } = req.body;
+//   return databaseManager
+//     .updatePassword(username, password)
+//     .then((data) => res.status(200).send(`Password changed for user '${data.username}'`))
+//     .catch((err) => {
+//       error = errorHandler.error(err, req, { opType: 'put_password' });
+//       res.status(501).json(error);
+//     });
+// };

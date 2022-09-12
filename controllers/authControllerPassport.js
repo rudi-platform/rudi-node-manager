@@ -15,40 +15,7 @@ const PUBLIC_TOKEN = 'publicToken';
 exports.AUTH_TOKEN = AUTH_TOKEN;
 exports.PUBLIC_TOKEN = PUBLIC_TOKEN;
 
-const registerUser = (data) => {
-  const fun = 'registerUser';
-  // TODO : throw error instead
-  if (!data.password || !data.confirmPassword || data.password !== data.confirmPassword) return;
-  return databaseManager
-    .getUserByUsername(data.username)
-    .then((user) => {
-      // Create new User
-      if (!user) {
-        const newUser = { username: data.username, password: data.password, email: data.email };
-        // Hash password before saving in database
-        return bcrypt
-          .genSalt(10)
-          .then((salt) => {
-            return bcrypt.hash(newUser.password, salt).then((hash) => {
-              newUser.password = hash;
-              return databaseManager.createUser(newUser).then((user) => {
-                return user;
-              });
-            });
-          })
-          .catch((err) => {
-            log.e(mod, fun, err);
-            throw err;
-          });
-      } else {
-        return Promise.reject(new Error(`User '${data.username}' already exists!`));
-      }
-    })
-    .catch((err) => {
-      log.e(mod, fun, err);
-      throw err;
-    });
-};
+const SALT_ROUNDS = 10;
 
 const authTokenOpts = (exp) => {
   return {
@@ -65,19 +32,15 @@ const publicTokenOpts = (exp) => {
     expires: new Date(exp * 1000),
   };
 };
+
 exports.postLogin = (req, res, next) => {
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', function (err, user, info) {
-    if (err) {
-      return res.status(400).send(err);
-    }
-    if (!user) {
-      return res.status(401).send('No user found');
-    }
+    if (err) return res.status(400).send(err);
+    if (!user) return res.status(401).send('No user found');
+
     req.login(user, { session: false }, function (err) {
-      if (err) {
-        return res.status(400).json({ errors: err });
-      }
+      if (err) return res.status(400).json({ errors: err });
 
       const { authToken, publicToken, exp } = utils.createToken(user);
 
@@ -97,18 +60,51 @@ exports.postLogin = (req, res, next) => {
   })(req, res, next);
 };
 
+const registerUser = (data) => {
+  const fun = 'registerUser';
+  // TODO : throw error instead
+  const { username, email, password, confirmPassword } = data;
+  return !password || !confirmPassword || password !== confirmPassword
+    ? null
+    : databaseManager
+        .getUserByUsername(username)
+        .then((user) => {
+          if (!!user) return Promise.reject(new Error(`User '${username}' already exists!`));
+
+          // Hash password before saving in database
+          return bcrypt
+            .genSalt(SALT_ROUNDS)
+            .then((salt) =>
+              bcrypt
+                .hash(password, salt)
+                .then((hashedPwd) =>
+                  databaseManager
+                    .createUser({ username: username, password: hashedPwd, email: email })
+                    .then((user) => user),
+                )
+                .catch((err) => {
+                  log.e(mod, fun, err);
+                  throw err;
+                }),
+            )
+            .catch((err) => {
+              log.e(mod, fun, err);
+              throw err;
+            });
+        })
+        .catch((err) => {
+          log.e(mod, fun, err);
+          throw err;
+        });
+};
+
 exports.postRegister = (req, res, next) => {
   const fun = 'postRegister';
   try {
-    const data = req.body;
-    registerUser(data)
-      .then((user) => {
-        // TODO : send mail? random password? temp password? link to first password?
-        res.json(user);
-      })
-      .catch((err) => {
-        res.status(400).send(err.message);
-      });
+    registerUser(req.body)
+      // TODO : send mail? random password? temp password? link to first password?
+      .then((user) => res.json(user))
+      .catch((err) => res.status(400).send(err.message));
   } catch (err) {
     log.e(mod, fun, err);
     res.status(400).send(err);
@@ -123,13 +119,51 @@ exports.postForgot = (req, res, next) => {
     throw err;
   }
 };
-exports.postReset = (req, res, next) => {
-  const fun = 'postReset';
+exports.putPassword = (req, res, next) => {
+  const fun = 'changePwd';
   try {
-    // TODO
+    const { username, password, newPassword, confirmNewPassword } = req.body;
+    if (
+      !username ||
+      !password ||
+      !newPassword ||
+      !confirmNewPassword ||
+      newPassword === password ||
+      newPassword !== confirmNewPassword
+    )
+      res.status(401).send('Prerequisites not met');
+
+    passport.authenticate('local', (err, user, info) => {
+      if (err) return res.status(400).send(err);
+      if (!user) return res.status(401).send(info.message);
+
+      return bcrypt
+        .genSalt(SALT_ROUNDS)
+        .then((salt) =>
+          bcrypt
+            .hash(newPassword, salt)
+            .then((hashedPwd) =>
+              databaseManager
+                .updatePassword(username, hashedPwd)
+                .then((user) => res.json(user))
+                .catch((err) => {
+                  log.e(mod, fun, err);
+                  res.status(400).send(err.message);
+                }),
+            )
+            .catch((err) => {
+              log.e(mod, fun, err);
+              throw err;
+            }),
+        )
+        .catch((err) => {
+          log.e(mod, fun, err);
+          throw err;
+        });
+    })(req, res, next);
   } catch (err) {
     log.e(mod, fun, err);
-    throw err;
+    res.status(400).send(err);
   }
 };
 
@@ -169,5 +203,3 @@ exports.getToken = (req, res, next) => {
       expires: new Date(exp * 1000),
     });
 };
-
-exports.registerUser = registerUser;

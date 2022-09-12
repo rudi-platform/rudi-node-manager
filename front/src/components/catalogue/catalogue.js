@@ -302,7 +302,6 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                     aria-describedby="addon-wrapping"
                   />
                   <button type="button" className="btn btn-success" onClick={(e) => refresh()}>
-                    {' '}
                     <Search />
                   </button>
                 </div>

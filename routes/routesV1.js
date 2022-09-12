@@ -47,7 +47,7 @@ router.get(
   authControllerPassport.logout,
 );
 router.post('/forgot-password', authControllerPassport.postForgot);
-router.post('/reset-password', authControllerPassport.postReset);
+router.put('/change-password', authControllerPassport.putPassword);
 
 router.get(
   '/roles',

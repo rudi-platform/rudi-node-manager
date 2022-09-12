@@ -6,6 +6,18 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
 
+export const btnColor = 'success';
+export const btnText = 'Accéder à l‘application';
+
+export const showPill = (condition, showState) =>
+  condition ? (
+    <div className={'login-pill text-bg-' + btnColor} onClick={showState}>
+      {btnText}
+    </div>
+  ) : (
+    ''
+  );
+
 /**
  * Login component
  * @param {*} param0 (token hooks)
@@ -106,8 +118,8 @@ export default function Login({ setToken }) {
           </Form.Group>
         </div>
         <div className="login-button">
-          <Button type="submit" disabled={!isFormValid()}>
-            Accéder à l‘application
+          <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
+            {btnText}
           </Button>
         </div>
       </Form>
