@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
+import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
 /**
  * Composant : EditCard
  * @return {ReactNode}
  */
-export default function EditCard({}) {
+export default function EditUserCard({ formUrl, refresh }) {
   const [editID, setEditID] = useState('');
-  const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { changeOptions, toggle } = useContext(ModalContext);
+  const { defaultErrorHandler } = useDefaultErrorHandler();
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
+   * @return {void}
    */
-  const handleChange = (event) => {
-    setEditID(event.target.value);
-  };
+  const handleChange = (event) => setEditID(event.target.value);
+
   /**
    * call for user deletion
    */
@@ -28,25 +29,48 @@ export default function EditCard({}) {
       .delete(`api/v1/users/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];
+        options.text = [`L'utilisateur' ${res.data.username} a été supprimé`];
+        options.buttons = [
+          {
+            text: 'Ok',
+            action: () => refresh(),
+          },
+        ];
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
+  /**
+   * call for confirmation before organization deletion
+   */
+  function triggerDeleteUser() {
+    const options = DefaultConfirmOption;
+    options.text = [`Confirmez vous la suppression de l'utilisateur ${editID}?`];
+    options.buttons = [
+      {
+        text: 'Oui',
+        action: () => deleteUser(),
+      },
+      {
+        text: 'Non',
+        action: () => {},
+      },
+    ];
+    changeOptions(options);
+    toggle();
+  }
   return (
-    <div className="col-12 hide-wip">
+    <div className="col-12">
       <div className="card temp-margin">
         <div className="card-body">
-          <div>
+        <div className="inline">
             <a className="btn btn-secondary">
               Ajouter un Utilisateur <Plus />
             </a>
           </div>
-          <div className="card-text">
+          <div className="inline card-text on-right">
             Modifier un Utilisateur :
             <div className="btn-group" role="group">
               <input
@@ -59,7 +83,7 @@ export default function EditCard({}) {
               <a className="btn btn-warning">
                 <Pencil />
               </a>
-              <button type="button" className="btn btn-danger" onClick={(e) => deleteUser()}>
+              <button type="button" className="btn btn-danger" onClick={(e) => triggerDeleteUser()}>
                 <Trash />
               </button>
             </div>
@@ -69,4 +93,7 @@ export default function EditCard({}) {
     </div>
   );
 }
-EditCard.propTypes = {};
+EditUserCard.propTypes = {
+  formUrl: PropTypes.string,
+  refresh: PropTypes.func,
+};

@@ -24,6 +24,7 @@ exports.checkRolePerm = (role) => (req, res, next) => {
     })
     .catch((err) => {
       log.e(mod, fun, err);
-      next(new Error('Not Authorize'));
+      res.status(403).json('Forbidden');
+      next(new Error('Insufficient credentials'));
     });
 };

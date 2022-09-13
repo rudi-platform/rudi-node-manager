@@ -7,7 +7,6 @@ import ProducerCard from './producerCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-
 /**
  * Composant : CatalogueProducer
  * @return {void}
@@ -22,12 +21,8 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
   const generalConf = useContext(GeneralContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  useEffect(() => {
-    getInitialData();
-  }, []);
-  useEffect(() => {
-    setFormUrl(`${generalConf.formUrl}organizations`);
-  }, [generalConf]);
+  useEffect(() => getInitialData(), []);
+  useEffect(() => setFormUrl(`${generalConf.formUrl}organizations`), [generalConf]);
 
   const refresh = () => {
     setHasMore(true);
@@ -46,9 +41,7 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
         setCurrentOffset(PAGE_SIZE);
         setOrganizations(res.data);
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   /**
@@ -70,9 +63,7 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
           }
           setOrganizations(organizations.concat(orgas));
         })
-        .catch((e) => {
-          defaultErrorHandler(e);
-        });
+        .catch((e) => defaultErrorHandler(e));
     };
   }
 

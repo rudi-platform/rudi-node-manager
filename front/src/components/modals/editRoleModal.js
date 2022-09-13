@@ -16,9 +16,8 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  const isInUserRole = (role, user) => {
-    return user.roles ? user.roles.findIndex((element) => element === role.role) : -1;
-  };
+  const isInUserRole = (role, user) =>
+    user.roles ? user.roles.findIndex((element) => element === role.role) : -1;
 
   /**
    * call for user_role deletion
@@ -38,9 +37,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   /**
@@ -51,9 +48,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
   function addUserRole(role, user) {
     axios
       .post(`api/v1/user-roles`, JSON.stringify({ userId: user.id, role: role.role }), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       })
       .then((res) => {
         if (!user.roles) {
@@ -65,16 +60,14 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   return (
     <>
       <Modal show={visible} onHide={toggleEdit} animation={false}>
         <Modal.Header closeButton>
-          <Modal.Title>Edition des Roles de {options.user && options.user.username}</Modal.Title>
+          <Modal.Title>Edition des rôles pour {options.user?.username}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {options.roles &&

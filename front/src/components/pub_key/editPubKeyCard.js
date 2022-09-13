@@ -72,7 +72,7 @@ export default function EditPubKeyCard({ formUrl, refresh }) {
     <div className="col-12">
       <div className="card temp-margin">
         <div className="card-body">
-          <div>
+        <div className="inline">
             <a
               href={formUrl}
               target="_blank"
@@ -82,7 +82,7 @@ export default function EditPubKeyCard({ formUrl, refresh }) {
               Ajouter une clé publique <Plus />
             </a>
           </div>
-          <div className="card-text">
+          <div className="inline card-text on-right">
             Modifier une clé publique :
             <div className="btn-group" role="group">
               <input

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -12,15 +12,15 @@ import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 export default function EditProducerCard({ formUrl, refresh }) {
   const [editID, setEditID] = useState('');
 
-  const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { changeOptions, toggle } = useContext(ModalContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
+   * @return {void}
    */
-  const handleChange = (event) => {
-    setEditID(event.target.value);
-  };
+  const handleChange = (event) => setEditID(event.target.value);
+
   /**
    * call for organization deletion
    */
@@ -29,21 +29,17 @@ export default function EditProducerCard({ formUrl, refresh }) {
       .delete(`api/admin/organizations/${editID}`)
       .then((res) => {
         const options = DefaultOkOption;
-        options.text = [`Le Producteur ${res.data.organization_name} a été supprimé`];
+        options.text = [`Le producteur ${res.data.organization_name} a été supprimé`];
         options.buttons = [
           {
             text: 'Ok',
-            action: () => {
-              refresh();
-            },
+            action: () => refresh(),
           },
         ];
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   /**
@@ -51,13 +47,11 @@ export default function EditProducerCard({ formUrl, refresh }) {
    */
   function triggerDeleteOrganization() {
     const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression du Producteur ${editID}?`];
+    options.text = [`Confirmez vous la suppression du producteur ${editID}?`];
     options.buttons = [
       {
         text: 'Oui',
-        action: () => {
-          deleteOrganization();
-        },
+        action: () => deleteOrganization(),
       },
       {
         text: 'Non',
@@ -71,7 +65,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
     <div className="col-12">
       <div className="card temp-margin">
         <div className="card-body">
-          <div>
+          <div className="inline">
             <a
               href={formUrl}
               target="_blank"
@@ -81,7 +75,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
               Ajouter un Producteur <Plus />
             </a>
           </div>
-          <div className="card-text">
+          <div className="inline card-text on-right">
             Modifier un Producteur :
             <div className="btn-group" role="group">
               <input
