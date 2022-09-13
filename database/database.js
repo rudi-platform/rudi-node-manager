@@ -9,23 +9,28 @@ const config = require('../config/config');
 const log = require('../utils/logger');
 
 // ---- Constants -----
+const DB_NAME = config.database.db_filename;
+const DB_FILE = `${config.database.db_directory}/${DB_NAME}`;
+
 const TBL_USERS = 'Users';
+exports.TBL_USERS = TBL_USERS;
+
+const TBL_ROLES = 'Roles';
+exports.TBL_ROLES = TBL_ROLES;
+
 const TBL_USER_ROLES = 'User_Roles';
+exports.TBL_USER_ROLES = TBL_USER_ROLES;
 
 // ---- Functions -----
 const open = function () {
   const fun = 'open';
-  const db = new sqlite3.Database(
-    `${config.database.db_directory}/rudy_manager.db`,
-    sqlite3.OPEN_READWRITE,
-    (err) => {
-      if (err) {
-        log.e(mod, fun, err);
-        log.e(mod, fun, err.message);
-      } else {
-      }
-    },
-  );
+  const db = new sqlite3.Database(DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      log.e(mod, fun, err);
+      log.e(mod, fun, err.message);
+    } else {
+    }
+  });
   return db.exec('PRAGMA foreign_keys = ON');
 };
 const close = function (db) {
@@ -36,6 +41,57 @@ const close = function (db) {
 };
 
 // ---- Controllers -----
+exports.normalizeUserTableName = () => {
+  const fun = 'normalizeUserTableName';
+  const oldTblName = 'users';
+  const fakeName = 'totox';
+  const db = open();
+  return new Promise((resolve, reject) => {
+    db.get(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`,
+      [],
+      (err, row) => {
+        if (err) {
+          log.d(mod, `${fun}.check`, err.message);
+          close(db);
+          return reject(err);
+        }
+        if (!row) {
+          close(db);
+          log.d(mod, `${fun}.check`, `No table found with name '${oldTblName}'`);
+          return resolve(`No table found with name '${oldTblName}'`);
+        }
+
+        console.log(mod, `${fun}.check`, JSON.stringify(row));
+
+        db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${fakeName}'`, [], (err, row) => {
+          if (err) {
+            log.e(mod, `${fun}.renameToto`, err.message);
+            close(db);
+            return reject(err);
+          }
+          if (!row) {
+            close(db);
+            return resolve(`Renaming table '${oldTblName}' to temp name '${fakeName}'`);
+          }
+          console.log(mod, `${fun}.renameToto`, JSON.stringify(row));
+          db.run(`ALTER TABLE '${fakeName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
+            if (err) {
+              log.e(mod, `${fun}.renameReal`, err.message);
+              close(db);
+              return reject(err);
+            } else {
+              console.log(mod, fun, JSON.stringify(row));
+              close(db);
+              return resolve('Users table name normalized');
+            }
+          });
+        });
+      },
+    );
+  });
+};
+
 exports.getUserByUsername = (username) => {
   const fun = 'getUserByUsername';
   const db = open();
@@ -44,12 +100,16 @@ exports.getUserByUsername = (username) => {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
-      } else {
-        resolve(row);
-      }
+      } else resolve(row);
+
       close(db);
     });
   });
+};
+
+exports.existsUser = async (username) => {
+  const user = await this.getUserByUsername(username);
+  return !!user?.username;
 };
 
 exports.getUsers = () => {
@@ -60,15 +120,13 @@ exports.getUsers = () => {
       `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role) ` +
         `AS roles FROM ${TBL_USERS} LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id ` +
         `GROUP BY ${TBL_USERS}.id;`,
-      function (err, rows) {
+      (err, rows) => {
         if (err) {
           log.e(mod, fun, err.message);
           reject(err);
         } else {
           const result = rows.map((row) => {
-            if (row.roles) {
-              row.roles = row.roles.split(',');
-            }
+            if (row.roles) row.roles = row.roles.split(',');
             return row;
           });
           resolve(result);
@@ -94,35 +152,43 @@ exports.createUser = (user) => {
             log.i(
               mod,
               fun,
-              `${TBL_USERS} : A row has been inserted with rowid ${this.lastID}`,
+              `${TBL_USERS} : user created: '${user.username}'`,
               log.getContext(null, { opType: 'post_user' }),
             );
-            const id = this.lastID;
+            db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [user.username], (err, row) => {
+              if (err) {
+                log.e(mod, fun, err.message);
+                reject(err);
+              } else {
+                // console.log(JSON.stringify(row));
+                resolve({ id: row.id, username: row.username });
 
-            // TODO : replace by count SELECT COUNT (*) FROM ${USER_TABLE};
-            db.get(
-              `SELECT COUNT (*) FROM ${TBL_USER_ROLES} WHERE role = ?`,
-              ['SuperAdmin'],
-              function (err, result) {
-                if (err) {
-                  log.e(mod, fun, err.message);
-                  reject(err);
-                } else {
-                  if (result && result['COUNT (*)'] < 1) {
-                    createUserRole({ userId: id, role: 'SuperAdmin' })
-                      .then(() => {
-                        resolve({ id: this.lastID, username: user.username });
-                      })
-                      .catch((err) => {
-                        log.e(mod, fun, err.message);
-                        reject(err);
-                      });
-                  } else {
-                    resolve({ id: this.lastID, username: user.username });
-                  }
-                }
-              },
-            );
+                // TODO : replace by count SELECT COUNT (*) FROM ${USER_TABLE};
+                // db.get(
+                //   `SELECT COUNT (*) FROM ${TBL_USER_ROLES} WHERE role = ?`,
+                //   ['SuperAdmin'],
+                //   (err, result) => {
+                //     if (err) {
+                //       log.e(mod, fun, err.message);
+                //       reject(err);
+                //     } else {
+                //       if (result && result['COUNT (*)'] < 1) {
+                //         createUserRole({ userId: id, role: 'SuperAdmin' })
+                //           .then(() => {
+                //             resolve({ id: this.lastID, username: user.username });
+                //           })
+                //           .catch((err) => {
+                //             log.e(mod, fun, err.message);
+                //             reject(err);
+                //           });
+                //       } else {
+                //         resolve({ id: this.lastID, username: user.username });
+                //       }
+                //     }
+                //   },
+                // );
+              }
+            });
           }
           close(db);
         },
@@ -186,19 +252,23 @@ exports.createRoles = (roles) => {
   return new Promise((resolve, reject) => {
     db.serialize(function () {
       roles.forEach((role) => {
-        db.run(`INSERT INTO Roles(role,desc) VALUES(?,?)`, [role.role, role.desc], function (err) {
-          if (err) {
-            log.e(mod, fun, err.message);
-            reject(err);
-          } else {
-            log.i(
-              mod,
-              fun,
-              `Roles : A row has been inserted with name ${role.role}`,
-              log.getContext(null, { opType: 'add_role' }),
-            );
-          }
-        });
+        db.run(
+          `INSERT INTO ${TBL_ROLES}(role,desc) VALUES(?,?)`,
+          [role.role, role.desc],
+          function (err) {
+            if (err) {
+              log.e(mod, fun, err.message);
+              reject(err);
+            } else {
+              log.i(
+                mod,
+                fun,
+                `${TBL_ROLES} : A row has been inserted with name ${role.role}`,
+                log.getContext(null, { opType: 'add_role' }),
+              );
+            }
+          },
+        );
       });
       resolve({ roles });
       close(db);
@@ -209,7 +279,7 @@ exports.getRoles = () => {
   const fun = 'getRoles';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.all('SELECT * FROM Roles', function (err, rows) {
+    db.all(`SELECT * FROM ${TBL_ROLES}`, function (err, rows) {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
@@ -224,7 +294,7 @@ exports.getRoleById = (role) => {
   const fun = 'getRoleById';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM Roles WHERE role = ?`, [role], function (err, row) {
+    db.get(`SELECT * FROM ${TBL_ROLES} WHERE role = ?`, [role], function (err, row) {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
@@ -458,10 +528,8 @@ exports.open = open;
 exports.close = close;
 exports.openOrCreateDB = () => {
   const fun = 'openOrCreateDB';
-  return new sqlite3.Database(`${config.database.db_directory}/rudy_manager.db`, (err) => {
-    if (err) {
-      log.e(mod, fun, err);
-    }
-    log.v(mod, fun, 'Creation of (or Connected to) the rudi_manager database.');
+  return new sqlite3.Database(DB_FILE, (err) => {
+    if (err) log.e(mod, fun, err);
+    else log.v(mod, fun, 'Creation of (or Connected to) the rudi_manager database.');
   });
 };

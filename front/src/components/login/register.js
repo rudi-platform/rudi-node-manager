@@ -94,13 +94,13 @@ export default function Register({ backToLogin }) {
       });
   }
 
-  const formGroup = (id, label, val, type, onChangeMethod) => {
+  const formGroup = (id, label, val, type, onChangeMethod, hasFocus) => {
     return (
       <div className="login-form">
         <Form.Group size="lg" controlId={id}>
           <Form.Label>{label}</Form.Label>
           <Form.Control
-            autoFocus
+            autoFocus={hasFocus}
             type={type}
             value={val}
             onChange={(e) => onChangeMethod(e.target.value)}
@@ -119,7 +119,7 @@ export default function Register({ backToLogin }) {
         animation={false}
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
-        {formGroup('username', 'Nom', username, 'text', setUserName)}
+        {formGroup('username', 'Nom', username, 'text', setUserName, true)}
         {formGroup('email', 'E-mail', email, 'text', setEmail)}
         {formGroup('password', 'Mot de passe', password, 'password', setPassword)}
         {formGroup(

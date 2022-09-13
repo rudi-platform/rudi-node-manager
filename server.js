@@ -16,7 +16,7 @@ const log = require('./utils/logger');
 const mod = 'server';
 
 const passport = require('./utils/passportSetup');
-const initDatabase = require('./database/scripts/initDatabase');
+const initDb = require('./database/scripts/initDatabase');
 const { isDevEnv } = require('./config/backOptions');
 
 // Create a new express application named 'app'
@@ -74,7 +74,7 @@ if (!isDevEnv()) {
 }
 
 // Init database on startup
-initDatabase.initDatabase();
+initDb.initDatabase();
 
 // Catch any bad requests
 app.get('*', (req, res) => res.status(404).send(`Route '${req.method} ${req.url}' not found`));

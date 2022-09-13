@@ -59,7 +59,7 @@ function Monitoring({}) {
 
   return (
     <div className="tempPaddingTop">
-      <div className="row">
+      <div className="row catalogue">
         <div className="col-4">
           <div className="card">
             <h5 className="card-header">

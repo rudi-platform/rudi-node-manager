@@ -77,7 +77,7 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
 
   return (
     <div className="tempPaddingTop">
-      <div className="row">
+      <div className="row catalogue">
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && formUrl && (

@@ -101,17 +101,12 @@ export default function ChangePwd({ backToLogin }) {
       });
   }
 
-  const formGroup = (id, label, val, type, onChangeMethod) => {
+  const formGroup = (id, label, val, type, onChangeMethod, hasFocus) => {
     return (
       <div className="login-form">
         <Form.Group size="lg" controlId={id}>
           <Form.Label>{label}</Form.Label>
-          <Form.Control
-            autoFocus
-            type={type}
-            value={val}
-            onChange={(e) => onChangeMethod(e.target.value)}
-          />
+          <Form.Control autoFocus={hasFocus} type={type} value={val} onChange={(e) => onChangeMethod(e.target.value)} />
         </Form.Group>
       </div>
     );
@@ -126,7 +121,7 @@ export default function ChangePwd({ backToLogin }) {
         animation={false}
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
-        {formGroup('username', 'Nom', username, 'text', setUserName)}
+        {formGroup('username', 'Nom', username, 'text', setUserName, true)}
         {formGroup('password', 'Mot de passe actuel', password, 'password', setPwd)}
         {formGroup('password', 'Nouveau mot de passe', newPassword, 'password', setNewPwd)}
         {formGroup(

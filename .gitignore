@@ -6,5 +6,6 @@ _logs
 coverage
 junit.xml
 *.db
+*.sql
 env
 built

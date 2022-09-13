@@ -98,7 +98,7 @@ export default function Login({ setToken }) {
           <Form.Group size="lg" controlId="usr">
             <Form.Label>Nom</Form.Label>
             <Form.Control
-              autoFocus
+              autoFocus={true}
               type="text"
               value={username}
               autoComplete="username"

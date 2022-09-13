@@ -228,7 +228,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
   // TODO :  sticky-top ?
   return (
     <div className="tempPaddingTop">
-      <div className="row">
+      <div className="row catalogue">
         {display && display.searchbar && (
           <div className="col-3 rounded temp-align">
             <div className="row">

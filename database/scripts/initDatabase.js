@@ -1,21 +1,118 @@
-const databaseManager = require('../database');
-const config = require('../../config/config');
-const initUsersTable = require('./initUsersTable');
-const initRolesTable = require('./initRoles');
-const initDefaultFormTable = require('./initDefaultForm');
-const fs = require('fs');
-const log = require('../../utils/logger');
-const mod = 'database';
+const mod = 'initDb';
 
-exports.initDatabase = () => {
+// ---- External dependencies -----
+const fs = require('fs');
+
+// ---- Internal dependencies -----
+const config = require('../../config/config');
+const log = require('../../utils/logger');
+const dbManager = require('../database');
+const initDefaultFormTable = require('./initDefaultForm');
+
+// ---- Constants -----
+const initialRoles = [
+  { role: 'SuperAdmin', desc: 'a tous les droits' },
+  { role: 'Admin', desc: 'administration' },
+  { role: 'Moniteur', desc: 'accès au monitoring' },
+  { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
+  { role: 'Créateur', desc: 'gestion simple des métadonnées' },
+];
+
+let initialUsers;
+if (config.database?.db_su_usr && config.database?.db_su_pwd)
+  initialUsers = [
+    {
+      username: config.database.db_su_usr,
+      password: config.database.db_su_pwd,
+      email: 'security@rudi-univ-rennes1.fr',
+      role: 'SuperAdmin',
+    },
+  ];
+
+const sqlGet = `SELECT name FROM sqlite_master WHERE type='table' AND name=?`;
+const sqlCreateRoleTable =
+  `CREATE TABLE IF NOT EXISTS ${dbManager.TBL_ROLES} ` +
+  `(role TEXT PRIMARY KEY NOT NULL UNIQUE,desc TEXT);`;
+
+const sqlCreateUserTable =
+  `CREATE TABLE IF NOT EXISTS ${dbManager.TBL_USERS} (` +
+  `id INTEGER PRIMARY KEY AUTOINCREMENT,` +
+  `username TEXT NOT NULL UNIQUE,` +
+  `password TEXT NOT NULL,email TEXT);`;
+
+const sqlCreateUserRoleTable =
+  `CREATE TABLE IF NOT EXISTS ${dbManager.TBL_USER_ROLES} (userId INTEGER, role TEXT, PRIMARY KEY(userId,role),` +
+  `CONSTRAINT Roles_fk_user_Id FOREIGN KEY (userId) REFERENCES ${dbManager.TBL_USERS}(id) ` +
+  `ON UPDATE CASCADE ON DELETE CASCADE,` +
+  `CONSTRAINT Roles_fk_role FOREIGN KEY (role) REFERENCES ${dbManager.TBL_ROLES}(role) ` +
+  `ON UPDATE CASCADE ON DELETE CASCADE);`;
+
+// ---- Functions -----
+const initTable = (tableName, sqlCreateReq, initializeTable) => {
+  const fun = 'initTable';
+  const db = dbManager.open();
+  db.get(sqlGet, [tableName], (err, row) => {
+    if (err) {
+      // log.e(mod, `${fun}.${tableName}.get`, err.message);
+      dbManager.close(db);
+    } else {
+      log.i(mod, `${fun}.${tableName}.get`, row);
+      if (!row) {
+        db.run(sqlCreateReq, (err) => {
+          if (err) {
+            log.e(mod, `${fun}.${tableName}.create`, err.message);
+          } else {
+            log.i(
+              mod,
+              `${fun}.${tableName}.create`,
+              `Table Created : ${tableName}`,
+              log.getContext(null, { opType: `init_table_${tableName}`.toLowerCase() }),
+            );
+          }
+          initializeTable();
+          dbManager.close(db);
+        });
+      } else {
+        dbManager.close(db);
+      }
+    }
+  });
+};
+
+const initializeRoles = () => dbManager.createRoles(initialRoles);
+const initRolesTable = () =>
+  initTable(dbManager.TBL_ROLES, sqlCreateRoleTable, () => initializeRoles);
+const initUsersTable = () => initTable(dbManager.TBL_USERS, sqlCreateUserTable, () => {});
+
+const initializeUsers = async () => {
+  // const fun = 'initializeUsers';
+  initialUsers?.map((user) =>
+    dbManager.existsUser(user.username).then((existsUser) => {
+      if (!existsUser)
+        dbManager.createUser(user).then((res) => {
+          const { id, username } = res;
+          console.log(id, username);
+          dbManager.createUserRole({ userId: id, role: user.role });
+        });
+    }),
+  );
+};
+
+const initUserRolesTable = () =>
+  initTable(dbManager.TBL_USER_ROLES, sqlCreateUserRoleTable, () => {});
+
+exports.initDatabase = async () => {
   const fun = 'initDatabase';
   try {
     fs.statSync(config.database.db_directory).isDirectory();
-    const db = databaseManager.openOrCreateDB();
-    databaseManager.close(db);
-    initUsersTable.initUsersTable();
-    initRolesTable.initRolesTable();
-    initRolesTable.initUserRolesTable();
+
+    const db = dbManager.openOrCreateDB();
+    dbManager.close(db);
+    initRolesTable();
+    initUserRolesTable();
+    await dbManager.normalizeUserTableName();
+    initUsersTable();
+    initializeUsers();
     initDefaultFormTable.initDefaultFormTable();
   } catch (error) {
     log.e(mod, fun, error);
