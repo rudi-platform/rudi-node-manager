@@ -20,7 +20,7 @@ export default function LicenceCard({ metadata, formUrl, display }) {
 
   return (
     <div className="col-12" key={metadata.concept_id}>
-      <div className="card temp-margin">
+      <div className="card card-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{getLangText(metadata.pref_label)}</a>

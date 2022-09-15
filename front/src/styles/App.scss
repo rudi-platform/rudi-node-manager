@@ -116,8 +116,12 @@ a {
   align-self: flex-start;
 }
 
-.temp-margin {
+.card-margin {
   margin-bottom: 4px;
+}
+
+.edit-card-margin {
+  margin-bottom: 18px;
 }
 
 .no-row-margin {
@@ -233,7 +237,7 @@ a {
   @extend .col-12;
   @extend .border;
   @extend .rounded;
-  @extend .temp-margin;
+  @extend .card-margin;
 }
 
 .login-form {

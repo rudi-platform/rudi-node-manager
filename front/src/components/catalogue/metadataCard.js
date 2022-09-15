@@ -126,7 +126,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
 
   return (
     <div className="col-12" key={metadata.global_id}>
-      <div className="card temp-margin">
+      <div className="card card-margin">
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
@@ -187,7 +187,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           <p className="card-text">
             Producteur : <span className="text-muted">{metadata.producer?.organization_name}</span>
           </p>
-          <a href="#" className="btn btn-secondary temp-margin">
+          <a href="#" className="btn btn-secondary card-margin">
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
           <span className="card-text">

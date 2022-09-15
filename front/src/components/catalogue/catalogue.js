@@ -3,12 +3,22 @@ import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import MetadataCard from './metadataCard';
-import EditCard from './editCard';
 import { filterConf } from './conf';
 import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
+import EditObjCard from '../generic/editObjCard';
+
+
+const idField = 'global_id';
+
+const deleteUrl = (id) => `api/admin/resources/${id}`;
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`;
+const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`;
+
+const btnTextAdd = 'Ajouter un jeu de données';
+const btnTextChg = 'Modifier un jeu de données :';
 
 /**
  * Composant : Catalogue
@@ -362,7 +372,16 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && formUrl && (
-              <EditCard formUrl={formUrl} refresh={refresh}></EditCard>
+              <EditObjCard
+              idField={idField}
+              urlEdit={formUrl}
+              urlDelete={deleteUrl}
+              msgConfirmDelete={deleteConfirmMsg}
+              msgDelete={deleteMsg}
+              btnTextAdd={btnTextAdd}
+              btnTextChg={btnTextChg}
+              refresh={refresh}
+            ></EditObjCard>
             )}
             <InfiniteScroll
               dataLength={metadatas.length}

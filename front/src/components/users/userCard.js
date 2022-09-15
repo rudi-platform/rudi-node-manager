@@ -6,7 +6,6 @@ import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/M
 import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-
 /**
  * Composant : UserCard
  * @return {ReactNode}
@@ -85,7 +84,7 @@ export default function UserCard({ user, display, refresh }) {
 
   return (
     <div className="col-12" key={user.id}>
-      <div className="card temp-margin">
+      <div className="card card-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             {user.username}
@@ -110,7 +109,7 @@ export default function UserCard({ user, display, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            email : <small className="text-muted">{user.email}</small>
+            email&nbsp;: <small className="text-muted">{user.email}</small>
           </p>
           {user.roles && (
             <p className="card-text">

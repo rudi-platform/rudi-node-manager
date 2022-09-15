@@ -2,10 +2,19 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
-import EditProducerCard from './editProducerCard';
-import ProducerCard from './producerCard';
+import ObjCard from './producerCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import EditObjCard from '../generic/editObjCard';
+
+const idField = 'organization_id';
+
+const deleteUrl = (id) => `api/admin/organizations/${id}`;
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression du producteur ${id}?`;
+const deleteMsg = (data) => `Le producteur ${data.organization_name} a été supprimé`;
+
+const btnTextAdd = 'Ajouter un producteur';
+const btnTextChg = 'Modifier un producteur :';
 
 /**
  * Composant : CatalogueProducer
@@ -73,7 +82,16 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && (
-              <EditProducerCard formUrl={formUrl} refresh={refresh}></EditProducerCard>
+              <EditObjCard
+                idField={idField}
+                urlEdit={formUrl}
+                urlDelete={deleteUrl}
+                msgConfirmDelete={deleteConfirmMsg}
+                msgDelete={deleteMsg}
+                btnTextAdd={btnTextAdd}
+                btnTextChg={btnTextChg}
+                refresh={refresh}
+              ></EditObjCard>
             )}
             <InfiniteScroll
               dataLength={organizations.length}
@@ -83,12 +101,14 @@ export default function CatalogueProducer({ display, specialSearch, editMode }) 
             >
               {organizations.map((organization, i) => {
                 return (
-                  <ProducerCard
-                    organization={organization}
+                  <ObjCard
+                    objId={organization.organization_id}
+                    txtObjId="organization_id"
+                    objName={organization.organization_name}
                     formUrl={formUrl}
                     refresh={refresh}
                     key={`${organization.organization_id}-${i}`}
-                  ></ProducerCard>
+                  ></ObjCard>
                 );
               })}
             </InfiniteScroll>

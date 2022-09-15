@@ -2,75 +2,60 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
+import { ModalContext, getOptConfirm, getOptOk } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+
+ObjCard.propTypes = {
+  objId: PropTypes.string,
+  txtObjId: PropTypes.string,
+  objName: PropTypes.string,
+  formUrl: PropTypes.string,
+  refresh: PropTypes.func,
+};
 
 /**
  * Composant : ProducerCard
  * @return {ReactNode}
  */
-export default function ProducerCard({ formUrl, organization, refresh }) {
+export default function ObjCard({ formUrl, objId, objName, txtObjId, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
   /**
-   * call for organization deletion
-   * @param {*} organization organization a suppr
+   * Call for organization deletion
+   * @param {*} id Identifier of the object to delete
    */
-  function deleteOrganization(organization) {
+  const deleteObj = (id) => {
     axios
-      .delete(`api/admin/organizations/${organization.organization_id}`)
+      .delete(`api/admin/organizations/${id}`)
       .then((res) => {
-        const options = DefaultOkOption;
-        options.text = [`Le Producteur ${res.data.organization_name} a été supprimé`];
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => {
-              refresh();
-            },
-          },
-        ];
-        changeOptions(options);
+        changeOptions(
+          getOptOk(`Le Producteur ${res.data.organization_name} a été supprimé`, () => refresh()),
+        );
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
-  }
+      .catch((e) => defaultErrorHandler(e));
+  };
   /**
    * call for confirmation before organization deletion
-   * @param {*} organization organization a suppr
+   * @param {*} id Identifier of the organization to delete
    */
-  function triggerDeleteOrganization(organization) {
-    const options = DefaultConfirmOption;
-    options.text = [
-      `Confirmez vous la suppression du Producteur ${organization.organization_name}?`,
-    ];
-    options.buttons = [
-      {
-        text: 'Oui',
-        action: () => {
-          deleteOrganization(organization);
-        },
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
-    ];
-    changeOptions(options);
+  const triggerDeleteObj = (id) => {
+    changeOptions(
+      getOptConfirm(`Confirmez vous la suppression du Producteur ${objName}?`, () => deleteObj(id)),
+    );
     toggle();
-  }
+  };
+  
   return (
-    <div className="col-12" key={organization.organization_id}>
-      <div className="card temp-margin">
+    <div className="col-12" key={objId}>
+      <div className="card card-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
-            <a>{organization.organization_name}</a>
+            <a>{objName}</a>
             <div className="btn-group" role="group">
               <a
-                href={`${formUrl}?update=${organization.organization_id}`}
+                href={`${formUrl}?update=${objId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-warning"
@@ -80,7 +65,7 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => triggerDeleteOrganization(organization)}
+                onClick={(e) => triggerDeleteObj(objId)}
               >
                 <Trash />
               </button>
@@ -89,15 +74,10 @@ export default function ProducerCard({ formUrl, organization, refresh }) {
         </h5>
         <div className="card-body">
           <p className="card-text">
-            organization_id : <small className="text-muted">{organization.organization_id}</small>
+            {txtObjId} : <small className="text-muted">{objId}</small>
           </p>
         </div>
       </div>
     </div>
   );
 }
-ProducerCard.propTypes = {
-  organization: PropTypes.object,
-  formUrl: PropTypes.string,
-  refresh: PropTypes.func,
-};

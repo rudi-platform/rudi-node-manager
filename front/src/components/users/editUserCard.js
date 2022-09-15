@@ -63,20 +63,20 @@ export default function EditUserCard({ formUrl, refresh }) {
   }
   return (
     <div className="col-12">
-      <div className="card temp-margin">
+      <div className="card edit-card-margin">
         <div className="card-body">
         <div className="inline">
             <a className="btn btn-secondary">
-              Ajouter un Utilisateur <Plus />
+              Ajouter un utilisateur <Plus />
             </a>
           </div>
           <div className="inline card-text on-right">
-            Modifier un Utilisateur :
+            Modifier un utilisateur&nbsp;:&nbsp;
             <div className="btn-group" role="group">
               <input
                 type="text"
                 className="form-control"
-                placeholder="username"
+                placeholder="nom"
                 value={editID}
                 onChange={handleChange}
               />

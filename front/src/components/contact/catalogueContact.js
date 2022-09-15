@@ -2,10 +2,19 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
-import EditContactCard from './editContactCard';
 import ContactCard from './contactCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import EditObjCard from '../generic/editObjCard';
+
+const idField = 'contact_id';
+
+const deleteUrl = (id) => `api/admin/contacts/${id}`;
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression du contact ${id}?`;
+const deleteMsg = (data) => `Le contact ${data.contact_name} a été supprimé`;
+
+const btnTextAdd = 'Ajouter un contact';
+const btnTextChg = 'Modifier un contact :';
 
 /**
  * Composant : CatalogueContact
@@ -21,13 +30,8 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
   const generalConf = useContext(GeneralContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
-  useEffect(() => {
-    getInitialData();
-  }, []);
-
-  useEffect(() => {
-    setFormUrl(`${generalConf.formUrl}contacts`);
-  }, [generalConf]);
+  useEffect(() => getInitialData(), []);
+  useEffect(() => setFormUrl(`${generalConf.formUrl}contacts`), [generalConf]);
 
   const refresh = () => {
     setHasMore(true);
@@ -46,34 +50,25 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
         setCurrentOffset(PAGE_SIZE);
         setContacts(res.data);
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   /**
    * récupere la page suivante
    * @return {Function} fonction utilisée par InfiniteScroll
    */
-  function fetchMoreData() {
-    return () => {
-      axios
-        .get(`api/admin/contacts`, {
-          params: { limit: PAGE_SIZE, offset: currentOffset },
-        })
-        .then((res) => {
-          const conts = res.data;
-          setCurrentOffset(currentOffset + PAGE_SIZE);
-          if (conts.length === 0) {
-            setHasMore(false);
-          }
-          setContacts(contacts.concat(conts));
-        })
-        .catch((e) => {
-          defaultErrorHandler(e);
-        });
-    };
-  }
+  const fetchMoreData = () =>
+    axios
+      .get(`api/admin/contacts`, {
+        params: { limit: PAGE_SIZE, offset: currentOffset },
+      })
+      .then((res) => {
+        const conts = res.data;
+        setCurrentOffset(currentOffset + PAGE_SIZE);
+        if (conts.length === 0) setHasMore(false);
+        setContacts(contacts.concat(conts));
+      })
+      .catch((e) => defaultErrorHandler(e));
 
   return (
     <div className="tempPaddingTop">
@@ -81,11 +76,20 @@ export default function CatalogueContact({ display, specialSearch, editMode }) {
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && formUrl && (
-              <EditContactCard formUrl={formUrl} refresh={refresh}></EditContactCard>
+              <EditObjCard
+                idField={idField}
+                urlEdit={formUrl}
+                urlDelete={deleteUrl}
+                msgConfirmDelete={deleteConfirmMsg}
+                msgDelete={deleteMsg}
+                btnTextAdd={btnTextAdd}
+                btnTextChg={btnTextChg}
+                refresh={refresh}
+              ></EditObjCard>
             )}
             <InfiniteScroll
               dataLength={contacts.length}
-              next={fetchMoreData()}
+              next={fetchMoreData}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >

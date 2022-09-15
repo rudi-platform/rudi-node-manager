@@ -2,13 +2,21 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
-import EditPubKeyCard from './editPubKeyCard';
 import PubKeyCard from './pubKeyCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import EditObjCard from '../generic/editObjCard';
 
-const API_PUB_URL = 'api/admin/pub_keys'
-const formPubKeysUrl = 'pub_keys'
+const API_PUB_URL = 'api/admin/pub_keys';
+const formPubKeysUrl = 'pub_keys';
+
+const idField = 'name';
+const deleteUrl = (id) => `api/admin/pub_keys/${id}`;
+
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la clé publique ${id}?`;
+const deleteMsg = (data) => `La clé publique ${data.name} a été retirée`;
+const btnTextAdd = 'Ajouter une clé publique';
+const btnTextChg = 'Modifier une clé publique :';
 
 /**
  * Composant : CataloguePubKey
@@ -84,7 +92,16 @@ export default function CataloguePubKeys({ display, specialSearch, editMode }) {
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && formUrl && (
-              <EditPubKeyCard formUrl={formUrl} refresh={refresh}></EditPubKeyCard>
+              <EditObjCard
+                idField={idField}
+                urlEdit={formUrl}
+                urlDelete={deleteUrl}
+                msgConfirmDelete={deleteConfirmMsg}
+                msgDelete={deleteMsg}
+                btnTextAdd={btnTextAdd}
+                btnTextChg={btnTextChg}
+                refresh={refresh}
+              ></EditObjCard>
             )}
             <InfiniteScroll
               dataLength={pubKeys.length}

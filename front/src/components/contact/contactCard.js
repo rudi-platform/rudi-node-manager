@@ -62,10 +62,10 @@ export default function ContactCard({ contact, formUrl, refresh }) {
 
   return (
     <div className="col-12" key={contact.contact_id}>
-      <div className="card temp-margin">
+      <div className="card card-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
-            <a>{contact.contact_name}</a>
+            {contact.contact_name}
             <div className="btn-group" role="group">
               <a
                 href={`${formUrl}?update=${contact.contact_id}`}

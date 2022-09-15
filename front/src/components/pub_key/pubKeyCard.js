@@ -22,47 +22,30 @@ export default function PubKeyCard({ pubKey, formUrl, refresh }) {
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`La clé publique ${res.data.name} a été retirée`];
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => {
-              refresh();
-            },
-          },
-        ];
+        options.buttons = [{ text: 'Ok', action: () => refresh() }];
         changeOptions(options);
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
   /**
    * Call for confirmation before public key deletion
    * @param {*} pubKey The public key to delete
    */
-  function triggerDeletePubKey(pubKey) {
+  const triggerDeletePubKey = (pubKey) => {
     const options = DefaultConfirmOption;
     options.text = [`Confirmez vous la suppression de la clé publique ${pubKey.name}?`];
     options.buttons = [
-      {
-        text: 'Oui',
-        action: () => {
-          deletePubKey(pubKey);
-        },
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
+      { text: 'Oui', action: () => deletePubKey(pubKey) },
+      { text: 'Non', action: () => {} },
     ];
     changeOptions(options);
     toggle();
-  }
+  };
 
   return (
     <div className="col-12" key={pubKey.name}>
-      <div className="card temp-margin">
+      <div className="card card-margin">
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{pubKey.name}</a>

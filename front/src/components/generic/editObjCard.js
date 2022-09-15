@@ -2,14 +2,34 @@ import React, { useContext, useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
+import { DefaultConfirmOption, DefaultOkOption, ModalContext } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
+EditObjCard.propTypes = {
+  idField: PropTypes.string,
+  urlEdit: PropTypes.string,
+  refresh: PropTypes.func,
+  urlDelete: PropTypes.func,
+  msgConfirmDelete: PropTypes.func,
+  msgDelete: PropTypes.func,
+  btnTextAdd: PropTypes.string,
+  btnTextChg: PropTypes.string,
+};
+
 /**
- * Composant : EditProducerCard
+ * Composant : EditCard
  * @return {ReactNode}
  */
-export default function EditProducerCard({ formUrl, refresh }) {
+export default function EditObjCard({
+  idField,
+  urlEdit,
+  urlDelete,
+  msgConfirmDelete,
+  msgDelete,
+  btnTextAdd,
+  btnTextChg,
+  refresh,
+}) {
   const [editID, setEditID] = useState('');
 
   const { changeOptions, toggle } = useContext(ModalContext);
@@ -22,71 +42,66 @@ export default function EditProducerCard({ formUrl, refresh }) {
   const handleChange = (event) => setEditID(event.target.value);
 
   /**
-   * call for organization deletion
+   * Call for organization deletion
+   * @param {*} id Identifier of the object to delete
    */
-  function deleteOrganization() {
+  const deleteObj = (id) => {
     axios
-      .delete(`api/admin/organizations/${editID}`)
+      .delete(deleteUrl(id))
       .then((res) => {
+        //  const options = getOkOptions(deleteMsg(res.data), refresh);
         const options = DefaultOkOption;
-        options.text = [`Le producteur ${res.data.organization_name} a été supprimé`];
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => refresh(),
-          },
-        ];
+        options.text = [okText];
+        options.buttons = [{ text: 'Ok', action: () => refresh() }];
         changeOptions(options);
         toggle();
       })
       .catch((e) => defaultErrorHandler(e));
-  }
+  };
 
   /**
-   * call for confirmation before organization deletion
+   * call for confirmation before object deletion
+   * @param {*} id Identifier of the object to delete
    */
-  function triggerDeleteOrganization() {
+  const triggerDeleteObj = (id) => {
+    // const options = getConfirmOptions(deleteConfirmMsg(id), () => deleteObj(id));
     const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression du producteur ${editID}?`];
+    options.text = [deleteConfirmMsg];
     options.buttons = [
-      {
-        text: 'Oui',
-        action: () => deleteOrganization(),
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
+      { text: 'Oui', action: () => deleteObj() },
+      { text: 'Non', action: () => {} },
     ];
     changeOptions(options);
     toggle();
-  }
+  };
+
   return (
     <div className="col-12">
-      <div className="card temp-margin">
+      <div className="card edit-card-margin">
         <div className="card-body">
           <div className="inline">
             <a
-              href={formUrl}
+              href={urlEdit}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
             >
-              Ajouter un Producteur <Plus />
+              {btnTextAdd}
+              <Plus />
             </a>
           </div>
           <div className="inline card-text on-right">
-            Modifier un Producteur :
+            {btnTextChg}&nbsp;
             <div className="btn-group" role="group">
               <input
                 type="text"
                 className="form-control"
-                placeholder="organization_id"
+                placeholder={idField}
                 value={editID}
                 onChange={handleChange}
               />
               <a
-                href={`${formUrl}?update=${editID}`}
+                href={`${urlEdit}?update=${editID}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-warning"
@@ -96,7 +111,7 @@ export default function EditProducerCard({ formUrl, refresh }) {
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => triggerDeleteOrganization()}
+                onClick={(e) => triggerDeleteObj(editID)}
               >
                 <Trash />
               </button>
@@ -107,7 +122,3 @@ export default function EditProducerCard({ formUrl, refresh }) {
     </div>
   );
 }
-EditProducerCard.propTypes = {
-  formUrl: PropTypes.string,
-  refresh: PropTypes.func,
-};
