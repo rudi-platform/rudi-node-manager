@@ -8,8 +8,7 @@ import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
-import EditObjCard from '../generic/editObjCard';
-
+import { EditObjCard } from  '../generic/objCard';
 
 const idField = 'global_id';
 
@@ -373,15 +372,15 @@ export default function Catalogue({ display, specialSearch, editMode }) {
           <div className="row">
             {display && display.editJDD && formUrl && (
               <EditObjCard
-              idField={idField}
-              urlEdit={formUrl}
-              urlDelete={deleteUrl}
-              msgConfirmDelete={deleteConfirmMsg}
-              msgDelete={deleteMsg}
-              btnTextAdd={btnTextAdd}
-              btnTextChg={btnTextChg}
-              refresh={refresh}
-            ></EditObjCard>
+                idField={idField}
+                formUrl={formUrl}
+                deleteUrl={deleteUrl}
+                deleteConfirmMsg={deleteConfirmMsg}
+                deleteMsg={deleteMsg}
+                btnTextAdd={btnTextAdd}
+                btnTextChg={btnTextChg}
+                refresh={refresh}
+              ></EditObjCard>
             )}
             <InfiniteScroll
               dataLength={metadatas.length}

@@ -7,6 +7,8 @@ const databaseManager = require('../database/database');
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
 
+exports.getApiUrl = (obj) => `${api}/${!obj ? '' : obj}`;
+
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
   const token = utils.createRudiApiToken({

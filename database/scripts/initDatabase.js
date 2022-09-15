@@ -56,7 +56,7 @@ const initTable = (tableName, sqlCreateReq, initializeTable) => {
       // log.e(mod, `${fun}.${tableName}.get`, err.message);
       dbManager.close(db);
     } else {
-      log.i(mod, `${fun}.${tableName}.get`, row);
+      // log.i(mod, `${fun}.${tableName}.get`, row);
       if (!row) {
         db.run(sqlCreateReq, (err) => {
           if (err) {

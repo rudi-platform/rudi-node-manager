@@ -58,7 +58,7 @@ exports.normalizeUserTableName = () => {
         }
         if (!row) {
           close(db);
-          log.d(mod, `${fun}.check`, `No table found with name '${oldTblName}'`);
+          // log.d(mod, `${fun}.check`, `No table found with name '${oldTblName}'`);
           return resolve(`No table found with name '${oldTblName}'`);
         }
 

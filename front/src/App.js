@@ -4,10 +4,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Catalogue from './components/catalogue/catalogue';
+import { CatalogueProducer } from './components/generic/catalogueProducer';
+import { CatalogueContact } from './components/generic/catalogueContact';
+import { CataloguePubKeys } from './components/generic/cataloguePubKeys';
 import CatalogueLicence from './components/catalogue/catalogueLicence';
 import CatalogueUser from './components/users/catalogueUser';
-import CatalogueProducer from './components/producer/catalogueProducer';
-import CatalogueContact from './components/contact/catalogueContact';
 import Visualisation from './components/visualisation/visualisation';
 import { createBrowserHistory } from 'history';
 import Login, { showPill as showPillLogin } from './components/login/login';
@@ -18,14 +19,12 @@ import { GeneralContext } from './generalContext';
 import axios from 'axios';
 import Monitoring from './components/monitoring/monitoring';
 import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
-import CataloguePubKeys from './components/pub_key/cataloguePubKeys';
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
+const API_URL = 'api/admin/';
 
-export const history = createBrowserHistory({
-  basename: getBackUrl(),
-});
+export const history = createBrowserHistory({ basename: getBackUrl() });
 
 /*
 TODO :
@@ -72,7 +71,7 @@ export default function App() {
         axios.get(`api/v1/formUrl`).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`api/admin/enum/themes/fr`).catch((e) => {
+        axios.get(`${API_URL}/enum/themes/fr`).catch((e) => {
           return { data: {} };
         }),
       ]).then((values) => {

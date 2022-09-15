@@ -16,12 +16,9 @@ export default function useDefaultErrorHandler() {
         if (err.response.data.moreInfo && err.response.data.moreInfo.message) {
           options.text.push(`${err.response.data.moreInfo.message}`);
         }
-      } else {
-        options.text = [`${err.response.data}`];
-      }
-    } else {
-      options.text = [`${err.message}`];
-    }
+      } else options.text = [`${err.response.data}`];
+    } else options.text = [`${err.message}`];
+
     changeOptions(options);
     toggle();
   };
