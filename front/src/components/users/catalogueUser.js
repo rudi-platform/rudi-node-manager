@@ -7,12 +7,14 @@ import UserCard from './userCard';
 import { GeneralContext } from '../../generalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
+const propId = 'id';
+
 /**
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
 export default function CatalogueUser({ editMode, display }) {
-  const [users, setUser] = useState([]);
+  const [objList, setUser] = useState([]);
   const [formUrl, setFormUrl] = useState('');
   const [hasMore] = useState(false);
   const PAGE_SIZE = 20;
@@ -40,27 +42,21 @@ export default function CatalogueUser({ editMode, display }) {
   }
 
   /**
-   * récupere la page suivante
-   * @return {Function} fonction utilisée par InfiniteScroll
+   * Fonction utilisée par InfiniteScroll
+   * Récupere la page suivante
    */
-  function fetchMoreData() {
-    return () => {
-      axios
-        .get(`api/admin/users`, {
-          params: { limit: PAGE_SIZE, offset: currentOffset },
-        })
-        .then((res) => {
-          const userList = res.data;
+  const fetchMoreData = () => {
+    axios
+      .get(`api/admin/users`, { params: { limit: PAGE_SIZE, offset: currentOffset } })
+      .then((res) => {
+        const partialObjList = res.data;
+        setCurrentOffset(currentOffset + PAGE_SIZE);
+        if (partialObjList.length === 0) setHasMore(false);
+        setOrganizations(objList.concat(partialObjList));
+      })
+      .catch((e) => defaultErrorHandler(e));
+  };
 
-          setCurrentOffset(currentOffset + PAGE_SIZE);
-          if (userList.length === 0) {
-            setHasMore(false);
-          }
-          setOrganizations(users.concat(userList));
-        })
-        .catch((e) => defaultErrorHandler(e));
-    };
-  }
   return (
     <div className="tempPaddingTop">
       <div className="row catalogue">
@@ -70,21 +66,19 @@ export default function CatalogueUser({ editMode, display }) {
               <EditUserCard formUrl={formUrl} refresh={refresh}></EditUserCard>
             )}
             <InfiniteScroll
-              dataLength={users.length}
-              next={fetchMoreData()}
+              dataLength={objList.length}
+              next={fetchMoreData}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {users.map((user, i) => {
-                return (
-                  <UserCard
-                    user={user}
-                    display={display}
-                    refresh={refresh}
-                    key={user.id}
-                  ></UserCard>
-                );
-              })}
+              {objList.map((obj, i) => (
+                <UserCard
+                  user={obj}
+                  display={display}
+                  refresh={refresh}
+                  key={obj[propId]}
+                ></UserCard>
+              ))}
             </InfiniteScroll>
           </div>
         </div>

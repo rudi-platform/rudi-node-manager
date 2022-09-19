@@ -2,9 +2,14 @@ import React from 'react';
 import { Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
-import EditRoleModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editRoleModal';
+
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext';
+import EditUserModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editUser';
+
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`;
+const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`;
+const deleteUrl = (id) => `api/v1/users/${id}`;
 
 /**
  * Composant : UserCard
@@ -21,66 +26,38 @@ export default function UserCard({ user, display, refresh }) {
    * call for user deletion
    * @param {*} user utilisateur
    */
-  function deleteUser(user) {
+  const deleteUser = (user) => {
     axios
-      .delete(`api/v1/users/${user.username}`)
+      .delete(deleteUrl(user.id))
       .then((res) => {
-        const options = DefaultOkOption;
-        options.text = [`L'Utilisateur' ${res.data.username} a été supprimé`];
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => {
-              refresh();
-            },
-          },
-        ];
-        changeOptions(options);
+        changeOptions(getOptOk(deleteMsg(user.username), () => refresh()));
         toggle();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
-  }
+      .catch((e) => defaultErrorHandler(e));
+  };
 
   /**
    * call for confirmation before user deletion
    * @param {*} user user a suppr
    */
-  function triggerDeleteUser(user) {
-    const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression de l'utilisateur ${user.username}?`];
-    options.buttons = [
-      {
-        text: 'Oui',
-        action: () => {
-          deleteUser(user);
-        },
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
-    ];
-    changeOptions(options);
+  const triggerDeleteUser = (user) => {
+    changeOptions(getOptConfirm(deleteConfirmMsg(user.username), () => deleteUser(user)));
     toggle();
-  }
+  };
 
   /**
    * call for user update
    * @param {*} user utilisateur
    */
-  function updateUser(user) {
+  const updateUser = (user) => {
     axios
       .get(`api/v1/roles`)
       .then((res) => {
         changeOptionsEdit({ user, roles: res.data });
         toggleEdit();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
-  }
+      .catch((e) => defaultErrorHandler(e));
+  };
 
   return (
     <div className="col-12" key={user.id}>
@@ -100,26 +77,28 @@ export default function UserCard({ user, display, refresh }) {
                 <Trash />
               </button>
             </div>
-            <EditRoleModal
+            <EditUserModal
               visible={visible}
               toggleEdit={toggleEdit}
               options={options}
-            ></EditRoleModal>
+              user={user}
+              roles={options.roles}
+            ></EditUserModal>
           </div>
         </h5>
         <div className="card-body">
           <p className="card-text">
-            email&nbsp;: <small className="text-muted">{user.email}</small>
+            id&nbsp;: <small className="text-muted">{user.id}</small>
+          </p>  <p className="card-text">
+            e-mail&nbsp;: <small className="text-muted">{user.email}</small>
           </p>
           {user.roles && (
             <p className="card-text">
-              {user.roles.map((role, i) => {
-                return (
-                  <span key={`${i}`} className="badge rounded-pill text-bg-success">
-                    {role}
-                  </span>
-                );
-              })}
+              {user.roles.map((role, i) => (
+                <span key={`${i}`} className="badge rounded-pill text-bg-success">
+                  {role}
+                </span>
+              ))}
             </p>
           )}
         </div>

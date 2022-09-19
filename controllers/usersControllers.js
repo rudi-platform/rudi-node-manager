@@ -16,21 +16,28 @@ exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
   databaseManager
     .getUserByUsername(username)
-    .then((row) => {
-      res.status(200).json(row);
-    })
+    .then((row) => res.status(200).json(row))
     .catch((err) => {
       error = errorHandler.error(err, req, { opType: 'get_user' });
       res.status(501).json(error);
     });
 };
-exports.deleteUser = (req, res, next) => {
+exports.deleteUserWithName = (req, res, next) => {
   const { username } = req.params;
   databaseManager
-    .deleteUser(username)
-    .then((row) => {
-      res.status(200).json(row);
-    })
+    .deleteUserWithName(username)
+    .then((row) => res.status(200).json(row))
+    .catch((err) => {
+      error = errorHandler.error(err, req, { opType: 'delete_user' });
+      res.status(501).json(error);
+    });
+};
+
+exports.deleteUser = (req, res, next) => {
+  const { id } = req.params;
+  databaseManager
+    .deleteUser(id)
+    .then((row) => res.status(200).json(row))
     .catch((err) => {
       error = errorHandler.error(err, req, { opType: 'delete_user' });
       res.status(501).json(error);

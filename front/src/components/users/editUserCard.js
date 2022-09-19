@@ -2,8 +2,17 @@ import React, { useContext, useState } from 'react';
 import { Plus, Pencil, Trash } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+
+const urlUser = 'api/v1/users';
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`;
+const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`;
+
+EditUserCard.propTypes = {
+  formUrl: PropTypes.string,
+  refresh: PropTypes.func,
+};
 
 /**
  * Composant : EditCard
@@ -26,16 +35,9 @@ export default function EditUserCard({ formUrl, refresh }) {
    */
   function deleteUser() {
     axios
-      .delete(`api/v1/users/${editID}`)
+      .delete(`${urlUser}/${editID}`)
       .then((res) => {
-        const options = DefaultOkOption;
-        options.text = [`L'utilisateur' ${res.data.username} a été supprimé`];
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => refresh(),
-          },
-        ];
+        const options = getOptOk(deleteMsg(editID), () => refresh());
         changeOptions(options);
         toggle();
       })
@@ -46,18 +48,7 @@ export default function EditUserCard({ formUrl, refresh }) {
    * call for confirmation before organization deletion
    */
   function triggerDeleteUser() {
-    const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression de l'utilisateur ${editID}?`];
-    options.buttons = [
-      {
-        text: 'Oui',
-        action: () => deleteUser(),
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
-    ];
+    const options = getOptConfirm(deleteConfirmMsg(editID), () => deleteUser());
     changeOptions(options);
     toggle();
   }
@@ -65,7 +56,7 @@ export default function EditUserCard({ formUrl, refresh }) {
     <div className="col-12">
       <div className="card edit-card-margin">
         <div className="card-body">
-        <div className="inline">
+          <div className="inline">
             <a className="btn btn-secondary">
               Ajouter un utilisateur <Plus />
             </a>
@@ -93,7 +84,3 @@ export default function EditUserCard({ formUrl, refresh }) {
     </div>
   );
 }
-EditUserCard.propTypes = {
-  formUrl: PropTypes.string,
-  refresh: PropTypes.func,
-};

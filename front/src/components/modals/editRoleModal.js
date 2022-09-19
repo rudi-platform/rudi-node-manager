@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import PropTypes from 'prop-types';
+import React, { useContext, useState } from 'react';
 import { Plus, Trash } from 'react-bootstrap-icons';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import PropTypes from 'prop-types';
 import axios from 'axios';
+
 import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+
+const urlUserRoles = 'api/v1/user-roles'
 
 /**
  * EditRoleModal component
@@ -13,7 +16,7 @@ import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
  * @return {ReactNode} EditRoleModal html component
  */
 export default function EditRoleModal({ visible, toggleEdit, options }) {
-  const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { changeOptions, toggle } = useContext(ModalContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
   const isInUserRole = (role, user) =>
@@ -24,9 +27,9 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
    * @param {*} role role
    * @param {*} user utilisateur
    */
-  function deleteUserRole(role, user) {
+  function removeUserRole(role, user) {
     axios
-      .delete(`api/v1/user-roles/${user.id}/${role.role}`)
+      .delete(`${urlUserRoles}/${user.id}/${role.role}`)
       .then((res) => {
         user.roles.splice(
           user.roles.findIndex((element) => element === role.role),
@@ -45,15 +48,13 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
    * @param {*} role role
    * @param {*} user utilisateur
    */
-  function addUserRole(role, user) {
+  function assignUserRole(role, user) {
     axios
-      .post(`api/v1/user-roles`, JSON.stringify({ userId: user.id, role: role.role }), {
+      .post(urlUserRoles, JSON.stringify({ userId: user.id, role: role.role }), {
         headers: { 'Content-Type': 'application/json' },
       })
       .then((res) => {
-        if (!user.roles) {
-          user.roles = [];
-        }
+        if (!user.roles) user.roles = [];
         user.roles.push(role.role);
         const options = DefaultOkOption;
         options.text = [`Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`];
@@ -75,23 +76,13 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
               return (
                 <span key={i}>
                   {isInUserRole(role, options.user) < 0 && (
-                    <Button
-                      variant="light"
-                      onClick={() => {
-                        addUserRole(role, options.user);
-                      }}
-                    >
+                    <Button variant="light" onClick={() => assignUserRole(role, options.user)}>
                       {role.role}
                       <Plus color="green" />
                     </Button>
                   )}
                   {isInUserRole(role, options.user) >= 0 && (
-                    <Button
-                      variant="light"
-                      onClick={() => {
-                        deleteUserRole(role, options.user);
-                      }}
-                    >
+                    <Button variant="light" onClick={() => removeUserRole(role, options.user)}>
                       {role.role} <Trash color="red" />
                     </Button>
                   )}
@@ -100,12 +91,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
             })}
         </Modal.Body>
         <Modal.Footer>
-          <Button
-            variant="primary"
-            onClick={() => {
-              toggleEdit();
-            }}
-          >
+          <Button variant="primary" onClick={() => toggleEdit()}>
             Terminer
           </Button>
         </Modal.Footer>
@@ -125,9 +111,7 @@ export const useEditRoleModal = () => {
    * toggle l'affichage de la modal
    * @return {void}
    */
-  function toggleEdit() {
-    setVisible(!visible);
-  }
+  const toggleEdit = () => setVisible(!visible);
   return { toggleEdit, visible };
 };
 
@@ -138,8 +122,6 @@ export const useEditRoleModalOptions = () => {
    * @param {*} param nouvelles options
    * @return {void}
    */
-  function changeOptionsEdit(param) {
-    setOptions(param);
-  }
+  const changeOptionsEdit = (param) => setOptions(param);
   return { changeOptionsEdit, options };
 };

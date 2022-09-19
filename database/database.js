@@ -223,8 +223,8 @@ exports.updatePassword = (username, password) => {
     // });
   });
 };
-exports.deleteUser = (username) => {
-  const fun = 'deleteUser';
+exports.deleteUserWithName = (username) => {
+  const fun = 'deleteUserWithName';
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USERS} WHERE username = ?`, [username], function (err) {
@@ -239,6 +239,28 @@ exports.deleteUser = (username) => {
           log.getContext(null, { opType: 'delete_user' }),
         );
         resolve({ username: username });
+      }
+      close(db);
+    });
+  });
+};
+
+exports.deleteUser = (id) => {
+  const fun = 'deleteUser';
+  const db = open();
+  return new Promise((resolve, reject) => {
+    db.run(`DELETE FROM ${TBL_USERS} WHERE id = ?`, [id], function (err) {
+      if (err) {
+        log.e(mod, fun, err.message);
+        reject(err);
+      } else {
+        log.i(
+          mod,
+          fun,
+          `${TBL_USERS} : A row has been deleted with id ${id}`,
+          log.getContext(null, { opType: 'delete_user' }),
+        );
+        resolve({ id: id });
       }
       close(db);
     });

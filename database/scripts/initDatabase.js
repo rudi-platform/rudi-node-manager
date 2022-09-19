@@ -12,7 +12,7 @@ const initDefaultFormTable = require('./initDefaultForm');
 // ---- Constants -----
 const initialRoles = [
   { role: 'SuperAdmin', desc: 'a tous les droits' },
-  { role: 'Admin', desc: 'administration' },
+  { role: 'Admin', desc: 'administration, création et validation des comptes' },
   { role: 'Moniteur', desc: 'accès au monitoring' },
   { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
   { role: 'Créateur', desc: 'gestion simple des métadonnées' },

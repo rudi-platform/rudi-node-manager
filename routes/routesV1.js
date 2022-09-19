@@ -28,7 +28,7 @@ router.get(
 );
 // TODO protect superAdmin
 router.delete(
-  '/users/:username',
+  '/users/:id',
   passport.authenticate('jwt', { session: false }),
   checkRolePerm('Admin'),
   usersController.deleteUser,
