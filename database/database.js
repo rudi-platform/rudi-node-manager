@@ -10,7 +10,7 @@ const log = require('../utils/logger');
 
 // ---- Constants -----
 const DB_NAME = `${config.database.db_filename}`.trim();
-const DB_FILE = `${config.database.db_directory}/${DB_NAME}`.trim();
+const DB_FILE = `${config.database.db_directory}${DB_NAME ? `/${DB_NAME}` : ''}`.trim();
 
 const TBL_USERS = 'Users';
 exports.TBL_USERS = TBL_USERS;

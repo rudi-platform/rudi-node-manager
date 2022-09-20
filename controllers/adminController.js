@@ -24,9 +24,9 @@ exports.getEnum = (req, res, next) => {
       const results = resRUDI.data;
       res.status(200).json(results);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_enum' });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_enum' });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.getThemeByLang = (req, res, next) => {
@@ -42,11 +42,12 @@ exports.getThemeByLang = (req, res, next) => {
       const results = resRUDI.data;
       res.status(200).json(results);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_theme_by_lang' });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_theme_by_lang' });
+      res.status(error.statusCode).json(error);
     });
 };
+
 exports.getLicences = (req, res, next) => {
   const url = `${api}/licences`;
   const token = utils.createRudiApiToken({
@@ -59,9 +60,9 @@ exports.getLicences = (req, res, next) => {
       const results = resRUDI.data;
       res.status(200).json(results);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_licences' });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_licences' });
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -75,7 +76,7 @@ exports.getDefaultForm = (req, res, next) => {
     })
     .catch((err) => {
       error = errorHandler.error(err, req, { opType: 'get_defaultForm' });
-      res.status(501).json(error);
+      res.status(error.statusCode).json(error);
     });
 };
 exports.deleteDefaultForm = (req, res, next) => {
@@ -87,8 +88,8 @@ exports.deleteDefaultForm = (req, res, next) => {
       res.status(200).json(row);
     })
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'delete_defaultForm' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'delete_defaultForm' });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.putDefaultForm = (req, res, next) => {
@@ -101,8 +102,8 @@ exports.putDefaultForm = (req, res, next) => {
       res.status(200).json(row);
     })
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'put_defaultForm' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'put_defaultForm' });
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -121,8 +122,8 @@ exports.getVersion = (req, res, next) => {
       const reports = resRUDI.data;
       res.status(200).send(reports);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_version' });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_version' });
+      res.status(error.statusCode).json(error);
     });
 };

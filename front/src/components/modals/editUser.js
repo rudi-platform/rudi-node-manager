@@ -10,18 +10,27 @@ import Row from 'react-bootstrap/Row';
 
 import { ModalContext, getOptOk } from './ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { VALID_EMAIL, VALID_NOT_EMPTY_STRING } from './validation';
+import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation';
 
 const urlUserRoles = 'api/v1/user-roles';
 const modalTitle = 'Modifier l‘utilisateur';
 const modalSubmitBtnTxt = 'Terminer';
 
 const validation = {
-  username: [VALID_NOT_EMPTY_STRING],
+  username: [VALID_NOT_EMPTY_WORD],
   email: [VALID_EMAIL],
 };
 
-const validateProp = (prop, val) => {
+const defaultState = {
+  name: '',
+  email: '',
+  password: '',
+  nameError: '',
+  emailError: '',
+  passwordError: '',
+};
+
+const hasErrors = (prop, val) => {
   let isInvalid;
   validation[prop]?.map((valid) => {
     if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val);
@@ -68,8 +77,8 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
   // const editErrors = (prop, val) =>
   //   val && setErrors((errors) => ({ ...errors, ...{ [prop]: val } }));
 
-  const isInUserRole = (role, user) =>
-    !!(user.roles && user.roles.findIndex((element) => element === role.role) >= 0);
+  const isInUserRole = (role, rolesList) =>
+    !!(rolesList && rolesList.findIndex((element) => element === role.role) >= 0);
 
   // const handleClick = (event) => {
   //   const form = event.currentTarget;
@@ -101,7 +110,8 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
     const prop = event.target.id;
     const val = event.target.value;
     console.log('(handleChange)', prop, '=>', val);
-    validateProp(prop, val)
+    console.log('(handleChange)', hasErrors(prop, val));
+
     editUserInfo(prop, val);
     // editErrors(prop, validateProp(prop, val));
     // console.log('(handleChange)', errors[prop]);
@@ -118,7 +128,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
   const handleRoleChange = (e) => {
     const prop = event.target.id;
     const val = event.target.value;
-    console.log('(handleRoleChange)', prop, '=>', val);
+    console.log('(handleRoleChange)', name, ': ', prop, '=>', val);
     console.log('(handleRoleChange)', e);
     setUserRoles((userRoles) => {
       if (!userRoles) return [prop];
@@ -186,12 +196,13 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
             <Form.Group as={Col} id="formName" controlId="username">
               <Form.Label>Nom</Form.Label>
               <Form.Control
-                required
+                required={true}
                 type="text"
                 placeholder="Nom"
                 defaultValue={user?.username}
                 onChange={handleChange}
-                // isValid={!errors?.username}
+                // isValid={hasErrors('username', username)}
+                pattern={VALID_NOT_EMPTY_WORD[0]}
               />
               {/* <Form.Control.Feedback type="invalid">{errors?.username}</Form.Control.Feedback> */}
             </Form.Group>
@@ -219,8 +230,8 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
                     key={role.role}
                     label={`${role.role} (${role.desc})`}
                     id={role.role}
-                    defaultChecked={isInUserRole(role, user)}
-                    value={isInUserRole(role, user)}
+                    defaultChecked={isInUserRole(role, user.roles)}
+                    value={isInUserRole(role, userRoles)}
                     onChange={handleRoleChange}
                   />
                 ))}

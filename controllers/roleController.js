@@ -6,8 +6,8 @@ const roleList = (req, res, next) => {
     .getRoles()
     .then((rows) => res.status(200).json(rows))
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'get_roles' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'get_roles' });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.getRoleById = (req, res, next) => {
@@ -16,8 +16,8 @@ exports.getRoleById = (req, res, next) => {
     .getRoleById(role)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'get_role' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'get_role' });
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -28,8 +28,8 @@ exports.getUserRolesByUsername = (req, res, next) => {
     .getUserRolesByUsername(username)
     .then((rows) => res.status(200).json(rows))
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'get_userRole' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'get_userRole' });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.deleteUserRole = (req, res, next) => {
@@ -38,8 +38,8 @@ exports.deleteUserRole = (req, res, next) => {
     .deleteUserRole(userId, role)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'delete_userRole' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'delete_userRole' });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.postUserRole = (req, res, next) => {
@@ -48,8 +48,8 @@ exports.postUserRole = (req, res, next) => {
     .createUserRole(data)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
-      error = errorHandler.error(err, req, { opType: 'post_userRole' });
-      res.status(501).json(error);
+      const error = errorHandler.error(err, req, { opType: 'post_userRole' });
+      res.status(error.statusCode).json(error);
     });
 };
 

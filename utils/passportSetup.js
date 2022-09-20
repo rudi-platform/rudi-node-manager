@@ -26,20 +26,18 @@ passport.use(
       .getUserByUsername(username)
       .then((user) => {
         // Create new User
-        if (!user) {
-          return done(null, false, { message: 'no user found' });
-        } else {
-          // Match password
-          bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err) throw err;
+        if (!user) return done(null, false, { message: 'no user found' });
 
-            if (isMatch) {
-              return done(null, user);
-            } else {
-              return done(null, false, { message: 'Wrong password' });
-            }
-          });
-        }
+        // Match password
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) throw err;
+
+          if (isMatch) {
+            return done(null, user);
+          } else {
+            return done(null, false, { message: 'Wrong password' });
+          }
+        });
       })
       .catch((err) => {
         return done(null, false, { message: err });

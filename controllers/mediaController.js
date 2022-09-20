@@ -11,9 +11,9 @@ exports.getMediaById = (req, res, next) => {
       const results = resRUDI.data;
       res.status(200).json(results);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_media', id: `media+${id}` });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(error, req, { opType: 'get_media', id: `media+${id}` });
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -29,8 +29,8 @@ exports.getDownloadById = (req, res, next) => {
       const results = resRUDI.data;
       res.status(200).contentType(resRUDI.headers['content-type']).json(results);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_download', id: `media+${id}` });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_download', id: `media+${id}` });
+      res.status(error.statusCode).json(error);
     });
 };

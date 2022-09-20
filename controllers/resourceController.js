@@ -26,7 +26,7 @@ exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 're
 //     })
 //     .catch((error) => {
 //       error = errorHandler.error(error, req, { opType: 'get_metadatas' });
-//       res.status(501).json(error);
+//       res.status(error.statusCode).json(error);
 //     });
 // };
 exports.getResourceById = (req, res, next) => {
@@ -45,9 +45,9 @@ exports.getResourceById = (req, res, next) => {
       const metadata = resRUDI.data;
       res.status(200).json(metadata);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_metadata', id: `metadata+${id}` });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_metadata', id: `metadata+${id}` });
+      res.status(error.statusCode).json(error);
     });
 };
 exports.postResources = (req, res, next) => {
@@ -66,9 +66,9 @@ exports.postResources = (req, res, next) => {
     .then((resRUDI) => {
       res.status(200).json(resRUDI.data);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'post_metadata' });
-      res.status(501).send(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'post_metadata' });
+      res.status(error.statusCode).send(error);
     });
 };
 exports.putResources = (req, res, next) => {
@@ -87,12 +87,12 @@ exports.putResources = (req, res, next) => {
     .then((resRUDI) => {
       res.status(200).json(resRUDI.data);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, {
+    .catch((err) => {
+      const error = errorHandler.error(err, req, {
         opType: 'put_metadata',
         id: `metadata+${req.body.global_id}`,
       });
-      res.status(501).json(error);
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -112,9 +112,9 @@ exports.deleteResource = (req, res, next) => {
       const metadata = resRUDI.data;
       res.status(200).json(metadata);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'delete_metadata', id: `metadata+${id}` });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'delete_metadata', id: `metadata+${id}` });
+      res.status(error.statusCode).json(error);
     });
 };
 
@@ -133,8 +133,8 @@ exports.getReports = (req, res, next) => {
       const reports = resRUDI.data;
       res.status(200).send(reports);
     })
-    .catch((error) => {
-      error = errorHandler.error(error, req, { opType: 'get_reports' });
-      res.status(501).json(error);
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType: 'get_reports' });
+      res.status(error.statusCode).json(error);
     });
 };

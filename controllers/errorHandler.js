@@ -11,7 +11,8 @@ exports.error = (error, req, options) => {
     log.e(mod, fun, error.response.data);
     log.e(mod, fun, error.response.status);
     log.e(mod, fun, error.response.headers);
-    options.statusCode = error.response.status;
+    options.statusCode =
+      error.statusCode || error.status || error.response.statusCode || error.response.status || 501;
     log.sysError(mod, fun, error.response.data, log.getContext(req, options));
 
     errorToDisplay = error.toJSON();

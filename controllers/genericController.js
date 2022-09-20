@@ -29,7 +29,7 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
   console.log('req: ' + req);
   console.log('res: ' + res);
   console.log('initialError: ' + initialError);
-  console.log('errCode: ' + errCode);
+  console.log('errCode: ' + initialError.statusCode || errCode);
   console.log('fun: ' + fun);
   console.log('objectType: ' + objectType);
   console.log('id: ' + id);
@@ -37,7 +37,7 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
   if (fun) errPayload.opType = fun;
   if (id) errPayload.id = `${objectType}+${id}`;
   const error = errorHandler.error(initialError, req, errPayload);
-  res.status(errCode).json(error);
+  res.status(initialError.statusCode || errCode).json(error);
 }
 
 const checkObjectType = (req, res, fun, objectType) => {
@@ -53,7 +53,7 @@ exports.getObjectList = (req, res, next) => {
   const { objectType } = req.params;
 
   if (!checkObjectType(req, res, fun, objectType)) return;
-  if(objectType==='media') return
+  if (objectType === 'media') return;
 
   const url = `${api}/${objectType}`;
   const token = utils.createRudiApiToken({
