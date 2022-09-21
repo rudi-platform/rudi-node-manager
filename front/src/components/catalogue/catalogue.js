@@ -8,11 +8,12 @@ import { GeneralContext } from '../../generalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
-import { EditObjCard } from  '../generic/objCard';
+import { EditObjCard } from '../generic/objCard';
+import { getApiAdmin } from '../../App';
 
 const idField = 'global_id';
 
-const deleteUrl = (id) => `api/admin/resources/${id}`;
+const deleteUrl = (id) => getApiAdmin(`resources/${id}`);
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`;
 const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`;
 
@@ -35,15 +36,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
   const initialRender = useRef(true);
   const searchText = useRef(null);
-  const isSearchMode = () => {
-    return searchText.current?.value && searchText.current.value?.length > 0;
-  };
-  const searchMode = () => {
-    if (isSearchMode()) {
-      return `/search`;
-    }
-    return '';
-  };
+  const isSearchMode = () => searchText.current?.value && searchText.current.value?.length > 0;
+  const searchMode = () => (isSearchMode() ? `/search` : '');
 
   const generalConf = useContext(GeneralContext);
   const { defaultErrorHandler } = useDefaultErrorHandler();
@@ -56,11 +50,8 @@ export default function Catalogue({ display, specialSearch, editMode }) {
     if (initialRender.current) {
       initialRender.current = false;
     } else {
-      if (currentOffset < 0) {
-        setCurrentOffset(0);
-      } else {
-        fetchMoreData();
-      }
+      if (currentOffset < 0) setCurrentOffset(0);
+      else fetchMoreData();
     }
   }, [currentOffset]);
   useEffect(() => {
@@ -168,11 +159,11 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
-    // console.log('-- getInitialData')
+    console.log('-- getInitialData');
 
     Promise.all(
       filterConf.map((count) =>
-        axios.get(`api/admin/resources${searchMode()}`, {
+        axios.get(getApiAdmin(`resources${searchMode()}`), {
           params: createParams({ count_by: count.name }),
         }),
       ),
@@ -184,9 +175,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         });
         setCountBy(countByTemp);
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((e) => defaultErrorHandler(e));
   }
 
   /**
@@ -194,7 +183,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     axios
-      .get(`api/admin/resources${searchMode()}`, {
+      .get(getApiAdmin(`resources${searchMode()}`), {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {

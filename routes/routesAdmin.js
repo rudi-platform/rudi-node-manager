@@ -2,7 +2,12 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
 const router = new express.Router();
-const adminController = require('../controllers/adminController');
+const {
+  getEnum,
+  getThemeByLang,
+  getLicences,
+  getVersion,
+} = require('../controllers/adminController');
 const {
   getObjectList,
   postObject,
@@ -12,10 +17,10 @@ const {
 } = require('../controllers/genericController');
 // const passport = require('../utils/passportSetup');
 
-router.get('/enum', adminController.getEnum);
-router.get('/enum/themes/:lang', adminController.getThemeByLang);
-router.get('/licences', adminController.getLicences);
-router.get('/version', adminController.getVersion);
+router.get('/enum', getEnum);
+router.get('/enum/themes/:lang', getThemeByLang);
+router.get('/licences', getLicences);
+router.get('/version', getVersion);
 router.get('/uuid', (req, res, next) => res.status(200).send(uuidv4()));
 
 // TODO : propage res.status

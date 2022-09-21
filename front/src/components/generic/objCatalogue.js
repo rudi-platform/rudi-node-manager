@@ -6,21 +6,23 @@ import PropTypes from 'prop-types';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { GeneralContext } from '../../generalContext';
 import { EditObjCard, ObjCard } from '../generic/objCard';
+import { getApiAdmin } from '../../App';
+
+// import curlirize from 'axios-curlirize';
+// curlirize(axios);
 
 const PAGE_SIZE = 20;
-const API_URL = '/api/admin'
 
 ObjCatalogue.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
-  btnTextAdd: PropTypes.string,
-  btnTextChg: PropTypes.string,
+  formUrlObj: PropTypes.string,
   propId: PropTypes.string,
   propName: PropTypes.string,
   propNamesToDisplay: PropTypes.object,
-  formUrlObj: PropTypes.string,
-  apiUrlObj: PropTypes.string,
+  btnTextAdd: PropTypes.string,
+  btnTextChg: PropTypes.string,
   deleteConfirmMsg: PropTypes.func,
   deleteMsg: PropTypes.func,
 };
@@ -33,12 +35,12 @@ export default function ObjCatalogue({
   display,
   specialSearch,
   editMode,
-  btnTextAdd,
-  btnTextChg,
+  formUrlObj,
   propId,
   propName,
   propNamesToDisplay,
-  formUrlObj,
+  btnTextAdd,
+  btnTextChg,
   deleteConfirmMsg,
   deleteMsg,
 }) {
@@ -51,12 +53,12 @@ export default function ObjCatalogue({
 
   const generalConf = useContext(GeneralContext);
   const editUrl = `${generalConf.formUrl}${formUrlObj}`;
-  const apiUrlObj = `${API_URL}/${formUrlObj}`;
+  const getApiUrlObj = (suffix) => getApiAdmin(`${formUrlObj}${suffix ? `/${suffix}` : ''}`);
 
   useEffect(() => getInitialData(), []);
   useEffect(() => setFormUrl(editUrl), [generalConf]);
 
-  const deleteUrl = (id) => `${apiUrlObj}/${id}`;
+  const deleteUrl = (id) => getApiUrlObj(id);
   const refresh = () => {
     setHasMore(true);
     getInitialData();
@@ -66,11 +68,16 @@ export default function ObjCatalogue({
    * recup la 1er page des contacts
    */
   function getInitialData() {
+    // const params = new URLSearchParams(`limit=${PAGE_SIZE}&offset=0`);
+    // const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
+    const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
+    console.log('url:', fetchUrl);
     axios
-      .get(apiUrlObj, { params: { limit: PAGE_SIZE, offset: 0 } })
+      .get(fetchUrl)
       .then((res) => {
         setCurrentOffset(PAGE_SIZE);
         setListObj(res.data);
+        // if (res.data?.length < PAGE_SIZE) setHasMore(false);
       })
       .catch((e) => defaultErrorHandler(e));
   }
@@ -80,13 +87,23 @@ export default function ObjCatalogue({
    * Récupere la page suivante
    */
   const fetchMoreData = () => {
+    const fetchUrl = getApiUrlObj();
+    // console.log(fetchUrl);
     axios
-      .get(apiUrlObj, { params: { limit: PAGE_SIZE, offset: currentOffset } })
+      .get(fetchUrl, { params: { sort_by: '-updateAt', limit: PAGE_SIZE, offset: currentOffset } })
       .then((res) => {
         const partialListObj = res.data;
         setCurrentOffset(currentOffset + PAGE_SIZE);
-        if (partialListObj.length === 0) setHasMore(false);
-        setListObj(listObj.concat(partialListObj));
+        if (partialListObj.length === 0) {
+          setHasMore(false);
+          console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length);
+          console.log('(fetchMoreData 0) hasMore=', hasMore);
+        } else {
+          console.log('(fetchMoreData +) partialListObj.length=', partialListObj.length);
+          console.log('(fetchMoreData +) hasMore=', hasMore);
+
+          setListObj(listObj.concat(partialListObj));
+        }
       })
       .catch((e) => defaultErrorHandler(e));
   };

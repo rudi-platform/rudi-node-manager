@@ -51,11 +51,15 @@ const checkObjectType = (req, res, fun, objectType) => {
 exports.getObjectList = (req, res, next) => {
   const fun = 'get_objects';
   const { objectType } = req.params;
+  console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
+
+  const urlParts = `${req.url}`.split('?');
+  const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
 
   if (!checkObjectType(req, res, fun, objectType)) return;
   if (objectType === 'media') return;
 
-  const url = `${api}/${objectType}`;
+  const url = `${api}/${objectType}${urlSuffix}`;
   const token = utils.createRudiApiToken({
     url: url,
     req: req,

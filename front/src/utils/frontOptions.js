@@ -46,7 +46,7 @@ export const getFrontOptions = (opt, altValue) => {
   return optVal || '';
 };
 
-export const getBackUrl = (suffix) => `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? suffix : ''}`;
+export const getBackUrl = (suffix) => `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`;
 
 if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/';
 

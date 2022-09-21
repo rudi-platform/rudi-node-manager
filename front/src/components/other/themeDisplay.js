@@ -12,12 +12,8 @@ export default function ThemeDisplay({ value }) {
    * get Theme Label
    * @return {String} text to display
    */
-  function getLabel() {
-    if (generalConf.themeLabel && generalConf.themeLabel[value]) {
-      return generalConf.themeLabel[value];
-    }
-    return value;
-  }
+  const getLabel = () =>
+    generalConf.themeLabel && generalConf.themeLabel[value] ? generalConf.themeLabel[value] : value;
 
   return <span>{getLabel()}</span>;
 }

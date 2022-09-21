@@ -27,7 +27,7 @@ const port = config.server.listening_port || 5000;
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, res, next) => {
   log.sysInfo(mod, '', `Request_Endpoint: ${req.method} ${req.url}`, log.getContext(req, {}));
-  // console.log(JSON.stringify(req))
+  // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
   next();
 });
 app.use(
@@ -44,11 +44,7 @@ app.use(
 
 // Configure the bodyParser middleware
 app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  }),
-);
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Configure the CORs middleware

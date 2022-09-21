@@ -22,7 +22,10 @@ import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
-const API_URL = 'api/admin/';
+const API_ADMIN = 'api/admin';
+const API_V1 = 'api/v1';
+export const getApiV1 = (suffix) => `${API_V1}${suffix ? `/${suffix}` : ''}`;
+export const getApiAdmin = (suffix) => `${API_ADMIN}${suffix ? `/${suffix}` : ''}`;
 
 export const history = createBrowserHistory({ basename: getBackUrl() });
 
@@ -68,10 +71,11 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(`api/v1/formUrl`).catch((e) => {
+        axios.get(getApiV1('formUrl')).catch((e) => {
           return { data: '' };
         }),
-        axios.get(`${API_URL}/enum/themes/fr`).catch((e) => {
+        axios.get(getApiAdmin('enum/themes/fr')).catch((e) => {
+          // console.error('Error getting themes: ', e);
           return { data: {} };
         }),
       ]).then((values) => {
@@ -108,7 +112,7 @@ export default function App() {
    */
   function logout() {
     // console.log('-- logout');
-    axios.get(getBackUrl('/api/v1/logout')).then((res) => updateToken());
+    axios.get(getBackUrl(getApiV1('logout'))).then((res) => updateToken());
   }
 
   if (!token) {
@@ -153,21 +157,21 @@ export default function App() {
                 <div className="collapse navbar-collapse" id="navbarCollapse">
                   <ul className="navbar-nav me-auto mb-2 mb-md-0">
                     {navItem('', 'Catalogue')}
-                    {navItem('/licence', 'Licence')}
-                    {navItem('/show', 'Visualisation')}
+                    {navItem('licence', 'Licence')}
+                    {navItem('show', 'Visualisation')}
 
                     <li className="nav-item">
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item as={Link} to={getBackUrl('/metadata')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
                           Métadonnées
                         </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('/producer')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('producer')}>
                           Producteurs
                         </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('/contact')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('contact')}>
                           Contacts
                         </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('/pub_key')}>
+                        <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
                           Clés
                         </Dropdown.Item>
                       </DropdownButton>
@@ -203,7 +207,7 @@ export default function App() {
               }
             />
             <Route
-              path={getBackUrl('/metadata')}
+              path={getBackUrl('metadata')}
               element={
                 <Catalogue
                   display={{ searchbar: true, editJDD: true }}
@@ -213,7 +217,7 @@ export default function App() {
               }
             />
             <Route
-              path={getBackUrl('/producer')}
+              path={getBackUrl('producer')}
               element={
                 <CatalogueProducer
                   display={{ searchbar: true, editJDD: true }}
@@ -223,7 +227,7 @@ export default function App() {
               }
             />
             <Route
-              path={getBackUrl('/contact')}
+              path={getBackUrl('contact')}
               element={
                 <CatalogueContact
                   display={{ searchbar: true, editJDD: true }}
@@ -233,7 +237,7 @@ export default function App() {
               }
             />
             <Route
-              path={getBackUrl('/pub_key')}
+              path={getBackUrl('pub_key')}
               element={
                 <CataloguePubKeys
                   display={{ searchbar: true, editJDD: true }}
@@ -243,18 +247,18 @@ export default function App() {
               }
             />
             <Route
-              path={getBackUrl('/licence')}
+              path={getBackUrl('licence')}
               element={<CatalogueLicence display={{ editJDD: false }} editMode={{}} />}
             />
-            <Route path={getBackUrl('/show/:id')} element={<Visualisation />} />
-            <Route path={getBackUrl('/show')} element={<Visualisation />} />
-            <Route path={getBackUrl('/monitoring')} element={<Monitoring />} />
+            <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
+            <Route path={getBackUrl('show')} element={<Visualisation />} />
+            <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
             <Route
-              path={getBackUrl('/user')}
+              path={getBackUrl('user')}
               element={<CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />}
             />
             <Route
-              path={getBackUrl('/conf')}
+              path={getBackUrl('conf')}
               element={<div className="tempPaddingTop">Work in progress</div>}
             />
           </Routes>
