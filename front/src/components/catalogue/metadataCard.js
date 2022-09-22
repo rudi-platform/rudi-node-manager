@@ -194,7 +194,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             {metadata.available_formats.map((ressource, i) => {
               return (
                 <div key={`${ressource.media_id}`}>
-                  <Link to={getBackUrl(`/show/${ressource.media_id}`)}>
+                  <Link to={getBackUrl(`show/${ressource.media_id}`)}>
                     <span className="btn btn-success" title="Aperçu">
                       <Eye />
                     </span>

@@ -9,13 +9,13 @@ module.exports = function (app) {
     createProxyMiddleware({
       target: 'http://localhost:5005',
       changeOrigin: true,
-      // pathRewrite: { [rewriteBackPathKey]: '/api' },
-      pathRewrite: (path, req) => {
-        const pathReplaced = path.replace(new RegExp(rewriteBackPathKey), '/api');
-        console.log(req.url, '=>', pathReplaced, '|', req.params, '|', req.query);
-        // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
-        return pathReplaced;
-      },
+      pathRewrite: { [rewriteBackPathKey]: '/api' },
+      // pathRewrite: (path, req) => {
+      //   const pathReplaced = path.replace(new RegExp(rewriteBackPathKey), '/api');
+      //   console.log(req.url, '=>', pathReplaced, '|', req.params, '|', req.query);
+      //   // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
+      //   return pathReplaced;
+      // },
     }),
   );
 };

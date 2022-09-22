@@ -51,7 +51,7 @@ const checkObjectType = (req, res, fun, objectType) => {
 exports.getObjectList = (req, res, next) => {
   const fun = 'get_objects';
   const { objectType } = req.params;
-  console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
+  // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
 
   const urlParts = `${req.url}`.split('?');
   const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';

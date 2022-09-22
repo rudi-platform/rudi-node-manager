@@ -5,14 +5,18 @@ const fun = '';
 
 exports.error = (error, req, options) => {
   let errorToDisplay;
+
+  // log.e(mod, fun, error.response.data);
+  // log.e(mod, fun, error.response.status);
+  // log.e(mod, fun, error.response.headers);
+  const statusCode =
+    error.statusCode || error.status || error.response.statusCode || error.response.status || 501;
+  options.statusCode = statusCode;
+  error.statusCode = statusCode;
+
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
-    log.e(mod, fun, error.response.data);
-    log.e(mod, fun, error.response.status);
-    log.e(mod, fun, error.response.headers);
-    options.statusCode =
-      error.statusCode || error.status || error.response.statusCode || error.response.status || 501;
     log.sysError(mod, fun, error.response.data, log.getContext(req, options));
 
     errorToDisplay = error.toJSON();
