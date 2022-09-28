@@ -177,9 +177,9 @@ export default function App() {
                       </DropdownButton>
                     </li>
 
-                    {navItem('/monitoring', 'Monitoring', 'hide')}
-                    {navItem('/user', 'Utilisateurs')}
-                    {navItem('/conf', 'Configuration', 'hide')}
+                    {navItem('monitoring', 'Monitoring', 'hide')}
+                    {navItem('user', 'Utilisateurs')}
+                    {navItem('conf', 'Configuration', 'hide')}
 
                     <li className="nav-item center">
                       <button type="button" className="btn btn-secondary" onClick={() => logout()}>
