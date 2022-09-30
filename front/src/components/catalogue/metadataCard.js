@@ -2,13 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
 import PropTypes from 'prop-types';
-import Moment from 'react-moment';
 import axios from 'axios';
 import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
 import ThemeDisplay from '../other/themeDisplay';
 import FileSizeDisplay from '../other/fileSizeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { getBackUrl } from '../../utils/frontOptions';
+import { nowLocaleFormatted } from '../../utils/utils';
 // import { getFrontPath } from '../../utils/frontOptions';
 
 /**
@@ -117,7 +117,9 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   function displayStatus() {
     const displaySpan = (level, text) => (
-      <span className={'status-pill text-bg-' + level} id="status-pill">{text}</span>
+      <span className={'status-pill text-bg-' + level} id="status-pill">
+        {text}
+      </span>
     );
     if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'En attente');
     if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié');
@@ -168,7 +170,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           <div>
             {metaDates?.updated && (
               <small className="text-muted">
-                Modifié le :<Moment format=" DD/MM/YYYY HH:mm:ss">{metaDates.updated}</Moment>
+                Modifié le : {nowLocaleFormatted(metaDates.updated)}
               </small>
             )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
@@ -177,7 +179,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
           {metaDates?.published && (
             <div>
               <small className="text-muted">
-                Publié le :<Moment format=" DD/MM/YYYY HH:mm:ss">{metaDates.published}</Moment>
+                Publié le : {nowLocaleFormatted(metaDates.published)}
               </small>
             </div>
           )}

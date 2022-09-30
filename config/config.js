@@ -14,9 +14,10 @@ try {
 const config = ini.parse(fs.readFileSync(defaultConfigFile, 'utf-8'));
 const CONF_PARAMS = {
   server: ['listening_address', 'listening_port'],
-  auth: ['secret_key_JWT', 'token_expire'],
+  auth: ['secret_key_JWT', 'exp_time_s'],
   security: ['trusted_domain'],
-  API_RUDI: ['listening_address', 'admin_api', 'media_api', 'RUDI_key', 'manager_id'],
+  API_RUDI: ['listening_address', 'admin_api', 'media_api', 'RUDI_key', 'api_key', 'manager_id'],
+  media_auth: ['media_key', 'manager_id', 'user_id', 'group_id'],
   formulaire: ['base_url'],
   database: ['db_directory', 'db_filename', 'db_su_usr', 'db_su_pwd'],
   logging: ['log_dir', 'app_name', 'debug'],

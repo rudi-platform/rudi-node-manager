@@ -3,17 +3,11 @@ const mod = 'authController';
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const databaseManager = require('../database/database');
-const utils = require('../utils/utils');
 const log = require('../utils/logger');
 
 const { isDevEnv } = require('../config/backOptions');
+const { createUserToken, AUTH_TOKEN, PUBLIC_TOKEN } = require('../utils/jwt');
 const SHOULD_SECURE = !isDevEnv();
-
-const AUTH_TOKEN = 'authToken';
-const PUBLIC_TOKEN = 'publicToken';
-
-exports.AUTH_TOKEN = AUTH_TOKEN;
-exports.PUBLIC_TOKEN = PUBLIC_TOKEN;
 
 const SALT_ROUNDS = 10;
 
@@ -42,7 +36,7 @@ exports.postLogin = (req, res, next) => {
     req.login(user, { session: false }, function (err) {
       if (err) return res.status(400).json({ errors: err });
 
-      const { authToken, publicToken, exp } = utils.createToken(user);
+      const { authToken, publicToken, exp } = createUserToken(user);
 
       // sameSite: 'Lax' ?
       return res
@@ -184,7 +178,7 @@ exports.logout = (req, res, next) => {
     .json({});
 };
 exports.getToken = (req, res, next) => {
-  const { authToken, publicToken, exp } = utils.createToken(req.user);
+  const { authToken, publicToken, exp } = createUserToken(req.user);
   res
     .status(200)
     .cookie(AUTH_TOKEN, authToken, {

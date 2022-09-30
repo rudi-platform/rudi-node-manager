@@ -1,8 +1,8 @@
 const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
-const utils = require('../utils/utils');
 const databaseManager = require('../database/database');
+const { createRudiApiToken } = require('../utils/jwt');
 
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
@@ -11,7 +11,7 @@ exports.getApiUrl = (obj) => `${api}/${!obj ? '' : obj}`;
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -32,7 +32,7 @@ exports.getEnum = (req, res, next) => {
 exports.getThemeByLang = (req, res, next) => {
   const { lang } = req.params;
   const url = `${api}/enum/themes/${lang}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -50,7 +50,7 @@ exports.getThemeByLang = (req, res, next) => {
 
 exports.getLicences = (req, res, next) => {
   const url = `${api}/licences`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -109,7 +109,7 @@ exports.putDefaultForm = (req, res, next) => {
 
 exports.getVersion = (req, res, next) => {
   const url = `/api/version`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });

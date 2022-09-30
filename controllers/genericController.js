@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
-const utils = require('../utils/utils');
+const { createRudiApiToken } = require('../utils/jwt');
 
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
@@ -60,7 +60,7 @@ exports.getObjectList = (req, res, next) => {
   if (objectType === 'media') return;
 
   const url = `${api}/${objectType}${urlSuffix}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -85,7 +85,7 @@ exports.getObjectById = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -107,7 +107,7 @@ exports.postObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -132,7 +132,7 @@ exports.putObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
@@ -157,7 +157,7 @@ exports.deleteObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
-  const token = utils.createRudiApiToken({
+  const token = createRudiApiToken({
     url: url,
     req: req,
   });
