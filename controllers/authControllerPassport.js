@@ -23,6 +23,7 @@ const pmFrontTokenOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
+    sameSite: 'Strict',
     expires: new Date(exp * 1000),
   };
 };
@@ -30,6 +31,7 @@ const mediaTokenOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
+    sameSite: 'None',
     expires: new Date(exp * 1000),
   };
 };
