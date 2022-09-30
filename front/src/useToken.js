@@ -1,5 +1,11 @@
 import { useState } from 'react';
 
+export const getCookie = (name) =>
+  document.cookie
+    ?.split('; ')
+    ?.find((row) => row.startsWith(`${name}`))
+    ?.split('=')[1];
+
 /**
  * Token hooks
  * @return {*} Token hooks
@@ -7,17 +13,10 @@ import { useState } from 'react';
 export default function useToken() {
   // console.log('-- useToken');
 
-  const getCookie = (name) =>
-    document.cookie
-      ?.split('; ')
-      ?.find((row) => row.startsWith(`${name}`))
-      ?.split('=')[1];
-
-  const getToken = () => getCookie('publicToken');
+  const getToken = () => getCookie('pmFrontToken');
 
   const [token, setToken] = useState(getToken());
-
-  const updateToken = () => setToken(getCookie('publicToken'));
+  const updateToken = () => setToken(getToken());
 
   return { token, updateToken };
 }

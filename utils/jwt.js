@@ -9,8 +9,8 @@ const { v4: uuidv4 } = require('uuid');
 const KTYP = 'ktyp';
 const PRVK = 'prvk';
 
-exports.AUTH_TOKEN = 'authToken';
-exports.PUBLIC_TOKEN = 'publicToken';
+exports.CONSOLE_TOKEN = 'consoleToken';
+exports.PM_FRONT_TOKEN = 'pmFrontToken';
 exports.MEDIA_TOKEN = 'mediaToken';
 
 /**
@@ -75,8 +75,9 @@ exports.createUserToken = (user) => {
   const exp = nowEpochS() + parseInt(config.auth.exp_time_s);
   const body = { id: user.id, username: user.username };
   return {
-    authToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
-    publicToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    consoleToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
+    pmFrontToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    mediaToken: this.createRudiMediaToken({ exp: exp, user_id: user.id, user_name: user.username }),
     exp: exp,
   };
 };
@@ -104,10 +105,10 @@ exports.createRudiMediaToken = (jwtPayload) => {
       user_id: config.media_auth.user_id,
       group_id: config.media_auth.group_id,
       xattr: {
-        name: jwtPayload?.username || 'rudiconsole',
+        name: jwtPayload?.user_name || 'rudiconsole',
       },
     };
-    if (jwtPayload.id) body.xattr.uuid = jwtPayload.user_id;
+    if (jwtPayload?.user_id) body.xattr.uuid = jwtPayload.user_id;
 
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {

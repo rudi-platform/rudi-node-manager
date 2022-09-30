@@ -9,6 +9,8 @@ const log = require('../../utils/logger');
 const dbManager = require('../database');
 const initDefaultFormTable = require('./initDefaultForm');
 
+const USER_ID_START_VALUE = 6000;
+
 // ---- Constants -----
 const initialRoles = [
   { role: 'SuperAdmin', desc: 'a tous les droits' },
@@ -36,7 +38,7 @@ const sqlCreateRoleTable =
 
 const sqlCreateUserTable =
   `CREATE TABLE IF NOT EXISTS ${dbManager.TBL_USERS} (` +
-  `id INTEGER PRIMARY KEY AUTOINCREMENT,` +
+  `id INTEGER PRIMARY KEY AUTOINCREMENT=${USER_ID_START_VALUE},` +
   `username TEXT NOT NULL UNIQUE,` +
   `password TEXT NOT NULL,email TEXT);`;
 

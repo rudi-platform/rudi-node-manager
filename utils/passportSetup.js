@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const databaseManager = require('../database/database');
 const passport = require('passport');
 const config = require('../config/config');
-const { AUTH_TOKEN } = require('./jwt');
+const { CONSOLE_TOKEN } = require('./jwt');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -47,7 +47,7 @@ passport.use(
 const cookieExtractor = function (req) {
   let token = null;
   if (req && req.cookies) {
-    token = req.cookies[AUTH_TOKEN];
+    token = req.cookies[CONSOLE_TOKEN];
   }
   return token;
 };

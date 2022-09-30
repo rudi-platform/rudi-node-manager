@@ -6,12 +6,12 @@ const databaseManager = require('../database/database');
 const log = require('../utils/logger');
 
 const { isDevEnv } = require('../config/backOptions');
-const { createUserToken, AUTH_TOKEN, PUBLIC_TOKEN } = require('../utils/jwt');
+const { createUserToken, CONSOLE_TOKEN, PM_FRONT_TOKEN, MEDIA_TOKEN } = require('../utils/jwt');
 const SHOULD_SECURE = !isDevEnv();
 
 const SALT_ROUNDS = 10;
 
-const authTokenOpts = (exp) => {
+const consoleTokenOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: true,
@@ -19,7 +19,14 @@ const authTokenOpts = (exp) => {
     expires: new Date(exp * 1000),
   };
 };
-const publicTokenOpts = (exp) => {
+const pmFrontTokenOpts = (exp) => {
+  return {
+    secure: SHOULD_SECURE,
+    httpOnly: false,
+    expires: new Date(exp * 1000),
+  };
+};
+const mediaTokenOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
@@ -36,17 +43,19 @@ exports.postLogin = (req, res, next) => {
     req.login(user, { session: false }, function (err) {
       if (err) return res.status(400).json({ errors: err });
 
-      const { authToken, publicToken, exp } = createUserToken(user);
+      const { consoleToken, pmFrontToken, mediaToken, exp } = createUserToken(user);
 
       // sameSite: 'Lax' ?
       return res
         .status(200)
-        .cookie(AUTH_TOKEN, authToken, authTokenOpts(exp))
-        .cookie(PUBLIC_TOKEN, publicToken, publicTokenOpts(exp))
+        .cookie(CONSOLE_TOKEN, consoleToken, consoleTokenOpts(exp))
+        .cookie(PM_FRONT_TOKEN, pmFrontToken, pmFrontTokenOpts(exp))
+        .cookie(MEDIA_TOKEN, mediaToken, mediaTokenOpts(exp))
         .json({
           success: `logged as ${user.username}`,
-          token: publicToken,
-          authToken: authToken,
+          pmFrontToken: pmFrontToken,
+          consoleToken: consoleToken,
+          mediaToken: mediaToken,
           expires: new Date(exp * 1000),
         });
       // TODO : remove .json() for cookie only? or give refresh token instead
@@ -164,13 +173,18 @@ exports.putPassword = (req, res, next) => {
 exports.logout = (req, res, next) => {
   res
     .status(200)
-    .cookie(AUTH_TOKEN, null, {
+    .cookie(CONSOLE_TOKEN, null, {
       secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(0),
     })
-    .cookie(PUBLIC_TOKEN, null, {
+    .cookie(PM_FRONT_TOKEN, null, {
+      secure: SHOULD_SECURE,
+      httpOnly: false,
+      expires: new Date(0),
+    })
+    .cookie(MEDIA_TOKEN, null, {
       secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(0),
@@ -178,22 +192,27 @@ exports.logout = (req, res, next) => {
     .json({});
 };
 exports.getToken = (req, res, next) => {
-  const { authToken, publicToken, exp } = createUserToken(req.user);
+  const { consoleToken, pmFrontToken, exp } = createUserToken(req.user);
   res
     .status(200)
-    .cookie(AUTH_TOKEN, authToken, {
+    .cookie(CONSOLE_TOKEN, consoleToken, {
       secure: SHOULD_SECURE,
       httpOnly: true,
       sameSite: 'Strict',
       expires: new Date(exp * 1000),
     })
-    .cookie(PUBLIC_TOKEN, publicToken, {
+    .cookie(PM_FRONT_TOKEN, pmFrontToken, {
+      secure: SHOULD_SECURE,
+      httpOnly: false,
+      expires: new Date(exp * 1000),
+    })
+    .cookie(MEDIA_TOKEN, pmFrontToken, {
       secure: SHOULD_SECURE,
       httpOnly: false,
       expires: new Date(exp * 1000),
     })
     .json({
-      token: authToken,
+      consoleToken: consoleToken,
       expires: new Date(exp * 1000),
     });
 };
