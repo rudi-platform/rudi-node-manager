@@ -159,7 +159,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
-    console.log('-- getInitialData');
+    // console.log('-- getInitialData');
 
     Promise.all(
       filterConf.map((count) =>

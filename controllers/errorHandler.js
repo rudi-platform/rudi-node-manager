@@ -6,11 +6,12 @@ const fun = '';
 exports.error = (error, req, options) => {
   let errorToDisplay;
 
-  // log.e(mod, fun, error.response.data);
-  // log.e(mod, fun, error.response.status);
-  // log.e(mod, fun, error.response.headers);
+  // log.e(mod, fun, error);
+  // log.e(mod, fun, error.response?.data);
+  // log.e(mod, fun, error.response?.status);
+  // log.e(mod, fun, error.response?.headers);
   const statusCode =
-    error.statusCode || error.status || error.response.statusCode || error.response.status || 501;
+    error.statusCode || error.status || error.response?.statusCode || error.response?.status || 501;
   options.statusCode = statusCode;
   error.statusCode = statusCode;
 

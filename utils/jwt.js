@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const KTYP = 'ktyp';
 const PRVK = 'prvk';
+const OFFSET_USR_ID = 5000;
 
 exports.CONSOLE_TOKEN = 'consoleToken';
 exports.PM_FRONT_TOKEN = 'pmFrontToken';
@@ -71,13 +72,18 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
-exports.createUserToken = (user) => {
+exports.createUserTokens = (user) => {
   const exp = nowEpochS() + parseInt(config.auth.exp_time_s);
   const body = { id: user.id, username: user.username };
+  // console.log('T (createUserToken) payload', { user: body, exp });
   return {
-    consoleToken: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
-    pmFrontToken: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    mediaToken: this.createRudiMediaToken({ exp: exp, user_id: user.id, user_name: user.username }),
+    [this.CONSOLE_TOKEN]: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
+    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    [this.MEDIA_TOKEN]: this.createRudiMediaToken({
+      exp: exp,
+      user_id: user.id,
+      user_name: user.username,
+    }),
     exp: exp,
   };
 };
@@ -85,8 +91,12 @@ exports.createUserToken = (user) => {
 /**
  *
  * @param {Object} jwtPayload optional options to create the JWT payload
- *  - exp_time: time in seconds during which the JWt is valid
- *  -
+ *  - exp: Epoch date in seconds until which the JWt is valid
+ *  - exp_time: time in seconds during which the JWT is valid
+ *              (not taken into account if 'exp' is given)
+ *  - user_name: name of the user
+ *  - user_id: id of the user
+ *    (shifted here with an offset of 5000 to ensure compatibility with media)
  * @return {String} a JWT
  */
 exports.createRudiMediaToken = (jwtPayload) => {
@@ -105,10 +115,15 @@ exports.createRudiMediaToken = (jwtPayload) => {
       user_id: config.media_auth.user_id,
       group_id: config.media_auth.group_id,
       xattr: {
-        name: jwtPayload?.user_name || 'rudiconsole',
+        name: 'rudiconsole',
+        // name: jwtPayload?.user_name || 'rudiconsole',
       },
     };
-    if (jwtPayload?.user_id) body.xattr.uuid = jwtPayload.user_id;
+    if (jwtPayload?.user_id)
+      body.xattr.uuid =
+        jwtPayload.user_id > OFFSET_USR_ID
+          ? jwtPayload.user_id
+          : jwtPayload.user_id + OFFSET_USR_ID;
 
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
@@ -153,9 +168,9 @@ exports.createJwt = (jwtHeader, jwtPayload, keyInfo) => {
   const signatureBase64url = convertEncoding(signatureBase64.toString(), 'base64', 'base64url');
   // log.d(mod, fun, `base64url signature: ${signatureBase64url}`)
 
-  // Building the final JWT
-  const jwt = data + '.' + signatureBase64url;
-  return jwt;
+  // Returning the final JWT
+  // console.log('T (createJwt) final JWT',`${data}.${signatureBase64url}`)
+  return `${data}.${signatureBase64url}`;
 };
 
 /**

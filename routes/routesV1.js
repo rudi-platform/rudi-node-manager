@@ -36,11 +36,11 @@ router.delete(
 
 router.post('/register', authControllerPassport.postRegister);
 router.post('/login', authControllerPassport.postLogin);
-router.get(
-  '/token',
-  passport.authenticate('jwt', { session: false }),
-  authControllerPassport.getToken,
-);
+// router.get(
+//   '/token',
+//   passport.authenticate('jwt', { session: false }),
+//   authControllerPassport.getToken,
+// );
 router.get(
   '/logout',
   passport.authenticate('jwt', { session: false }),
