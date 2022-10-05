@@ -1,8 +1,8 @@
 const { floor } = require('lodash');
 
 // ---- Dates
-exports.nowEpochMs = () => new Date().getTime();
-exports.nowEpochS = () => floor(this.nowEpochMs() / 1000);
+exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs;
+exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS;
 
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '');
 
@@ -18,4 +18,10 @@ exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   } catch (err) {
     throw err;
   }
+};
+
+exports.toInt = (str) => {
+  const i = parseInt(str, 10);
+  // console.log('T (toInt)', str, '->', i);
+  return Number.isNaN(i) || `${i}` !== str ? str : i;
 };

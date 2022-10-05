@@ -3,7 +3,7 @@ const config = require('../config/config');
 const fs = require('fs');
 const { parsePrivateKey } = require('sshpk');
 const axios = require('axios');
-const { toBase64url, convertEncoding, nowEpochS } = require('./utils');
+const { toBase64url, convertEncoding, timeEpochS, toInt } = require('./utils');
 const { v4: uuidv4 } = require('uuid');
 
 const KTYP = 'ktyp';
@@ -73,7 +73,7 @@ exports.getHashAlgo = (algo) => {
 };
 
 exports.createUserTokens = (user) => {
-  const exp = nowEpochS() + parseInt(config.auth.exp_time_s);
+  const exp = timeEpochS(toInt(config.auth.exp_time_s));
   const body = { id: user.id, username: user.username };
   // console.log('T (createUserToken) payload', { user: body, exp });
   return {
@@ -108,23 +108,24 @@ exports.createRudiMediaToken = (jwtPayload) => {
     // Building the JWT body
     const body = {
       jti: uuidv4(),
-      iat: nowEpochS(),
-      exp: jwtPayload?.exp || nowEpochS() + (jwtPayload?.exp_time || config.auth.exp_time_s),
+      iat: timeEpochS(),
+      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
       client_id: config.media_auth.manager_id,
       group: 'auth',
-      user_id: config.media_auth.user_id,
-      group_id: config.media_auth.group_id,
+      user_id: toInt(config.media_auth.user_id),
+      group_id: toInt(config.media_auth.group_id),
       xattr: {
         // name: 'rudiconsole',
         name: jwtPayload?.user_name || 'rudiconsole',
       },
     };
-    if (jwtPayload?.user_id)
+    if (jwtPayload?.user_id) {
+      jwtPayload.user_id = toInt(jwtPayload.user_id);
       body.xattr.uuid =
         jwtPayload.user_id > OFFSET_USR_ID
           ? jwtPayload.user_id
           : jwtPayload.user_id + OFFSET_USR_ID;
-
+    }
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
     throw err;
@@ -138,7 +139,7 @@ exports.createRudiApiToken = (jwtPayload) => {
     const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
 
     const body = {
-      exp: nowEpochS() + 60, // 1 minute to reach the API should be plenty enough
+      exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
       sub: config.API_RUDI.manager_id,
       client_id: jwtPayload.req.user && jwtPayload.req.user.id,
       req_mtd: jwtPayload.methode || jwtPayload.req.method,
