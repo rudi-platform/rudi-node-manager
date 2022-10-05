@@ -111,7 +111,7 @@ exports.createRudiMediaToken = (jwtPayload) => {
       iat: timeEpochS(),
       exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
       client_id: config.media_auth.manager_id,
-      group: 'auth',
+      sub: 'auth',
       user_id: toInt(config.media_auth.user_id),
       group_id: toInt(config.media_auth.group_id),
       xattr: {
