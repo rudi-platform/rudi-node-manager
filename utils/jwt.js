@@ -115,8 +115,8 @@ exports.createRudiMediaToken = (jwtPayload) => {
       user_id: config.media_auth.user_id,
       group_id: config.media_auth.group_id,
       xattr: {
-        name: 'rudiconsole',
-        // name: jwtPayload?.user_name || 'rudiconsole',
+        // name: 'rudiconsole',
+        name: jwtPayload?.user_name || 'rudiconsole',
       },
     };
     if (jwtPayload?.user_id)
