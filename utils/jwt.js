@@ -234,7 +234,7 @@ function getKeyInfo(name) {
       default:
         keyPath = config.API_RUDI.RUDI_key;
     }
-    const prvKeyPem = fs.readFileSync(keyPath, 'ascii');
+    const prvKeyPem = fs.readFileSync(keyPath || config.API_RUDI.RUDI_key, 'ascii');
     const prvKey = parsePrivateKey(prvKeyPem);
     const keyType = prvKey.type;
 
