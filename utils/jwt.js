@@ -1,11 +1,14 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 const { parsePrivateKey } = require('sshpk');
 const axios = require('axios');
-const { toBase64url, convertEncoding, timeEpochS, toInt } = require('./utils');
 const { v4: uuidv4 } = require('uuid');
-const util = require('util');
+
+const config = require('../config/config');
+const { toBase64url, convertEncoding, timeEpochS, toInt } = require('./utils');
+const log = require('./logger');
+
+const mod = 'jwt';
 
 const KTYP = 'ktyp';
 const PRVK = 'prvk';
@@ -15,6 +18,8 @@ exports.CONSOLE_TOKEN = 'consoleToken';
 exports.PM_FRONT_TOKEN = 'pmFrontToken';
 exports.MEDIA_TOKEN = 'mediaToken';
 exports.PM_MEDIA_TOKEN = 'mediaManagerToken';
+
+const MEDIA_AUTH = config.rudi_media;
 
 /**
  * Retrieve the string that states which algorithm was used for the
@@ -74,37 +79,65 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
-exports.createUserTokens = (user, error, next) => {
+exports.createUserTokens = async (user, error, next) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
-  const cbody = { id: user.id, username: user.username };
-  const mbody = { client_id: config.media_auth.manager_id, sub: 'auth' };
-  // console.log('T (createUserToken) payload', { user: body, exp });
-  const PM_FRONT_TOKEN = jwt.sign({ exp }, config.auth.secret_key_JWT);
-  const CONSOLE_TOKEN  = jwt.sign({ user: cbody, exp }, config.auth.secret_key_JWT);
-  const PM_MEDIA_TOKEN = this.createRudiMediaToken({ user: mbody, exp });
+
+  return {
+    [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
+    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    [this.MEDIA_TOKEN]: await this.getTokenFromMediaForUser(user),
+  };
+};
+
+exports.getTokenFromMediaForUser = async (user) => {
+  const fun = 'getTokenFromMediaForUser';
+  const pmHeadersJwt = await this.createPmHeadersJwtForMedia();
+  const opts = {
+    headers: {
+      Authorization: `Bearer ${pmHeadersJwt}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  };
 
   const delegationBody = {
-      'user_id': user.id || OFFSET_USR_ID,
-      'user_name': user.username || 'rudiconsole',
-      'group_name': config.media_auth.default_client_group
+    user_id: user.id,
+    user_name: user.username || 'rudiconsole',
+    group_name: MEDIA_AUTH.default_client_group,
   };
+  // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
-  //next(CONSOLE_TOKEN, PM_FRONT_TOKEN, '--', exp);
-  //return ;
 
-  const serveurMedia = `${config.API_RUDI.media_api}`;
-  axios.post(serveurMedia + '/jwt/forge', delegationBody, {
-      headers: { 'authorization': 'Bearer '+PM_MEDIA_TOKEN, 'Content-Type': 'application/json', 'Accept': 'application/json' }
-  }).then((resMEDIA) => {
-      if (!resMEDIA.headers || !resMEDIA.headers.cookie) error('Unexpected response from Media while forging a token');
-      else {
-          const umc = resMEDIA.headers.cookie;
-          const userMediaToken = umc.slice(umc.indexOf('=')+1);
-          next(CONSOLE_TOKEN, PM_FRONT_TOKEN, userMediaToken, exp);
-      }
-  }) .catch((err) => {
-      error('while forging a Media token: '+err);
-  });
+  const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}jwt/forge`;
+  console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
+  try {
+    const resMedia = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
+    if (!resMedia?.data?.token)
+      throw new Error('Unexpected response from Media while forging a token');
+    else return resMedia.data.token;
+  } catch (err) {
+    log.e(mod, fun, `Could not forge a token on Media: ${err}`);
+    // throw new Error(`Could not forge a token on Media: ${err}`);
+    return;
+  }
+};
+
+exports.createPmHeadersJwtForMedia = async (body) => {
+  // Building the JWT header
+  const keyInfo = getKeyInfo('media');
+  const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
+
+  // Building the JWT body
+  const jwtPayload = {
+    jti: body?.jti || uuidv4(),
+    iat: body?.iat || timeEpochS(),
+    exp: body?.exp || timeEpochS(body?.exp_time || config.auth.exp_time_s),
+    sub: body?.sub || 'auth',
+    client_id: body?.client_id || 'rudimanager',
+  };
+
+  const jwt = this.createJwt(jwtHeader, jwtPayload, keyInfo);
+  return jwt;
 };
 
 /**
@@ -128,13 +161,13 @@ exports.createRudiMediaToken = (jwtPayload) => {
     const body = {
       jti: uuidv4(),
       iat: timeEpochS(),
-      exp: jwtPayload.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
-      sub: jwtPayload.sub || 'auth',
-      client_id: jwtPayload.client_id || config.media_auth.manager_id,
+      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
+      sub: jwtPayload?.sub || 'auth',
+      client_id: jwtPayload.client_id || MEDIA_AUTH.manager_id,
     };
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
-      throw err;
+    throw err;
   }
 };
 
@@ -188,7 +221,20 @@ exports.createJwt = (jwtHeader, jwtPayload, keyInfo) => {
 function getKeyInfo(name) {
   try {
     // Extracting the private key
-    const prvKeyPem = fs.readFileSync(config.API_RUDI[name] || config.API_RUDI.RUDI_key, 'ascii');
+    let keyPath;
+    switch (name) {
+      case 'api':
+      case 'api_key':
+        keyPath = config.API_RUDI.api_key;
+        break;
+      case 'media':
+      case 'media_key':
+        keyPath = config.rudi_media.media_key;
+        break;
+      default:
+        keyPath = config.API_RUDI.RUDI_key;
+    }
+    const prvKeyPem = fs.readFileSync(keyPath, 'ascii');
     const prvKey = parsePrivateKey(prvKeyPem);
     const keyType = prvKey.type;
 
