@@ -5,6 +5,7 @@ const { parsePrivateKey } = require('sshpk');
 const axios = require('axios');
 const { toBase64url, convertEncoding, timeEpochS, toInt } = require('./utils');
 const { v4: uuidv4 } = require('uuid');
+const util = require('util');
 
 const KTYP = 'ktyp';
 const PRVK = 'prvk';
@@ -13,6 +14,7 @@ const OFFSET_USR_ID = 5000;
 exports.CONSOLE_TOKEN = 'consoleToken';
 exports.PM_FRONT_TOKEN = 'pmFrontToken';
 exports.MEDIA_TOKEN = 'mediaToken';
+exports.PM_MEDIA_TOKEN = 'mediaManagerToken';
 
 /**
  * Retrieve the string that states which algorithm was used for the
@@ -72,20 +74,37 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
-exports.createUserTokens = (user) => {
+exports.createUserTokens = (user, error, next) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
-  const body = { id: user.id, username: user.username };
+  const cbody = { id: user.id, username: user.username };
+  const mbody = { client_id: config.media_auth.manager_id, sub: 'auth' };
   // console.log('T (createUserToken) payload', { user: body, exp });
-  return {
-    [this.CONSOLE_TOKEN]: jwt.sign({ user: body, exp }, config.auth.secret_key_JWT),
-    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    [this.MEDIA_TOKEN]: this.createRudiMediaToken({
-      exp: exp,
-      user_id: user.id,
-      user_name: user.username,
-    }),
-    exp: exp,
+  const PM_FRONT_TOKEN = jwt.sign({ exp }, config.auth.secret_key_JWT);
+  const CONSOLE_TOKEN  = jwt.sign({ user: cbody, exp }, config.auth.secret_key_JWT);
+  const PM_MEDIA_TOKEN = this.createRudiMediaToken({ user: mbody, exp });
+
+  const delegationBody = {
+      'user_id': user.id || OFFSET_USR_ID,
+      'user_name': user.username || 'rudiconsole',
+      'group_name': config.media_auth.default_client_group
   };
+  if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
+  //next(CONSOLE_TOKEN, PM_FRONT_TOKEN, '--', exp);
+  //return ;
+
+  const serveurMedia = `${config.API_RUDI.media_api}`;
+  axios.post(serveurMedia + '/jwt/forge', delegationBody, {
+      headers: { 'authorization': 'Bearer '+PM_MEDIA_TOKEN, 'Content-Type': 'application/json', 'Accept': 'application/json' }
+  }).then((resMEDIA) => {
+      if (!resMEDIA.headers || !resMEDIA.headers.cookie) error('Unexpected response from Media while forging a token');
+      else {
+          const umc = resMEDIA.headers.cookie;
+          const userMediaToken = umc.slice(umc.indexOf('=')+1);
+          next(CONSOLE_TOKEN, PM_FRONT_TOKEN, userMediaToken, exp);
+      }
+  }) .catch((err) => {
+      error('while forging a Media token: '+err);
+  });
 };
 
 /**
@@ -109,26 +128,13 @@ exports.createRudiMediaToken = (jwtPayload) => {
     const body = {
       jti: uuidv4(),
       iat: timeEpochS(),
-      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
-      client_id: config.media_auth.manager_id,
-      sub: 'auth',
-      user_id: toInt(config.media_auth.user_id),
-      group_id: toInt(config.media_auth.group_id),
-      xattr: {
-        // name: 'rudiconsole',
-        name: jwtPayload?.user_name || 'rudiconsole',
-      },
+      exp: jwtPayload.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
+      sub: jwtPayload.sub || 'auth',
+      client_id: jwtPayload.client_id || config.media_auth.manager_id,
     };
-    if (jwtPayload?.user_id) {
-      jwtPayload.user_id = toInt(jwtPayload.user_id);
-      body.xattr.uuid =
-        jwtPayload.user_id > OFFSET_USR_ID
-          ? jwtPayload.user_id
-          : jwtPayload.user_id + OFFSET_USR_ID;
-    }
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
-    throw err;
+      throw err;
   }
 };
 
