@@ -150,7 +150,8 @@ exports.getMediaToken = async (req, res, next) => {
   }
   try {
     const mediaRes = await getTokenFromMediaForUser(user);
-    if(!mediaRes?.token) throw Error(`Media module will not give a token`)
+    if(!mediaRes) throw Error(`No answer received from Media module`)
+    if(!mediaRes.token) throw Error(`Unexpected answer from Media module: ${mediaRes}`)
     res.status(200).send(mediaRes.token);
   } catch (e) {
     const errMsg = `Media module will not give a token: ${e}`;

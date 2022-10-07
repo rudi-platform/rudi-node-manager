@@ -131,8 +131,8 @@ exports.getTokenFromMediaForUser = async (user) => {
   // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}jwt/forge`;
-  console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
-  console.log('T (getTokenFromMediaForUser) opts', opts);
+  // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
+  // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
     const resMedia = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
     if (!resMedia?.data?.token)
