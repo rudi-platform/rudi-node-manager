@@ -167,7 +167,7 @@ exports.createPmHeadersJwtForMedia = async (body) => {
     sub: body?.sub || 'auth',
     client_id: body?.client_id || 'rudimanager',
   };
-  // console.log('T (createPmHeadersJwtForMedia) jwtPayload', jwtPayload);
+  console.log('T (createPmHeadersJwtForMedia) exp', jwtPayload.exp);
 
   const jwt = this.createJwt(jwtHeader, jwtPayload, keyInfo);
   return jwt;
