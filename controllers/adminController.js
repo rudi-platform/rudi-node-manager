@@ -143,11 +143,12 @@ exports.getMediaToken = async (req, res, next) => {
   const jwt = extractCookieFromReq(req, CONSOLE_TOKEN);
   const jwtPayload = JSON.parse(getJwtBody(jwt));
   const user = jwtPayload.user;
+  const exp = jwtPayload.exp;
   if (!user)
     throw new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`);
 
   try {
-    const token = await getTokenFromMediaForUser(user);
+    const token = await getTokenFromMediaForUser(user, exp);
     res.status(200).send(token);
   } catch (e) {
     const errMsg = `Media module will not give a token: ${e}`;

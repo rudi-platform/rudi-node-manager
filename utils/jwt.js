@@ -118,7 +118,7 @@ exports.createUserTokens = async (user) => {
 
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser';
-  const pmHeadersJwt = await this.createPmHeadersJwtForMedia({ exp });
+  const pmHeadersJwt = await this.createPmHeadersJwtForMedia(exp ? { exp } : null);
   // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
   const opts = {
     headers: {
