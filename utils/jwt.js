@@ -5,8 +5,9 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 
 const config = require('../config/config');
-const { toBase64url, convertEncoding, timeEpochS, toInt } = require('./utils');
+const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
 const log = require('./logger');
+const { ForbiddenError, BadRequestError } = require('./errors');
 
 const mod = 'jwt';
 
@@ -79,6 +80,25 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
+exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
+  req?.cookies ? req.cookies[cookieName] : null;
+
+exports.extractJwtFromReq = (req) => {
+  const auth = req?.headers?.Authorization;
+  if (!auth) throw new ForbiddenError('Forbidden: no Authorization found in request headers');
+  if (!auth.startsWith('Bearer ')) return new BadRequestError('Request should use a JWT');
+
+  const token = auth.substring(7);
+  return token;
+};
+
+const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
+exports.getJwtBody = (jwt) => {
+  if (!`${jwt}`.match(REGEX_JWT)) throw new BadRequestError(`Wrong format for token ${jwt}`);
+  const encodedBody = jwt.split('.')[1];
+  return decodeBase64url(encodedBody);
+};
+
 exports.createUserTokens = (user, error, next) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
 
@@ -108,9 +128,11 @@ exports.getTokenFromMediaForUser = async (user) => {
   };
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
+  // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}jwt/forge`;
-  // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
+  console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
+  console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
     const resMedia = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
     if (!resMedia?.data?.token)
@@ -136,6 +158,7 @@ exports.createPmHeadersJwtForMedia = async (body) => {
     sub: body?.sub || 'auth',
     client_id: body?.client_id || 'rudimanager',
   };
+  // console.log('T (createPmHeadersJwtForMedia) jwtPayload', jwtPayload);
 
   const jwt = this.createJwt(jwtHeader, jwtPayload, keyInfo);
   return jwt;

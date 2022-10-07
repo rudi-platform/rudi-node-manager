@@ -1,15 +1,14 @@
 const bcrypt = require('bcrypt');
-const databaseManager = require('../database/database');
 const passport = require('passport');
-const config = require('../config/config');
-const { CONSOLE_TOKEN } = require('./jwt');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
+const config = require('../config/config');
+const databaseManager = require('../database/database');
+const { extractCookieFromReq, CONSOLE_TOKEN } = require('./jwt');
+
+passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser((id, done) => {
   databaseManager
@@ -44,13 +43,6 @@ passport.use(
       });
   }),
 );
-const cookieExtractor = function (req) {
-  let token = null;
-  if (req && req.cookies) {
-    token = req.cookies[CONSOLE_TOKEN];
-  }
-  return token;
-};
 
 passport.use(
   new JWTstrategy(
@@ -58,7 +50,7 @@ passport.use(
       secretOrKey: config.auth.secret_key_JWT,
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
-        cookieExtractor,
+        (req) => extractCookieFromReq(req, CONSOLE_TOKEN),
         // Take jwt from http header
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),

@@ -2,7 +2,17 @@ const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
-const { createRudiApiToken } = require('../utils/jwt');
+const {
+  createRudiApiToken,
+  extractJwtFromReq,
+  getJwtBody,
+  getTokenFromMediaForUser,
+  extractCookieFromReq,
+  CONSOLE_TOKEN,
+} = require('../utils/jwt');
+const log = require('../utils/logger');
+const { BadRequestError } = require('../utils/errors');
+const mod = 'admCtrl';
 
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
@@ -126,4 +136,24 @@ exports.getVersion = (req, res, next) => {
       const error = errorHandler.error(err, req, { opType: 'get_version' });
       res.status(error.statusCode).json(error);
     });
+};
+
+exports.getMediaToken = async (req, res, next) => {
+  const fun = 'getMediaToken';
+  // if (!user) return res.status(401).send('Error: user should be provided');
+  const jwt = extractCookieFromReq(req, CONSOLE_TOKEN);
+  const jwtPayload = JSON.parse(getJwtBody(jwt));
+  const user = jwtPayload.user;
+  if (!user) {
+    const errMsg = `JWT body token should contain an identified user: ${jwtPayload}`;
+    throw new BadRequestError(errMsg);
+  }
+  try {
+    const mediaRes = await getTokenFromMediaForUser(user);
+    return mediaRes.token;
+  } catch (e) {
+    const errMsg = `Media module will not give a token: ${e}`;
+    log.e(mod, fun, errMsg);
+    throw new Error(errMsg);
+  }
 };

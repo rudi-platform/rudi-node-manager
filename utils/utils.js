@@ -7,8 +7,9 @@ exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS;
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '');
 
 // ---- Strings
-
 exports.toBase64url = (str) => this.convertEncoding(str, 'utf-8', 'base64url');
+exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8');
+exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf-8');
 
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   try {
