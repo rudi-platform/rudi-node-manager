@@ -99,20 +99,27 @@ exports.getJwtBody = (jwt) => {
   return decodeBase64url(encodedBody);
 };
 
-exports.createUserTokens = (user, error, next) => {
+exports.createUserTokens = async (user) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
-
+  let mediaToken = 'x';
+  try {
+    mediaToken = await this.getTokenFromMediaForUser(user, exp);
+  } catch (e) {
+    log.e(`No token from Media: ${e}`);
+    mediaToken = false;
+  }
   return {
     [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
     [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    // [this.MEDIA_TOKEN]: await this.getTokenFromMediaForUser(user),
+    [this.MEDIA_TOKEN]: mediaToken,
     exp,
   };
 };
 
-exports.getTokenFromMediaForUser = async (user) => {
+exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser';
-  const pmHeadersJwt = await this.createPmHeadersJwtForMedia();
+  const pmHeadersJwt = await this.createPmHeadersJwtForMedia({ exp });
+  // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
   const opts = {
     headers: {
       Authorization: `Bearer ${pmHeadersJwt}`,
@@ -151,6 +158,7 @@ exports.createPmHeadersJwtForMedia = async (body) => {
   const keyInfo = getKeyInfo('media');
   const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
 
+  // console.log('T (createPmHeadersJwtForMedia) body', body);
   // Building the JWT body
   const jwtPayload = {
     jti: body?.jti || uuidv4(),
