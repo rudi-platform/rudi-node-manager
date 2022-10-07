@@ -4,7 +4,6 @@ const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 const {
   createRudiApiToken,
-  extractJwtFromReq,
   getJwtBody,
   getTokenFromMediaForUser,
   extractCookieFromReq,
@@ -149,10 +148,8 @@ exports.getMediaToken = async (req, res, next) => {
     throw new BadRequestError(errMsg);
   }
   try {
-    const mediaRes = await getTokenFromMediaForUser(user);
-    if(!mediaRes) throw Error(`No answer received from Media module`)
-    if(!mediaRes.token) throw Error(`Unexpected answer from Media module: ${mediaRes}`)
-    res.status(200).send(mediaRes.token);
+    const token = await getTokenFromMediaForUser(user);
+    res.status(200).send(token);
   } catch (e) {
     const errMsg = `Media module will not give a token: ${e}`;
     log.e(mod, fun, errMsg);

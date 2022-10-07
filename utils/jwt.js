@@ -134,10 +134,11 @@ exports.getTokenFromMediaForUser = async (user) => {
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
-    const resMedia = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
-    if (!resMedia?.data?.token)
-      throw new Error('Unexpected response from Media while forging a token');
-    else return resMedia.data.token;
+    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
+    if (!mediaRes) throw Error(`No answer received from Media module`);
+    if (!mediaRes?.data?.token)
+      throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
+    else return mediaRes.data.token;
   } catch (err) {
     log.e(mod, fun, `Could not forge a token on Media: ${err}`);
     // throw new Error(`Could not forge a token on Media: ${err}`);

@@ -28,7 +28,6 @@ class RudiError extends Error {
   }
 
   static createRudiHttpError(code, message, ctxMod, ctxFun) {
-    const fun = 'createRudiHttpError';
     try {
       // logD(mod, fun, `Error ${code}: ${message}`)
       switch (parseInt(code)) {
