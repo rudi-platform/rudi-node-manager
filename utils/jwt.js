@@ -79,13 +79,14 @@ exports.getHashAlgo = (algo) => {
   }
 };
 
-exports.createUserTokens = async (user, error, next) => {
+exports.createUserTokens = (user, error, next) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
 
   return {
     [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
     [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    [this.MEDIA_TOKEN]: await this.getTokenFromMediaForUser(user),
+    // [this.MEDIA_TOKEN]: await this.getTokenFromMediaForUser(user),
+    exp,
   };
 };
 
@@ -109,7 +110,7 @@ exports.getTokenFromMediaForUser = async (user) => {
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}jwt/forge`;
-  console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
+  // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   try {
     const resMedia = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
     if (!resMedia?.data?.token)
@@ -118,7 +119,7 @@ exports.getTokenFromMediaForUser = async (user) => {
   } catch (err) {
     log.e(mod, fun, `Could not forge a token on Media: ${err}`);
     // throw new Error(`Could not forge a token on Media: ${err}`);
-    return;
+    return false;
   }
 };
 
