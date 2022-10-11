@@ -2,17 +2,25 @@ const axios = require('axios');
 const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 
+const serveurMedia = (id) => {
+  if (!config?.rudi_media?.media_url)
+    throw new Error(
+      `Server configuration error: config file should contain a parameter 'rudi_media.media_url'`,
+    );
+    const mediaUrl = `${config.media_url}/download/${id}`
+  return mediaUrl;
+};
+
 exports.getMediaById = (req, res, next) => {
   const { id } = req.params;
-  const serveurMedia = `${config.API_RUDI.media_api}`;
   return axios
-    .get(serveurMedia + '/' + id)
+    .get(serveurMedia(id))
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
     })
     .catch((err) => {
-      const error = errorHandler.error(error, req, { opType: 'get_media', id: `media+${id}` });
+      const error = errorHandler.error(err, req, { opType: 'get_media', id: `media+${id}` });
       res.status(error.statusCode).json(error);
     });
 };
@@ -20,9 +28,8 @@ exports.getMediaById = (req, res, next) => {
 // Deprecated ? now use direct access
 exports.getDownloadById = (req, res, next) => {
   const { id } = req.params;
-  const serveurMedia = `${config.API_RUDI.media_api}`;
   return axios
-    .get(serveurMedia + '/' + id, {
+    .get(serveurMedia(id), {
       headers: { 'media-access-method': 'Direct', 'media-access-compression': true },
     })
     .then((resRUDI) => {
@@ -33,4 +40,8 @@ exports.getDownloadById = (req, res, next) => {
       const error = errorHandler.error(err, req, { opType: 'get_download', id: `media+${id}` });
       res.status(error.statusCode).json(error);
     });
+};
+
+exports.commitMedia = (req, res, next) => {
+  const { mediaId, resourceId } = req.body;
 };

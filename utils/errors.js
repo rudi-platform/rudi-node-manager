@@ -1,5 +1,9 @@
 /* eslint-disable require-jsdoc */
 
+const { d } = require('./logger');
+
+const STATUS_CODE = 'statusCode';
+
 class RudiError extends Error {
   constructor(message, code, name, desc, ctxMod, ctxFun) {
     super(message);
@@ -29,10 +33,11 @@ class RudiError extends Error {
 
   static createRudiHttpError(code, message, ctxMod, ctxFun) {
     try {
-      // logD(mod, fun, `Error ${code}: ${message}`)
+      console.log('T (createRudiHttpError)', `Error ${code}: ${message}`);
       switch (parseInt(code)) {
         case 400:
           return new BadRequestError(message, ctxMod, ctxFun);
+        case 460:
         case 401:
           return new UnauthorizedError(message, ctxMod, ctxFun);
         case 403:
@@ -122,7 +127,7 @@ class InternalServerError extends RudiError {
   }
 }
 
-exports.NotImplementedError = class NotImplementedError extends RudiError {
+class NotImplementedError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
@@ -133,7 +138,7 @@ exports.NotImplementedError = class NotImplementedError extends RudiError {
       ctxFun,
     );
   }
-};
+}
 
 exports.BadRequestError = BadRequestError;
 exports.UnauthorizedError = UnauthorizedError;
@@ -142,3 +147,4 @@ exports.NotFoundError = NotFoundError;
 exports.MethodNotAllowedError = MethodNotAllowedError;
 exports.NotAcceptableError = NotAcceptableError;
 exports.InternalServerError = InternalServerError;
+exports.RudiError = RudiError;

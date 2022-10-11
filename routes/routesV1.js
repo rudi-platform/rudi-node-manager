@@ -14,8 +14,6 @@ router.get('/hash', getHashFun);
 router.get('/formUrl', sysController.getFormUrl);
 router.get('/test', sysController.getTest);
 
-router.get('/jwt/media/', passport.authenticate('jwt', { session: false }),adminController.getMediaToken);
-
 router.get(
   '/users',
   passport.authenticate('jwt', { session: false }),

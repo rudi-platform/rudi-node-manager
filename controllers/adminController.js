@@ -4,10 +4,10 @@ const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 const {
   createRudiApiToken,
-  getJwtBody,
-  getTokenFromMediaForUser,
+  readJwtBody,
   extractCookieFromReq,
   CONSOLE_TOKEN,
+  getTokenFromMediaForUser,
 } = require('../utils/jwt');
 const log = require('../utils/logger');
 const { BadRequestError } = require('../utils/errors');
@@ -141,7 +141,7 @@ exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
   // if (!user) return res.status(401).send('Error: user should be provided');
   const jwt = extractCookieFromReq(req, CONSOLE_TOKEN);
-  const jwtPayload = JSON.parse(getJwtBody(jwt));
+  const jwtPayload = readJwtBody(jwt);
   const user = jwtPayload.user;
   const exp = jwtPayload.exp;
   if (!user)
@@ -149,10 +149,17 @@ exports.getMediaToken = async (req, res, next) => {
 
   try {
     const token = await getTokenFromMediaForUser(user, exp);
+    try {
+      const parsedBody = readJwtBody(token);
+      parsedBody.exp = new Date(parsedBody.exp).toISOString();
+      console.log('T (getMediaToken) token:', parsedBody);
+    } catch (e) {
+      console.log('T (getMediaToken) token:', token);
+    }
     res.status(200).send(token);
   } catch (e) {
-    const errMsg = `Media module will not give a token: ${e}`;
-    log.e(mod, fun, errMsg);
-    throw new Error(errMsg);
+    log.e(mod, fun, e);
+    // throw new Error(errMsg);
+    res.status(e.statusCode || 500).send(e);
   }
 };

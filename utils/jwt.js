@@ -7,7 +7,9 @@ const { v4: uuidv4 } = require('uuid');
 const config = require('../config/config');
 const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
 const log = require('./logger');
-const { ForbiddenError, BadRequestError } = require('./errors');
+const errorHandler = require('../controllers/errorHandler');
+const { ForbiddenError, BadRequestError, RudiError } = require('./errors');
+const e = require('express');
 
 const mod = 'jwt';
 
@@ -93,25 +95,19 @@ exports.extractJwtFromReq = (req) => {
 };
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
-exports.getJwtBody = (jwt) => {
+exports.readJwtBody = (jwt) => {
   if (!`${jwt}`.match(REGEX_JWT)) throw new BadRequestError(`Wrong format for token ${jwt}`);
   const encodedBody = jwt.split('.')[1];
-  return decodeBase64url(encodedBody);
+  const decodedBody = decodeBase64url(encodedBody);
+  const parsedBody = JSON.parse(decodedBody);
+  return parsedBody;
 };
 
 exports.createUserTokens = async (user) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
-  let mediaToken = 'x';
-  try {
-    mediaToken = await this.getTokenFromMediaForUser(user, exp);
-  } catch (e) {
-    log.e(`No token from Media: ${e}`);
-    mediaToken = false;
-  }
   return {
     [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
     [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
-    [this.MEDIA_TOKEN]: mediaToken,
     exp,
   };
 };
@@ -137,7 +133,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
   // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
 
-  const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}jwt/forge`;
+  const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}/jwt/forge`;
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
@@ -147,9 +143,16 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
     else return mediaRes.data.token;
   } catch (err) {
-    log.e(mod, fun, `Could not forge a token on Media: ${err}`);
-    // throw new Error(`Could not forge a token on Media: ${err}`);
-    return false;
+    console.log('T (getTokenFromMediaForUser) rudiError.code', err);
+    const rudiError = RudiError.createRudiHttpError(
+      err.response?.data?.statusCode || err.response?.status,
+      `Could not forge a token for user '${user.username}' on Media: ${
+        err.response?.data?.message || err.response?.data || err.message
+      }`,
+    );
+
+    log.e(mod, fun, `Could not forge a token on Media: ${rudiError}`);
+    throw rudiError;
   }
 };
 
