@@ -86,7 +86,7 @@ exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
 
 exports.extractJwtFromReq = (req) => {
   const fun = 'extractJwtFromReq';
-  const headers = req?.headers || req?.Headers
+  const headers = req?.headers || req?.Headers;
   const auth = headers?.Authorization || headers?.authorization;
   if (!auth) {
     log.d(mod, fun, `headers: ${headers}`);
@@ -110,7 +110,7 @@ exports.readJwtBody = (jwt) => {
 
 exports.createUserTokens = async (user) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
-  delete user.password
+  delete user.password;
   return {
     [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
     [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
@@ -149,7 +149,11 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
     else return mediaRes.data.token;
   } catch (err) {
-    console.error('T (getTokenFromMediaForUser) mediaError.msg/data', err.message, err.response?.data);
+    console.error(
+      'T (getTokenFromMediaForUser) mediaError.msg/data',
+      err.message,
+      err.response?.data,
+    );
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
       `Could not forge a token for user '${user.username}' on Media: ${
@@ -220,7 +224,6 @@ exports.createRudiApiToken = (url, req) => {
     // Building the JWT header
     const keyInfo = getKeyInfo('api');
     const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
-
     const body = {
       exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
       sub: config.API_RUDI.manager_id,
@@ -228,7 +231,7 @@ exports.createRudiApiToken = (url, req) => {
       req_url: axios.getUri({ url, params: req.query }),
     };
     if (req?.user?.id) body.client_id = req.user.id;
-
+    // console.log('T (createRudiApiToken) body.req_url',body.req_url)
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
     throw err;

@@ -21,7 +21,7 @@ router.get('/enum', getEnum);
 router.get('/enum/themes/:lang', getThemeByLang);
 router.get('/licences', getLicences);
 router.get('/version', getVersion);
-router.get('/uuid', (req, res, next) => res.status(200).send(uuidv4()));
+router.get('/uuid', () => res.status(200).send(uuidv4()));
 
 // TODO : propage res.status
 router.get(`/:objectType`, getObjectList);

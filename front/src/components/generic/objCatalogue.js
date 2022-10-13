@@ -8,9 +8,6 @@ import { GeneralContext } from '../../generalContext';
 import { EditObjCard, ObjCard } from '../generic/objCard';
 import { getApiAdmin } from '../../App';
 
-// import curlirize from 'axios-curlirize';
-// curlirize(axios);
-
 const PAGE_SIZE = 20;
 
 ObjCatalogue.propTypes = {

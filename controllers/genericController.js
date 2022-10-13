@@ -3,7 +3,10 @@ const config = require('../config/config');
 const errorHandler = require('./errorHandler');
 const { createRudiApiToken } = require('../utils/jwt');
 
-const serveur = `${config.API_RUDI.listening_address}`;
+// const axiosCurlirize = require('axios-curlirize');
+// axiosCurlirize(axios);
+
+const apiServer = (subUrl) => `${config.API_RUDI.listening_address}${subUrl}`;
 const api = `${config.API_RUDI.admin_api}`;
 
 const OBJECT_TYPES = {
@@ -53,24 +56,21 @@ exports.getObjectList = (req, res, next) => {
   const { objectType } = req.params;
   // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
 
-  const urlParts = `${req.url}`.split('?');
-  const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
+  // const urlParts = `${req.url}`.split('?');
+  // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
 
   if (!checkObjectType(req, res, fun, objectType)) return;
   if (objectType === 'media') return;
 
-  const url = `${api}/${objectType}${urlSuffix}`;
-  // console.log('T (getObjectList) url', `${serveur}${url}`);
+  const url = `${api}/${objectType}`;
+  // console.log('T (getObjectList) url', serveur(url));
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, {
+    .get(apiServer(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then((resRudiApi) => {
-      // const rudiObjects = resRudiApi.data;
-      res.status(200).json(resRudiApi.data);
-    })
+    .then((resRudiApi) => res.status(200).json(resRudiApi.data))
     .catch((error) => {
       console.log(error);
       raiseError(req, res, error, 501, fun, objectType);
@@ -85,7 +85,7 @@ exports.getObjectById = (req, res, next) => {
   const url = `${api}/${objectType}/${id}`;
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, {
+    .get(apiServer(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -104,7 +104,7 @@ exports.postObject = (req, res, next) => {
   const url = `${api}/${objectType}`;
   const token = createRudiApiToken(url, req);
   return axios
-    .post(`${serveur}${url}`, req.body, {
+    .post(apiServer(url), req.body, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -126,7 +126,7 @@ exports.putObject = (req, res, next) => {
   const url = `${api}/${objectType}`;
   const token = createRudiApiToken(url, req);
   return axios
-    .put(`${serveur}${url}`, req.body, {
+    .put(apiServer(url), req.body, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -148,7 +148,7 @@ exports.deleteObject = (req, res, next) => {
   const url = `${api}/${objectType}/${id}`;
   const token = createRudiApiToken(url, req);
   return axios
-    .delete(`${serveur}${url}`, {
+    .delete(apiServer(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
