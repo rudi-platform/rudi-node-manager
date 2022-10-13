@@ -149,7 +149,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
     else return mediaRes.data.token;
   } catch (err) {
-    console.log('T (getTokenFromMediaForUser) rudiError.code', err);
+    console.error('T (getTokenFromMediaForUser) mediaError.msg/data', err.message, err.response?.data);
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
       `Could not forge a token for user '${user.username}' on Media: ${
@@ -178,7 +178,7 @@ exports.createPmHeadersJwtForMedia = async (body) => {
     sub: body?.sub || 'auth',
     client_id: body?.client_id || 'rudimanager',
   };
-  console.log('T (createPmHeadersJwtForMedia) exp', jwtPayload.exp);
+  // console.log('T (createPmHeadersJwtForMedia) exp', jwtPayload.exp);
 
   const jwt = this.createJwt(jwtHeader, jwtPayload, keyInfo);
   return jwt;

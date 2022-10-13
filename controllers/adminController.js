@@ -141,13 +141,15 @@ exports.getMediaToken = async (req, res, next) => {
 
     const token = await getTokenFromMediaForUser(user, exp);
     // T (The following is just for debugging)
+    /*
     try {
       const parsedBody = readJwtBody(token);
       parsedBody.exp = new Date(parsedBody.exp).toISOString();
-      console.log('T (getMediaToken) token:', parsedBody);
+      // console.log('T (getMediaToken) token:', parsedBody);
     } catch (parsingErr) {
-      console.log('T (getMediaToken) token:', token);
+      // console.log('T (getMediaToken) token:', token);
     }
+    */
     return res.status(200).send(token);
   } catch (err) {
     log.e(mod, fun, err);

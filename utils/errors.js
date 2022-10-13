@@ -31,7 +31,7 @@ class RudiError extends Error {
 
   static createRudiHttpError(code, message, ctxMod, ctxFun) {
     try {
-      console.log('T (createRudiHttpError)', `Error ${code}: ${message}`);
+      // console.log('T (createRudiHttpError)', `Error ${code}: ${message}`);
       switch (parseInt(code)) {
         case 400:
           return new BadRequestError(message, ctxMod, ctxFun);
