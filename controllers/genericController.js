@@ -60,6 +60,7 @@ exports.getObjectList = (req, res, next) => {
   if (objectType === 'media') return;
 
   const url = `${api}/${objectType}${urlSuffix}`;
+  // console.log('T (getObjectList) url', `${serveur}${url}`);
   const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {

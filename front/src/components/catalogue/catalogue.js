@@ -79,7 +79,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    * @return {*} params enrichis pour la requete
    */
   function createParams(baseParams) {
-    baseParams[searchText.current.value] = '';
+    if (searchText.current.value) baseParams[searchText.current.value] = '';
     currentFilters.forEach((filter) => Object.assign(baseParams, filter));
     return baseParams;
   }
@@ -152,6 +152,43 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         filterList.splice(indexType, 1);
         setCurrentFilters(filterList.concat(filterParam));
       }
+    }
+  }
+
+  const getFirstKey = (obj) => Object.keys(obj)[0];
+  const getAbsFilterVal = (str, toggle) =>
+    `${str}`.startsWith('-') ? `${str}`.substring(1) : `${toggle ? '-' : ''}${str}`;
+  const toggleFilterVal = (str) => getAbsFilterVal(str, true);
+  /**
+   * ajoute un filter pour la requete
+   * @param {*} filterParam element a rajouter
+   */
+  function toggleFilter(filterParam) {
+    const filterKey = getFirstKey(filterParam);
+    const newFilterVal = filterParam[filterKey];
+
+    const filterList = currentFilters.slice();
+    const existingFilterIndex = filterList.findIndex(
+      (existingFilter) => getFirstKey(existingFilter) === filterKey,
+    );
+    // should add
+    const newFilter = { [filterKey]: newFilterVal };
+    if (existingFilterIndex === -1) {
+      setCurrentFilters(filterList.concat(newFilter));
+    } else {
+      // should replace/remove
+
+      const existingFilter = filterList[existingFilterIndex];
+      const existingFilterVal = existingFilter[filterKey];
+      if (getAbsFilterVal(existingFilterVal) !== getAbsFilterVal(newFilterVal)) {
+        // We were using another reference value for this filter type
+        filterList[existingFilterIndex] = newFilter;
+      } else {
+        // Simple toggle of the actual reference value for this filter type
+        filterList[existingFilterIndex] = { [filterKey]: toggleFilterVal(existingFilterVal) };
+      }
+      // console.log('T (toggleFilter) filterList[0]', filterList[0]);
+      setCurrentFilters(filterList);
     }
   }
 
@@ -236,14 +273,14 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={(e) => addToFilter({ sort_by: `-updatedAt` })}
+                    onClick={(e) => toggleFilter({ sort_by: `-updatedAt` })}
                   >
                     Modifié
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={(e) => addToFilter({ sort_by: `resource_title` })}
+                    onClick={(e) => toggleFilter({ sort_by: `resource_title` })}
                   >
                     A à Z
                   </button>
