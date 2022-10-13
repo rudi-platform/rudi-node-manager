@@ -60,10 +60,7 @@ exports.getObjectList = (req, res, next) => {
   if (objectType === 'media') return;
 
   const url = `${api}/${objectType}${urlSuffix}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,
@@ -85,10 +82,7 @@ exports.getObjectById = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,
@@ -107,10 +101,7 @@ exports.postObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .post(`${serveur}${url}`, req.body, {
       headers: {
@@ -132,10 +123,7 @@ exports.putObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .put(`${serveur}${url}`, req.body, {
       headers: {
@@ -157,10 +145,7 @@ exports.deleteObject = (req, res, next) => {
   if (!checkObjectType(req, res, fun, objectType)) return;
 
   const url = `${api}/${objectType}/${id}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .delete(`${serveur}${url}`, {
       params: req.query,

@@ -207,7 +207,7 @@ exports.createRudiMediaToken = (jwtPayload) => {
   }
 };
 
-exports.createRudiApiToken = (jwtPayload) => {
+exports.createRudiApiToken = (url, req) => {
   try {
     // Building the JWT header
     const keyInfo = getKeyInfo('api');
@@ -216,10 +216,10 @@ exports.createRudiApiToken = (jwtPayload) => {
     const body = {
       exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
       sub: config.API_RUDI.manager_id,
-      client_id: jwtPayload.req.user && jwtPayload.req.user.id,
-      req_mtd: jwtPayload.methode || jwtPayload.req.method,
-      req_url: axios.getUri({ url: jwtPayload.url, params: jwtPayload.req.query }),
+      req_mtd: req.method,
+      req_url: axios.getUri({ url, params: req.query }),
     };
+    if (req?.user?.id) body.client_id = req.user.id;
 
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {

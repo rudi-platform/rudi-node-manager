@@ -23,7 +23,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    * download le fichier via media_id
    * @param {*} ressource connector du fichier
    */
-  /* 
+  /*
   function downloadFile(ressource) {
     axios
       .get(`${ressource.connector.url}`, {
@@ -121,7 +121,9 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         {text}
       </span>
     );
-    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'En attente');
+    if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag);
+    if (metadata.storage_status === 'pending') return displaySpan('danger', 'En cours');
+    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé');
     if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié');
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé');
   }

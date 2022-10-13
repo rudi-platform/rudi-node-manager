@@ -32,10 +32,7 @@ exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 're
 exports.getResourceById = (req, res, next) => {
   const { id } = req.params;
   const url = `${api}/resources/${id}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,
@@ -52,10 +49,7 @@ exports.getResourceById = (req, res, next) => {
 };
 exports.postResources = (req, res, next) => {
   const url = `${api}/resources`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .post(`${serveur}${url}`, req.body, {
       headers: {
@@ -73,10 +67,7 @@ exports.postResources = (req, res, next) => {
 };
 exports.putResources = (req, res, next) => {
   const url = `${api}/resources`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .put(`${serveur}${url}`, req.body, {
       headers: {
@@ -99,10 +90,7 @@ exports.putResources = (req, res, next) => {
 exports.deleteResource = (req, res, next) => {
   const { id } = req.params;
   const url = `${api}/resources/${id}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .delete(`${serveur}${url}`, {
       params: req.query,
@@ -120,10 +108,7 @@ exports.deleteResource = (req, res, next) => {
 
 exports.getReports = (req, res, next) => {
   const url = `${api}/report`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,

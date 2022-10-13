@@ -16,14 +16,11 @@ const mod = 'admCtrl';
 const serveur = `${config.API_RUDI.listening_address}`;
 const api = `${config.API_RUDI.admin_api}`;
 
-exports.getApiUrl = (obj) => `${api}/${!obj ? '' : obj}`;
+exports.getApiUrl = (suffix) => `${api}/${!suffix ? '' : suffix}`;
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,
@@ -41,10 +38,7 @@ exports.getEnum = (req, res, next) => {
 exports.getThemeByLang = (req, res, next) => {
   const { lang } = req.params;
   const url = `${api}/enum/themes/${lang}`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
@@ -59,10 +53,7 @@ exports.getThemeByLang = (req, res, next) => {
 
 exports.getLicences = (req, res, next) => {
   const url = `${api}/licences`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
@@ -118,10 +109,7 @@ exports.putDefaultForm = (req, res, next) => {
 
 exports.getVersion = (req, res, next) => {
   const url = `/api/version`;
-  const token = createRudiApiToken({
-    url: url,
-    req: req,
-  });
+  const token = createRudiApiToken(url, req);
   return axios
     .get(`${serveur}${url}`, {
       params: req.query,

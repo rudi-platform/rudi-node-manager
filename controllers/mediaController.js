@@ -1,5 +1,7 @@
 const axios = require('axios');
 const config = require('../config/config');
+const { createRudiApiToken } = require('../utils/jwt');
+const { getApiUrl } = require('./adminController');
 const errorHandler = require('./errorHandler');
 
 const serveurMedia = (id) => {
@@ -7,7 +9,7 @@ const serveurMedia = (id) => {
     throw new Error(
       `Server configuration error: config file should contain a parameter 'rudi_media.media_url'`,
     );
-    const mediaUrl = `${config.media_url}/download/${id}`
+  const mediaUrl = `${config.media_url}/download/${id}`;
   return mediaUrl;
 };
 
@@ -42,6 +44,21 @@ exports.getDownloadById = (req, res, next) => {
     });
 };
 
-exports.commitMedia = (req, res, next) => {
+exports.commitMedia = async (req, res, next) => {
+  // const fun = 'commitMedia';
   const { mediaId, resourceId } = req.body;
+
+  const url = getApiUrl(`media/${mediaId}/commit`);
+  const token = createRudiApiToken(url, req);
+
+  const mediaInfo = await axios.post(
+    url,
+    { global_id: resourceId },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 };
