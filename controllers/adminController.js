@@ -128,23 +128,17 @@ exports.getVersion = (req, res, next) => {
 
 exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
-  // if (!user) return res.status(401).send('Error: user should be provided');
-  const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
-  if (!jwt) return res.code(401).send(new ForbiddenError('No JWT was found in the request'));
-  let jwtPayload;
   try {
-    jwtPayload = readJwtBody(jwt);
-  } catch (err) {
-    return res.code(err[STATUS_CODE]).send(err);
-  }
-  const user = jwtPayload.user;
-  const exp = jwtPayload.exp;
-  if (!user)
-    return res
-      .code(400)
-      .send(new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`));
+    // if (!user) return res.status(401).send('Error: user should be provided');
+    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
+    if (!jwt) throw new ForbiddenError('No JWT was found in the request');
 
-  try {
+    const jwtPayload = readJwtBody(jwt);
+    const user = jwtPayload.user;
+    const exp = jwtPayload.exp;
+    if (!user)
+      throw new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`);
+
     const token = await getTokenFromMediaForUser(user, exp);
     // T (The following is just for debugging)
     try {
@@ -154,7 +148,7 @@ exports.getMediaToken = async (req, res, next) => {
     } catch (parsingErr) {
       console.log('T (getMediaToken) token:', token);
     }
-    res.status(200).send(token);
+    return res.status(200).send(token);
   } catch (err) {
     log.e(mod, fun, err);
     // throw new Error(errMsg);
