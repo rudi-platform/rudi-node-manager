@@ -85,8 +85,13 @@ exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
   req?.cookies ? req.cookies[cookieName] : null;
 
 exports.extractJwtFromReq = (req) => {
-  const auth = req?.headers?.Authorization;
-  if (!auth) throw new ForbiddenError('Forbidden: no Authorization found in request headers');
+  const fun = 'extractJwtFromReq';
+  const headers = req?.headers || req?.Headers
+  const auth = headers?.Authorization || headers?.authorization;
+  if (!auth) {
+    log.d(mod, fun, `headers: ${headers}`);
+    throw new ForbiddenError('No Authorization found in request headers');
+  }
   if (!auth.startsWith('Bearer ')) return new BadRequestError('Request should use a JWT');
 
   const token = auth.substring(7);
@@ -105,6 +110,7 @@ exports.readJwtBody = (jwt) => {
 
 exports.createUserTokens = async (user) => {
   const exp = timeEpochS(toInt(config.auth.exp_time_s));
+  delete user.password
   return {
     [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
     [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),

@@ -45,23 +45,22 @@ exports.postLogin = async (req, res, next) => {
     req.login(user, { session: false }, async (err) => {
       if (err) return res.status(400).json({ errors: err });
       // const { consoleToken, pmFrontToken, exp } = await createUserTokens(user);
+      delete user.password;
       const { consoleToken, pmFrontToken, mediaToken, exp } = await createUserTokens(user);
 
       // console.log('T (postLogin) mediaToken:',mediaToken)
       // sameSite: 'Lax' ?
-      return (
-        res
-          .status(200)
-          .cookie(CONSOLE_TOKEN, consoleToken, consoleCookieOpts(exp))
-          .cookie(PM_FRONT_TOKEN, pmFrontToken, pmFrontCookieOpts(exp))
-          .cookie(MEDIA_TOKEN, mediaToken, mediaCookieOpts(exp))
-          .json({
-            success: `logged as ${user.username}`,
-            [CONSOLE_TOKEN]: consoleToken,
-            [MEDIA_TOKEN]: mediaToken,
-            expires: new Date(exp * 1000),
-          })
-      );
+      return res
+        .status(200)
+        .cookie(CONSOLE_TOKEN, consoleToken, consoleCookieOpts(exp))
+        .cookie(PM_FRONT_TOKEN, pmFrontToken, pmFrontCookieOpts(exp))
+        .cookie(MEDIA_TOKEN, mediaToken, mediaCookieOpts(exp))
+        .json({
+          success: `logged as ${user.username}`,
+          [CONSOLE_TOKEN]: consoleToken,
+          [MEDIA_TOKEN]: mediaToken,
+          expires: new Date(exp * 1000),
+        });
       // TODO : remove .json() for cookie only? or give refresh token instead
     });
   })(req, res, next);
