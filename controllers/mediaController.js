@@ -1,10 +1,14 @@
 const axios = require('axios');
 const config = require('../config/config');
-const { createRudiApiToken } = require('../utils/jwt');
+const {
+  createRudiApiToken,
+  createRudiMediaToken,
+  createPmHeadersJwtForMedia,
+} = require('../utils/jwt');
 const { getApiUrl } = require('./adminController');
 const errorHandler = require('./errorHandler');
 
-const serveurMedia = (id) => {
+const getMediaDwnlUrl = (id) => {
   if (!config?.rudi_media?.media_url)
     throw new Error(
       `Server configuration error: config file should contain a parameter 'rudi_media.media_url'`,
@@ -16,7 +20,7 @@ const serveurMedia = (id) => {
 exports.getMediaById = (req, res, next) => {
   const { id } = req.params;
   return axios
-    .get(serveurMedia(id))
+    .get(getMediaDwnlUrl(id))
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
@@ -31,7 +35,7 @@ exports.getMediaById = (req, res, next) => {
 exports.getDownloadById = (req, res, next) => {
   const { id } = req.params;
   return axios
-    .get(serveurMedia(id), {
+    .get(getMediaDwnlUrl(id), {
       headers: { 'media-access-method': 'Direct', 'media-access-compression': true },
     })
     .then((resRUDI) => {
@@ -46,19 +50,28 @@ exports.getDownloadById = (req, res, next) => {
 
 exports.commitMedia = async (req, res, next) => {
   // const fun = 'commitMedia';
-  const { mediaId, resourceId } = req.body;
+  const { mediaId, metadataId, commitId, zoneName } = req.body;
+
+  // Let's commit the media on Media module
+  const pmMediaHeaders = createPmHeadersJwtForMedia();
+
+  const commitMediaRes = await axios.post(
+    `${config.media_url}/commit/`,
+    { commitId, zoneName },
+    pmMediaHeaders,
+  );
+  console.log('T (commitMedia) commitMediaRes', commitMediaRes?.response?.data);
 
   const url = getApiUrl(`media/${mediaId}/commit`);
   const token = createRudiApiToken(url, req);
-
-  const mediaInfo = await axios.post(
-    url,
-    { global_id: resourceId },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+  const apiHeaders = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
-  );
+  };
+
+  const mediaInfo = await axios.post(url, { metadataId, commitId }, apiHeaders);
+
+  res.send(200).send(mediaInfo);
 };

@@ -120,7 +120,7 @@ exports.createUserTokens = async (user) => {
 
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser';
-  const pmHeadersJwt = await this.createPmHeadersJwtForMedia(exp ? { exp } : null);
+  const pmHeadersJwt = this.createPmHeadersJwtForMedia(exp ? { exp } : null);
   // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
   const opts = {
     headers: {
@@ -168,7 +168,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
 };
 
-exports.createPmHeadersJwtForMedia = async (body) => {
+exports.createPmHeadersJwtForMedia = (body) => {
   // Building the JWT header
   const keyInfo = getKeyInfo('media');
   const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
@@ -184,8 +184,7 @@ exports.createPmHeadersJwtForMedia = async (body) => {
   };
   // console.log('T (createPmHeadersJwtForMedia) exp', jwtPayload.exp);
 
-  const jwt = this.createJwt(jwtHeader, jwtPayload, keyInfo);
-  return jwt;
+  return this.createJwt(jwtHeader, jwtPayload, keyInfo);
 };
 
 /**
