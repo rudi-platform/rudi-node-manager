@@ -8,6 +8,7 @@ const {
   extractCookieFromReq,
   CONSOLE_TOKEN,
   getTokenFromMediaForUser,
+  extractJwtFromReq,
 } = require('../utils/jwt');
 const log = require('../utils/logger');
 const { BadRequestError, STATUS_CODE, ForbiddenError } = require('../utils/errors');
