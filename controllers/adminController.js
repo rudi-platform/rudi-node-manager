@@ -10,7 +10,7 @@ const {
   getTokenFromMediaForUser,
 } = require('../utils/jwt');
 const log = require('../utils/logger');
-const { BadRequestError } = require('../utils/errors');
+const { BadRequestError, STATUS_CODE, ForbiddenError } = require('../utils/errors');
 const mod = 'admCtrl';
 
 const serveur = `${config.API_RUDI.listening_address}`;
@@ -128,26 +128,35 @@ exports.getVersion = (req, res, next) => {
 exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
   // if (!user) return res.status(401).send('Error: user should be provided');
-  const jwt = extractCookieFromReq(req, CONSOLE_TOKEN);
-  const jwtPayload = readJwtBody(jwt);
+  const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
+  if (!jwt) return res.code(401).send(new ForbiddenError('No JWT was found in the request'));
+  let jwtPayload;
+  try {
+    jwtPayload = readJwtBody(jwt);
+  } catch (err) {
+    return res.code(err[STATUS_CODE]).send(err);
+  }
   const user = jwtPayload.user;
   const exp = jwtPayload.exp;
   if (!user)
-    throw new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`);
+    return res
+      .code(400)
+      .send(new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`));
 
   try {
     const token = await getTokenFromMediaForUser(user, exp);
+    // T (The following is just for debugging)
     try {
       const parsedBody = readJwtBody(token);
       parsedBody.exp = new Date(parsedBody.exp).toISOString();
       console.log('T (getMediaToken) token:', parsedBody);
-    } catch (e) {
+    } catch (parsingErr) {
       console.log('T (getMediaToken) token:', token);
     }
     res.status(200).send(token);
-  } catch (e) {
-    log.e(mod, fun, e);
+  } catch (err) {
+    log.e(mod, fun, err);
     // throw new Error(errMsg);
-    res.status(e.statusCode || 500).send(e);
+    return res.status(err[STATUS_CODE] || 500).send(err);
   }
 };

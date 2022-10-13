@@ -7,9 +7,8 @@ const { v4: uuidv4 } = require('uuid');
 const config = require('../config/config');
 const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
 const log = require('./logger');
-const errorHandler = require('../controllers/errorHandler');
+
 const { ForbiddenError, BadRequestError, RudiError } = require('./errors');
-const e = require('express');
 
 const mod = 'jwt';
 
@@ -96,6 +95,7 @@ exports.extractJwtFromReq = (req) => {
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
 exports.readJwtBody = (jwt) => {
+  if (!jwt) throw new BadRequestError(`No JWT provided`, mod, 'readJwtBody');
   if (!`${jwt}`.match(REGEX_JWT)) throw new BadRequestError(`Wrong format for token ${jwt}`);
   const encodedBody = jwt.split('.')[1];
   const decodedBody = decodeBase64url(encodedBody);
@@ -149,6 +149,8 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
       `Could not forge a token for user '${user.username}' on Media: ${
         err.response?.data?.message || err.response?.data || err.message
       }`,
+      mod,
+      fun,
     );
 
     log.e(mod, fun, `Could not forge a token on Media: ${rudiError}`);

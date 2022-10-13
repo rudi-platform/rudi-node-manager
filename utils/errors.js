@@ -1,13 +1,11 @@
 /* eslint-disable require-jsdoc */
 
-const { d } = require('./logger');
-
 const STATUS_CODE = 'statusCode';
 
 class RudiError extends Error {
   constructor(message, code, name, desc, ctxMod, ctxFun) {
     super(message);
-    this.statusCode = code;
+    this[STATUS_CODE] = code;
     this.name = name;
     this.description = desc;
     this.ctxMod = ctxMod;
@@ -28,7 +26,7 @@ class RudiError extends Error {
   }
 
   get code() {
-    return this.statusCode;
+    return this[STATUS_CODE];
   }
 
   static createRudiHttpError(code, message, ctxMod, ctxFun) {
@@ -148,3 +146,4 @@ exports.MethodNotAllowedError = MethodNotAllowedError;
 exports.NotAcceptableError = NotAcceptableError;
 exports.InternalServerError = InternalServerError;
 exports.RudiError = RudiError;
+exports.STATUS_CODE = STATUS_CODE
