@@ -122,7 +122,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
       </span>
     );
     if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag);
-    if (metadata.storage_status === 'pending') return displaySpan('danger', 'En cours');
+    if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet');
     if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé');
     if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié');
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé');

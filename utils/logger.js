@@ -1,7 +1,8 @@
 const rudiLogger = require('@aqmo.org/rudi_logger');
-const config = require('../config/config');
+const { getConf } = require('../config/config');
 const { getBackOptions, OPT_GIT_HASH } = require('../config/backOptions');
 const { nowFormatted } = require('./utils');
+const APP_NAME = getConf('logging', 'app_name');
 
 /**
  * build ips array from the request
@@ -26,13 +27,13 @@ exports.getContext = (req, options = {}) => {
   if (!req) {
     ctx.auth = {
       userId: '',
-      clientApp: config.logging.app_name,
+      clientApp: APP_NAME,
       reqIP: [],
     };
   } else {
     ctx.auth = {
       userId: req.user ? req.user.id : '',
-      clientApp: config.logging.app_name,
+      clientApp: APP_NAME,
       reqIP: [req.ip, ...extractIpRedirections(req)],
     };
   }
@@ -50,12 +51,12 @@ exports.getContext = (req, options = {}) => {
  */
 function getRudiLoggerOptions() {
   let facility = 20;
-  if (config.syslog.syslog_facility.substr(0, 5) == 'local') {
-    facility = 16 + Number(config.syslog.syslog_facility.substr(5, 1));
+  if (getConf('syslog', 'syslog_facility').substr(0, 5) == 'local') {
+    facility = 16 + Number(getConf('syslog', 'syslog_facility').substr(5, 1));
   }
   let transports = 2;
-  let path = config.syslog.syslog_host;
-  switch (config.syslog.syslog_protocol) {
+  let path = getConf('syslog', 'syslog_host');
+  switch (getConf('syslog', 'syslog_protocol')) {
     case 'tcp':
       transports = 1;
       break;
@@ -64,13 +65,13 @@ function getRudiLoggerOptions() {
       break;
     case 'unix':
       transports = 4;
-      path = config.syslog.syslog_socket;
+      path = getConf('syslog', 'syslog_socket');
       break;
   }
   const rudiLoggerOpts = {
     log_server: {
       path: path,
-      port: config.syslog.syslog_port,
+      port: getConf('syslog', 'syslog_port'),
       facility: facility,
       transport: transports,
     },
@@ -79,14 +80,14 @@ function getRudiLoggerOptions() {
   rudiLoggerOpts.log_local = {
     console: true,
     consoleData: false,
-    directory: config.logging.log_dir,
+    directory: getConf('logging', 'log_dir'),
     prefix: 'rudiProd.manager.syslog',
   };
   return rudiLoggerOpts;
 }
 
 const syslog = new rudiLogger.RudiLogger(
-  config.logging.app_name,
+  APP_NAME,
   getBackOptions(OPT_GIT_HASH),
   getRudiLoggerOptions(),
 );

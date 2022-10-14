@@ -1,13 +1,10 @@
 const axios = require('axios');
-const config = require('../config/config');
+const { getRudiApi, getAdminApi } = require('../config/config');
 const errorHandler = require('./errorHandler');
 const { createRudiApiToken } = require('../utils/jwt');
 
 // const axiosCurlirize = require('axios-curlirize');
 // axiosCurlirize(axios);
-
-const apiServer = (subUrl) => `${config.API_RUDI.listening_address}${subUrl}`;
-const api = `${config.API_RUDI.admin_api}`;
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -59,14 +56,13 @@ exports.getObjectList = (req, res, next) => {
   // const urlParts = `${req.url}`.split('?');
   // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
 
-  if (!checkObjectType(req, res, fun, objectType)) return;
-  if (objectType === 'media') return;
+  if (!checkObjectType(req, res, fun, objectType) || objectType === 'media') return;
 
-  const url = `${api}/${objectType}`;
-  // console.log('T (getObjectList) url', serveur(url));
+  const url = getAdminApi(objectType);
+  // console.log('T (getObjectList) url', getRudiApi(url));
   const token = createRudiApiToken(url, req);
   return axios
-    .get(apiServer(url), {
+    .get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -82,10 +78,10 @@ exports.getObjectById = (req, res, next) => {
   const { objectType, id } = req.params;
   if (!checkObjectType(req, res, fun, objectType)) return;
 
-  const url = `${api}/${objectType}/${id}`;
+  const url = getAdminApi(`${objectType}/${id}`);
   const token = createRudiApiToken(url, req);
   return axios
-    .get(apiServer(url), {
+    .get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -101,10 +97,10 @@ exports.postObject = (req, res, next) => {
   const { objectType } = req.params;
   if (!checkObjectType(req, res, fun, objectType)) return;
 
-  const url = `${api}/${objectType}`;
+  const url = getAdminApi(objectType);
   const token = createRudiApiToken(url, req);
   return axios
-    .post(apiServer(url), req.body, {
+    .post(getRudiApi(url), req.body, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -123,10 +119,10 @@ exports.putObject = (req, res, next) => {
   const { objectType } = req.params;
   if (!checkObjectType(req, res, fun, objectType)) return;
 
-  const url = `${api}/${objectType}`;
+  const url = getAdminApi(objectType);
   const token = createRudiApiToken(url, req);
   return axios
-    .put(apiServer(url), req.body, {
+    .put(getRudiApi(url), req.body, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -145,10 +141,10 @@ exports.deleteObject = (req, res, next) => {
   const { objectType, id } = req.params;
   if (!checkObjectType(req, res, fun, objectType)) return;
 
-  const url = `${api}/${objectType}/${id}`;
+  const url = getAdminApi(`${objectType}/${id}`);
   const token = createRudiApiToken(url, req);
   return axios
-    .delete(apiServer(url), {
+    .delete(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })

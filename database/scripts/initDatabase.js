@@ -4,7 +4,7 @@ const mod = 'initDb';
 const fs = require('fs');
 
 // ---- Internal dependencies -----
-const config = require('../../config/config');
+const { getDbConf } = require('../../config/config');
 const log = require('../../utils/logger');
 const dbManager = require('../database');
 const initDefaultFormTable = require('./initDefaultForm');
@@ -21,11 +21,12 @@ const initialRoles = [
 ];
 
 let initialUsers;
-if (config.database?.db_su_usr && config.database?.db_su_pwd)
+
+if (getDbConf('db_su_usr') && getDbConf('db_su_pwd'))
   initialUsers = [
     {
-      username: config.database.db_su_usr,
-      password: config.database.db_su_pwd,
+      username: getDbConf('db_su_usr'),
+      password: getDbConf('db_su_pwd'),
       email: 'security@rudi-univ-rennes1.fr',
       role: 'SuperAdmin',
     },
@@ -106,7 +107,7 @@ const initUserRolesTable = () =>
 exports.initDatabase = async () => {
   const fun = 'initDatabase';
   try {
-    fs.statSync(config.database.db_directory).isDirectory();
+    fs.statSync(getDbConf('db_directory')).isDirectory();
 
     const db = dbManager.openOrCreateDB();
     dbManager.close(db);

@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const { getConf } = require('../config/config');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const config = require('../config/config');
 const databaseManager = require('../database/database');
 const { extractCookieFromReq, CONSOLE_TOKEN } = require('./jwt');
 
@@ -47,7 +47,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: config.auth.secret_key_JWT,
+      secretOrKey: getConf('auth', 'secret_key_jwt'),
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN),

@@ -1,62 +1,60 @@
 const fs = require('fs');
 const ini = require('ini');
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions');
+
 const defaultConfigFile = './rudi_console_proxy.ini';
-const customConfigFile = getBackOptions(OPT_USER_CONF, './rudi_console_proxy_custom.ini');
-let customExist;
-let customConfig;
+let defaultConfFileContent;
 try {
-  customExist = fs.statSync(customConfigFile).isFile();
+  defaultConfFileContent = fs.readFileSync(defaultConfigFile, 'utf-8');
 } catch (error) {
-  customExist = false;
+  throw new Error(`No default configuration file was found at '${customConfigFile}'`);
 }
 
-const config = ini.parse(fs.readFileSync(defaultConfigFile, 'utf-8'));
-const CONF_PARAMS = {
-  server: ['listening_address', 'listening_port'],
-  auth: ['secret_key_JWT', 'exp_time_s'],
-  security: ['trusted_domain'],
-  API_RUDI: ['listening_address', 'admin_api', 'media_api', 'RUDI_key', 'api_key', 'manager_id'],
-  rudi_media: [
-    'media_url',
-    'media_key',
-    'manager_id',
-    'user_id',
-    'group_id',
-    'default_client_group',
-    'exp_time_s',
-  ],
-  formulaire: ['base_url'],
-  database: ['db_directory', 'db_filename', 'db_su_usr', 'db_su_pwd'],
-  logging: ['log_dir', 'app_name', 'debug'],
-  syslog: [
-    'syslog_level',
-    'syslog_host',
-    'syslog_port',
-    'syslog_facility',
-    'syslog_protocol',
-    'syslog_type',
-    'syslog_socket',
-    'syslog_node_name',
-    'syslog_dir',
-  ],
-};
-if (customExist) {
-  customConfig = ini.parse(fs.readFileSync(customConfigFile, 'utf-8'));
+const customConfigFile = getBackOptions(OPT_USER_CONF, './rudi_console_proxy_custom.ini');
+let customConfFileContent;
+try {
+  customConfFileContent = fs.readFileSync(customConfigFile, 'utf-8');
+} catch (error) {
+  throw new Error(`No custom configuration file was found at '${customConfigFile}'`);
+}
 
-  // eslint-disable-next-line guard-for-in
-  for (const section in CONF_PARAMS) {
-    console.log('CONF', section);
-    const sectionParams = customConfig[section];
-    if (sectionParams) {
-      if (!config[section]) config[section] = {};
-      for (const param of CONF_PARAMS[section]) {
-        // console.log('CONF', param);
-        if (sectionParams[param]) config[section][param] = sectionParams[param];
-      }
+const customConfig = ini.parse(customConfFileContent);
+const config = ini.parse(defaultConfFileContent);
+
+// eslint-disable-next-line guard-for-in
+for (const section in customConfig) {
+  // console.log('CONF', section);
+  const customParams = customConfig[section];
+  if (customParams) {
+    if (!config[section]) config[section] = {};
+    for (const param in customParams) {
+      // console.log('CONF', param);
+      if (customParams[param]) config[section][param] = customParams[param];
     }
   }
 }
-if (config.logging.debug) console.log(config);
 
-module.exports = config;
+if (config.logging.displayConf) console.log(config);
+
+exports.getConf = (section, subSection) => {
+  if (!section) return config;
+  const sect = config[section];
+  if (!sect || !subSection) return sect;
+  return sect[subSection];
+};
+
+const getCompletedUrl = (baseUrl, subUrl) => {
+  if (!subUrl) return baseUrl;
+  if (`${subUrl}`.startsWith('/')) return `${baseUrl}${subUrl}`;
+  return `${baseUrl}/${subUrl}`;
+};
+
+exports.getRudiApi = (suffix) => getCompletedUrl(config.rudi_api.rudi_api_url, suffix);
+exports.getAdminApi = (suffix) => getCompletedUrl(config.rudi_api.admin_api, suffix);
+
+exports.getRudiMediaUrl = (suffix) => getCompletedUrl(config.rudi_media.rudi_media_url, suffix);
+exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl(`/download/${id}`);
+
+exports.getConsoleFormUrl = () => config.rudi_console.console_form_url;
+
+exports.getDbConf = (subSection) => config.database[subSection];

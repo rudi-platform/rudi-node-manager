@@ -4,7 +4,7 @@ const { parsePrivateKey } = require('sshpk');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 
-const config = require('../config/config');
+const { getConf } = require('../config/config');
 const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
 const log = require('./logger');
 
@@ -21,7 +21,7 @@ exports.PM_FRONT_TOKEN = 'pmFrontToken';
 exports.MEDIA_TOKEN = 'mediaToken';
 exports.PM_MEDIA_TOKEN = 'mediaManagerToken';
 
-const MEDIA_AUTH = config.rudi_media;
+const MEDIA_AUTH = getConf('rudi_media');
 
 /**
  * Retrieve the string that states which algorithm was used for the
@@ -107,13 +107,13 @@ exports.readJwtBody = (jwt) => {
   const parsedBody = JSON.parse(decodedBody);
   return parsedBody;
 };
-
-exports.createUserTokens = async (user) => {
-  const exp = timeEpochS(toInt(config.auth.exp_time_s));
+const AUTH_CONF = getConf('auth');
+exports.createFrontUserTokens = async (user) => {
+  const exp = timeEpochS(toInt(getConf('auth', 'exp_time_s')));
   delete user.password;
   return {
-    [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, config.auth.secret_key_JWT),
-    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, config.auth.secret_key_JWT),
+    [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, AUTH_CONF.secret_key_jwt),
+    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, AUTH_CONF.secret_key_jwt),
     exp,
   };
 };
@@ -139,7 +139,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
   // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
 
-  const mediaForgeJwtUrl = `${MEDIA_AUTH.media_url}/jwt/forge`;
+  const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`;
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
@@ -178,7 +178,7 @@ exports.createPmHeadersJwtForMedia = (body) => {
   const jwtPayload = {
     jti: body?.jti || uuidv4(),
     iat: body?.iat || timeEpochS(),
-    exp: body?.exp || timeEpochS(body?.exp_time || config.auth.exp_time_s),
+    exp: body?.exp || timeEpochS(body?.exp_time || AUTH_CONF.exp_time_s),
     sub: body?.sub || 'auth',
     client_id: body?.client_id || 'rudimanager',
   };
@@ -208,9 +208,9 @@ exports.createRudiMediaToken = (jwtPayload) => {
     const body = {
       jti: uuidv4(),
       iat: timeEpochS(),
-      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || config.auth.exp_time_s),
+      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || AUTH_CONF.exp_time_s),
       sub: jwtPayload?.sub || 'auth',
-      client_id: jwtPayload.client_id || MEDIA_AUTH.manager_id,
+      client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
     };
     return this.createJwt(jwtHeader, body, keyInfo);
   } catch (err) {
@@ -225,7 +225,7 @@ exports.createRudiApiToken = (url, req) => {
     const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
     const body = {
       exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-      sub: config.API_RUDI.manager_id,
+      sub: getConf('rudi_api', 'pm_api_id'),
       req_mtd: req.method,
       req_url: axios.getUri({ url, params: req.query }),
     };
@@ -271,16 +271,18 @@ function getKeyInfo(name) {
     switch (name) {
       case 'api':
       case 'api_key':
-        keyPath = config.API_RUDI.api_key;
+      case 'pm_api_key':
+        keyPath = getConf('rudi_api', 'pm_api_key');
         break;
       case 'media':
-      case 'media_key':
-        keyPath = config.rudi_media.media_key;
+      case 'pm_media_key':
+      case 'pm_pm_media_key':
+        keyPath = getConf('rudi_media', 'pm_media_key');
         break;
       default:
-        keyPath = config.API_RUDI.RUDI_key;
+        keyPath = getConf('auth', 'pm_prv_key');
     }
-    const prvKeyPem = fs.readFileSync(keyPath || config.API_RUDI.RUDI_key, 'ascii');
+    const prvKeyPem = fs.readFileSync(keyPath || getConf('rudi_api', 'pm_prv_key'), 'ascii');
     const prvKey = parsePrivateKey(prvKeyPem);
     const keyType = prvKey.type;
 

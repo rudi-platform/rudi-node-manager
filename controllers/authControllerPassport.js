@@ -6,7 +6,7 @@ const databaseManager = require('../database/database');
 const log = require('../utils/logger');
 
 const { isDevEnv } = require('../config/backOptions');
-const { createUserTokens, CONSOLE_TOKEN, PM_FRONT_TOKEN, MEDIA_TOKEN } = require('../utils/jwt');
+const { createFrontUserTokens, CONSOLE_TOKEN, PM_FRONT_TOKEN, MEDIA_TOKEN } = require('../utils/jwt');
 const SHOULD_SECURE = !isDevEnv();
 
 const SALT_ROUNDS = 10;
@@ -46,7 +46,7 @@ exports.postLogin = async (req, res, next) => {
       if (err) return res.status(400).json({ errors: err });
       // const { consoleToken, pmFrontToken, exp } = await createUserTokens(user);
       delete user.password;
-      const { consoleToken, pmFrontToken, mediaToken, exp } = await createUserTokens(user);
+      const { consoleToken, pmFrontToken, mediaToken, exp } = await createFrontUserTokens(user);
 
       // console.log('T (postLogin) mediaToken:',mediaToken)
       // sameSite: 'Lax' ?
@@ -58,7 +58,6 @@ exports.postLogin = async (req, res, next) => {
         .json({
           success: `logged as ${user.username}`,
           [CONSOLE_TOKEN]: consoleToken,
-          [MEDIA_TOKEN]: mediaToken,
           expires: new Date(exp * 1000),
         });
       // TODO : remove .json() for cookie only? or give refresh token instead

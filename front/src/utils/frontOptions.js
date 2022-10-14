@@ -20,7 +20,7 @@ const frontOptions = {};
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
-/* 
+/*
 console.log('= Extract command line arguments =');
 console.log('REACT_APP_URL: ' + process.env.REACT_APP_URL);
 console.log('FRONT_PATH: ' + process.env.FRONT_PATH);

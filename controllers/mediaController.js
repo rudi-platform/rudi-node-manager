@@ -1,21 +1,7 @@
 const axios = require('axios');
-const config = require('../config/config');
-const {
-  createRudiApiToken,
-  createRudiMediaToken,
-  createPmHeadersJwtForMedia,
-} = require('../utils/jwt');
-const { getApiUrl } = require('./adminController');
+const { getMediaDwnlUrl, getRudiApi } = require('../config/config');
+const { createRudiApiToken, createPmHeadersJwtForMedia } = require('../utils/jwt');
 const errorHandler = require('./errorHandler');
-
-const getMediaDwnlUrl = (id) => {
-  if (!config?.rudi_media?.media_url)
-    throw new Error(
-      `Server configuration error: config file should contain a parameter 'rudi_media.media_url'`,
-    );
-  const mediaUrl = `${config.media_url}/download/${id}`;
-  return mediaUrl;
-};
 
 exports.getMediaById = (req, res, next) => {
   const { id } = req.params;
@@ -56,13 +42,13 @@ exports.commitMedia = async (req, res, next) => {
   const pmMediaHeaders = createPmHeadersJwtForMedia();
 
   const commitMediaRes = await axios.post(
-    `${config.media_url}/commit/`,
+    getRudiMediaUrl('commit/'),
     { commitId, zoneName },
     pmMediaHeaders,
   );
   console.log('T (commitMedia) commitMediaRes', commitMediaRes?.response?.data);
 
-  const url = getApiUrl(`media/${mediaId}/commit`);
+  const url = getRudiApi(`media/${mediaId}/commit`);
   const token = createRudiApiToken(url, req);
   const apiHeaders = {
     headers: {

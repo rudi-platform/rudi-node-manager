@@ -5,12 +5,12 @@ const sqlite3 = require('sqlite3').verbose();
 const Promise = require('bluebird');
 
 // ---- Internal dependencies -----
-const config = require('../config/config');
+const { getDbConf } = require('../config/config');
 const log = require('../utils/logger');
 
 // ---- Constants -----
-const DB_NAME = `${config.database.db_filename}`.trim();
-const DB_FILE = `${config.database.db_directory}${DB_NAME ? `/${DB_NAME}` : ''}`.trim();
+const DB_NAME = getDbConf('db_filename');
+const DB_FILE = `${getDbConf('db_directory')}${DB_NAME ? `/${DB_NAME}` : ''}`.trim();
 
 const TBL_USERS = 'Users';
 exports.TBL_USERS = TBL_USERS;

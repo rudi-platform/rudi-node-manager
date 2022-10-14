@@ -1,5 +1,5 @@
 const axios = require('axios');
-const config = require('../config/config');
+const { getConf } = require('../config/config');
 const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 const {
@@ -14,10 +14,9 @@ const log = require('../utils/logger');
 const { BadRequestError, STATUS_CODE, ForbiddenError } = require('../utils/errors');
 const mod = 'admCtrl';
 
-const serveur = `${config.API_RUDI.listening_address}`;
-const api = `${config.API_RUDI.admin_api}`;
+const serveur = `${getConf('rudi_api', 'rudi_api_url')}`;
+const api = `${getConf('rudi_api', 'admin_api')}`;
 
-exports.getApiUrl = (suffix) => `${api}/${!suffix ? '' : suffix}`;
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
@@ -67,7 +66,7 @@ exports.getLicences = (req, res, next) => {
     });
 };
 
-// Default Value for formulaire
+// Default Value for rudi_console
 exports.getDefaultForm = (req, res, next) => {
   const user = req.user;
   return databaseManager

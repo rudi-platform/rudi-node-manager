@@ -10,7 +10,7 @@ const apiV1 = require('./routes/routesV1');
 const apiAdmin = require('./routes/routesAdmin');
 const apiMedia = require('./routes/routesMedia');
 // Require Config
-const config = require('./config/config');
+const { getConf } = require('./config/config');
 const log = require('./utils/logger');
 
 const mod = 'server';
@@ -22,7 +22,7 @@ const { isDevEnv } = require('./config/backOptions');
 // Create a new express application named 'app'
 const app = express();
 // Set our backend port to be either an environment variable or port 5000
-const port = config.server.listening_port || 5000;
+const port = getConf('server', 'listening_port') || 5000;
 
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, res, next) => {
@@ -36,7 +36,7 @@ app.use(
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
-        'connect-src': ["'self'", ...config.security.trusted_domain],
+        'connect-src': ["'self'", ...getConf('security').trusted_domain],
       },
     },
   }),
