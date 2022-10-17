@@ -11,12 +11,11 @@ const {
   extractJwtFromReq,
 } = require('../utils/jwt');
 const log = require('../utils/logger');
-const { BadRequestError, STATUS_CODE, ForbiddenError } = require('../utils/errors');
+const { STATUS_CODE, ForbiddenError } = require('../utils/errors');
 const mod = 'admCtrl';
 
 const serveur = `${getConf('rudi_api', 'rudi_api_url')}`;
 const api = `${getConf('rudi_api', 'admin_api')}`;
-
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
@@ -130,13 +129,19 @@ exports.getMediaToken = async (req, res, next) => {
   try {
     // if (!user) return res.status(401).send('Error: user should be provided');
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
-    if (!jwt) throw new ForbiddenError('No JWT was found in the request');
+    if (!jwt) {
+      // console.error('T (getMediaToken) req:', req);
+      throw new ForbiddenError('No JWT was found in the request');
+    }
+    // console.error('T (getMediaToken) jwt:', jwt);
 
     const jwtPayload = readJwtBody(jwt);
     const user = jwtPayload.user;
     const exp = jwtPayload.exp;
     if (!user)
-      throw new BadRequestError(`JWT body token should contain an identified user: ${jwtPayload}`);
+      throw new ForbiddenError(`JWT body token should contain an identified user: ${jwtPayload}`);
+    if (exp * 1000 < new Date().getTime())
+      throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`);
 
     const token = await getTokenFromMediaForUser(user, exp);
     // T (The following is just for debugging)
@@ -151,7 +156,11 @@ exports.getMediaToken = async (req, res, next) => {
     */
     return res.status(200).send(token);
   } catch (err) {
-    log.e(mod, fun, err);
+    log.e(
+      mod,
+      fun,
+      '!! Liaison avec le module “Media” incomplète, création de JWT impossible: ' + err,
+    );
     // throw new Error(errMsg);
     return res.status(err[STATUS_CODE] || 500).send(err);
   }

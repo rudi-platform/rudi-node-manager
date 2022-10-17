@@ -8,7 +8,7 @@ const { getConf } = require('../config/config');
 const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
 const log = require('./logger');
 
-const { ForbiddenError, BadRequestError, RudiError } = require('./errors');
+const { ForbiddenError, RudiError } = require('./errors');
 
 const mod = 'jwt';
 
@@ -31,25 +31,23 @@ const MEDIA_AUTH = getConf('rudi_media');
  * @return {String} Key algo
  */
 exports.getJwtAlgo = (algo) => {
-  try {
-    switch (algo) {
-      case 'ed25519':
-      case 'EdDSA':
-        return 'EdDSA';
-      case 'HS256':
-      case 'ES256':
-      case 'RS256':
-      case 'PS256':
-      case 'HS512':
-      case 'ES512':
-      case 'RS512':
-      case 'PS512':
-        return algo;
-      default:
-        throw Error(`Algo not recognized: '${algo}'`);
-    }
-  } catch (err) {
-    throw err;
+  switch (algo) {
+    case 'ed25519':
+    case 'EdDSA':
+      return 'EdDSA';
+    case 'HS256':
+    case 'ES256':
+    case 'RS256':
+    case 'PS256':
+    case 'HS512':
+    case 'ES512':
+    case 'RS512':
+    case 'PS512':
+      return algo;
+    case 'rsa':
+      return 'rsa';
+    default:
+      throw new Error(`Algo not recognized: '${algo}'`);
   }
 };
 
@@ -59,25 +57,22 @@ exports.getJwtAlgo = (algo) => {
  * @return {String} Hash algo
  */
 exports.getHashAlgo = (algo) => {
-  try {
-    switch (algo) {
-      case 'HS256':
-      case 'RS256':
-      case 'ES256':
-      case 'PS256':
-        return 'sha256';
-      case 'ES512':
-      case 'HS512':
-      case 'RS512':
-      case 'PS512':
-      case 'ed25519':
-      case 'EdDSA':
-        return 'sha512';
-      default:
-        throw Error(`Algo not recognized: '${algo}'`);
-    }
-  } catch (err) {
-    throw err;
+  switch (algo) {
+    case 'HS256':
+    case 'RS256':
+    case 'ES256':
+    case 'PS256':
+    case 'rsa':
+      return 'sha256';
+    case 'ES512':
+    case 'HS512':
+    case 'RS512':
+    case 'PS512':
+    case 'ed25519':
+    case 'EdDSA':
+      return 'sha512';
+    default:
+      throw Error(`[getHashAlgo] Algo not recognized: '${algo}'`);
   }
 };
 
@@ -92,21 +87,23 @@ exports.extractJwtFromReq = (req) => {
     log.d(mod, fun, `headers: ${headers}`);
     throw new ForbiddenError('No Authorization found in request headers');
   }
-  if (!auth.startsWith('Bearer ')) return new BadRequestError('Request should use a JWT');
+  if (!auth.startsWith('Bearer ')) return new ForbiddenError('Request should use a JWT');
 
   const token = auth.substring(7);
+  if (token.length === 0) return new ForbiddenError('Request provided an empty JWT');
   return token;
 };
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
 exports.readJwtBody = (jwt) => {
-  if (!jwt) throw new BadRequestError(`No JWT provided`, mod, 'readJwtBody');
-  if (!`${jwt}`.match(REGEX_JWT)) throw new BadRequestError(`Wrong format for token ${jwt}`);
+  if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody');
+  if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`);
   const encodedBody = jwt.split('.')[1];
   const decodedBody = decodeBase64url(encodedBody);
   const parsedBody = JSON.parse(decodedBody);
   return parsedBody;
 };
+
 const AUTH_CONF = getConf('auth');
 exports.createFrontUserTokens = async (user) => {
   const exp = timeEpochS(toInt(getConf('auth', 'exp_time_s')));
@@ -121,7 +118,7 @@ exports.createFrontUserTokens = async (user) => {
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser';
   const pmHeadersJwt = this.createPmHeadersJwtForMedia(exp ? { exp } : null);
-  // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
+  console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
   const opts = {
     headers: {
       Authorization: `Bearer ${pmHeadersJwt}`,
@@ -171,9 +168,11 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
 exports.createPmHeadersJwtForMedia = (body) => {
   // Building the JWT header
   const keyInfo = getKeyInfo('media');
+  // console.log('T (createPmHeadersJwtForMedia) keyInfo', keyInfo);
+
   const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
 
-  // console.log('T (createPmHeadersJwtForMedia) body', body);
+  // console.log('T (createPmHeadersJwtForMedia) jwtHeader', jwtHeader);
   // Building the JWT body
   const jwtPayload = {
     jti: body?.jti || uuidv4(),
@@ -242,11 +241,13 @@ exports.createJwt = (jwtHeader, jwtPayload, keyInfo) => {
   const headerBase64url = toBase64url(JSON.stringify(jwtHeader));
   const payloadBase64url = toBase64url(JSON.stringify(jwtPayload));
   const data = headerBase64url + '.' + payloadBase64url;
+  // console.log('T (createJwt) data', `${data}`);
 
   // Building the JWT signature
   const keyType = keyInfo[KTYP];
   const prvKey = keyInfo[PRVK];
   const hashAlgo = this.getHashAlgo(keyType);
+  console.log('T (createJwt) hashAlgo', `${hashAlgo}`);
 
   const signBuffer = prvKey.createSign(hashAlgo);
   signBuffer.update(data);
@@ -255,7 +256,7 @@ exports.createJwt = (jwtHeader, jwtPayload, keyInfo) => {
   // log.d(mod, fun, `base64url signature: ${signatureBase64url}`)
 
   // Returning the final JWT
-  // console.log('T (createJwt) final JWT',`${data}.${signatureBase64url}`)
+  // console.log('T (createJwt) final JWT', `${data}.${signatureBase64url}`);
   return `${data}.${signatureBase64url}`;
 };
 
