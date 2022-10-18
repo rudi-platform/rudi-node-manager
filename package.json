@@ -4,7 +4,7 @@
   "description": "Application d'administration du noeud RUDI",
   "main": "server.js",
   "scripts": {
-    "prestart": "npm install",
+    "prestart": "npm install && cd jwti && npm install && tsc && npm run build",
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",

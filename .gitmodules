@@ -1,0 +1,4 @@
+[submodule "simple-crypto"]
+	path = jwti
+	url = https://gitlab.aqmo.org/rudidev/simple-crypto.git
+	branch = main

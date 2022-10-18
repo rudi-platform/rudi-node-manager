@@ -5,7 +5,13 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 
 const { getConf } = require('../config/config');
-const { toBase64url, convertEncoding, timeEpochS, toInt, decodeBase64url } = require('./utils');
+const {
+  toBase64url,
+  convertEncoding,
+  laterEpochS: timeEpochS,
+  toInt,
+  decodeBase64url,
+} = require('./utils');
 const log = require('./logger');
 
 const { ForbiddenError, RudiError } = require('./errors');
@@ -58,6 +64,8 @@ exports.getJwtAlgo = (algo) => {
  */
 exports.getHashAlgo = (algo) => {
   switch (algo) {
+    case 'EdDSA':
+      return 'none';
     case 'HS256':
     case 'RS256':
     case 'ES256':
@@ -69,7 +77,6 @@ exports.getHashAlgo = (algo) => {
     case 'RS512':
     case 'PS512':
     case 'ed25519':
-    case 'EdDSA':
       return 'sha512';
     default:
       throw Error(`[getHashAlgo] Algo not recognized: '${algo}'`);
@@ -207,7 +214,9 @@ exports.createRudiMediaToken = (jwtPayload) => {
     const body = {
       jti: uuidv4(),
       iat: timeEpochS(),
-      exp: jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || AUTH_CONF.exp_time_s),
+      exp:
+        jwtPayload?.exp ||
+        timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || AUTH_CONF.exp_time_s),
       sub: jwtPayload?.sub || 'auth',
       client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
     };
