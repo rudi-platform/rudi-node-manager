@@ -1,7 +1,4 @@
-[submodule "simple-crypto"]
-	path = 1-sub/jwti
-	url = https://gitlab.aqmo.org/rudidev/simple-crypto.git
-	branch = main
 [submodule "1-sub/jwti"]
 	path = 1-sub/jwti
 	url = https://gitlab.aqmo.org/rudidev/simple-crypto.git
+	branch = main

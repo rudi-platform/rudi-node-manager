@@ -20,7 +20,7 @@
     "quality": "npm run prettier && npm run lintBack -- --fix",
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null",
-    "syncSub": "cd 1-sub/*; git pull"
+    "syncSub": "cd 1-sub/*; npm run reinit"
   },
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",
