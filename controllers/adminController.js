@@ -31,6 +31,7 @@ exports.getEnum = (req, res, next) => {
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_enum' });
+      log.w(mod, fun, error);
       res.status(error.statusCode).json(error);
     });
 };
@@ -127,7 +128,7 @@ exports.getVersion = (req, res, next) => {
 exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
   try {
-    // if (!user) return res.status(401).send('Error: user should be provided');
+    // We extract
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
     if (!jwt) {
       // console.error('T (getMediaToken) req:', req);

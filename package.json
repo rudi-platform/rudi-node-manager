@@ -4,7 +4,7 @@
   "description": "Application d'administration du noeud RUDI",
   "main": "server.js",
   "scripts": {
-    "prestart": "npm install && cd jwti && npm install && tsc && npm run build",
+    "prestart": "npm install && cd 1-sub/jwti && npm run prestart && npm run build",
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
@@ -12,13 +12,15 @@
     "serverWindow": "nodemon server.js --ignore './front/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
-    "front:build": "cd front && npm run build",
+    "jwti-build": "cd 1-sub/jwti && ls && git pull origin main && npm i && npm run prestart && npm run build",
+    "front-build": "cd front && npm run build",
     "lintBack": "eslint \"**/*.js\"",
     "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc --no-ignore",
     "prettier": "npx prettier --write .",
     "quality": "npm run prettier && npm run lintBack -- --fix",
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
-    "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
+    "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null",
+    "syncSub": "cd 1-sub/*; git pull"
   },
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",

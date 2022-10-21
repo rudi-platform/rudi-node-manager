@@ -1,25 +1,18 @@
-const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const { parsePrivateKey } = require('sshpk');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 
 const { getConf } = require('../config/config');
-const {
-  toBase64url,
-  convertEncoding,
-  laterEpochS: timeEpochS,
-  toInt,
-  decodeBase64url,
-} = require('./utils');
+const { timeEpochS, toInt } = require('./utils');
 const log = require('./logger');
-
 const { ForbiddenError, RudiError } = require('./errors');
+
+// const jwtiFolder = getConf('auth','jwti_folder')
+
+const jwtLib = require(`../1-sub/jwti`);
 
 const mod = 'jwt';
 
-const KTYP = 'ktyp';
-const PRVK = 'prvk';
 const OFFSET_USR_ID = 5000;
 
 exports.CONSOLE_TOKEN = 'consoleToken';
@@ -28,60 +21,6 @@ exports.MEDIA_TOKEN = 'mediaToken';
 exports.PM_MEDIA_TOKEN = 'mediaManagerToken';
 
 const MEDIA_AUTH = getConf('rudi_media');
-
-/**
- * Retrieve the string that states which algorithm was used for the
- * private/public key pair.
- * see https://datatracker.ietf.org/doc/html/rfc7518#section-3.1
- * @param {String} algo
- * @return {String} Key algo
- */
-exports.getJwtAlgo = (algo) => {
-  switch (algo) {
-    case 'ed25519':
-    case 'EdDSA':
-      return 'EdDSA';
-    case 'HS256':
-    case 'ES256':
-    case 'RS256':
-    case 'PS256':
-    case 'HS512':
-    case 'ES512':
-    case 'RS512':
-    case 'PS512':
-      return algo;
-    case 'rsa':
-      return 'rsa';
-    default:
-      throw new Error(`Algo not recognized: '${algo}'`);
-  }
-};
-
-/**
- * Hash algo to be used to sign the JWT
- * @param {String} algo
- * @return {String} Hash algo
- */
-exports.getHashAlgo = (algo) => {
-  switch (algo) {
-    case 'EdDSA':
-      return 'none';
-    case 'HS256':
-    case 'RS256':
-    case 'ES256':
-    case 'PS256':
-    case 'rsa':
-      return 'sha256';
-    case 'ES512':
-    case 'HS512':
-    case 'RS512':
-    case 'PS512':
-    case 'ed25519':
-      return 'sha512';
-    default:
-      throw Error(`[getHashAlgo] Algo not recognized: '${algo}'`);
-  }
-};
 
 exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
   req?.cookies ? req.cookies[cookieName] : null;
@@ -102,13 +41,11 @@ exports.extractJwtFromReq = (req) => {
 };
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
+
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody');
   if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`);
-  const encodedBody = jwt.split('.')[1];
-  const decodedBody = decodeBase64url(encodedBody);
-  const parsedBody = JSON.parse(decodedBody);
-  return parsedBody;
+  return jwtLib.tokenStringToJwtObject(jwt)?.payload;
 };
 
 const AUTH_CONF = getConf('auth');
@@ -172,26 +109,18 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
 };
 
-exports.createPmHeadersJwtForMedia = (body) => {
-  // Building the JWT header
-  const keyInfo = getKeyInfo('media');
-  // console.log('T (createPmHeadersJwtForMedia) keyInfo', keyInfo);
-
-  const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
-
-  // console.log('T (createPmHeadersJwtForMedia) jwtHeader', jwtHeader);
-  // Building the JWT body
-  const jwtPayload = {
-    jti: body?.jti || uuidv4(),
-    iat: body?.iat || timeEpochS(),
-    exp: body?.exp || timeEpochS(body?.exp_time || AUTH_CONF.exp_time_s),
-    sub: body?.sub || 'auth',
-    client_id: body?.client_id || 'rudimanager',
-  };
-  // console.log('T (createPmHeadersJwtForMedia) exp', jwtPayload.exp);
-
-  return this.createJwt(jwtHeader, jwtPayload, keyInfo);
-};
+exports.createPmHeadersJwtForMedia = (body) =>
+  jwtLib.forgeToken(
+    getPrvKey('media'),
+    {},
+    {
+      jti: body?.jti || uuidv4(),
+      iat: timeEpochS(),
+      exp: body?.exp || timeEpochS(body?.exp_time || AUTH_CONF.exp_time_s),
+      sub: body?.sub || 'auth',
+      client_id: body?.client_id || getConf('rudi_media', 'pm_media_id') || 'rudimanager',
+    },
+  );
 
 /**
  *
@@ -204,14 +133,11 @@ exports.createPmHeadersJwtForMedia = (body) => {
  *    (shifted here with an offset of 5000 to ensure compatibility with media)
  * @return {String} a JWT
  */
-exports.createRudiMediaToken = (jwtPayload) => {
-  try {
-    // Building the JWT header
-    const keyInfo = getKeyInfo('media');
-    const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
-
-    // Building the JWT body
-    const body = {
+exports.createRudiMediaToken = (jwtPayload) =>
+  jwtLib.forgeToken(
+    getPrvKey('media'),
+    {},
+    {
       jti: uuidv4(),
       iat: timeEpochS(),
       exp:
@@ -219,90 +145,63 @@ exports.createRudiMediaToken = (jwtPayload) => {
         timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || AUTH_CONF.exp_time_s),
       sub: jwtPayload?.sub || 'auth',
       client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
-    };
-    return this.createJwt(jwtHeader, body, keyInfo);
-  } catch (err) {
-    throw err;
-  }
-};
+    },
+  );
 
-exports.createRudiApiToken = (url, req) => {
-  try {
-    // Building the JWT header
-    const keyInfo = getKeyInfo('api');
-    const jwtHeader = { typ: 'JWT', alg: this.getJwtAlgo(keyInfo[KTYP]) };
-    const body = {
+exports.createRudiApiToken = (url, req) =>
+  jwtLib.forgeToken(
+    getPrvKey('api'),
+    {},
+    {
       exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
       sub: getConf('rudi_api', 'pm_api_id'),
       req_mtd: req.method,
       req_url: axios.getUri({ url, params: req.query }),
-    };
-    if (req?.user?.id) body.client_id = req.user.id;
-    // console.log('T (createRudiApiToken) body.req_url',body.req_url)
-    return this.createJwt(jwtHeader, body, keyInfo);
-  } catch (err) {
-    throw err;
-  }
-};
-
-exports.createJwt = (jwtHeader, jwtPayload, keyInfo) => {
-  // Building the data to sign
-  const headerBase64url = toBase64url(JSON.stringify(jwtHeader));
-  const payloadBase64url = toBase64url(JSON.stringify(jwtPayload));
-  const data = headerBase64url + '.' + payloadBase64url;
-  // console.log('T (createJwt) data', `${data}`);
-
-  // Building the JWT signature
-  const keyType = keyInfo[KTYP];
-  const prvKey = keyInfo[PRVK];
-  const hashAlgo = this.getHashAlgo(keyType);
-  console.log('T (createJwt) hashAlgo', `${hashAlgo}`);
-
-  const signBuffer = prvKey.createSign(hashAlgo);
-  signBuffer.update(data);
-  const signatureBase64 = signBuffer.sign();
-  const signatureBase64url = convertEncoding(signatureBase64.toString(), 'base64', 'base64url');
-  // log.d(mod, fun, `base64url signature: ${signatureBase64url}`)
-
-  // Returning the final JWT
-  // console.log('T (createJwt) final JWT', `${data}.${signatureBase64url}`);
-  return `${data}.${signatureBase64url}`;
-};
+    },
+  );
 
 /**
- * Returns both the private key and the algo
- * @param {String} name of the key ('api' | 'media')
- * @return {*} key info
+ * Shortcut to call a key by name
+ * @param {*} name
+ * @return {string} path to the key
  */
-function getKeyInfo(name) {
-  try {
-    // Extracting the private key
-    let keyPath;
-    switch (name) {
-      case 'api':
-      case 'api_key':
-      case 'pm_api_key':
-        keyPath = getConf('rudi_api', 'pm_api_key');
-        break;
-      case 'media':
-      case 'pm_media_key':
-      case 'pm_pm_media_key':
-        keyPath = getConf('rudi_media', 'pm_media_key');
-        break;
-      default:
-        keyPath = getConf('auth', 'pm_prv_key');
-    }
-    const prvKeyPem = fs.readFileSync(keyPath || getConf('rudi_api', 'pm_prv_key'), 'ascii');
-    const prvKey = parsePrivateKey(prvKeyPem);
-    const keyType = prvKey.type;
-
-    // Storing key info
-    const keyInfos = {
-      [KTYP]: keyType,
-      [PRVK]: prvKey,
-    };
-    return keyInfos;
-  } catch (err) {
-    throw err;
+const getKeyPath = (name) => {
+  switch (name) {
+    case 'api':
+      return getConf('rudi_api', 'pm_api_key') || getConf('auth', 'pm_prv_key');
+    case 'media':
+      return getConf('rudi_media', 'pm_media_key') || getConf('auth', 'pm_prv_key');
+    default:
+      return getConf('auth', 'pm_prv_key');
   }
-}
+};
+
+const prvKeyCache = {};
+
+/**
+ * Access to local private keys
+ * @param {string} name
+ * @return {object} the private key
+ */
+const getPrvKey = (name) => {
+  // Shortcuts
+  switch (name) {
+    case 'api':
+    case 'api_key':
+    case 'pm_api_key':
+      name = 'api';
+      break;
+    case 'media':
+    case 'media_key':
+    case 'pm_media_key':
+      name = 'media';
+      break;
+    default:
+      name = 'auth';
+  }
+  // If PEM is cached, let's return it
+  if (prvKeyCache[name]) return prvKeyCache[name];
+  const keyPath = getKeyPath(name);
+  prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath);
+  return prvKeyCache[name];
+};
