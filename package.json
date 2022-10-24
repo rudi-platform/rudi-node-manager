@@ -4,7 +4,7 @@
   "description": "Application d'administration du noeud RUDI",
   "main": "server.js",
   "scripts": {
-    "prestart": "npm install && cd 1-sub/jwti && npm run prestart && npm run build",
+    "prestart": "npm install",
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
@@ -20,11 +20,11 @@
     "quality": "npm run prettier && npm run lintBack -- --fix",
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null",
-    "syncSub": "cd 1-sub/*; npm run reinit"
   },
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",
   "dependencies": {
+    "@aqmo.org/jwt_lib": "^1.1.1",
     "@aqmo.org/rudi_logger": "^1.1.2",
     "@babel/preset-react": "^7.18.6",
     "axios": "^0.27.2",
@@ -41,7 +41,7 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "sqlite3": "^5.0.11",
+    "sqlite3": "^5.1.2",
     "sshpk": "^1.17.0",
     "uuid": "^9.0.0"
   },

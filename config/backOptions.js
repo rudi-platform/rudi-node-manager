@@ -5,7 +5,6 @@ exports.OPT_USER_CONF = 'conf';
 exports.OPT_GIT_HASH = 'hash';
 exports.OPT_NODE_ENV = 'nodeEnv';
 exports.OPT_BACK_PATH = 'backPath';
-exports.OPT_JWTI_PATH = 'jwtiPath';
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -35,11 +34,6 @@ exports.OPTIONS = {
     text: 'Back-end path',
     cli: '--back_path',
     env: 'RUDI_PROD_MANAGER_BACK_PATH',
-  },
-  [this.OPT_JWTI_PATH]: {
-    text: 'JWT submodule folder',
-    cli: '--jwti_path',
-    env: 'RUDI_PROD_MANAGER_JWTI_PATH',
   },
 };
 // if (argv.indexOf('--opts') > -1) {

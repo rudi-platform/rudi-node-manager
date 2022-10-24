@@ -1,15 +1,13 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
+const jwtLib = require(`@aqmo.org/jwt_lib`);
 
 const { getConf } = require('../config/config');
 const { timeEpochS, toInt } = require('./utils');
 const log = require('./logger');
 const { ForbiddenError, RudiError } = require('./errors');
 
-// const jwtiFolder = getConf('auth','jwti_folder')
-
-const jwtLib = require(`../1-sub/jwti`);
 
 const mod = 'jwt';
 
