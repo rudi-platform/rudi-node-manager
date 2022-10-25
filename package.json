@@ -24,7 +24,7 @@
   "author": "Yann Porret <yporret@micropole.com>",
   "license": "EUPL-1.2",
   "dependencies": {
-    "@aqmo.org/jwt_lib": "^1.1.3",
+    "@aqmo.org/jwt_lib": "^1.1.8",
     "@aqmo.org/rudi_logger": "^1.1.2",
     "@babel/preset-react": "^7.18.6",
     "axios": "^0.27.2",
