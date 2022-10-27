@@ -8,7 +8,6 @@ const { timeEpochS, toInt } = require('./utils');
 const log = require('./logger');
 const { ForbiddenError, RudiError } = require('./errors');
 
-
 const mod = 'jwt';
 
 const OFFSET_USR_ID = 5000;
@@ -59,20 +58,13 @@ exports.createFrontUserTokens = async (user) => {
 
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser';
-  const pmHeadersJwt = this.createPmHeadersJwtForMedia(exp ? { exp } : null);
-  console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
-  const opts = {
-    headers: {
-      Authorization: `Bearer ${pmHeadersJwt}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  };
+  const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null);
+  // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
 
   const delegationBody = {
     user_id: user.id,
     user_name: user.username || 'rudiconsole',
-    group_name: MEDIA_AUTH.default_client_group,
+    group_name: getConf('rudi_console', 'default_client_group'),
   };
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
@@ -82,7 +74,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
-    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, opts);
+    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders);
     if (!mediaRes) throw Error(`No answer received from Media module`);
     if (!mediaRes?.data?.token)
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
@@ -107,7 +99,18 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
 };
 
-exports.createPmHeadersJwtForMedia = (body) =>
+exports.createPmHeadersForMedia = (body) => {
+  const pmHeadersJwt = this.createPmJwtForMedia(body);
+  return {
+    headers: {
+      Authorization: `Bearer ${pmHeadersJwt}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  };
+};
+
+exports.createPmJwtForMedia = (body) =>
   jwtLib.forgeToken(
     getPrvKey('media'),
     {},

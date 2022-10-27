@@ -6,10 +6,10 @@ const { getMediaById, getDownloadById, commitMedia } = require('../controllers/m
 const { getMediaToken } = require('../controllers/adminController');
 
 router.get('/jwt', passport.authenticate('jwt', { session: false }), getMediaToken);
+router.post('/commit', commitMedia);
 
 router.get('/:id', getMediaById);
 router.get('/download/:id', getDownloadById);
 
-router.post('/commit', passport.authenticate('jwt', { session: false }), commitMedia);
 
 module.exports = router;

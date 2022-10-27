@@ -16,6 +16,7 @@ const mod = 'admCtrl';
 
 const serveur = `${getConf('rudi_api', 'rudi_api_url')}`;
 const api = `${getConf('rudi_api', 'admin_api')}`;
+const getApiUrl = (suffix) => `${serveur}${url}${suffix ? `/${suffix}` : ''}`;
 
 exports.getEnum = (req, res, next) => {
   const url = `${api}/enum`;
@@ -128,6 +129,7 @@ exports.getVersion = (req, res, next) => {
 exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
   try {
+    console.log('T (getMediaToken)');
     // We extract
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
     if (!jwt) {

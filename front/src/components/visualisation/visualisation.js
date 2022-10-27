@@ -5,7 +5,7 @@ import 'jspreadsheet-ce/dist/jspreadsheet.css';
 import { Check } from 'react-bootstrap-icons';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import ReactJson from '@textea/json-viewer';
+import { JsonViewer } from '@textea/json-viewer';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { useParams } from 'react-router-dom';
 
@@ -84,7 +84,7 @@ function Visualisation() {
         loadingSpin: true,
         includeHeadersOnDownload: true,
         parseTableAutoCellType: true,
-        parseTableFirstRowAsHeader:true
+        parseTableFirstRowAsHeader: true,
       };
       setEl(jspreadsheet(wrapper.current, options));
     }
@@ -196,7 +196,7 @@ function Visualisation() {
       {
         {
           CSV: <div ref={wrapper} />,
-          JSON: <ReactJson ref={wrapper} src={visuOption.data} collapsed={2} />,
+          JSON: <JsonViewer ref={wrapper} src={visuOption.data} collapsed={2} />,
           TXT: <div className="body">{visuOption.data}</div>,
           IMG: <img alt="image" ref={wrapper} className="image90" src={visuOption.data} />,
         }[visuOption.displayType]
