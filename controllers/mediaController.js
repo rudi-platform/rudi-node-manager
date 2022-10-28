@@ -36,7 +36,7 @@ exports.getDownloadById = (req, res, next) => {
 
 exports.commitMedia = async (req, res, next) => {
   // const fun = 'commitMedia';
-  console.log('T (commitMedia) req.body', req.body);
+  // console.log('T (commitMedia) req.body', req.body);
   const {
     media_id: mediaId,
     global_id: metadataId,

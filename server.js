@@ -28,6 +28,7 @@ const port = getConf('server', 'listening_port') || 5000;
 app.use((req, res, next) => {
   log.sysInfo(mod, '', `Request_Endpoint: ${req.method} ${req.url}`, log.getContext(req, {}));
   // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
+  // console.debug(req.cookies?`   cookies: ${req.cookies}`:'   auth:', req.headers?.authorization);
   next();
 });
 app.use(

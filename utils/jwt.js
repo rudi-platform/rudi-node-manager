@@ -10,14 +10,15 @@ const { ForbiddenError, RudiError } = require('./errors');
 
 const mod = 'jwt';
 
+const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
+
 const OFFSET_USR_ID = 5000;
-
-exports.CONSOLE_TOKEN = 'consoleToken';
-exports.PM_FRONT_TOKEN = 'pmFrontToken';
-exports.MEDIA_TOKEN = 'mediaToken';
-exports.PM_MEDIA_TOKEN = 'mediaManagerToken';
-
+const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt');
+const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600;
 const MEDIA_AUTH = getConf('rudi_media');
+
+exports.CONSOLE_TOKEN_NAME = 'consoleToken';
+exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken';
 
 exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
   req?.cookies ? req.cookies[cookieName] : null;
@@ -37,21 +38,19 @@ exports.extractJwtFromReq = (req) => {
   return token;
 };
 
-const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
-
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody');
   if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`);
   return jwtLib.tokenStringToJwtObject(jwt)?.payload;
 };
 
-const AUTH_CONF = getConf('auth');
-exports.createFrontUserTokens = async (user) => {
-  const exp = timeEpochS(toInt(getConf('auth', 'exp_time_s')));
-  delete user.password;
+exports.createFrontUserTokens = async (userInfo) => {
+  const exp = timeEpochS(toInt(DEFAULT_EXP));
+  // console.log('T (createFrontUserTokens) exp:', new Date(exp * 1000));
+  delete userInfo.password;
   return {
-    [this.CONSOLE_TOKEN]: jwt.sign({ user: user, exp }, AUTH_CONF.secret_key_jwt),
-    [this.PM_FRONT_TOKEN]: jwt.sign({ exp }, AUTH_CONF.secret_key_jwt),
+    [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
+    [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ exp }, SECRET_KEY_JWT),
     exp,
   };
 };
@@ -117,9 +116,9 @@ exports.createPmJwtForMedia = (body) =>
     {
       jti: body?.jti || uuidv4(),
       iat: timeEpochS(),
-      exp: body?.exp || timeEpochS(body?.exp_time || AUTH_CONF.exp_time_s),
+      exp: body?.exp || timeEpochS(body?.exp_time || DEFAULT_EXP),
       sub: body?.sub || 'auth',
-      client_id: body?.client_id || getConf('rudi_media', 'pm_media_id') || 'rudimanager',
+      client_id: body?.client_id || getConf('rudi_media', 'pm_media_id'),
     },
   );
 
@@ -142,8 +141,7 @@ exports.createRudiMediaToken = (jwtPayload) =>
       jti: uuidv4(),
       iat: timeEpochS(),
       exp:
-        jwtPayload?.exp ||
-        timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || AUTH_CONF.exp_time_s),
+        jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || DEFAULT_EXP),
       sub: jwtPayload?.sub || 'auth',
       client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
     },

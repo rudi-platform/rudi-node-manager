@@ -6,7 +6,11 @@ const databaseManager = require('../database/database');
 const log = require('../utils/logger');
 
 const { isDevEnv } = require('../config/backOptions');
-const { createFrontUserTokens, CONSOLE_TOKEN, PM_FRONT_TOKEN, MEDIA_TOKEN } = require('../utils/jwt');
+const {
+  createFrontUserTokens,
+  CONSOLE_TOKEN_NAME,
+  PM_FRONT_TOKEN_NAME,
+} = require('../utils/jwt');
 const SHOULD_SECURE = !isDevEnv();
 
 const SALT_ROUNDS = 10;
@@ -14,7 +18,7 @@ const SALT_ROUNDS = 10;
 const consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
-    httpOnly: true,
+    httpOnly: SHOULD_SECURE,
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   };
@@ -27,14 +31,6 @@ const pmFrontCookieOpts = (exp) => {
     expires: new Date(exp * 1000),
   };
 };
-const mediaCookieOpts = (exp) => {
-  return {
-    secure: SHOULD_SECURE,
-    httpOnly: false,
-    sameSite: 'None',
-    expires: new Date(exp * 1000),
-  };
-};
 
 exports.postLogin = async (req, res, next) => {
   // log.d(mod, 'postLogin', '<--')
@@ -44,22 +40,20 @@ exports.postLogin = async (req, res, next) => {
 
     req.login(user, { session: false }, async (err) => {
       if (err) return res.status(400).json({ errors: err });
-      // const { consoleToken, pmFrontToken, exp } = await createUserTokens(user);
-      delete user.password;
-      const { consoleToken, pmFrontToken, mediaToken, exp } = await createFrontUserTokens(user);
+      const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user);
 
-      // console.log('T (postLogin) mediaToken:',mediaToken)
       // sameSite: 'Lax' ?
-      return res
-        .status(200)
-        .cookie(CONSOLE_TOKEN, consoleToken, consoleCookieOpts(exp))
-        .cookie(PM_FRONT_TOKEN, pmFrontToken, pmFrontCookieOpts(exp))
-        .cookie(MEDIA_TOKEN, mediaToken, mediaCookieOpts(exp))
-        .json({
-          success: `logged as ${user.username}`,
-          [CONSOLE_TOKEN]: consoleToken,
-          expires: new Date(exp * 1000),
-        });
+      return (
+        res
+          .status(200)
+          .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
+          .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
+          .json({
+            success: `logged as ${user.username}`,
+            // [CONSOLE_TOKEN_NAME]: consoleToken,
+            expires: new Date(exp * 1000),
+          })
+      );
       // TODO : remove .json() for cookie only? or give refresh token instead
     });
   })(req, res, next);
@@ -175,8 +169,7 @@ exports.putPassword = (req, res, next) => {
 exports.logout = (req, res, next) => {
   res
     .status(200)
-    .cookie(CONSOLE_TOKEN, '', consoleCookieOpts(0))
-    .cookie(PM_FRONT_TOKEN, '', pmFrontCookieOpts(0))
-    .cookie(MEDIA_TOKEN, '', mediaCookieOpts(0))
-    .json({ [CONSOLE_TOKEN]: '', [PM_FRONT_TOKEN]: '', [MEDIA_TOKEN]: '' });
+    .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
+    .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
+    .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' });
 };

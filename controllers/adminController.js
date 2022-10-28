@@ -3,10 +3,10 @@ const { getConf } = require('../config/config');
 const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 const {
+  CONSOLE_TOKEN_NAME,
   createRudiApiToken,
   readJwtBody,
   extractCookieFromReq,
-  CONSOLE_TOKEN,
   getTokenFromMediaForUser,
   extractJwtFromReq,
 } = require('../utils/jwt');
@@ -14,15 +14,16 @@ const log = require('../utils/logger');
 const { STATUS_CODE, ForbiddenError } = require('../utils/errors');
 const mod = 'admCtrl';
 
-const serveur = `${getConf('rudi_api', 'rudi_api_url')}`;
-const api = `${getConf('rudi_api', 'admin_api')}`;
-const getApiUrl = (suffix) => `${serveur}${url}${suffix ? `/${suffix}` : ''}`;
+const apiUrl = `${getConf('rudi_api', 'rudi_api_url')}`;
+const adminApiPrefix = `${getConf('rudi_api', 'admin_api')}`;
+const getAdminApiUrl = (suffix) => `${adminApiPrefix}${suffix ? `/${suffix}` : ''}`;
 
 exports.getEnum = (req, res, next) => {
-  const url = `${api}/enum`;
+  // console.log('T (getEnum) <')
+  const url = getAdminApiUrl('enum');
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, {
+    .get(`${apiUrl}${url}`, {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -38,10 +39,10 @@ exports.getEnum = (req, res, next) => {
 };
 exports.getThemeByLang = (req, res, next) => {
   const { lang } = req.params;
-  const url = `${api}/enum/themes/${lang}`;
+  const url = getAdminApiUrl(`enum/themes/${lang}`);
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
+    .get(`${apiUrl}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
@@ -53,10 +54,10 @@ exports.getThemeByLang = (req, res, next) => {
 };
 
 exports.getLicences = (req, res, next) => {
-  const url = `${api}/licences`;
+  const url = getAdminApiUrl(`licences`);
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, { headers: { Authorization: `Bearer ${token}` } })
+    .get(`${apiUrl}${url}`, { headers: { Authorization: `Bearer ${token}` } })
     .then((resRUDI) => {
       const results = resRUDI.data;
       res.status(200).json(results);
@@ -112,7 +113,7 @@ exports.getVersion = (req, res, next) => {
   const url = `/api/version`;
   const token = createRudiApiToken(url, req);
   return axios
-    .get(`${serveur}${url}`, {
+    .get(`${apiUrl}${url}`, {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -129,11 +130,11 @@ exports.getVersion = (req, res, next) => {
 exports.getMediaToken = async (req, res, next) => {
   const fun = 'getMediaToken';
   try {
-    console.log('T (getMediaToken)');
+    // console.log('T (getMediaToken)');
     // We extract
-    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN) || extractJwtFromReq(req);
+    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwtFromReq(req);
     if (!jwt) {
-      // console.error('T (getMediaToken) req:', req);
+      console.error('T (getMediaToken) req:', req);
       throw new ForbiddenError('No JWT was found in the request');
     }
     // console.error('T (getMediaToken) jwt:', jwt);
@@ -146,7 +147,7 @@ exports.getMediaToken = async (req, res, next) => {
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`);
 
-    const token = await getTokenFromMediaForUser(user, exp);
+    const mediaToken = await getTokenFromMediaForUser(user, exp);
     // T (The following is just for debugging)
     /*
     try {
@@ -157,7 +158,7 @@ exports.getMediaToken = async (req, res, next) => {
       // console.log('T (getMediaToken) token:', token);
     }
     */
-    return res.status(200).send(token);
+    return res.status(200).send({token: mediaToken});
   } catch (err) {
     log.e(
       mod,

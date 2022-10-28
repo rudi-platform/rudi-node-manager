@@ -1,12 +1,11 @@
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-const { getConf } = require('../config/config');
 const LocalStrategy = require('passport-local').Strategy;
-const JWTstrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
+const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt');
 
+const { getConf } = require('../config/config');
 const databaseManager = require('../database/database');
-const { extractCookieFromReq, CONSOLE_TOKEN } = require('./jwt');
+const { extractCookieFromReq, CONSOLE_TOKEN_NAME: CONSOLE_TOKEN } = require('./jwt');
 
 passport.serializeUser((user, done) => done(null, user.id));
 
@@ -39,15 +38,17 @@ passport.use(
         });
       })
       .catch((err) => {
+        console.error('T (LocalStrategy) Error login');
         return done(null, false, { message: err });
       });
   }),
 );
 
+const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt');
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: getConf('auth', 'secret_key_jwt'),
+      secretOrKey: SECRET_KEY_JWT,
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN),
@@ -57,6 +58,7 @@ passport.use(
     },
     async (token, done) => {
       try {
+        // console.error('T (JWTstrategy) Error auth:', token);
         return done(null, token.user);
       } catch (error) {
         done(error);
