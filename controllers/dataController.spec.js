@@ -2,7 +2,7 @@ const { expect } = require('@jest/globals');
 const axios = require('axios');
 const { createRudiApiToken } = require('../utils/utils');
 const databaseManager = require('../database/database');
-const controllers = require('./adminController');
+const controllers = require('./dataController');
 const { Response } = require('jest-express/lib/response');
 
 jest.mock('axios');

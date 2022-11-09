@@ -1,7 +1,7 @@
 const errorHandler = require('./errorHandler');
 const databaseManager = require('../database/database');
 
-const roleList = (req, res, next) => {
+exports.getRoleList = (req, res, next) => {
   return databaseManager
     .getRoles()
     .then((rows) => res.status(200).json(rows))
@@ -10,6 +10,7 @@ const roleList = (req, res, next) => {
       res.status(error.statusCode).json(error);
     });
 };
+
 exports.getRoleById = (req, res, next) => {
   const { role } = req.params;
   return databaseManager
@@ -52,5 +53,3 @@ exports.postUserRole = (req, res, next) => {
       res.status(error.statusCode).json(error);
     });
 };
-
-module.exports.roleList = roleList;

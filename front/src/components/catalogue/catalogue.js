@@ -9,11 +9,11 @@ import ThemeDisplay from '../other/themeDisplay';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { Search } from 'react-bootstrap-icons';
 import { EditObjCard } from '../generic/objCard';
-import { getApiAdmin } from '../../App';
+import { getApiData } from '../../App';
 
 const idField = 'global_id';
 
-const deleteUrl = (id) => getApiAdmin(`resources/${id}`);
+const deleteUrl = (id) => getApiData(`resources/${id}`);
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`;
 const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`;
 
@@ -36,7 +36,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
   const initialRender = useRef(true);
   const searchText = useRef(null);
-  const isSearchMode = () => searchText.current?.value && searchText.current.value?.length > 0;
+  const isSearchMode = () => searchText?.current?.value?.length > 0;
   const searchMode = () => (isSearchMode() ? `/search` : '');
 
   const generalConf = useContext(GeneralContext);
@@ -169,7 +169,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
     const filterList = currentFilters.slice();
     const existingFilterIndex = filterList.findIndex(
-      (existingFilter) => getFirstKey(existingFilter) === filterKey,
+      (existingFilter) => getFirstKey(existingFilter) === filterKey
     );
     // should add
     const newFilter = { [filterKey]: newFilterVal };
@@ -200,10 +200,10 @@ export default function Catalogue({ display, specialSearch, editMode }) {
 
     Promise.all(
       filterConf.map((count) =>
-        axios.get(getApiAdmin(`resources${searchMode()}`), {
+        axios.get(getApiData(`resources${searchMode()}`), {
           params: createParams({ count_by: count.name }),
-        }),
-      ),
+        })
+      )
     )
       .then((values) => {
         const countByTemp = filterConf.map((count, i) => {
@@ -212,7 +212,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
         });
         setCountBy(countByTemp);
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((err) => defaultErrorHandler(err));
   }
 
   /**
@@ -220,24 +220,18 @@ export default function Catalogue({ display, specialSearch, editMode }) {
    */
   function fetchMoreData() {
     axios
-      .get(getApiAdmin(`resources${searchMode()}`), {
+      .get(getApiData(`resources${searchMode()}`), {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {
-        let datas;
-        if (isSearchMode()) {
-          datas = res.data.items;
-        } else {
-          datas = res.data;
-        }
-        if (datas.length === 0) {
-          setHasMore(false);
-        }
-        setMetadatas((metadatas) => metadatas.concat(datas));
+        let data;
+        if (isSearchMode()) data = res.data.items;
+        else data = res.data;
+
+        if (data.length === 0) setHasMore(false);
+        setMetadatas((metadatas) => metadatas.concat(data));
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
-      });
+      .catch((err) => defaultErrorHandler(err));
   }
 
   /**
@@ -273,14 +267,14 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={(e) => toggleFilter({ sort_by: `-updatedAt` })}
+                    onClick={() => toggleFilter({ sort_by: `-updatedAt` })}
                   >
                     Modifié
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={(e) => toggleFilter({ sort_by: `resource_title` })}
+                    onClick={() => toggleFilter({ sort_by: `resource_title` })}
                   >
                     A à Z
                   </button>
@@ -299,25 +293,25 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                     <div className="dropdown-menu" aria-labelledby="sortDrop">
                       <a
                         className="dropdown-item"
-                        onClick={(e) => addToFilter({ sort_by: `resource_title` })}
+                        onClick={() => addToFilter({ sort_by: `resource_title` })}
                       >
                         Alphabétique
                       </a>
                       <a
                         className="dropdown-item"
-                        onClick={(e) => addToFilter({ sort_by: `-resource_title` })}
+                        onClick={() => addToFilter({ sort_by: `-resource_title` })}
                       >
                         Anti alphabétique
                       </a>
                       <a
                         className="dropdown-item"
-                        onClick={(e) => addToFilter({ sort_by: `-updatedAt` })}
+                        onClick={() => addToFilter({ sort_by: `-updatedAt` })}
                       >
                         Récemment modifiés
                       </a>
                       <a
                         className="dropdown-item"
-                        onClick={(e) => addToFilter({ sort_by: `updatedAt` })}
+                        onClick={() => addToFilter({ sort_by: `updatedAt` })}
                       >
                         Anciennement modifiés
                       </a>
@@ -336,7 +330,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                     aria-label="Recherche"
                     aria-describedby="addon-wrapping"
                   />
-                  <button type="button" className="btn btn-success" onClick={(e) => refresh()}>
+                  <button type="button" className="btn btn-success" onClick={() => refresh()}>
                     <Search />
                   </button>
                 </div>
@@ -365,7 +359,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
                               <li
                                 className="filter-items"
                                 key={getFilterLabel(filterValue, filter) + i}
-                                onClick={(e) => addToFilter(filter.toFilterParam(filterValue))}
+                                onClick={() => addToFilter(filter.toFilterParam(filterValue))}
                               >
                                 {filter.name === 'theme' && (
                                   <ThemeDisplay
@@ -416,7 +410,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {metadatas.map((metadata, i) => {
+              {metadatas.map((metadata) => {
                 return (
                   <MetadataCard
                     metadata={metadata}

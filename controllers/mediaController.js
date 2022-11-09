@@ -1,7 +1,66 @@
+const mod = 'mediactrl'
+
+// External dependencies
 const axios = require('axios');
+
+// Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config');
-const { createRudiApiToken, createPmHeadersForMedia } = require('../utils/jwt');
+const { ForbiddenError, STATUS_CODE } = require('../utils/errors');
+const log = require('../utils/logger');
+const {
+  createRudiApiToken,
+  createPmHeadersForMedia,
+  extractCookieFromReq,
+  CONSOLE_TOKEN_NAME,
+  extractJwtFromReq,
+  readJwtBody,
+  getTokenFromMediaForUser,
+} = require('../utils/jwt');
 const errorHandler = require('./errorHandler');
+
+// Controllers
+exports.getMediaToken = async (req, res, next) => {
+  const fun = 'getMediaToken';
+  try {
+    // console.log('T (getMediaToken)');
+    // We extract
+    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwtFromReq(req);
+    if (!jwt) {
+      console.error('T (getMediaToken) req:', req);
+      throw new ForbiddenError('No JWT was found in the request');
+    }
+    // console.error('T (getMediaToken) jwt:', jwt);
+
+    const jwtPayload = readJwtBody(jwt);
+    const user = jwtPayload.user;
+    const exp = jwtPayload.exp;
+    if (!user)
+      throw new ForbiddenError(`JWT body token should contain an identified user: ${jwtPayload}`);
+    if (exp * 1000 < new Date().getTime())
+      throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`);
+
+    const mediaToken = await getTokenFromMediaForUser(user, exp);
+    // T (The following is just for debugging)
+    /*
+    try {
+      const parsedBody = readJwtBody(token);
+      parsedBody.exp = new Date(parsedBody.exp).toISOString();
+      // console.log('T (getMediaToken) token:', parsedBody);
+    } catch (parsingErr) {
+      // console.log('T (getMediaToken) token:', token);
+    }
+    */
+    return res.status(200).send({ token: mediaToken });
+  } catch (err) {
+    log.e(
+      mod,
+      fun,
+      '!! Liaison avec le module “Media” incomplète, création de JWT impossible: ' + err
+    );
+    // throw new Error(errMsg);
+    return res.status(err[STATUS_CODE] || 500).send(err);
+  }
+};
 
 exports.getMediaById = (req, res, next) => {
   const { id } = req.params;
@@ -51,16 +110,16 @@ exports.commitMedia = async (req, res, next) => {
     const commitMediaRes = await axios.post(
       getRudiMediaUrl(`commit/?zone_name=${zoneName}&commit_uuid=${commitId}`),
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
-      pmMediaHeaders,
+      pmMediaHeaders
     );
     console.log(
       'T (commitMedia) commitMediaRes',
-      commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes,
+      commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes
     );
   } catch (err) {
     console.error(
       `T (commitMedia) ERR${err.response?.status} Media commit:`,
-      err.response?.data || err.response?.statusText,
+      err.response?.data || err.response?.statusText
     );
     return res
       .status(err.response?.status || 500)
@@ -81,7 +140,7 @@ exports.commitMedia = async (req, res, next) => {
   } catch (err) {
     console.error(
       `T (commitMedia) ERR${err.response?.status} Api commit:`,
-      err.response?.data || err.response?.statusText || err.response,
+      err.response?.data || err.response?.statusText || err.response
     );
     return res
       .status(err.response?.status || 500)

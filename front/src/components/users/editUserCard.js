@@ -5,7 +5,7 @@ import axios from 'axios';
 import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-const urlUser = 'api/v1/users';
+const urlUser = 'api/secu/users';
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`;
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`;
 
@@ -18,7 +18,7 @@ EditUserCard.propTypes = {
  * Composant : EditCard
  * @return {ReactNode}
  */
-export default function EditUserCard({ formUrl, refresh }) {
+export default function EditUserCard({ refresh }) {
   const [editID, setEditID] = useState('');
 
   const { changeOptions, toggle } = useContext(ModalContext);
@@ -74,7 +74,7 @@ export default function EditUserCard({ formUrl, refresh }) {
               <a className="btn btn-warning">
                 <Pencil />
               </a>
-              <button type="button" className="btn btn-danger" onClick={(e) => triggerDeleteUser()}>
+              <button type="button" className="btn btn-danger" onClick={() => triggerDeleteUser()}>
                 <Trash />
               </button>
             </div>

@@ -26,10 +26,13 @@ const OBJECT_TYPES = {
  * @param {String} id The UUID of the object
  */
 function raiseError(req, res, initialError, errCode, fun, objectType, id) {
-  console.log('req: ' + req);
-  console.log('res: ' + res);
-  console.log('initialError: ' + initialError);
-  console.log('errCode: ' + initialError.statusCode || errCode);
+  console.log('req params:', req.params);
+  console.log('req url:', req.originalUrl);
+  console.log('res:' + res);
+  console.log('initialError:', initialError?.response?.data);
+  console.log(
+    `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
+  );
   console.log('fun: ' + fun);
   console.log('objectType: ' + objectType);
   console.log('id: ' + id);
@@ -37,7 +40,7 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
   if (fun) errPayload.opType = fun;
   if (id) errPayload.id = `${objectType}+${id}`;
   const error = errorHandler.error(initialError, req, errPayload);
-  res.status(initialError.statusCode || errCode).json(error);
+  res.status(initialError.statusCode || errCode).json(error.moreInfo || error);
 }
 
 const checkObjectType = (req, res, fun, objectType) => {
@@ -109,9 +112,10 @@ exports.postObject = (req, res, next) => {
     .then((resRudiApi) => {
       res.status(200).json(resRudiApi.data);
     })
-    .catch((error) =>
-      raiseError(req, res, error, 501, fun, objectType, req.body[OBJECT_TYPES[objectType].id]),
-    );
+    .catch((error) => {
+      const id = req.body[OBJECT_TYPES[objectType].id];
+      raiseError(req, res, error, 501, fun, objectType, id);
+    });
 };
 
 exports.putObject = (req, res, next) => {
@@ -123,17 +127,13 @@ exports.putObject = (req, res, next) => {
   const token = createRudiApiToken(url, req);
   return axios
     .put(getRudiApi(url), req.body, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     })
-    .then((resRudiApi) => {
-      res.status(200).json(resRudiApi.data);
-    })
-    .catch((error) =>
-      raiseError(req, res, error, 501, fun, objectType, req.body[OBJECT_TYPES[objectType].id]),
-    );
+    .then((resRudiApi) => res.status(200).json(resRudiApi.data))
+    .catch((error) => {
+      const id = req.body[OBJECT_TYPES[objectType].id];
+      raiseError(req, res, error, 501, fun, objectType, id);
+    });
 };
 
 exports.deleteObject = (req, res, next) => {

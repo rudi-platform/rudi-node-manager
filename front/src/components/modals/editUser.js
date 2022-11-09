@@ -13,7 +13,7 @@ import { ModalContext, getOptOk } from './ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation';
 
-const urlUserRoles = 'api/v1/user-roles';
+const urlUserRoles = 'api/secu/user-roles';
 const modalTitle = 'Modifier l‘utilisateur';
 const modalSubmitBtnTxt = 'Terminer';
 
@@ -22,14 +22,14 @@ const validation = {
   email: [VALID_EMAIL],
 };
 
-const defaultState = {
-  name: '',
-  email: '',
-  password: '',
-  nameError: '',
-  emailError: '',
-  passwordError: '',
-};
+// const defaultState = {
+//   name: '',
+//   email: '',
+//   password: '',
+//   nameError: '',
+//   emailError: '',
+//   passwordError: '',
+// };
 
 const hasErrors = (prop, val) => {
   let isInvalid;
@@ -226,7 +226,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
             <Form.Group className="mb-1" id="formRoles" controlId="roles">
               <Form.Label>Rôles</Form.Label>
               {roles &&
-                roles.map((role, i) => (
+                roles.map((role) => (
                   <Form.Check
                     key={role.role}
                     label={`${role.role} (${role.desc})`}

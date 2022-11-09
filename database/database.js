@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config');
+const { ForbiddenError } = require('../utils/errors');
 const log = require('../utils/logger');
 
 // ---- Constants -----
@@ -29,6 +30,7 @@ const open = function () {
       log.e(mod, fun, err);
       log.e(mod, fun, err.message);
     } else {
+      // TODO: return something?
     }
   });
   return db.exec('PRAGMA foreign_keys = ON');
@@ -87,7 +89,7 @@ exports.normalizeUserTableName = () => {
             }
           });
         });
-      },
+      }
     );
   });
 };
@@ -132,18 +134,80 @@ exports.getUsers = () => {
           resolve(result);
         }
         close(db);
-      },
+      }
     );
   });
 };
+
+/**
+ * Check if the users exists, creates it if not.
+ * @param {Object} user
+ * @return {Promise} User id and username when successful
+ * @throws {ForbiddenError} user already exists
+ */
+exports.safeCreateUser = (user) => {
+  const fun = 'safeCreateUser';
+  const { username, password, email } = user;
+  const db = open();
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], (err, row) => {
+        if (err) {
+          log.e(mod, fun + ' doesUserExist', err.message);
+          reject(err);
+        } else {
+          if (row?.id) {
+            log.e(mod, fun + ' userExists', err.message);
+            reject(new ForbiddenError(`User '${username}' already exists`));
+          } else {
+            db.run(
+              `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
+              [username, password, email],
+              (err) => {
+                if (err) {
+                  log.e(mod, fun + ' cannotCreateUser', err.message);
+                  reject(err);
+                } else {
+                  log.i(
+                    mod,
+                    fun,
+                    `${TBL_USERS} : user created: '${username}'`,
+                    log.getContext(null, { opType: 'post_user' })
+                  );
+                  db.get(
+                    `SELECT * FROM ${TBL_USERS} where username = ?`,
+                    [username],
+                    (err, userInfo) => {
+                      if (err) {
+                        log.e(mod, fun + ' retrieveUserInfo', err.message);
+                        reject(err);
+                      } else {
+                        const { id, username } = userInfo;
+                        resolve({ id, username });
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        }
+        close(db);
+      });
+    });
+  });
+};
+
 exports.createUser = (user) => {
   const fun = 'createUser';
+  const { username, password, email } = user;
+
   const db = open();
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       db.run(
         `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
-        [user.username, user.password, user.email],
+        [username, password, email],
         (err) => {
           if (err) {
             log.e(mod, fun, err.message);
@@ -152,10 +216,10 @@ exports.createUser = (user) => {
             log.i(
               mod,
               fun,
-              `${TBL_USERS} : user created: '${user.username}'`,
-              log.getContext(null, { opType: 'post_user' }),
+              `(${TBL_USERS}) user created: '${username}'`,
+              log.getContext(null, { opType: 'post_user' })
             );
-            db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [user.username], (err, row) => {
+            db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
               if (err) {
                 log.e(mod, fun, err.message);
                 reject(err);
@@ -175,14 +239,14 @@ exports.createUser = (user) => {
                 //       if (result && result['COUNT (*)'] < 1) {
                 //         createUserRole({ userId: id, role: 'SuperAdmin' })
                 //           .then(() => {
-                //             resolve({ id: this.lastID, username: user.username });
+                //             resolve({ id: this.lastID, username: username });
                 //           })
                 //           .catch((err) => {
                 //             log.e(mod, fun, err.message);
                 //             reject(err);
                 //           });
                 //       } else {
-                //         resolve({ id: this.lastID, username: user.username });
+                //         resolve({ id: this.lastID, username: username });
                 //       }
                 //     }
                 //   },
@@ -191,7 +255,7 @@ exports.createUser = (user) => {
             });
           }
           close(db);
-        },
+        }
       );
     });
   });
@@ -213,12 +277,12 @@ exports.updatePassword = (username, password) => {
             mod,
             fun,
             `${TBL_USERS}: password reset for user '${username}'`,
-            log.getContext(null, { opType: 'put_password' }),
+            log.getContext(null, { opType: 'put_password' })
           );
           resolve({ username: username });
         }
         close(db);
-      },
+      }
     );
     // });
   });
@@ -236,7 +300,7 @@ exports.deleteUserWithName = (username) => {
           mod,
           fun,
           `${TBL_USERS} : A row has been deleted with username ${username}`,
-          log.getContext(null, { opType: 'delete_user' }),
+          log.getContext(null, { opType: 'delete_user' })
         );
         resolve({ username: username });
       }
@@ -258,7 +322,7 @@ exports.deleteUser = (id) => {
           mod,
           fun,
           `${TBL_USERS} : A row has been deleted with id ${id}`,
-          log.getContext(null, { opType: 'delete_user' }),
+          log.getContext(null, { opType: 'delete_user' })
         );
         resolve({ id: id });
       }
@@ -285,11 +349,11 @@ exports.createRoles = (roles) => {
               log.i(
                 mod,
                 fun,
-                `${TBL_ROLES} : A row has been inserted with name ${role.role}`,
-                log.getContext(null, { opType: 'add_role' }),
+                `(${TBL_ROLES}) A row has been inserted with name ${role.role}`,
+                log.getContext(null, { opType: 'add_role' })
               );
             }
-          },
+          }
         );
       });
       resolve({ roles });
@@ -345,7 +409,7 @@ exports.getUserRolesByUsername = (username) => {
                 resolve(rows);
               }
               close(db);
-            },
+            }
           );
         });
       } else {
@@ -373,12 +437,12 @@ exports.deleteUserRole = (userId, role) => {
             mod,
             fun,
             `${TBL_USER_ROLES} : A row has been deleted with userId ${userId} and role ${role}`,
-            log.getContext(null, { opType: 'delete_userRole' }),
+            log.getContext(null, { opType: 'delete_userRole' })
           );
           resolve({ userId, role });
         }
         close(db);
-      },
+      }
     );
   });
 };
@@ -398,13 +462,13 @@ const createUserRole = (userRole) => {
           log.i(
             mod,
             fun,
-            `${TBL_USER_ROLES} : A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
-            log.getContext(null, { opType: 'post_userRole' }),
+            `(${TBL_USER_ROLES}) A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
+            log.getContext(null, { opType: 'post_userRole' })
           );
           resolve(userRole);
         }
         close(db);
-      },
+      }
     );
   }).catch((err) => {
     if (err.message.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
@@ -431,7 +495,7 @@ exports.getDefaultForm = (user) => {
           resolve(
             rows.map((row) => {
               return { name: row.name, defaultValue: JSON.parse(row.defaultValue) };
-            }),
+            })
           );
         }
         close(db);
@@ -457,12 +521,12 @@ exports.getDefaultFormWithName = (user, name) => {
             resolve(JSON.parse(row.defaultValue));
           }
           close(db);
-        },
+        }
       );
     });
   } else {
     return Promise.reject(
-      new Error(`Default value for ${user.username} and name : ${name} not found!`),
+      new Error(`Default value for ${user.username} and name : ${name} not found!`)
     );
   }
 };
@@ -482,12 +546,12 @@ exports.deleteDefaultForm = (user, name) => {
             mod,
             fun,
             `Default_Value_Form : A row has been deleted with userId ${user.id} and name : ${name}`,
-            log.getContext(null, { opType: 'delete_defaultForm' }),
+            log.getContext(null, { opType: 'delete_defaultForm' })
           );
           resolve({});
         }
         close(db);
-      },
+      }
     );
   });
 };
@@ -509,13 +573,13 @@ exports.updateDefaultForm = (user, data) => {
               log.i(
                 mod,
                 fun,
-                `Default_Value_Form : A row has been inserted with userId ${user.id} and name : ${data.name}`,
-                log.getContext(null, { opType: 'post_defaultForm' }),
+                `(Default_Value_Form) A row has been inserted with userId ${user.id} and name : ${data.name}`,
+                log.getContext(null, { opType: 'post_defaultForm' })
               );
               resolve(data);
             }
             close(db);
-          },
+          }
         );
       });
     } else {
@@ -533,12 +597,12 @@ exports.updateDefaultForm = (user, data) => {
                 mod,
                 fun,
                 `Default_Value_Form : A row has been edited with userId ${user.id} and name : ${data.name}`,
-                log.getContext(null, { opType: 'put_defaultForm' }),
+                log.getContext(null, { opType: 'put_defaultForm' })
               );
               resolve(data);
             }
             close(db);
-          },
+          }
         );
       });
     }

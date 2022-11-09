@@ -8,7 +8,7 @@ import axios from 'axios';
 import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-const urlUserRoles = 'api/v1/user-roles'
+const urlUserRoles = 'api/secu/user-roles'
 
 /**
  * EditRoleModal component

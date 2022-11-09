@@ -22,10 +22,9 @@ import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
-const API_ADMIN = 'api/admin';
-const API_V1 = 'api/v1';
-export const getApiV1 = (suffix) => `${API_V1}${suffix ? `/${suffix}` : ''}`;
-export const getApiAdmin = (suffix) => `${API_ADMIN}${suffix ? `/${suffix}` : ''}`;
+
+export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`);
+export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`);
 
 export const history = createBrowserHistory({ basename: getBackUrl() });
 
@@ -71,10 +70,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(getApiV1('formUrl')).catch((e) => {
+        axios.get(getApiFront('formUrl')).catch((e) => {
           return { data: '' };
         }),
-        axios.get(getApiAdmin('enum/themes/fr')).catch((e) => {
+        axios.get(getApiData('enum/themes/fr')).catch((e) => {
           // console.error('Error getting themes: ', e);
           return { data: {} };
         }),
@@ -112,7 +111,7 @@ export default function App() {
    */
   function logout() {
     // console.log('-- logout');
-    axios.get(getBackUrl(getApiV1('logout'))).then((res) => updateToken());
+    axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken());
   }
 
   if (!token) {

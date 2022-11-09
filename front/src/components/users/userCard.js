@@ -9,7 +9,7 @@ import EditUserModal, { useEditRoleModal, useEditRoleModalOptions } from '../mod
 
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`;
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`;
-const deleteUrl = (id) => `api/v1/users/${id}`;
+const deleteUrl = (id) => `api/secu/users/${id}`;
 
 /**
  * Composant : UserCard
@@ -51,7 +51,7 @@ export default function UserCard({ user, display, refresh }) {
    */
   const updateUser = (user) => {
     axios
-      .get(`api/v1/roles`)
+      .get(`api/secu/roles`)
       .then((res) => {
         changeOptionsEdit({ user, roles: res.data });
         toggleEdit();
@@ -66,13 +66,13 @@ export default function UserCard({ user, display, refresh }) {
           <div className="d-flex justify-content-between align-items-center">
             {user.username}
             <div className="btn-group" role="group">
-              <button type="button" className="btn btn-warning" onClick={(e) => updateUser(user)}>
+              <button type="button" className="btn btn-warning" onClick={() => updateUser(user)}>
                 <Pencil />
               </button>
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => triggerDeleteUser(user)}
+                onClick={() => triggerDeleteUser(user)}
               >
                 <Trash />
               </button>
@@ -89,7 +89,8 @@ export default function UserCard({ user, display, refresh }) {
         <div className="card-body">
           <p className="card-text">
             id&nbsp;: <small className="text-muted">{user.id}</small>
-          </p>  <p className="card-text">
+          </p>{' '}
+          <p className="card-text">
             e-mail&nbsp;: <small className="text-muted">{user.email}</small>
           </p>
           {user.roles && (

@@ -11,38 +11,32 @@ function Monitoring({}) {
   useEffect(() => {
     Promise.all([
       axios
-        .get(`api/admin/resources`, {
-          params: { count_by: 'metadata_info.api_version' },
-        })
-        .catch((e) => {
+        .get(`api/data/resources`, { params: { count_by: 'metadata_info.api_version' } })
+        .catch(() => {
           return { data: [] };
         }),
+      axios.get(`api/data/resources`, { params: { count_by: 'storage_status' } }).catch(() => {
+        return { data: [] };
+      }),
       axios
-        .get(`api/admin/resources`, {
-          params: { count_by: 'storage_status' },
-        })
-        .catch((e) => {
-          return { data: [] };
-        }),
-      axios
-        .get(`api/admin/resources`, {
+        .get(`api/data/resources`, {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
-        .catch((e) => {
+        .catch(() => {
           return { data: [] };
         }),
       axios
-        .get(`api/admin/resources`, {
+        .get(`api/data/resources`, {
           params: { count_by: 'producer' },
         })
-        .catch((e) => {
+        .catch(() => {
           return { data: [] };
         }),
       axios
-        .get(`api/admin/report`, {
+        .get(`api/data/reports`, {
           params: { count_by: 'integration_status' },
         })
-        .catch((e) => {
+        .catch(() => {
           return { data: [] };
         }),
     ]).then((values) => {
@@ -97,7 +91,7 @@ function Monitoring({}) {
       </div>
       <div className="row">
         {generalMonitoring.byStorageStatus &&
-          generalMonitoring.byStorageStatus.map((status, i) => {
+          generalMonitoring.byStorageStatus.map((status) => {
             return (
               <div key={status.storage_status} className="col-4">
                 <div className="card">
@@ -108,9 +102,7 @@ function Monitoring({}) {
                   </h5>
                   <div className="card-body">
                     <div className="card-text justify-content-between align-items-center">
-                      <div className="badge-monitoring">
-                        {status.count}
-                      </div>
+                      <div className="badge-monitoring">{status.count}</div>
                     </div>
                   </div>
                 </div>
@@ -120,7 +112,7 @@ function Monitoring({}) {
       </div>
       <div className="row">
         {generalMonitoring.byProducer &&
-          generalMonitoring.byProducer.map((prod, i) => {
+          generalMonitoring.byProducer.map((prod) => {
             return (
               <div key={prod.producer.organization_id} className="col-4">
                 <div className="card">
@@ -131,9 +123,7 @@ function Monitoring({}) {
                   </h5>
                   <div className="card-body">
                     <div className="card-text justify-content-between align-items-center">
-                      <div className="badge-monitoring">
-                        {prod.count}
-                      </div>
+                      <div className="badge-monitoring">{prod.count}</div>
                     </div>
                   </div>
                 </div>
@@ -143,7 +133,7 @@ function Monitoring({}) {
       </div>
       <div className="row">
         {generalMonitoring.reportsByStatus &&
-          generalMonitoring.reportsByStatus.map((status, i) => {
+          generalMonitoring.reportsByStatus.map((status) => {
             return (
               <div key={status.integration_status} className="col-4">
                 <div className="card">
@@ -154,9 +144,7 @@ function Monitoring({}) {
                   </h5>
                   <div className="card-body">
                     <div className="card-text justify-content-between align-items-center">
-                      <div className="badge-monitoring">
-                        {status.count}
-                      </div>
+                      <div className="badge-monitoring">{status.count}</div>
                     </div>
                   </div>
                 </div>

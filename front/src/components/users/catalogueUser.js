@@ -13,10 +13,10 @@ const propId = 'id';
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
-export default function CatalogueUser({ editMode, display }) {
-  const [objList, setUser] = useState([]);
+export default function CatalogueUser({ display }) {
+  const [objList, setListObj] = useState([]);
   const [formUrl, setFormUrl] = useState('');
-  const [hasMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const PAGE_SIZE = 20;
   const [currentOffset, setCurrentOffset] = useState(0);
   const generalConf = useContext(GeneralContext);
@@ -33,10 +33,10 @@ export default function CatalogueUser({ editMode, display }) {
    */
   function getInitialData() {
     axios
-      .get(`api/v1/users`)
+      .get(`api/secu/users`)
       .then((res) => {
         setCurrentOffset(PAGE_SIZE);
-        setUser(res.data);
+        setListObj(res.data);
       })
       .catch((e) => defaultErrorHandler(e));
   }
@@ -47,12 +47,12 @@ export default function CatalogueUser({ editMode, display }) {
    */
   const fetchMoreData = () => {
     axios
-      .get(`api/admin/users`, { params: { limit: PAGE_SIZE, offset: currentOffset } })
+      .get(`api/secu/users`, { params: { limit: PAGE_SIZE, offset: currentOffset } })
       .then((res) => {
         const partialObjList = res.data;
         setCurrentOffset(currentOffset + PAGE_SIZE);
         if (partialObjList.length === 0) setHasMore(false);
-        setOrganizations(objList.concat(partialObjList));
+        setListObj(objList.concat(partialObjList));
       })
       .catch((e) => defaultErrorHandler(e));
   };
@@ -71,7 +71,7 @@ export default function CatalogueUser({ editMode, display }) {
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {objList.map((obj, i) => (
+              {objList.map((obj) => (
                 <UserCard
                   user={obj}
                   display={display}

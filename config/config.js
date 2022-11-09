@@ -1,7 +1,13 @@
+
+// External dependencies
 const fs = require('fs');
 const ini = require('ini');
+
+// Internal dependencies
+const { getCompletedUrl } = require('../utils/utils');
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions');
 
+// Load default conf
 const defaultConfigFile = './rudi_console_proxy.ini';
 let defaultConfFileContent;
 try {
@@ -10,6 +16,7 @@ try {
   throw new Error(`No default configuration file was found at '${customConfigFile}'`);
 }
 
+// Load custom conf
 const customConfigFile = getBackOptions(OPT_USER_CONF, './rudi_console_proxy_custom.ini');
 let customConfFileContent;
 try {
@@ -36,17 +43,12 @@ for (const section in customConfig) {
 
 if (config.logging.displayConf) console.log(config);
 
+// Access conf values
 exports.getConf = (section, subSection) => {
   if (!section) return config;
   const sect = config[section];
   if (!sect || !subSection) return sect;
   return sect[subSection];
-};
-
-const getCompletedUrl = (baseUrl, subUrl) => {
-  if (!subUrl) return baseUrl;
-  if (`${subUrl}`.startsWith('/')) return `${baseUrl}${subUrl}`;
-  return `${baseUrl}/${subUrl}`;
 };
 
 exports.getRudiApi = (suffix) => getCompletedUrl(config.rudi_api.rudi_api_url, suffix);

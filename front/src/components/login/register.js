@@ -44,7 +44,7 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const registerUser = (credentials) =>
-    axios.post(`api/v1/register`, JSON.stringify(credentials), {
+    axios.post(`api/front/register`, JSON.stringify(credentials), {
       headers: {
         'Content-Type': 'application/json',
       },

@@ -50,7 +50,7 @@ export default function ChangePwd({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const putPassword = (credentials) =>
-    axios.put(`api/v1/change-password`, JSON.stringify(credentials), {
+    axios.put(`api/front/change-password`, JSON.stringify(credentials), {
       headers: {
         'Content-Type': 'application/json',
       },

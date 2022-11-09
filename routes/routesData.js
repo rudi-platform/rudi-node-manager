@@ -7,7 +7,7 @@ const {
   getThemeByLang,
   getLicences,
   getVersion,
-} = require('../controllers/adminController');
+} = require('../controllers/dataController');
 const {
   getObjectList,
   postObject,
@@ -17,11 +17,11 @@ const {
 } = require('../controllers/genericController');
 // const passport = require('../utils/passportSetup');
 
+router.get('/uuid', (req, res) => res.status(200).send(uuidv4()));
+router.get('/version', getVersion);
 router.get('/enum', getEnum);
 router.get('/enum/themes/:lang', getThemeByLang);
 router.get('/licences', getLicences);
-router.get('/version', getVersion);
-router.get('/uuid', (req, res) => res.status(200).send(uuidv4()));
 
 // TODO : propage res.status
 router.get(`/:objectType`, getObjectList);

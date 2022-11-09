@@ -5,7 +5,9 @@ const fs = require('fs');
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../../config/config');
+const { registerUser } = require('../../controllers/authControllerPassport');
 const log = require('../../utils/logger');
+const { decodeBase64 } = require('../../utils/utils');
 const dbManager = require('../database');
 const initDefaultFormTable = require('./initDefaultForm');
 
@@ -19,18 +21,6 @@ const initialRoles = [
   { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
   { role: 'Créateur', desc: 'gestion simple des métadonnées' },
 ];
-
-let initialUsers;
-
-if (getDbConf('db_su_usr') && getDbConf('db_su_pwd'))
-  initialUsers = [
-    {
-      username: getDbConf('db_su_usr'),
-      password: getDbConf('db_su_pwd'),
-      email: 'security@rudi-univ-rennes1.fr',
-      role: 'SuperAdmin',
-    },
-  ];
 
 const sqlGet = `SELECT name FROM sqlite_master WHERE type='table' AND name=?`;
 const sqlCreateRoleTable =
@@ -87,18 +77,31 @@ const initRolesTable = () =>
   initTable(dbManager.TBL_ROLES, sqlCreateRoleTable, () => initializeRoles);
 const initUsersTable = () => initTable(dbManager.TBL_USERS, sqlCreateUserTable, () => {});
 
-const initializeUsers = async () => {
-  // const fun = 'initializeUsers';
-  initialUsers?.map((user) =>
-    dbManager.existsUser(user.username).then((existsUser) => {
-      if (!existsUser)
-        dbManager.createUser(user).then((res) => {
-          const { id, username } = res;
-          console.log(id, username);
-          dbManager.createUserRole({ userId: id, role: user.role });
-        });
-    }),
-  );
+const createSuperUser = async () => {
+  const fun = 'initializeUsers';
+
+  if (!getDbConf('db_su_usr') || !getDbConf('db_su_pwd')) {
+    log.d(mod, fun, 'No super user config was found');
+    return;
+  }
+
+  const suName = getDbConf('db_su_usr');
+  if (await dbManager.existsUser(suName)) {
+    // log.d(mod, fun, `Super user '${suName}' already exists`);
+    return;
+  }
+  const suPwd = decodeBase64(getDbConf('db_su_pwd'));
+  const superUser = {
+    username: suName,
+    password: suPwd,
+    email: 'security@rudi-univ-rennes1.fr',
+    role: 'SuperAdmin',
+  };
+
+  const res = await registerUser(superUser);
+  const { id, username } = res;
+  await dbManager.createUserRole({ userId: id, role: superUser.role });
+  log.i(mod, 'createSuperUser', `Super user created: '${username}' (id ${id})`);
 };
 
 const initUserRolesTable = () =>
@@ -115,7 +118,7 @@ exports.initDatabase = async () => {
     initUserRolesTable();
     await dbManager.normalizeUserTableName();
     initUsersTable();
-    initializeUsers();
+    await createSuperUser();
     initDefaultFormTable.initDefaultFormTable();
   } catch (error) {
     log.e(mod, fun, error);

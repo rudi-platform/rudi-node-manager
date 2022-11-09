@@ -49,7 +49,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   function deleteRessource() {
     axios
-      .delete(`api/admin/resources/${metadata.global_id}`)
+      .delete(`api/data/resources/${metadata.global_id}`)
       .then((res) => {
         const options = DefaultOkOption;
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`];
@@ -90,10 +90,16 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
   /**
    * affiche le text en fonction de la langue choisi
    * @param {*} langObjectArray Array d'objet au format {lang:'', text:''}
-   * @param {String} lang langue selectionnée
+   * @param {String} userLang langue selectionnée
    * @return {String} text dans la langue appropriée
    */
-  const getLangText = (langObjectArray, lang) => langObjectArray[0].text;
+  const getLangText = (langObjectArray, userLang) => {
+    langObjectArray.map((textObj) => {
+      const { lang, text } = textObj;
+      if (lang === userLang) return text;
+    });
+    return langObjectArray[0].text;
+  };
 
   /**
    * calcule la taille total des fichiers
@@ -138,7 +144,9 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {metadata.resource_title}
+              <span className={metadata.storage_status === 'pending' ? 'danger' : ''}>
+                {metadata.resource_title}
+              </span>
             </a>
             {displayStatus()}
             {display && display.editJDD && (
@@ -161,7 +169,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                 <button
                   type="button"
                   className="btn btn-danger"
-                  onClick={(e) => triggerDeleteRessource()}
+                  onClick={() => triggerDeleteRessource()}
                 >
                   <Trash />
                 </button>
@@ -195,7 +203,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
           <span className="card-text">
-            {metadata.available_formats.map((ressource, i) => {
+            {metadata.available_formats.map((ressource) => {
               return (
                 <div key={`${ressource.media_id}`}>
                   <Link to={getBackUrl(`show/${ressource.media_id}`)}>

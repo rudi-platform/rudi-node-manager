@@ -5,12 +5,11 @@ import PropTypes from 'prop-types';
 import LicenceCard from './licenceCard';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 
-
 /**
  * Composant : CatalogueLicence
  * @return {ReactNode}
  */
-export default function CatalogueLicence({ display, specialSearch, editMode }) {
+export default function CatalogueLicence({ display }) {
   const { defaultErrorHandler } = useDefaultErrorHandler();
 
   const [metadatas, setMetadatas] = useState([]);
@@ -19,7 +18,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
 
   useEffect(() => {
     axios
-      .get(`api/v1/formUrl`)
+      .get(`api/front/formUrl`)
       .then((res) => {
         setFormUrl(res.data);
       })
@@ -33,7 +32,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
    */
   function getInitialData() {
     axios
-      .get(`api/admin/licences`)
+      .get(`api/data/licences`)
       .then((res) => {
         setMetadatas(res.data);
       })
@@ -52,7 +51,7 @@ export default function CatalogueLicence({ display, specialSearch, editMode }) {
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {metadatas.map((metadata, i) => {
+              {metadatas.map((metadata) => {
                 return (
                   <LicenceCard
                     metadata={metadata}

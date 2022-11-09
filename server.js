@@ -6,9 +6,11 @@ const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
 // Require Route
-const apiV1 = require('./routes/routesV1');
-const apiAdmin = require('./routes/routesAdmin');
+const apiOpen = require('./routes/routesOpen');
+const apiFront = require('./routes/routesFront');
+const apiData = require('./routes/routesData');
 const apiMedia = require('./routes/routesMedia');
+const apiSecu = require('./routes/routesSecu');
 // Require Config
 const { getConf } = require('./config/config');
 const log = require('./utils/logger');
@@ -18,6 +20,7 @@ const mod = 'server';
 const passport = require('./utils/passportSetup');
 const initDb = require('./database/scripts/initDatabase');
 const { isDevEnv } = require('./config/backOptions');
+const { checkRolePerm } = require('./utils/roleCheck');
 
 // Create a new express application named 'app'
 const app = express();
@@ -40,7 +43,7 @@ app.use(
         'connect-src': ["'self'", ...getConf('security').trusted_domain],
       },
     },
-  }),
+  })
 );
 
 // Configure the bodyParser middleware
@@ -54,11 +57,14 @@ app.use(cors());
 // Passport middleware
 app.use(passport.initialize());
 
-// Configure app to use routes
-app.use(`/api/v1/`, apiV1);
-app.use(`/api/media/`, apiMedia);
+const authenticate = passport.authenticate('jwt', { session: false });
 
-app.use(`/api/admin/`, passport.authenticate('jwt', { session: false }), apiAdmin);
+// Configure app to use routes
+app.use(`/api/open/`, apiOpen);
+app.use(`/api/front/`, apiFront);
+app.use(`/api/data/`, authenticate, apiData);
+app.use(`/api/media/`, authenticate, apiMedia);
+app.use(`/api/secu/`, authenticate, checkRolePerm('Admin'), apiSecu);
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {

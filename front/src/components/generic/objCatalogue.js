@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
 import { GeneralContext } from '../../generalContext';
 import { EditObjCard, ObjCard } from '../generic/objCard';
-import { getApiAdmin } from '../../App';
+import { getApiData } from '../../App';
 
 const PAGE_SIZE = 20;
 
@@ -30,8 +30,6 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   display,
-  specialSearch,
-  editMode,
   formUrlObj,
   propId,
   propName,
@@ -50,7 +48,7 @@ export default function ObjCatalogue({
 
   const generalConf = useContext(GeneralContext);
   const editUrl = `${generalConf.formUrl}${formUrlObj}`;
-  const getApiUrlObj = (suffix) => getApiAdmin(`${formUrlObj}${suffix ? `/${suffix}` : ''}`);
+  const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`);
 
   useEffect(() => getInitialData(), []);
   useEffect(() => setFormUrl(editUrl), [generalConf]);
@@ -68,7 +66,7 @@ export default function ObjCatalogue({
     // const params = new URLSearchParams(`limit=${PAGE_SIZE}&offset=0`);
     // const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
     const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
-    console.log('url:', fetchUrl);
+    // console.log('url:', fetchUrl);
     axios
       .get(fetchUrl)
       .then((res) => {

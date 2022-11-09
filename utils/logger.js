@@ -1,8 +1,15 @@
+// External dependencies
 const rudiLogger = require('@aqmo.org/rudi_logger');
+
+// Internal dependencies
 const { getConf } = require('../config/config');
 const { getBackOptions, OPT_GIT_HASH } = require('../config/backOptions');
 const { nowFormatted } = require('./utils');
+
+// Constants
 const APP_NAME = getConf('logging', 'app_name');
+
+// Helper functions
 
 /**
  * build ips array from the request
@@ -21,30 +28,6 @@ function extractIpRedirections(req) {
   }
   return result;
 }
-
-exports.getContext = (req, options = {}) => {
-  const ctx = {};
-  if (!req) {
-    ctx.auth = {
-      userId: '',
-      clientApp: APP_NAME,
-      reqIP: [],
-    };
-  } else {
-    ctx.auth = {
-      userId: req.user ? req.user.id : '',
-      clientApp: APP_NAME,
-      reqIP: [req.ip, ...extractIpRedirections(req)],
-    };
-  }
-
-  ctx.operation = {
-    opType: options.opType ? options.opType : 'other',
-    statusCode: options.statusCode ? options.statusCode : '',
-    id: options.id ? options.id : '',
-  };
-  return ctx;
-};
 /**
  * build the logger option object
  * @return {Object} option for the logger
@@ -89,7 +72,7 @@ function getRudiLoggerOptions() {
 const syslog = new rudiLogger.RudiLogger(
   APP_NAME,
   getBackOptions(OPT_GIT_HASH),
-  getRudiLoggerOptions(),
+  getRudiLoggerOptions()
 );
 
 const rplog = function (logLevel, srcMod, srcFun, msg, context) {
@@ -114,7 +97,7 @@ const rplog = function (logLevel, srcMod, srcFun, msg, context) {
       break;
   }
   let ctx = undefined;
-  if (context !== undefined) {
+  if (!!context) {
     ctx = {
       subject: context.subject,
       req_ip: context.ip,
@@ -149,11 +132,36 @@ const createLogLine = (level, srcMod, srcFun, msg) => {
   return `${nowFormatted()} ${level} ${displayStr(srcMod, srcFun, msg)}`;
 };
 
-exports.e = (srcMod, srcFun, msg, context) => {
+// Controllers
+exports.getContext = (req, options = {}) => {
+  const ctx = {};
+  if (!req) {
+    ctx.auth = {
+      userId: '',
+      clientApp: APP_NAME,
+      reqIP: [],
+    };
+  } else {
+    ctx.auth = {
+      userId: req.user ? req.user.id : '',
+      clientApp: APP_NAME,
+      reqIP: [req.ip, ...extractIpRedirections(req)],
+    };
+  }
+
+  ctx.operation = {
+    opType: options.opType ? options.opType : 'other',
+    statusCode: options.statusCode ? options.statusCode : '',
+    id: options.id ? options.id : '',
+  };
+  return ctx;
+};
+
+exports.e = (srcMod, srcFun, msg) => {
   console.error(createLogLine('error', srcMod, srcFun, msg));
 };
 
-exports.w = (srcMod, srcFun, msg, context) => {
+exports.w = (srcMod, srcFun, msg) => {
   console.warn(createLogLine('warn', srcMod, srcFun, msg));
 };
 
@@ -162,11 +170,11 @@ exports.i = (srcMod, srcFun, msg, context) => {
   this.sysInfo(srcMod, srcFun, msg, context);
 };
 
-exports.v = (srcMod, srcFun, msg, context) => {
+exports.v = (srcMod, srcFun, msg) => {
   console.log(createLogLine('verbose', srcMod, srcFun, msg));
 };
 
-exports.d = (srcMod, srcFun, msg, context) => {
+exports.d = (srcMod, srcFun, msg) => {
   console.debug(createLogLine('debug', srcMod, srcFun, msg));
 };
 

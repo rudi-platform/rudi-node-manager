@@ -1,13 +1,16 @@
+// ----- External dependencies
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const jwtLib = require(`@aqmo.org/jwt_lib`);
 
+// ----- Internal dependencies
 const { getConf } = require('../config/config');
 const { timeEpochS, toInt } = require('./utils');
 const log = require('./logger');
 const { ForbiddenError, RudiError } = require('./errors');
 
+// ----- Constants
 const mod = 'jwt';
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
@@ -20,7 +23,8 @@ const MEDIA_AUTH = getConf('rudi_media');
 exports.CONSOLE_TOKEN_NAME = 'consoleToken';
 exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken';
 
-exports.extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN) =>
+// ----- Functions
+exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
   req?.cookies ? req.cookies[cookieName] : null;
 
 exports.extractJwtFromReq = (req) => {
