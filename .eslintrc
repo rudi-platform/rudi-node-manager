@@ -5,7 +5,7 @@
     "commonjs": true,
     "es2021": true
   },
-  "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "**/node_modules", "**/coverage", "**/front"],
+  "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "**/node_modules/*", "**/coverage/*", "**/front/*"],
   "parserOptions": {
     "ecmaFeatures": { "jsx": true },
     "ecmaVersion": "latest"
@@ -29,7 +29,7 @@
       "error",
       { "anonymous": "always", "named": "never", "asyncArrow": "always" }
     ],
-    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-imports": "warn",
     "unused-imports/no-unused-vars": [
       "warn",
       {

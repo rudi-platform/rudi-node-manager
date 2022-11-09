@@ -22,6 +22,7 @@ import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
+const HAST_TAG = getBackUrl('front/hash')
 
 export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`);
 export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`);

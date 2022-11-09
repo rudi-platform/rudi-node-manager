@@ -5,7 +5,19 @@
   "parserOptions": {
     "sourceType": "module"
   },
-  "plugins": ["react"],
+  "rules": {
+    "unused-imports/no-unused-imports": "warn",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_|req|res|reply|next",
+        "args": "after-used",
+        "argsIgnorePattern": "^_|req|res|reply|next"
+      }
+    ]
+  },
+  "plugins": ["react", "unused-imports"],
   "settings": {
     "react": {
       "version": "detect"

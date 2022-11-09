@@ -38,15 +38,13 @@ console.log('FRONT_PATH: ' + process.env.FRONT_PATH);
 export const getFrontOptions = (opt, altValue) => {
   if (!opt) return OPTIONS;
   if (frontOptions[opt]) return frontOptions[opt];
-  const optVal = process.env[opt];
-  if (optVal) {
-    frontOptions[opt] = optVal;
-    console.log('\t- ' + opt + '=' + optVal);
-  }
-  return optVal || '';
+  frontOptions[opt] = process.env[opt] || altValue;
+  console.log('\t- ' + opt + '=' + frontOptions[opt]);
+  return frontOptions[opt];
 };
 
-export const getBackUrl = (suffix) => `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`;
+export const getBackUrl = (suffix) =>
+  `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`;
 
 if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/';
 
