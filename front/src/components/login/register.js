@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import InputGroup from 'react-bootstrap/InputGroup';
+
 import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import { Eye, EyeSlash } from 'react-bootstrap-icons';
 
 export const btnColor = 'warning';
 export const btnText = 'Créer un compte';
@@ -28,6 +31,10 @@ export default function Register({ backToLogin }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [isPwdShown, setPasswordShown] = useState(false);
+  const togglePwdVisibility = () => setPasswordShown(!isPwdShown);
+  const stateType = () => (isPwdShown ? 'text' : 'password');
 
   const { toggle, visible } = useGenericModal();
   const { options, changeOptions } = useGenericModalOptions();
@@ -94,7 +101,7 @@ export default function Register({ backToLogin }) {
       });
   }
 
-  const formGroup = (id, label, val, type, onChangeMethod, hasFocus) => {
+  const formGroup = (id, label, val, type, onChangeMethod, autoCompl, hasFocus) => {
     return (
       <div className="login-form">
         <Form.Group size="lg" controlId={id}>
@@ -103,8 +110,30 @@ export default function Register({ backToLogin }) {
             autoFocus={hasFocus}
             type={type}
             value={val}
+            autoComplete={autoCompl}
             onChange={(e) => onChangeMethod(e.target.value)}
           />
+        </Form.Group>
+      </div>
+    );
+  };
+
+  const inputPassword = (id, label, password, setPassword) => {
+    return (
+      <div className="login-form">
+        <Form.Group size="lg" controlId={id}>
+          <Form.Label>{label}</Form.Label>
+          <InputGroup className="mt-3">
+            <Form.Control
+              type={stateType()}
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button variant="warning" id={`button-${id}`} onClick={togglePwdVisibility}>
+              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+            </Button>
+          </InputGroup>
         </Form.Group>
       </div>
     );
@@ -119,16 +148,10 @@ export default function Register({ backToLogin }) {
         animation={false}
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
-        {formGroup('username', 'Nom', username, 'text', setUserName, true)}
-        {formGroup('email', 'E-mail', email, 'text', setEmail)}
-        {formGroup('password', 'Mot de passe', password, 'password', setPassword)}
-        {formGroup(
-          'confirmPassword',
-          'Confirmation du mot de passe',
-          confirmPassword,
-          'password',
-          setConfirmPassword,
-        )}
+        {formGroup('username', 'Nom', username, 'text', setUserName, 'username', true)}
+        {formGroup('email', 'E-mail', email, 'text', setEmail, 'email')}
+        {inputPassword('pwd', 'Mot de passe', password, setPassword)}
+        {inputPassword('pwd2', 'Confirmation du mot de passe', confirmPassword, setConfirmPassword)}
         <div className="login-button">
           <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
             {btnText}

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import InputGroup from 'react-bootstrap/InputGroup';
 import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import { Eye, EyeSlash } from 'react-bootstrap-icons';
+import Button from 'react-bootstrap/esm/Button';
 
 export const btnColor = 'success';
 export const btnText = 'Accéder à l‘application';
@@ -29,6 +31,10 @@ export default function Login({ setToken }) {
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
+  const [isPwdShown, setPasswordShown] = useState(false);
+  const togglePwdVisibility = () => setPasswordShown(!isPwdShown);
+  const stateType = () => (isPwdShown ? 'text' : 'password');
+
   const { toggle, visible } = useGenericModal();
   const { options, changeOptions } = useGenericModalOptions();
 
@@ -36,7 +42,7 @@ export default function Login({ setToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const isFormValid = () => username.length > 0 && password.length > 0;
+  // const isFormValid = () => username.length > 0 && password.length > 0;
 
   /**
    * call server to log user
@@ -85,6 +91,27 @@ export default function Login({ setToken }) {
     });
   }
 
+  const inputPassword = () => {
+    return (
+      <div className="login-form">
+        <Form.Group size="lg" controlId="pwd">
+          <Form.Label>Mot de passe</Form.Label>
+          <InputGroup className="mt-3">
+            <Form.Control
+              type={stateType()}
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button variant="warning" id="button-addon2" onClick={togglePwdVisibility}>
+              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+            </Button>
+          </InputGroup>
+        </Form.Group>
+      </div>
+    );
+  };
+
   return (
     <div className="Login">
       <GenericModal
@@ -106,22 +133,7 @@ export default function Login({ setToken }) {
             />
           </Form.Group>
         </div>
-        <div className="login-form">
-          <Form.Group size="lg" controlId="pwd">
-            <Form.Label>Mot de passe</Form.Label>
-            <Form.Control
-              type="password"
-              value={password}
-              autoComplete="current-password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-        </div>
-        <div className="login-button">
-          <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
-            {btnText}
-          </Button>
-        </div>
+        {inputPassword()}
       </Form>
     </div>
   );

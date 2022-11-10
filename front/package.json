@@ -59,6 +59,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "eslint": "^8.26.0",
+    "eslint-plugin-only-warn": "^1.0.3",
     "eslint-plugin-react": "^7.31.10"
   },
   "overrides": {

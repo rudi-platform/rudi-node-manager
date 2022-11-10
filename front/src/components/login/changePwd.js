@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import './login.css';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import { Eye, EyeSlash } from 'react-bootstrap-icons';
 
 export const btnColor = 'secondary';
 export const btnText = 'Modifier le mot de passe';
@@ -28,6 +30,10 @@ export default function ChangePwd({ backToLogin }) {
   const [password, setPwd] = useState('');
   const [newPassword, setNewPwd] = useState('');
   const [confirmNewPassword, setConfirmNewPwd] = useState('');
+
+  const [isPwdShown, setPasswordShown] = useState(false);
+  const togglePwdVisibility = () => setPasswordShown(!isPwdShown);
+  const stateType = () => (isPwdShown ? 'text' : 'password');
 
   const { toggle, visible } = useGenericModal();
   const { options, changeOptions } = useGenericModalOptions();
@@ -106,7 +112,34 @@ export default function ChangePwd({ backToLogin }) {
       <div className="login-form">
         <Form.Group size="lg" controlId={id}>
           <Form.Label>{label}</Form.Label>
-          <Form.Control autoFocus={hasFocus} type={type} value={val} onChange={(e) => onChangeMethod(e.target.value)} />
+          <Form.Control
+            autoFocus={hasFocus}
+            autoComplete='username'
+            type={type}
+            value={val}
+            onChange={(e) => onChangeMethod(e.target.value)}
+          />
+        </Form.Group>
+      </div>
+    );
+  };
+
+  const inputPassword = (id, label, password, setPassword) => {
+    return (
+      <div className="login-form">
+        <Form.Group size="lg" controlId={id}>
+          <Form.Label>{label}</Form.Label>
+          <InputGroup className="mt-3">
+            <Form.Control
+              type={stateType()}
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button variant="warning" id={`button-${id}`} onClick={togglePwdVisibility}>
+              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+            </Button>
+          </InputGroup>
         </Form.Group>
       </div>
     );
@@ -122,14 +155,13 @@ export default function ChangePwd({ backToLogin }) {
       ></GenericModal>
       <Form onSubmit={handleSubmit}>
         {formGroup('username', 'Nom', username, 'text', setUserName, true)}
-        {formGroup('password', 'Mot de passe actuel', password, 'password', setPwd)}
-        {formGroup('password', 'Nouveau mot de passe', newPassword, 'password', setNewPwd)}
-        {formGroup(
-          'password',
+        {inputPassword('actualPwd', 'Mot de passe actuel', password, setPwd)}
+        {inputPassword('newPwd', 'Nouveau mot de passe', newPassword, setNewPwd)}
+        {inputPassword(
+          'newPwd2',
           'Confirmation du mot de passe',
           confirmNewPassword,
-          'password',
-          setConfirmNewPwd,
+          setConfirmNewPwd
         )}
         <div className="login-button">
           <Button type="submit" variant={btnColor} disabled={!isFormValid()}>

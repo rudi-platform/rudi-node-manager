@@ -22,7 +22,7 @@ import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
 
 const VERSION_TAG = getFrontOptions(OPT_TAG);
-const HAST_TAG = getBackUrl('front/hash')
+const HAST_TAG = getBackUrl('front/hash');
 
 export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`);
 export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`);
@@ -71,10 +71,10 @@ export default function App() {
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
-        axios.get(getApiFront('formUrl')).catch((e) => {
+        axios.get(getApiFront('formUrl')).catch(() => {
           return { data: '' };
         }),
-        axios.get(getApiData('enum/themes/fr')).catch((e) => {
+        axios.get(getApiData('enum/themes/fr')).catch(() => {
           // console.error('Error getting themes: ', e);
           return { data: {} };
         }),
@@ -88,7 +88,14 @@ export default function App() {
    * Returns the code to display the version tag (if defined)
    * @return {ReactNode} the code to display the version tag (if defined)
    */
-  const displayVersion = () => (!VERSION_TAG ? '' : <div className="version">v.{VERSION_TAG}</div>);
+  const displayVersion = () =>
+    !VERSION_TAG ? (
+      ''
+    ) : (
+      <div>
+        <div className="version">v.{VERSION_TAG}</div> <div>{HAST_TAG}</div>
+      </div>
+    );
 
   /**
    *
