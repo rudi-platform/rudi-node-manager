@@ -78,7 +78,7 @@ const initRolesTable = () =>
 const initUsersTable = () => initTable(dbManager.TBL_USERS, sqlCreateUserTable, () => {});
 
 const createSuperUser = async () => {
-  const fun = 'initializeUsers';
+  const fun = 'createSuperUser';
 
   if (!getDbConf('db_su_usr') || !getDbConf('db_su_pwd')) {
     log.d(mod, fun, 'No super user config was found');
@@ -101,7 +101,7 @@ const createSuperUser = async () => {
   const res = await registerUser(superUser);
   const { id, username } = res;
   await dbManager.createUserRole({ userId: id, role: superUser.role });
-  log.i(mod, 'createSuperUser', `Super user created: '${username}' (id ${id})`);
+  log.i(mod, fun, `Super user created: '${username}' (id ${id})`);
 };
 
 const initUserRolesTable = () =>

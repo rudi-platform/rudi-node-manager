@@ -44,12 +44,12 @@ const pmFrontCookieOpts = (exp) => {
   try {
     const pwdStr = `${password}`;
     if (pwdStr.startsWith('$')) {
-      console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
+      // console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
       return pwdStr;
     }
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
     const hashedPwd = await bcrypt.hash(pwdStr, salt);
-    console.debug('T (saltPassword) hashed pwd:', hashedPwd);
+    // console.debug('T (saltPassword) hashed pwd:', hashedPwd);
     return hashedPwd;
   } catch (e) {
     log.e(mod, fun, e);

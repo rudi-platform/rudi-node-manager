@@ -76,7 +76,7 @@ export function ObjCard({
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => triggerDeleteObj(objId)}
+                onClick={() => triggerDeleteObj(objId)}
               >
                 <Trash />
               </button>
@@ -193,7 +193,7 @@ export function EditObjCard({
               <button
                 type="button"
                 className="btn btn-danger"
-                onClick={(e) => triggerDeleteObj(editID)}
+                onClick={() => triggerDeleteObj(editID)}
               >
                 <Trash />
               </button>
