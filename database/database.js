@@ -459,9 +459,9 @@ const createUserRole = (userRole) => {
         if (err) {
           log.e(mod, fun, err.message);
           if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
-            err = new RudiError(`Role already assigned to user (${err.message})`,'SQL');
+            err = new RudiError(`Role already assigned to user (${err.message})`, 500, 'SQL');
           if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
-            err = new RudiError(`User or role not found (${err.message})`,'SQL');
+            err = new RudiError(`User or role not found (${err.message})`, 500, 'SQL');
           reject(err);
         } else {
           log.i(
