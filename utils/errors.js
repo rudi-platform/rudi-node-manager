@@ -5,7 +5,7 @@ const STATUS_CODE = 'statusCode';
 class RudiError extends Error {
   constructor(message, code, name, desc, ctxMod, ctxFun) {
     super(message);
-    this[STATUS_CODE] = code;
+    this[STATUS_CODE] = code || 500;
     this.name = name;
     this.description = desc;
     this.ctxMod = ctxMod;

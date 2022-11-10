@@ -59,7 +59,7 @@ const initTable = (tableName, sqlCreateReq, initializeTable) => {
               mod,
               `${fun}.${tableName}.create`,
               `Table Created : ${tableName}`,
-              log.getContext(null, { opType: `init_table_${tableName}`.toLowerCase() }),
+              log.getContext(null, { opType: `init_table_${tableName}`.toLowerCase() })
             );
           }
           initializeTable();
@@ -100,8 +100,12 @@ const createSuperUser = async () => {
 
   const res = await registerUser(superUser);
   const { id, username } = res;
-  await dbManager.createUserRole({ userId: id, role: superUser.role });
-  log.i(mod, fun, `Super user created: '${username}' (id ${id})`);
+  try {
+    await dbManager.createUserRole({ userId: id, role: superUser.role });
+    log.i(mod, fun, `Super user created: '${username}' (id ${id})`);
+  } catch (err) {
+    log.e(mod, fun, `Error: ${err}`);
+  }
 };
 
 const initUserRolesTable = () =>

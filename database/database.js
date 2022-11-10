@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config');
-const { ForbiddenError } = require('../utils/errors');
+const { ForbiddenError, RudiError } = require('../utils/errors');
 const log = require('../utils/logger');
 
 // ---- Constants -----
@@ -449,24 +449,25 @@ exports.deleteUserRole = (userId, role) => {
 
 const createUserRole = (userRole) => {
   const fun = 'createUserRole';
+  const { userId, role } = userRole;
   const db = open();
   return new Promise((resolve, reject) => {
     db.run(
       `INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`,
-      [userRole.userId, userRole.role],
+      [userId, role],
       function (err) {
         if (err) {
           log.e(mod, fun, err.message);
           if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
-            err.message = 'Role already assigned to user';
+            err = new RudiError(`Role already assigned to user (${err.message})`,'SQL');
           if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
-            err.message = 'User or role not found';
+            err = new RudiError(`User or role not found (${err.message})`,'SQL');
           reject(err);
         } else {
           log.i(
             mod,
             fun,
-            `(${TBL_USER_ROLES}) A row has been inserted with userId ${userRole.userId} and role ${userRole.role}`,
+            `(${TBL_USER_ROLES}) A row has been inserted with userId ${userId} and role ${role}`,
             log.getContext(null, { opType: 'post_userRole' })
           );
           resolve(userRole);
@@ -474,7 +475,7 @@ const createUserRole = (userRole) => {
         close(db);
       }
     );
-  })
+  });
 };
 exports.createUserRole = createUserRole;
 
