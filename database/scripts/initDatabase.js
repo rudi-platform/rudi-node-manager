@@ -90,7 +90,10 @@ const createSuperUser = async () => {
     // log.d(mod, fun, `Super user '${suName}' already exists`);
     return;
   }
-  const suPwd = decodeBase64(getDbConf('db_su_pwd'));
+  const encodedSuPwd = getDbConf('db_su_pwd');
+  log.d(mod, fun, `Super user pwd: '${encodedSuPwd}'`);
+
+  const suPwd = decodeBase64(encodedSuPwd);
   const superUser = {
     username: suName,
     password: suPwd,
