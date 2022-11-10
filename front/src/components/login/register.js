@@ -123,7 +123,7 @@ export default function Register({ backToLogin }) {
       <div className="login-form">
         <Form.Group size="lg" controlId={id}>
           <Form.Label>{label}</Form.Label>
-          <InputGroup className="mt-3">
+          <InputGroup className="login-pwd">
             <Form.Control
               type={stateType()}
               value={password}

@@ -94,7 +94,7 @@ export default function Login({ setToken }) {
       <div className="login-form">
         <Form.Group size="lg" controlId="pwd">
           <Form.Label>Mot de passe</Form.Label>
-          <InputGroup className="mt-3">
+          <InputGroup className="login-pwd">
             <Form.Control
               type={stateType()}
               value={password}
