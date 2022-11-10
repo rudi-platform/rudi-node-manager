@@ -13,7 +13,7 @@
   "rules": {
     "arrow-body-style": "off",
     "comma-dangle": ["error", "only-multiline"],
-    "complexity": ["warn", { "max": 20 }],
+    "complexity": ["warn", { "max": 25 }],
     "indent": "off",
     "no-await-in-loop": "error",
     "no-console": "off",

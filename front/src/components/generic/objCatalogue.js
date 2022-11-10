@@ -30,6 +30,8 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   display,
+  // specialSearch,
+  // editMode,
   formUrlObj,
   propId,
   propName,

@@ -6,17 +6,20 @@ import PropTypes from 'prop-types';
  * Composant : LicenceCard
  * @return {ReactNode}
  */
-export default function LicenceCard({ metadata, formUrl, display }) {
+export default function LicenceCard({ metadata, display }) {
   /**
    * affiche le text en fonction de la langue choisi
    * @param {*} langObjectArray Array d'objet au format {lang:'', text:''}
-   * @param {String} lang langue selectionnée
+   * @param {String} userLang langue selectionnée
    * @return {String} text dans la langue appropriée
    */
-  function getLangText(langObjectArray, lang) {
-    // TODO
+  const getLangText = (langObjectArray, userLang) => {
+    langObjectArray.map((textObj) => {
+      const { lang, text } = textObj;
+      if (lang === userLang) return text;
+    });
     return langObjectArray[0].text;
-  }
+  };
 
   return (
     <div className="col-12" key={metadata.concept_id}>

@@ -42,7 +42,7 @@ export default function Login({ setToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  // const isFormValid = () => username.length > 0 && password.length > 0;
+  const isFormValid = () => username.length > 0 && password.length > 0;
 
   /**
    * call server to log user
@@ -51,10 +51,8 @@ export default function Login({ setToken }) {
    */
   const loginUser = (credentials) =>
     axios
-      .post(`api/front/login`, JSON.stringify(credentials), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      .post('api/front/login', JSON.stringify(credentials), {
+        headers: { 'Content-Type': 'application/json' },
       })
       .catch((error) => {
         const errMsg =
@@ -134,6 +132,11 @@ export default function Login({ setToken }) {
           </Form.Group>
         </div>
         {inputPassword()}
+        <div className="login-button">
+          <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
+            {btnText}
+          </Button>
+        </div>
       </Form>
     </div>
   );

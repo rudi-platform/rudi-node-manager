@@ -8,9 +8,9 @@ import ObjCatalogue from './objCatalogue';
  */
 export const CatalogueContact = ({ display, specialSearch, editMode }) => (
   <ObjCatalogue
-    display={{ searchbar: true, editJDD: true }}
-    specialSearch={{}}
-    editMode={{}}
+    display={display}
+    specialSearch={specialSearch}
+    editMode={editMode}
     formUrlObj="contacts"
     propId="contact_id"
     propName="contact_name"

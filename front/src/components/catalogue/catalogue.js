@@ -24,7 +24,7 @@ const btnTextChg = 'Modifier un jeu de données :';
  * Composant : Catalogue
  * @return {ReactNode}
  */
-export default function Catalogue({ display, specialSearch, editMode }) {
+export default function Catalogue({ display }) {
   // console.log('-- Catalogue')
   const [metadatas, setMetadatas] = useState([]);
   const [countBy, setCountBy] = useState([]);
@@ -349,7 +349,7 @@ export default function Catalogue({ display, specialSearch, editMode }) {
               <div className="left-hand-blocks">
                 <div className="label-lv1">Filtrer</div>
                 <div className="row no-row-margin">
-                  {countBy.map((filter, i) => {
+                  {countBy.map((filter) => {
                     return (
                       <div className="col border rounded" key={filter.name}>
                         <div className="label-lv2">{filter.text}</div>
