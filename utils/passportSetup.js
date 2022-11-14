@@ -25,7 +25,7 @@ passport.use(
       .then((userInfo) => {
         // Create new User
         if (!userInfo) return done(null, false, { message: 'no user found' });
-        console.log(userInfo);
+        // console.log(userInfo);
         // Match password
         bcrypt.compare(password, userInfo.password, (err, isMatch) => {
           if (err) throw err;

@@ -39,7 +39,7 @@ const pmFrontCookieOpts = (exp) => {
  * @param {Boolean} isNotBase64 True of the password is not base64 encoded
  * @return {String} The salted passwrod
  */
- const hashPassword = async (password) => {
+const hashPassword = async (password) => {
   const fun = 'hashPassword';
   try {
     const pwdStr = `${password}`;
@@ -56,7 +56,6 @@ const pmFrontCookieOpts = (exp) => {
     throw e;
   }
 };
-
 
 // Controllers
 exports.postLogin = async (req, res, next) => {
@@ -86,15 +85,18 @@ exports.postLogin = async (req, res, next) => {
 
 exports.registerUser = async (data) => {
   try {
-    const { username, email, password } = data;
+    const { username, email, password, id } = data;
 
     const hashedPwd = await hashPassword(password);
-    const userInfo = await databaseManager.safeCreateUser({
-      username: username,
+    const userCreds = {
+      username,
       password: hashedPwd,
-      email: email,
-    });
-    return userInfo;
+      email,
+    };
+    if (id) userCreds.id = id;
+
+    const usr = await databaseManager.safeCreateUser(userCreds);
+    return { id: usr.id, username: usr.username };
   } catch (err) {
     log.e(mod, 'registerUser', err);
     throw err;
@@ -107,7 +109,7 @@ exports.postRegister = async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
     if (!password || password !== confirmPassword)
       throw new BadRequestError(
-        'Password and its confirmation should not be null and be the same.',
+        'Password and its confirmation should not be null and be the same.'
       );
 
     const user = await this.registerUser({ username, email, password });

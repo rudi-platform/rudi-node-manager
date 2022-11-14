@@ -91,7 +91,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
       `Could not forge a token for user '${user.username}' on Media: ${
-        err.response?.data?.message || err.response?.data || err.message
+        err.response?.data?.message || err.response?.data?.msg || JSON.stringify(err.response?.data) || err.message
       }`,
       mod,
       fun,

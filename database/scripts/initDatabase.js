@@ -90,10 +90,14 @@ const createSuperUser = async () => {
     // log.d(mod, fun, `Super user '${suName}' already exists`);
     return;
   }
+  const suId = getDbConf('db_su_id') || 1;
+
   const encodedSuPwd = getDbConf('db_su_pwd');
   // log.d(mod, fun, `Super user pwd: '${encodedSuPwd}'`);
   const suPwd = decodeBase64(encodedSuPwd);
+
   const superUser = {
+    id: suId,
     username: suName,
     password: suPwd,
     email: 'security@rudi-univ-rennes1.fr',

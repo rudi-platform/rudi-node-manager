@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config');
-const { ForbiddenError, RudiError, InternalServerError } = require('../utils/errors');
+const { ForbiddenError, InternalServerError } = require('../utils/errors');
 const log = require('../utils/logger');
 
 // ---- Constants -----
@@ -150,7 +150,8 @@ exports.getUsers = () => {
  */
 exports.safeCreateUser = (user) => {
   const fun = 'safeCreateUser';
-  const { username, password, email } = user;
+  console.log(user)
+  const { username, password, email, id } = user;
   const db = open();
   return new Promise((resolve, reject) => {
     db.serialize(() => {
@@ -164,8 +165,9 @@ exports.safeCreateUser = (user) => {
             reject(new ForbiddenError(`User '${username}' already exists`));
           } else {
             db.run(
-              `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
-              [username, password, email],
+              `INSERT INTO ${TBL_USERS}(username,password,email${id ? ',id' : ''})` +
+                ` VALUES(?,?,?${id ? ',?' : ''})`,
+              [username, password, email, id],
               (err) => {
                 if (err) {
                   log.e(mod, fun + ' cannotCreateUser', err.message);
