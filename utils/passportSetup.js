@@ -22,16 +22,16 @@ passport.use(
     // Match User
     databaseManager
       .getUserByUsername(username)
-      .then((user) => {
+      .then((userInfo) => {
         // Create new User
-        if (!user) return done(null, false, { message: 'no user found' });
-
+        if (!userInfo) return done(null, false, { message: 'no user found' });
+        console.log(userInfo);
         // Match password
-        bcrypt.compare(password, user.password, (err, isMatch) => {
+        bcrypt.compare(password, userInfo.password, (err, isMatch) => {
           if (err) throw err;
 
           if (isMatch) {
-            return done(null, user);
+            return done(null, userInfo);
           } else {
             return done(null, false, { message: 'Wrong password' });
           }
@@ -41,7 +41,7 @@ passport.use(
         console.error('T (LocalStrategy) Error login');
         return done(null, false, { message: err });
       });
-  }),
+  })
 );
 
 const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt');
@@ -63,7 +63,7 @@ passport.use(
       } catch (error) {
         done(error);
       }
-    },
-  ),
+    }
+  )
 );
 module.exports = passport;

@@ -16,7 +16,10 @@ exports.getUserByUsername = (req, res, next) => {
   const { username } = req.params;
   databaseManager
     .getUserByUsername(username)
-    .then((row) => res.status(200).json(row))
+    .then((userInfo) => {
+      const { id, username, email } = userInfo;
+      res.status(200).json({ id, username, email });
+    })
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_user' });
       res.status(error.statusCode).json(error);

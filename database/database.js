@@ -98,13 +98,13 @@ exports.getUserByUsername = (username) => {
   const fun = 'getUserByUsername';
   const db = open();
   return new Promise((resolve, reject) => {
-    db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], function (err, row) {
+    db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], function (err, userInfo) {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
       } else {
-        const { id, username, email } = row;
-        resolve({ id, username, email });
+        // const { id, username, email } = userInfo;
+        resolve(userInfo);
       }
 
       close(db);
