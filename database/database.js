@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config');
-const { ForbiddenError, RudiError } = require('../utils/errors');
+const { ForbiddenError, RudiError, InternalServerError } = require('../utils/errors');
 const log = require('../utils/logger');
 
 // ---- Constants -----
@@ -102,7 +102,10 @@ exports.getUserByUsername = (username) => {
       if (err) {
         log.e(mod, fun, err.message);
         reject(err);
-      } else resolve(row);
+      } else {
+        const { id, username, email } = row;
+        resolve({ id, username, email });
+      }
 
       close(db);
     });
@@ -459,10 +462,12 @@ const createUserRole = (userRole) => {
         if (err) {
           log.e(mod, fun, err.message);
           if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
-            err = new RudiError(`Role already assigned to user (${err.message})`, 500, 'SQL');
-          if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
-            err = new RudiError(`User or role not found (${err.message})`, 500, 'SQL');
-          reject(err);
+            reject(
+              new InternalServerError(`Role already assigned to user (${err.message})`, mod, fun)
+            );
+          else if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
+            reject(new InternalServerError(`User or role not found (${err.message})`, mod, fun));
+          else reject(err);
         } else {
           log.i(
             mod,

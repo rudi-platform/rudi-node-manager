@@ -224,6 +224,16 @@ export default function App() {
               }
             />
             <Route
+              path={getBackUrl('gestion')}
+              element={
+                <Catalogue
+                  display={{ searchbar: true, editJDD: true }}
+                  specialSearch={{}}
+                  editMode={{}}
+                />
+              }
+            />
+            <Route
               path={getBackUrl('producer')}
               element={
                 <CatalogueProducer

@@ -49,6 +49,7 @@ exports.postUserRole = (req, res, next) => {
     .createUserRole(data)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
+      console.error(err);
       const error = errorHandler.error(err, req, { opType: 'post_userRole' });
       res.status(error.statusCode).json(error);
     });

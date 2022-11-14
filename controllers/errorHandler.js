@@ -33,7 +33,7 @@ exports.error = (error, req, options) => {
     // Something happened in setting up the request that triggered an Error
     log.e(mod, fun, error.message);
     log.sysError(mod, fun, error.message, log.getContext(req, options));
-    errorToDisplay = error.message;
+    errorToDisplay = { message: error.message, statusCode };
   }
   log.e(mod, fun, error.config);
   return errorToDisplay;
