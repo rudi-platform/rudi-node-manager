@@ -72,10 +72,10 @@ exports.normalizeUserTableName = () => {
             close(db);
             return reject(err);
           }
-          if (!row) {
-            close(db);
-            return resolve(`Renaming table '${oldTblName}' to temp name '${fakeName}'`);
-          }
+          // if (!row) {
+          //   close(db);
+          //   return resolve(`Renaming table '${oldTblName}' to temp name '${fakeName}'`);
+          // }
           console.log(mod, `${fun}.renameToto`, JSON.stringify(row));
           db.run(`ALTER TABLE '${fakeName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
             if (err) {
