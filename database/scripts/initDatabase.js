@@ -47,7 +47,6 @@ const initTable = (tableName, sqlCreateReq, initializeTable) => {
   db.get(sqlGet, [tableName], (err, row) => {
     if (err) {
       // log.e(mod, `${fun}.${tableName}.get`, err.message);
-      dbManager.close(db);
     } else {
       // log.i(mod, `${fun}.${tableName}.get`, row);
       if (!row) {
@@ -63,11 +62,9 @@ const initTable = (tableName, sqlCreateReq, initializeTable) => {
             );
           }
           initializeTable();
-          dbManager.close(db);
         });
-      } else {
-        dbManager.close(db);
       }
+      dbManager.close(db);
     }
   });
 };
@@ -126,7 +123,8 @@ exports.initDatabase = async () => {
     dbManager.close(db);
     initRolesTable();
     initUserRolesTable();
-    await dbManager.normalizeUserTableName();
+    await dbManager.normalizeUserTableName('users');
+    await dbManager.normalizeUserTableName('totox');
     initUsersTable();
     await createSuperUser();
     initDefaultFormTable.initDefaultFormTable();

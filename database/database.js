@@ -43,10 +43,9 @@ const close = function (db) {
 };
 
 // ---- Controllers -----
-exports.normalizeUserTableName = () => {
+exports.normalizeUserTableName = (oldTblName) => {
   const fun = 'normalizeUserTableName';
-  const oldTblName = 'users';
-  const fakeName = 'totox';
+  const tempName = `x${oldTblName}x`;
   const db = open();
   return new Promise((resolve, reject) => {
     db.get(
@@ -66,7 +65,7 @@ exports.normalizeUserTableName = () => {
 
         console.log(mod, `${fun}.check`, JSON.stringify(row));
 
-        db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${fakeName}'`, [], (err, row) => {
+        db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`, [], (err, row) => {
           if (err) {
             log.e(mod, `${fun}.renameToto`, err.message);
             close(db);
@@ -77,7 +76,7 @@ exports.normalizeUserTableName = () => {
           //   return resolve(`Renaming table '${oldTblName}' to temp name '${fakeName}'`);
           // }
           console.log(mod, `${fun}.renameToto`, JSON.stringify(row));
-          db.run(`ALTER TABLE '${fakeName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
+          db.run(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
             if (err) {
               log.e(mod, `${fun}.renameReal`, err.message);
               close(db);
