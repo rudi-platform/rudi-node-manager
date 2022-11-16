@@ -32,7 +32,7 @@ const initialRoles = [
   { role: 'Admin', desc: 'administration, création et validation des comptes' },
   { role: 'Moniteur', desc: 'accès au monitoring' },
   { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
-  { role: 'Créateur', desc: 'gestion simple des métadonnées' },
+  { role: 'Createur', desc: 'gestion simple des métadonnées' },
 ];
 
 const sqlGet = `SELECT name FROM sqlite_master WHERE type='table' AND name=?`;
