@@ -12,7 +12,6 @@
     "serverWindow": "nodemon server.js --ignore './front/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
     "dev": "concurrently --kill-others-on-fail \"npm run front\" \"npm run serverWindow\"",
-    "jwti-build": "cd 1-sub/jwti && ls && git pull origin main && npm i && npm run prestart && npm run build",
     "front-build": "cd front && npm run build",
     "lintBack": "eslint \"**/*.js\"",
     "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc --no-ignore",
@@ -21,7 +20,7 @@
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
-  "author": "Yann Porret <yporret@micropole.com>",
+  "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "dependencies": {
     "@aqmo.org/jwt_lib": "^1.1.9",
@@ -31,7 +30,6 @@
     "axios": "^1.1.3",
     "bcrypt": "^5.1.0",
     "bluebird": "^3.7.2",
-    "body-parser": "^1.20.1",
     "concurrently": "^7.5.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -44,6 +42,7 @@
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.2",
     "sshpk": "^1.17.0",
+    "uninstall": "^0.0.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

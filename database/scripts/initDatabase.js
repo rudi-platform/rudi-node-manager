@@ -177,6 +177,7 @@ exports.dbInitialize = async () => {
     await dbInitUserRolesTable(db);
     log.d(mod, fun, 'Table initialized: UserRoles');
 
+    await dbNormalizeUserTableName(db, 'totox');
     await dbNormalizeUserTableName(db, 'users');
     log.d(mod, fun, 'Table normalized: users');
 
