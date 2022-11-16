@@ -1,7 +1,7 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require('http-proxy-middleware')
 
-const backPath = `${process.env.PUBLIC_URL}/api`;
-const rewriteBackPathKey = `^${backPath}`;
+const backPath = `${process.env.PUBLIC_URL}/api`
+const rewriteBackPathKey = `^${backPath}`
 
 module.exports = function (app) {
   app.use(
@@ -16,6 +16,6 @@ module.exports = function (app) {
       //   // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
       //   return pathReplaced;
       // },
-    }),
-  );
-};
+    })
+  )
+}

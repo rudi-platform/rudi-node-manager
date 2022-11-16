@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Button from 'react-bootstrap/Button';
-import './login.css';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
-import { Eye, EyeSlash } from 'react-bootstrap-icons';
+import React, { useState } from 'react'
+import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Button from 'react-bootstrap/Button'
+import './login.css'
+import PropTypes from 'prop-types'
+import axios from 'axios'
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
+import { Eye, EyeSlash } from 'react-bootstrap-icons'
 
-export const btnColor = 'secondary';
-export const btnText = 'Modifier le mot de passe';
+export const btnColor = 'secondary'
+export const btnText = 'Modifier le mot de passe'
 
 export const showPill = (condition, showState) =>
   condition ? (
@@ -18,7 +18,7 @@ export const showPill = (condition, showState) =>
     </div>
   ) : (
     ''
-  );
+  )
 
 /**
  * Register component
@@ -26,17 +26,17 @@ export const showPill = (condition, showState) =>
  * @return {ReactNode} Register html component
  */
 export default function ChangePwd({ backToLogin }) {
-  const [username, setUserName] = useState('');
-  const [password, setPwd] = useState('');
-  const [newPassword, setNewPwd] = useState('');
-  const [confirmNewPassword, setConfirmNewPwd] = useState('');
+  const [username, setUserName] = useState('')
+  const [password, setPwd] = useState('')
+  const [newPassword, setNewPwd] = useState('')
+  const [confirmNewPassword, setConfirmNewPwd] = useState('')
 
-  const [isPwdShown, setPasswordShown] = useState(false);
-  const togglePwdVisibility = () => setPasswordShown(!isPwdShown);
-  const stateType = () => (isPwdShown ? 'text' : 'password');
+  const [isPwdShown, setPasswordShown] = useState(false)
+  const togglePwdVisibility = () => setPasswordShown(!isPwdShown)
+  const stateType = () => (isPwdShown ? 'text' : 'password')
 
-  const { toggle, visible } = useGenericModal();
-  const { options, changeOptions } = useGenericModalOptions();
+  const { toggle, visible } = useGenericModal()
+  const { options, changeOptions } = useGenericModalOptions()
 
   /**
    * is form valid?
@@ -48,7 +48,7 @@ export default function ChangePwd({ backToLogin }) {
     newPassword.length > 0 &&
     confirmNewPassword.length > 0 &&
     password != newPassword &&
-    newPassword == confirmNewPassword;
+    newPassword == confirmNewPassword
 
   /**
    * call server to Register user
@@ -60,14 +60,14 @@ export default function ChangePwd({ backToLogin }) {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    })
 
   /**
    * handle submit Register form
    * @param {*} event
    */
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     putPassword({
       username,
       password,
@@ -75,7 +75,7 @@ export default function ChangePwd({ backToLogin }) {
       confirmNewPassword,
     })
       .then((res) => {
-        console.log(res);
+        console.log(res)
         changeOptions({
           text: [`Le mot de passe a bien été changé pour l'utilisateur '${res.data.username}'`],
           title: 'Action Validée',
@@ -84,12 +84,12 @@ export default function ChangePwd({ backToLogin }) {
             {
               text: 'Connexion',
               action: () => {
-                backToLogin();
+                backToLogin()
               },
             },
           ],
-        });
-        toggle();
+        })
+        toggle()
       })
       .catch((error) => {
         changeOptions({
@@ -102,9 +102,9 @@ export default function ChangePwd({ backToLogin }) {
               action: () => {},
             },
           ],
-        });
-        toggle();
-      });
+        })
+        toggle()
+      })
   }
 
   const formGroup = (id, label, val, type, onChangeMethod, hasFocus) => {
@@ -114,15 +114,15 @@ export default function ChangePwd({ backToLogin }) {
           <Form.Label>{label}</Form.Label>
           <Form.Control
             autoFocus={hasFocus}
-            autoComplete='username'
+            autoComplete="username"
             type={type}
             value={val}
             onChange={(e) => onChangeMethod(e.target.value)}
           />
         </Form.Group>
       </div>
-    );
-  };
+    )
+  }
 
   const inputPassword = (id, label, password, setPassword) => {
     return (
@@ -142,8 +142,8 @@ export default function ChangePwd({ backToLogin }) {
           </InputGroup>
         </Form.Group>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="Login">
@@ -170,8 +170,8 @@ export default function ChangePwd({ backToLogin }) {
         </div>
       </Form>
     </div>
-  );
+  )
 }
 ChangePwd.propTypes = {
   backToLogin: PropTypes.func.isRequired,
-};
+}

@@ -1,9 +1,9 @@
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
-export const OPT_FRONT_PATH = 'PUBLIC_URL';
+export const OPT_FRONT_PATH = 'PUBLIC_URL'
 // export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
-export const OPT_TAG = 'REACT_APP_TAG';
+export const OPT_TAG = 'REACT_APP_TAG'
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -13,9 +13,9 @@ export const OPT_TAG = 'REACT_APP_TAG';
 // 'file': option given through the configuration file
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
-const OPTIONS = [OPT_FRONT_PATH, OPT_TAG];
+const OPTIONS = [OPT_FRONT_PATH, OPT_TAG]
 
-const frontOptions = {};
+const frontOptions = {}
 
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
@@ -36,17 +36,17 @@ console.log('FRONT_PATH: ' + process.env.FRONT_PATH);
  * @return {String} Value for the option
  */
 export const getFrontOptions = (opt, altValue) => {
-  if (!opt) return OPTIONS;
-  if (frontOptions[opt]) return frontOptions[opt];
-  frontOptions[opt] = process.env[opt] || altValue;
-  console.log('\t- ' + opt + '=' + frontOptions[opt]);
-  return frontOptions[opt];
-};
+  if (!opt) return OPTIONS
+  if (frontOptions[opt]) return frontOptions[opt]
+  frontOptions[opt] = process.env[opt] || altValue
+  console.log('\t- ' + opt + '=' + frontOptions[opt])
+  return frontOptions[opt]
+}
 
 export const getBackUrl = (suffix) =>
-  `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`;
+  `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`
 
-if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/';
+if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/'
 
 // const ensureIsFound = (varName) => {
 //   if (!getFrontOptions(varName))

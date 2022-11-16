@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import PropTypes from 'prop-types';
-import LicenceCard from './licenceCard';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import PropTypes from 'prop-types'
+import LicenceCard from './licenceCard'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 /**
  * Composant : CatalogueLicence
  * @return {ReactNode}
  */
 export default function CatalogueLicence({ display }) {
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [metadatas, setMetadatas] = useState([]);
-  const [formUrl, setFormUrl] = useState('');
-  const [hasMore] = useState(false);
+  const [metadatas, setMetadatas] = useState([])
+  const [formUrl, setFormUrl] = useState('')
+  const [hasMore] = useState(false)
 
   useEffect(() => {
     axios
       .get(`api/front/formUrl`)
       .then((res) => {
-        setFormUrl(res.data);
+        setFormUrl(res.data)
       })
       .catch((e) => {
-        defaultErrorHandler(e);
-      });
-    getInitialData();
-  }, []);
+        defaultErrorHandler(e)
+      })
+    getInitialData()
+  }, [])
   /**
    * recup la 1er page des métadonnéees
    */
@@ -34,11 +34,11 @@ export default function CatalogueLicence({ display }) {
     axios
       .get(`api/data/licences`)
       .then((res) => {
-        setMetadatas(res.data);
+        setMetadatas(res.data)
       })
       .catch((e) => {
-        defaultErrorHandler(e);
-      });
+        defaultErrorHandler(e)
+      })
   }
 
   return (
@@ -59,17 +59,17 @@ export default function CatalogueLicence({ display }) {
                     display={display}
                     key={metadata.concept_id}
                   ></LicenceCard>
-                );
+                )
               })}
             </InfiniteScroll>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 CatalogueLicence.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
-};
+}

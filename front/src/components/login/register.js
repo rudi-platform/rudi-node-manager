@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import InputGroup from 'react-bootstrap/InputGroup';
+import React, { useState } from 'react'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
+import InputGroup from 'react-bootstrap/InputGroup'
 
-import './login.css';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
-import { Eye, EyeSlash } from 'react-bootstrap-icons';
+import './login.css'
+import PropTypes from 'prop-types'
+import axios from 'axios'
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
+import { Eye, EyeSlash } from 'react-bootstrap-icons'
 
-export const btnColor = 'warning';
-export const btnText = 'Créer un compte';
+export const btnColor = 'warning'
+export const btnText = 'Créer un compte'
 
 export const showPill = (condition, showState) =>
   condition ? (
@@ -19,7 +19,7 @@ export const showPill = (condition, showState) =>
     </div>
   ) : (
     ''
-  );
+  )
 
 /**
  * Register component
@@ -27,23 +27,23 @@ export const showPill = (condition, showState) =>
  * @return {ReactNode} Register html component
  */
 export default function Register({ backToLogin }) {
-  const [username, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUserName] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
-  const [isPwdShown, setPasswordShown] = useState(false);
-  const togglePwdVisibility = () => setPasswordShown(!isPwdShown);
-  const stateType = () => (isPwdShown ? 'text' : 'password');
+  const [isPwdShown, setPasswordShown] = useState(false)
+  const togglePwdVisibility = () => setPasswordShown(!isPwdShown)
+  const stateType = () => (isPwdShown ? 'text' : 'password')
 
-  const { toggle, visible } = useGenericModal();
-  const { options, changeOptions } = useGenericModalOptions();
+  const { toggle, visible } = useGenericModal()
+  const { options, changeOptions } = useGenericModalOptions()
 
   /**
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const isFormValid = () => username.length > 0 && password.length > 0;
+  const isFormValid = () => username.length > 0 && password.length > 0
 
   /**
    * call server to Register user
@@ -55,14 +55,14 @@ export default function Register({ backToLogin }) {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    })
 
   /**
    * handle submit Register form
    * @param {*} event
    */
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     registerUser({
       username,
       email,
@@ -78,12 +78,12 @@ export default function Register({ backToLogin }) {
             {
               text: 'Connexion',
               action: () => {
-                backToLogin();
+                backToLogin()
               },
             },
           ],
-        });
-        toggle();
+        })
+        toggle()
       })
       .catch((error) => {
         changeOptions({
@@ -96,9 +96,9 @@ export default function Register({ backToLogin }) {
               action: () => {},
             },
           ],
-        });
-        toggle();
-      });
+        })
+        toggle()
+      })
   }
 
   const formGroup = (id, label, val, type, onChangeMethod, autoCompl, hasFocus) => {
@@ -115,8 +115,8 @@ export default function Register({ backToLogin }) {
           />
         </Form.Group>
       </div>
-    );
-  };
+    )
+  }
 
   const inputPassword = (id, label, password, setPassword) => {
     return (
@@ -136,8 +136,8 @@ export default function Register({ backToLogin }) {
           </InputGroup>
         </Form.Group>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="Login">
@@ -159,8 +159,8 @@ export default function Register({ backToLogin }) {
         </div>
       </Form>
     </div>
-  );
+  )
 }
 Register.propTypes = {
   backToLogin: PropTypes.func.isRequired,
-};
+}

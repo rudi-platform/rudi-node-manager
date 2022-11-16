@@ -1,13 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal';
+import React from 'react'
+import PropTypes from 'prop-types'
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
-export const ModalContext = React.createContext();
-const { Provider } = ModalContext;
+export const ModalContext = React.createContext()
+const { Provider } = ModalContext
 
 export const ModalProvider = ({ children }) => {
-  const { toggle, visible } = useGenericModal();
-  const { options, changeOptions } = useGenericModalOptions();
+  const { toggle, visible } = useGenericModal()
+  const { options, changeOptions } = useGenericModalOptions()
   return (
     <Provider value={{ toggle, visible, options, changeOptions }}>
       <GenericModal
@@ -18,41 +18,41 @@ export const ModalProvider = ({ children }) => {
       ></GenericModal>
       {children}
     </Provider>
-  );
-};
-ModalProvider.propTypes = { children: PropTypes.node };
+  )
+}
+ModalProvider.propTypes = { children: PropTypes.node }
 
 export const DefaultErrorOption = {
   text: ``,
   title: 'Une erreur est survenue',
   type: 'error',
   buttons: [{ text: 'Ok', action: () => {} }],
-};
+}
 export const DefaultOkOption = {
   text: ``,
   title: 'Succès',
   type: 'success',
   buttons: [{ text: 'Ok', action: () => {} }],
-};
+}
 export const DefaultConfirmOption = {
   text: `Confirmez vous l'action?`,
   title: 'Confirmation',
   type: 'confirm',
   buttons: [{ text: 'Oui', action: () => {} }],
-};
+}
 
 export const getOptOk = (label, action = () => {}) => {
-  const opt = DefaultOkOption;
-  opt.text = [label];
-  opt.buttons = [{ text: 'Ok', action: () => action() }];
-  return opt;
-};
+  const opt = DefaultOkOption
+  opt.text = [label]
+  opt.buttons = [{ text: 'Ok', action: () => action() }]
+  return opt
+}
 export const getOptConfirm = (label, action = () => {}) => {
-  const opt = DefaultConfirmOption;
-  opt.text = [label];
+  const opt = DefaultConfirmOption
+  opt.text = [label]
   opt.buttons = [
     { text: 'Oui', action: () => action() },
     { text: 'Non', action: () => {} },
-  ];
-  return opt;
-};
+  ]
+  return opt
+}

@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ObjCatalogue from './objCatalogue';
+import React from 'react'
+import PropTypes from 'prop-types'
+import ObjCatalogue from './objCatalogue'
 
 /**
  * Composant : CataloguePubKeys
@@ -26,10 +26,10 @@ export const CataloguePubKeys = ({ display, specialSearch, editMode }) => (
     deleteConfirmMsg={(id) => `Confirmez vous la suppression de la clé publique ${id}?`}
     deleteMsg={(id) => `La clé publique ${id} a été supprimé`}
   />
-);
+)
 
 CataloguePubKeys.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
-};
+}

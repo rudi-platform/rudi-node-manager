@@ -5,7 +5,13 @@
     "commonjs": true,
     "es2021": true
   },
-  "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "**/node_modules/*", "**/coverage/*", "**/front/*"],
+  "ignorePatterns": [
+    "**/*.spec.js",
+    "**/*.test.js",
+    "**/node_modules/*",
+    "**/coverage/*",
+    "**/front/*"
+  ],
   "parserOptions": {
     "ecmaFeatures": { "jsx": true },
     "ecmaVersion": "latest"

@@ -1,50 +1,50 @@
-const errorHandler = require('./errorHandler');
+const errorHandler = require('./errorHandler')
 const {
   dbGetUsers,
   dbGetUserByUsername,
   dbDeleteUserWithName,
   dbDeleteUser,
-} = require('../database/database');
+} = require('../database/database')
 
 exports.getUsersList = (req, res, next) => {
   dbGetUsers()
     .then((rows) => res.status(200).json(rows))
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_users' });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'get_users' })
+      res.status(error.statusCode).json(error)
+    })
+}
 exports.getUserByUsername = (req, res, next) => {
-  const { username } = req.params;
+  const { username } = req.params
   dbGetUserByUsername(null, username)
     .then((userInfo) => {
-      const { id, username, email } = userInfo;
-      res.status(200).json({ id, username, email });
+      const { id, username, email } = userInfo
+      res.status(200).json({ id, username, email })
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_user' });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'get_user' })
+      res.status(error.statusCode).json(error)
+    })
+}
 exports.deleteUserWithName = (req, res, next) => {
-  const { username } = req.params;
+  const { username } = req.params
   dbDeleteUserWithName(null, username)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'delete_user' });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'delete_user' })
+      res.status(error.statusCode).json(error)
+    })
+}
 
 exports.deleteUser = (req, res, next) => {
-  const { id } = req.params;
+  const { id } = req.params
   dbDeleteUser(null, id)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'delete_user' });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'delete_user' })
+      res.status(error.statusCode).json(error)
+    })
+}
 
 // exports.putPassword = (req, res, next) => {
 //   const { username, password } = req.body;

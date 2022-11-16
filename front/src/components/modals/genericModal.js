@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import PropTypes from 'prop-types';
-import { Check, ExclamationTriangleFill } from 'react-bootstrap-icons';
+import React, { useState } from 'react'
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
+import PropTypes from 'prop-types'
+import { Check, ExclamationTriangleFill } from 'react-bootstrap-icons'
 
 /**
  * GenericModal component
@@ -23,7 +23,7 @@ export default function GenericModal({ visible, toggle, options }) {
         <Modal.Body>
           {options.text &&
             options.text.map((text, i) => {
-              return <p key={`text-${i}`}>{text}</p>;
+              return <p key={`text-${i}`}>{text}</p>
             })}
         </Modal.Body>
         <Modal.Footer>
@@ -34,46 +34,46 @@ export default function GenericModal({ visible, toggle, options }) {
                   key={i}
                   variant="primary"
                   onClick={() => {
-                    buttonOption.action();
-                    toggle();
+                    buttonOption.action()
+                    toggle()
                   }}
                 >
                   {buttonOption.text}
                 </Button>
-              );
+              )
             })}
         </Modal.Footer>
       </Modal>
     </>
-  );
+  )
 }
 GenericModal.propTypes = {
   visible: PropTypes.bool,
   toggle: PropTypes.func,
   options: PropTypes.object,
-};
+}
 
 export const useGenericModal = () => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
    * @return {void}
    */
   function toggle() {
-    setVisible(!visible);
+    setVisible(!visible)
   }
-  return { toggle, visible };
-};
+  return { toggle, visible }
+}
 
 export const useGenericModalOptions = () => {
-  const [options, setOptions] = useState({});
+  const [options, setOptions] = useState({})
   /**
    * change la valeur des options
    * @param {*} param nouvelles options
    * @return {void}
    */
   function changeOptions(param) {
-    setOptions(param);
+    setOptions(param)
   }
-  return { changeOptions, options };
-};
+  return { changeOptions, options }
+}

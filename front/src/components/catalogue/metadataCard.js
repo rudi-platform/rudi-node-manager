@@ -1,14 +1,14 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext';
-import ThemeDisplay from '../other/themeDisplay';
-import FileSizeDisplay from '../other/fileSizeDisplay';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { getBackUrl } from '../../utils/frontOptions';
-import { nowLocaleFormatted } from '../../utils/utils';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
+import PropTypes from 'prop-types'
+import axios from 'axios'
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/ModalContext'
+import ThemeDisplay from '../other/themeDisplay'
+import FileSizeDisplay from '../other/fileSizeDisplay'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { getBackUrl } from '../../utils/frontOptions'
+import { nowLocaleFormatted } from '../../utils/utils'
 // import { getFrontPath } from '../../utils/frontOptions';
 
 /**
@@ -16,8 +16,8 @@ import { nowLocaleFormatted } from '../../utils/utils';
  * @return {ReactNode}
  */
 export default function MetadataCard({ formUrl, metadata, display, refresh }) {
-  const { changeOptions, toggle } = React.useContext(ModalContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { changeOptions, toggle } = React.useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   /**
    * download le fichier via media_id
@@ -51,28 +51,28 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
     axios
       .delete(`api/data/resources/${metadata.global_id}`)
       .then((res) => {
-        const options = DefaultOkOption;
-        options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`];
+        const options = DefaultOkOption
+        options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`]
         options.buttons = [
           {
             text: 'Ok',
             action: () => {
-              refresh();
+              refresh()
             },
           },
-        ];
-        changeOptions(options);
-        toggle();
+        ]
+        changeOptions(options)
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
   /**
    * call for confirmation before metadata deletion
    * @param {*} metadata metadata a suppr
    */
   const triggerDeleteRessource = () => {
-    const options = DefaultConfirmOption;
-    options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`];
+    const options = DefaultConfirmOption
+    options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`]
     options.buttons = [
       {
         text: 'Oui',
@@ -82,10 +82,10 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         text: 'Non',
         action: () => {},
       },
-    ];
-    changeOptions(options);
-    toggle();
-  };
+    ]
+    changeOptions(options)
+    toggle()
+  }
 
   /**
    * affiche le text en fonction de la langue choisi
@@ -95,18 +95,18 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    */
   const getLangText = (langObjectArray, userLang) => {
     langObjectArray.map((textObj) => {
-      const { lang, text } = textObj;
-      if (lang === userLang) return text;
-    });
-    return langObjectArray[0].text;
-  };
+      const { lang, text } = textObj
+      if (lang === userLang) return text
+    })
+    return langObjectArray[0].text
+  }
 
   /**
    * calcule la taille total des fichiers
    * @return {Number} taille totale
    */
   const getTotalFileSize = () =>
-    metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0);
+    metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
 
   /**
    * Check if the metadata has restricted access
@@ -114,9 +114,9 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
    * @return {boolean} True if letadata has restricted access
    */
   const isRestricted = (metadata) =>
-    !!metadata?.access_condition?.confidentiality?.restricted_access;
+    !!metadata?.access_condition?.confidentiality?.restricted_access
 
-  const metaDates = metadata.metadata_info.metadata_dates;
+  const metaDates = metadata.metadata_info.metadata_dates
   /**
    * Display the metadata status
    * @return {html} A round pill that shows the status
@@ -126,12 +126,12 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
       <span className={'status-pill text-bg-' + level} id="status-pill">
         {text}
       </span>
-    );
-    if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag);
-    if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet');
-    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé');
-    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié');
-    if (metaDates?.deleted) return displaySpan('danger', 'Supprimé');
+    )
+    if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag)
+    if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet')
+    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé')
+    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié')
+    if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
   }
 
   return (
@@ -221,17 +221,17 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
                     <a href={ressource.connector.url}>{ressource.media_name}</a>
                   </span>
                 </div>
-              );
+              )
             })}
           </span>
         </div>
       </div>
     </div>
-  );
+  )
 }
 MetadataCard.propTypes = {
   metadata: PropTypes.object,
   formUrl: PropTypes.string,
   display: PropTypes.object,
   refresh: PropTypes.func,
-};
+}

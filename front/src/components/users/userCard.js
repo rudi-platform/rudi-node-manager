@@ -1,26 +1,26 @@
-import React from 'react';
-import { Pencil, Trash } from 'react-bootstrap-icons';
-import PropTypes from 'prop-types';
-import axios from 'axios';
+import React from 'react'
+import { Pencil, Trash } from 'react-bootstrap-icons'
+import PropTypes from 'prop-types'
+import axios from 'axios'
 
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext';
-import EditUserModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editUser';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext'
+import EditUserModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editUser'
 
-const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`;
-const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`;
-const deleteUrl = (id) => `api/secu/users/${id}`;
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
+const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
+const deleteUrl = (id) => `api/secu/users/${id}`
 
 /**
  * Composant : UserCard
  * @return {ReactNode}
  */
 export default function UserCard({ user, display, refresh }) {
-  const { changeOptions, toggle } = React.useContext(ModalContext);
+  const { changeOptions, toggle } = React.useContext(ModalContext)
 
-  const { toggleEdit, visible } = useEditRoleModal();
-  const { options, changeOptionsEdit } = useEditRoleModalOptions();
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { toggleEdit, visible } = useEditRoleModal()
+  const { options, changeOptionsEdit } = useEditRoleModalOptions()
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   /**
    * call for user deletion
@@ -30,20 +30,20 @@ export default function UserCard({ user, display, refresh }) {
     axios
       .delete(deleteUrl(user.id))
       .then((res) => {
-        changeOptions(getOptOk(deleteMsg(user.username), () => refresh()));
-        toggle();
+        changeOptions(getOptOk(deleteMsg(user.username), () => refresh()))
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
-  };
+      .catch((e) => defaultErrorHandler(e))
+  }
 
   /**
    * call for confirmation before user deletion
    * @param {*} user user a suppr
    */
   const triggerDeleteUser = (user) => {
-    changeOptions(getOptConfirm(deleteConfirmMsg(user.username), () => deleteUser(user)));
-    toggle();
-  };
+    changeOptions(getOptConfirm(deleteConfirmMsg(user.username), () => deleteUser(user)))
+    toggle()
+  }
 
   /**
    * call for user update
@@ -53,11 +53,11 @@ export default function UserCard({ user, display, refresh }) {
     axios
       .get(`api/secu/roles`)
       .then((res) => {
-        changeOptionsEdit({ user, roles: res.data });
-        toggleEdit();
+        changeOptionsEdit({ user, roles: res.data })
+        toggleEdit()
       })
-      .catch((e) => defaultErrorHandler(e));
-  };
+      .catch((e) => defaultErrorHandler(e))
+  }
 
   return (
     <div className="col-12" key={user.id}>
@@ -105,10 +105,10 @@ export default function UserCard({ user, display, refresh }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 UserCard.propTypes = {
   user: PropTypes.object,
   display: PropTypes.object,
   refresh: PropTypes.func,
-};
+}

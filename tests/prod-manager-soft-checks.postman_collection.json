@@ -1984,7 +1984,7 @@
 									"pm.test(\"Add user\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    const user1 = pm.variables.get('softUser1username');",
+									"    const user1 = pm.collectionVariables.get('softUser1username');",
 									"    pm.expect(responseJson.username).to.eq(user1);",
 									"});"
 								],
@@ -2077,8 +2077,9 @@
 									"pm.test(\"Role assigned to user\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const responseJson = pm.response.json();",
-									"    const user1 = pm.variables.get('softUser1username');",
-									"    pm.expect(responseJson.username).to.eq(user1);",
+									"    const userId = pm.collectionVariables.get('userId');",
+									"    console.log(userId)",
+									"    pm.expect(responseJson.userId).to.eq(`${userId}`);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2631,19 +2632,7 @@
 			"value": ""
 		},
 		{
-			"key": "softUser1username",
-			"value": ""
-		},
-		{
-			"key": "softUser1email",
-			"value": ""
-		},
-		{
-			"key": "softUser1password",
-			"value": ""
-		},
-		{
-			"key": "userId",
+			"key": "mediaToken",
 			"value": ""
 		},
 		{
@@ -2687,6 +2676,10 @@
 			"value": ""
 		},
 		{
+			"key": "metaTest",
+			"value": ""
+		},
+		{
 			"key": "org1",
 			"value": ""
 		},
@@ -2707,11 +2700,19 @@
 			"value": ""
 		},
 		{
-			"key": "mediaToken",
+			"key": "softUser1username",
 			"value": ""
 		},
 		{
-			"key": "metaTest",
+			"key": "softUser1email",
+			"value": ""
+		},
+		{
+			"key": "softUser1password",
+			"value": ""
+		},
+		{
+			"key": "userId",
 			"value": ""
 		}
 	]

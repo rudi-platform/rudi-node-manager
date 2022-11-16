@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useContext } from 'react'
+import axios from 'axios'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import PropTypes from 'prop-types'
 
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { GeneralContext } from '../../generalContext';
-import { EditObjCard, ObjCard } from '../generic/objCard';
-import { getApiData } from '../../App';
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { GeneralContext } from '../../generalContext'
+import { EditObjCard, ObjCard } from '../generic/objCard'
+import { getApiData } from '../../App'
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
   display: PropTypes.object,
@@ -22,7 +22,7 @@ ObjCatalogue.propTypes = {
   btnTextChg: PropTypes.string,
   deleteConfirmMsg: PropTypes.func,
   deleteMsg: PropTypes.func,
-};
+}
 
 /**
  * Composant : CatalogueContact
@@ -41,25 +41,25 @@ export default function ObjCatalogue({
   deleteConfirmMsg,
   deleteMsg,
 }) {
-  const [listObj, setListObj] = useState([]);
-  const [formUrl, setFormUrl] = useState('');
-  const [hasMore, setHasMore] = useState(true);
-  const [currentOffset, setCurrentOffset] = useState(0);
+  const [listObj, setListObj] = useState([])
+  const [formUrl, setFormUrl] = useState('')
+  const [hasMore, setHasMore] = useState(true)
+  const [currentOffset, setCurrentOffset] = useState(0)
 
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const generalConf = useContext(GeneralContext);
-  const editUrl = `${generalConf.formUrl}${formUrlObj}`;
-  const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`);
+  const generalConf = useContext(GeneralContext)
+  const editUrl = `${generalConf.formUrl}${formUrlObj}`
+  const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
-  useEffect(() => getInitialData(), []);
-  useEffect(() => setFormUrl(editUrl), [generalConf]);
+  useEffect(() => getInitialData(), [])
+  useEffect(() => setFormUrl(editUrl), [generalConf])
 
-  const deleteUrl = (id) => getApiUrlObj(id);
+  const deleteUrl = (id) => getApiUrlObj(id)
   const refresh = () => {
-    setHasMore(true);
-    getInitialData();
-  };
+    setHasMore(true)
+    getInitialData()
+  }
 
   /**
    * recup la 1er page des contacts
@@ -67,16 +67,16 @@ export default function ObjCatalogue({
   function getInitialData() {
     // const params = new URLSearchParams(`limit=${PAGE_SIZE}&offset=0`);
     // const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
-    const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
+    const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`)
     // console.log('url:', fetchUrl);
     axios
       .get(fetchUrl)
       .then((res) => {
-        setCurrentOffset(PAGE_SIZE);
-        setListObj(res.data);
+        setCurrentOffset(PAGE_SIZE)
+        setListObj(res.data)
         // if (res.data?.length < PAGE_SIZE) setHasMore(false);
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
 
   /**
@@ -84,26 +84,26 @@ export default function ObjCatalogue({
    * Récupere la page suivante
    */
   const fetchMoreData = () => {
-    const fetchUrl = getApiUrlObj();
+    const fetchUrl = getApiUrlObj()
     // console.log(fetchUrl);
     axios
       .get(fetchUrl, { params: { sort_by: '-updateAt', limit: PAGE_SIZE, offset: currentOffset } })
       .then((res) => {
-        const partialListObj = res.data;
-        setCurrentOffset(currentOffset + PAGE_SIZE);
+        const partialListObj = res.data
+        setCurrentOffset(currentOffset + PAGE_SIZE)
         if (partialListObj.length === 0) {
-          setHasMore(false);
-          console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length);
-          console.log('(fetchMoreData 0) hasMore=', hasMore);
+          setHasMore(false)
+          console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length)
+          console.log('(fetchMoreData 0) hasMore=', hasMore)
         } else {
-          console.log('(fetchMoreData +) partialListObj.length=', partialListObj.length);
-          console.log('(fetchMoreData +) hasMore=', hasMore);
+          console.log('(fetchMoreData +) partialListObj.length=', partialListObj.length)
+          console.log('(fetchMoreData +) hasMore=', hasMore)
 
-          setListObj(listObj.concat(partialListObj));
+          setListObj(listObj.concat(partialListObj))
         }
       })
-      .catch((e) => defaultErrorHandler(e));
-  };
+      .catch((e) => defaultErrorHandler(e))
+  }
 
   return (
     <div className="tempPaddingTop">
@@ -147,5 +147,5 @@ export default function ObjCatalogue({
         </div>
       </div>
     </div>
-  );
+  )
 }

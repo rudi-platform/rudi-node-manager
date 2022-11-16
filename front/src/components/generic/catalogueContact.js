@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ObjCatalogue from './objCatalogue';
+import React from 'react'
+import PropTypes from 'prop-types'
+import ObjCatalogue from './objCatalogue'
 
 /**
  * Composant : CatalogueContact
@@ -25,10 +25,10 @@ export const CatalogueContact = ({ display, specialSearch, editMode }) => (
     deleteConfirmMsg={(id) => `Confirmez vous la suppression du contact ${id}?`}
     deleteMsg={(id) => `Le contact ${id} a été supprimé`}
   />
-);
+)
 
 CatalogueContact.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
-};
+}

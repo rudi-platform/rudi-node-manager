@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import './styles/App.scss';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
-import Catalogue from './components/catalogue/catalogue';
-import { CatalogueProducer } from './components/generic/catalogueProducer';
-import { CatalogueContact } from './components/generic/catalogueContact';
-import { CataloguePubKeys } from './components/generic/cataloguePubKeys';
-import CatalogueLicence from './components/catalogue/catalogueLicence';
-import CatalogueUser from './components/users/catalogueUser';
-import Visualisation from './components/visualisation/visualisation';
-import { createBrowserHistory } from 'history';
-import Login, { showPill as showPillLogin } from './components/login/login';
-import Register, { showPill as showPillRegister } from './components/login/register';
-import useToken from './useToken';
-import { ModalProvider } from './components/modals/ModalContext';
-import { GeneralContext } from './generalContext';
-import axios from 'axios';
-import Monitoring from './components/monitoring/monitoring';
-import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions';
-import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd';
+import React, { useState, useEffect } from 'react'
+import './styles/App.scss'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+import Dropdown from 'react-bootstrap/Dropdown'
+import Catalogue from './components/catalogue/catalogue'
+import { CatalogueProducer } from './components/generic/catalogueProducer'
+import { CatalogueContact } from './components/generic/catalogueContact'
+import { CataloguePubKeys } from './components/generic/cataloguePubKeys'
+import CatalogueLicence from './components/catalogue/catalogueLicence'
+import CatalogueUser from './components/users/catalogueUser'
+import Visualisation from './components/visualisation/visualisation'
+import { createBrowserHistory } from 'history'
+import Login, { showPill as showPillLogin } from './components/login/login'
+import Register, { showPill as showPillRegister } from './components/login/register'
+import useToken from './useToken'
+import { ModalProvider } from './components/modals/ModalContext'
+import { GeneralContext } from './generalContext'
+import axios from 'axios'
+import Monitoring from './components/monitoring/monitoring'
+import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions'
+import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
 
-const VERSION_TAG = getFrontOptions(OPT_TAG);
-const HAST_TAG = getBackUrl('front/hash');
+const VERSION_TAG = getFrontOptions(OPT_TAG)
+const HAST_TAG = getBackUrl('front/hash')
 
-export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`);
-export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`);
+export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`)
+export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`)
 
-export const history = createBrowserHistory({ basename: getBackUrl() });
+export const history = createBrowserHistory({ basename: getBackUrl() })
 
 /*
 TODO :
@@ -44,45 +44,45 @@ TODO :
 export default function App() {
   // console.log('-- App');
 
-  const { token, updateToken } = useToken();
-  const [isLoginOpen, setIsLoginOpen] = useState(true);
-  const [isChgPwdOpen, setIsChgPwdOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [generalConf, setGeneralConf] = useState({});
+  const { token, updateToken } = useToken()
+  const [isLoginOpen, setIsLoginOpen] = useState(true)
+  const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+  const [generalConf, setGeneralConf] = useState({})
 
   const showLoginBox = () => {
-    setIsLoginOpen(true);
-    setIsChgPwdOpen(false);
-    setIsRegisterOpen(false);
-  };
+    setIsLoginOpen(true)
+    setIsChgPwdOpen(false)
+    setIsRegisterOpen(false)
+  }
 
   const showChgPwdBox = () => {
-    setIsLoginOpen(false);
-    setIsChgPwdOpen(true);
-    setIsRegisterOpen(false);
-  };
+    setIsLoginOpen(false)
+    setIsChgPwdOpen(true)
+    setIsRegisterOpen(false)
+  }
 
   const showRegisterBox = () => {
-    setIsLoginOpen(false);
-    setIsChgPwdOpen(false);
-    setIsRegisterOpen(true);
-  };
+    setIsLoginOpen(false)
+    setIsChgPwdOpen(false)
+    setIsRegisterOpen(true)
+  }
 
   useEffect(() => {
     if (!!token && !generalConf.formUrl) {
       Promise.all([
         axios.get(getApiFront('formUrl')).catch(() => {
-          return { data: '' };
+          return { data: '' }
         }),
         axios.get(getApiData('enum/themes/fr')).catch(() => {
           // console.error('Error getting themes: ', e);
-          return { data: {} };
+          return { data: {} }
         }),
       ]).then((values) => {
-        setGeneralConf({ formUrl: `${values[0].data}`, themeLabel: values[1].data });
-      });
+        setGeneralConf({ formUrl: `${values[0].data}`, themeLabel: values[1].data })
+      })
     }
-  }, [token]);
+  }, [token])
 
   /**
    * Returns the code to display the version tag (if defined)
@@ -95,7 +95,7 @@ export default function App() {
       <div>
         <div className="version">v.{VERSION_TAG}</div> <div>{HAST_TAG}</div>
       </div>
-    );
+    )
 
   /**
    *
@@ -112,14 +112,14 @@ export default function App() {
         </button>
       </Link>
     </li>
-  );
+  )
 
   /**
    * logout
    */
   function logout() {
     // console.log('-- logout');
-    axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken());
+    axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken())
   }
 
   if (!token) {
@@ -134,7 +134,7 @@ export default function App() {
           {showPillRegister(!isRegisterOpen, showRegisterBox)}
         </div>
       </div>
-    );
+    )
   }
   return (
     <Router>
@@ -282,5 +282,5 @@ export default function App() {
         </GeneralContext.Provider>
       </ModalProvider>
     </Router>
-  );
+  )
 }

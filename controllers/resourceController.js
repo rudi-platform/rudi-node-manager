@@ -1,10 +1,10 @@
-const axios = require('axios');
-const { getRudiApi, getAdminApi } = require('../config/config');
-const errorHandler = require('./errorHandler');
-const { getObjectList } = require('./genericController');
-const { createRudiApiToken } = require('../utils/jwt');
+const axios = require('axios')
+const { getRudiApi, getAdminApi } = require('../config/config')
+const errorHandler = require('./errorHandler')
+const { getObjectList } = require('./genericController')
+const { createRudiApiToken } = require('../utils/jwt')
 
-exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 'resources');
+exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 'resources')
 
 // {
 //   const url = `${api}/resources`;
@@ -27,26 +27,26 @@ exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 're
 //     });
 // };
 exports.getResourceById = (req, res, next) => {
-  const { id } = req.params;
-  const url = getAdminApi(`resources/${id}`);
-  const token = createRudiApiToken(url, req);
+  const { id } = req.params
+  const url = getAdminApi(`resources/${id}`)
+  const token = createRudiApiToken(url, req)
   return axios
     .get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRUDI) => {
-      const metadata = resRUDI.data;
-      res.status(200).json(metadata);
+      const metadata = resRUDI.data
+      res.status(200).json(metadata)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_metadata', id: `metadata+${id}` });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'get_metadata', id: `metadata+${id}` })
+      res.status(error.statusCode).json(error)
+    })
+}
 exports.postResources = (req, res, next) => {
-  const url = getAdminApi('resources');
-  const token = createRudiApiToken(url, req);
+  const url = getAdminApi('resources')
+  const token = createRudiApiToken(url, req)
   return axios
     .post(getRudiApi(url), req.body, {
       headers: {
@@ -55,16 +55,16 @@ exports.postResources = (req, res, next) => {
       },
     })
     .then((resRUDI) => {
-      res.status(200).json(resRUDI.data);
+      res.status(200).json(resRUDI.data)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'post_metadata' });
-      res.status(error.statusCode).send(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'post_metadata' })
+      res.status(error.statusCode).send(error)
+    })
+}
 exports.putResources = (req, res, next) => {
-  const url = getAdminApi('resources');
-  const token = createRudiApiToken(url, req);
+  const url = getAdminApi('resources')
+  const token = createRudiApiToken(url, req)
   return axios
     .put(getRudiApi(url), req.body, {
       headers: {
@@ -73,53 +73,53 @@ exports.putResources = (req, res, next) => {
       },
     })
     .then((resRUDI) => {
-      res.status(200).json(resRUDI.data);
+      res.status(200).json(resRUDI.data)
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, {
         opType: 'put_metadata',
         id: `metadata+${req.body.global_id}`,
-      });
-      res.status(error.statusCode).json(error);
-    });
-};
+      })
+      res.status(error.statusCode).json(error)
+    })
+}
 
 exports.deleteResource = (req, res, next) => {
-  const { id } = req.params;
-  const url = getAdminApi(`resources/${id}`);
-  const token = createRudiApiToken(url, req);
+  const { id } = req.params
+  const url = getAdminApi(`resources/${id}`)
+  const token = createRudiApiToken(url, req)
   return axios
     .delete(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRUDI) => {
-      const metadata = resRUDI.data;
-      res.status(200).json(metadata);
+      const metadata = resRUDI.data
+      res.status(200).json(metadata)
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, {
         opType: 'delete_metadata',
         id: `metadata+${id}`,
-      });
-      res.status(error.statusCode).json(error);
-    });
-};
+      })
+      res.status(error.statusCode).json(error)
+    })
+}
 
 exports.getReports = (req, res, next) => {
-  const url = getAdminApi('reports');
-  const token = createRudiApiToken(url, req);
+  const url = getAdminApi('reports')
+  const token = createRudiApiToken(url, req)
   return axios
     .get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRUDI) => {
-      const reports = resRUDI.data;
-      res.status(200).send(reports);
+      const reports = resRUDI.data
+      res.status(200).send(reports)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_reports' });
-      res.status(error.statusCode).json(error);
-    });
-};
+      const error = errorHandler.error(err, req, { opType: 'get_reports' })
+      res.status(error.statusCode).json(error)
+    })
+}

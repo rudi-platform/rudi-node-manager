@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 export const getCookie = (name) =>
   document.cookie
     ?.split('; ')
     ?.find((row) => row.startsWith(`${name}`))
-    ?.split('=')[1];
+    ?.split('=')[1]
 
 /**
  * Token hooks
@@ -13,10 +13,10 @@ export const getCookie = (name) =>
 export default function useToken() {
   // console.log('-- useToken');
 
-  const getToken = () => getCookie('pmFrontToken');
+  const getToken = () => getCookie('pmFrontToken')
 
-  const [token, setToken] = useState(getToken());
-  const updateToken = () => setToken(getToken());
+  const [token, setToken] = useState(getToken())
+  const updateToken = () => setToken(getToken())
 
-  return { token, updateToken };
+  return { token, updateToken }
 }

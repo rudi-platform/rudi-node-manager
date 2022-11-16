@@ -1,6 +1,6 @@
-import React from 'react';
-import { Pencil, Trash, Check } from 'react-bootstrap-icons';
-import PropTypes from 'prop-types';
+import React from 'react'
+import { Pencil, Trash, Check } from 'react-bootstrap-icons'
+import PropTypes from 'prop-types'
 
 /**
  * Composant : LicenceCard
@@ -15,11 +15,11 @@ export default function LicenceCard({ metadata, display }) {
    */
   const getLangText = (langObjectArray, userLang) => {
     langObjectArray.map((textObj) => {
-      const { lang, text } = textObj;
-      if (lang === userLang) return text;
-    });
-    return langObjectArray[0].text;
-  };
+      const { lang, text } = textObj
+      if (lang === userLang) return text
+    })
+    return langObjectArray[0].text
+  }
 
   return (
     <div className="col-12" key={metadata.concept_id}>
@@ -61,10 +61,10 @@ export default function LicenceCard({ metadata, display }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 LicenceCard.propTypes = {
   metadata: PropTypes.object,
   formUrl: PropTypes.string,
   display: PropTypes.object,
-};
+}

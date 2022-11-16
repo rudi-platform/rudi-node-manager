@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 /**
  * Composant : Monitoring
  * @return {ReactNode}
  */
 function Monitoring({}) {
-  const [generalMonitoring, setGeneralMonitoring] = useState({});
+  const [generalMonitoring, setGeneralMonitoring] = useState({})
 
   useEffect(() => {
     Promise.all([
       axios
         .get(`api/data/resources`, { params: { count_by: 'metadata_info.api_version' } })
         .catch(() => {
-          return { data: [] };
+          return { data: [] }
         }),
       axios.get(`api/data/resources`, { params: { count_by: 'storage_status' } }).catch(() => {
-        return { data: [] };
+        return { data: [] }
       }),
       axios
         .get(`api/data/resources`, {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
         .catch(() => {
-          return { data: [] };
+          return { data: [] }
         }),
       axios
         .get(`api/data/resources`, {
           params: { count_by: 'producer' },
         })
         .catch(() => {
-          return { data: [] };
+          return { data: [] }
         }),
       axios
         .get(`api/data/reports`, {
           params: { count_by: 'integration_status' },
         })
         .catch(() => {
-          return { data: [] };
+          return { data: [] }
         }),
     ]).then((values) => {
-      console.log(values);
+      console.log(values)
       setGeneralMonitoring({
         total: values[0].data,
         byStorageStatus: values[1].data,
         recentlyMod: values[2].data,
         byProducer: values[3].data,
         reportsByStatus: values[4].data,
-      });
-    });
-  }, []);
+      })
+    })
+  }, [])
 
   return (
     <div className="tempPaddingTop">
@@ -107,7 +107,7 @@ function Monitoring({}) {
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
       </div>
       <div className="row">
@@ -128,7 +128,7 @@ function Monitoring({}) {
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
       </div>
       <div className="row">
@@ -149,12 +149,12 @@ function Monitoring({}) {
                   </div>
                 </div>
               </div>
-            );
+            )
           })}
       </div>
     </div>
-  );
+  )
 }
-Monitoring.propTypes = {};
+Monitoring.propTypes = {}
 
-export default Monitoring;
+export default Monitoring

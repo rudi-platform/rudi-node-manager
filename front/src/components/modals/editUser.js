@@ -1,26 +1,26 @@
 /* eslint-disable no-unused-vars */
-import axios from 'axios';
-import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import axios from 'axios'
+import React, { useContext, useState } from 'react'
+import PropTypes from 'prop-types'
 
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
 
-import { ModalContext, getOptOk } from './ModalContext';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation';
+import { ModalContext, getOptOk } from './ModalContext'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation'
 
-const urlUserRoles = 'api/secu/user-roles';
-const modalTitle = 'Modifier l‘utilisateur';
-const modalSubmitBtnTxt = 'Terminer';
+const urlUserRoles = 'api/secu/user-roles'
+const modalTitle = 'Modifier l‘utilisateur'
+const modalSubmitBtnTxt = 'Terminer'
 
 const validation = {
   username: [VALID_NOT_EMPTY_WORD],
   email: [VALID_EMAIL],
-};
+}
 
 // const defaultState = {
 //   name: '',
@@ -32,26 +32,26 @@ const validation = {
 // };
 
 const hasErrors = (prop, val) => {
-  let isInvalid;
+  let isInvalid
   validation[prop]?.map((valid) => {
-    if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val);
-  });
-  return isInvalid;
-};
+    if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val)
+  })
+  return isInvalid
+}
 const show = (obj, option = 2) => {
   try {
-    return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`;
+    return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch (err) {
-    return `${obj}`;
+    return `${obj}`
   }
-};
+}
 
 EditUserModal.propTypes = {
   visible: PropTypes.bool,
   toggleEdit: PropTypes.func,
   user: PropTypes.object,
   roles: PropTypes.array,
-};
+}
 
 /**
  * EditRoleModal component
@@ -59,27 +59,27 @@ EditUserModal.propTypes = {
  * @return {ReactNode} EditRoleModal html component
  */
 export default function EditUserModal({ visible, toggleEdit, user, roles }) {
-  const { changeOptions, toggle } = useContext(ModalContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { changeOptions, toggle } = useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [validated, setValidated] = useState(false);
-  const [userInfo, setUserInfo] = useState(user);
-  const [userRoles, setUserRoles] = useState(user.roles);
+  const [validated, setValidated] = useState(false)
+  const [userInfo, setUserInfo] = useState(user)
+  const [userRoles, setUserRoles] = useState(user.roles)
 
   const editUserInfo = (prop, val) => {
     // console.log('(avant)', userInfo);
     // console.log('(avant)', prop, val);
     setUserInfo((state) => {
-      return { ...state, [prop]: val };
-    });
-  };
+      return { ...state, [prop]: val }
+    })
+  }
 
   // const [errors, setErrors] = useState({});
   // const editErrors = (prop, val) =>
   //   val && setErrors((errors) => ({ ...errors, ...{ [prop]: val } }));
 
   const isInUserRole = (role, rolesList) =>
-    !!(rolesList && rolesList.findIndex((element) => element === role.role) >= 0);
+    !!(rolesList && rolesList.findIndex((element) => element === role.role) >= 0)
 
   // const handleClick = (event) => {
   //   const form = event.currentTarget;
@@ -94,52 +94,52 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
   // };
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    console.log('(handleSubmit)', 'username:', event.target.username.value);
-    console.log('(handleSubmit)', 'email:', event.target.email.value);
-    console.log('(handleSubmit)', 'userInfo:', userInfo);
+    event.preventDefault()
+    const form = event.target
+    console.log('(handleSubmit)', 'username:', event.target.username.value)
+    console.log('(handleSubmit)', 'email:', event.target.email.value)
+    console.log('(handleSubmit)', 'userInfo:', userInfo)
     if (form.checkValidity() === false) {
-      event.stopPropagation();
+      event.stopPropagation()
     }
 
     // setValidated(true);
     // toggleEdit()
-  };
+  }
 
   const handleChange = (event) => {
-    const prop = event.target.id;
-    const val = event.target.value;
-    console.log('(handleChange)', prop, '=>', val);
-    console.log('(handleChange)', hasErrors(prop, val));
+    const prop = event.target.id
+    const val = event.target.value
+    console.log('(handleChange)', prop, '=>', val)
+    console.log('(handleChange)', hasErrors(prop, val))
 
-    editUserInfo(prop, val);
+    editUserInfo(prop, val)
     // editErrors(prop, validateProp(prop, val));
     // console.log('(handleChange)', errors[prop]);
 
     // setValidated(!errors?.length);
     // console.log('(user)', show(user));
-    console.log('(user)', show(userInfo));
+    console.log('(user)', show(userInfo))
 
     // userInfo[prop] = val;
     // editUserInfo(prop, val);
     // changeOptions();
-  };
+  }
 
   const handleRoleChange = (e) => {
-    const prop = event.target.id;
-    const val = event.target.value;
-    console.log('(handleRoleChange)', name, ': ', prop, '=>', val);
-    console.log('(handleRoleChange)', e);
+    const prop = event.target.id
+    const val = event.target.value
+    console.log('(handleRoleChange)', name, ': ', prop, '=>', val)
+    console.log('(handleRoleChange)', e)
     setUserRoles((userRoles) => {
-      if (!userRoles) return [prop];
-      const i = userRoles.indexOf(prop);
-      if (i > -1) userRoles.splice(i, 1);
-      else userRoles.push(prop);
-      return userRoles;
-    });
-    console.log('(handleRoleChange)', userRoles);
-  };
+      if (!userRoles) return [prop]
+      const i = userRoles.indexOf(prop)
+      if (i > -1) userRoles.splice(i, 1)
+      else userRoles.push(prop)
+      return userRoles
+    })
+    console.log('(handleRoleChange)', userRoles)
+  }
   // const hasError = (prop) => validateProp(prop, userInfo[prop]);
 
   /**
@@ -153,15 +153,15 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
       .then((res) => {
         user.roles.splice(
           user.roles.findIndex((element) => element === role.role),
-          1,
-        );
+          1
+        )
         const options = getOptOk(
-          `Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`,
-        );
-        changeOptions(options);
-        toggle();
+          `Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`
+        )
+        changeOptions(options)
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
 
   /**
@@ -175,15 +175,15 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
         headers: { 'Content-Type': 'application/json' },
       })
       .then((res) => {
-        if (!user.roles) user.roles = [];
-        user.roles.push(role.role);
+        if (!user.roles) user.roles = []
+        user.roles.push(role.role)
         const options = getOptOk(
-          `Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`,
-        );
-        changeOptions(options);
-        toggle();
+          `Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`
+        )
+        changeOptions(options)
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
 
   return (
@@ -260,26 +260,26 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
         </Modal.Footer>
       </Form>
     </Modal>
-  );
+  )
 }
 
 export const useEditRoleModal = () => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
    * @return {void}
    */
-  const toggleEdit = () => setVisible(!visible);
-  return { toggleEdit, visible };
-};
+  const toggleEdit = () => setVisible(!visible)
+  return { toggleEdit, visible }
+}
 
 export const useEditRoleModalOptions = () => {
-  const [options, setOptions] = useState({});
+  const [options, setOptions] = useState({})
   /**
    * change la valeur des options
    * @param {*} param nouvelles options
    * @return {void}
    */
-  const changeOptionsEdit = (param) => setOptions(param);
-  return { options, changeOptionsEdit };
-};
+  const changeOptionsEdit = (param) => setOptions(param)
+  return { options, changeOptionsEdit }
+}

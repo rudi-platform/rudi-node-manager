@@ -1,21 +1,21 @@
-const express = require('express');
-const router = new express.Router();
+const express = require('express')
+const router = new express.Router()
 const {
   postRegister,
   postLogin,
   putPassword,
   logout,
-} = require('../controllers/authControllerPassport');
-const passport = require('../utils/passportSetup');
+} = require('../controllers/authControllerPassport')
+const passport = require('../utils/passportSetup')
 
-const { getFormUrl } = require('../controllers/consoleController');
+const { getFormUrl } = require('../controllers/consoleController')
 
-router.get('/formUrl', passport.authenticate('jwt', { session: false }), getFormUrl);
-router.put('/change-password', passport.authenticate('jwt', { session: false }), putPassword);
-router.get('/logout', passport.authenticate('jwt', { session: false }), logout);
+router.get('/formUrl', passport.authenticate('jwt', { session: false }), getFormUrl)
+router.put('/change-password', passport.authenticate('jwt', { session: false }), putPassword)
+router.get('/logout', passport.authenticate('jwt', { session: false }), logout)
 
-router.post('/register', postRegister);
-router.post('/login', postLogin);
+router.post('/register', postRegister)
+router.post('/login', postLogin)
 
 // router.post('/forgot-password', authControllerPassport.postForgot);
 
@@ -35,4 +35,4 @@ router.post('/login', postLogin);
 //   adminController.putDefaultForm,
 // );
 
-module.exports = router;
+module.exports = router

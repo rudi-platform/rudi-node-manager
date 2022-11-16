@@ -1,117 +1,120 @@
 // ----- External dependencies
-const jwt = require('jsonwebtoken');
-const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
-const jwtLib = require(`@aqmo.org/jwt_lib`);
+const jwt = require('jsonwebtoken')
+const axios = require('axios')
+const { v4: uuidv4 } = require('uuid')
+const jwtLib = require(`@aqmo.org/jwt_lib`)
 
 // ----- Internal dependencies
-const { getConf } = require('../config/config');
-const { timeEpochS, toInt } = require('./utils');
-const log = require('./logger');
-const { ForbiddenError, RudiError } = require('./errors');
+const { getConf } = require('../config/config')
+const { timeEpochS, toInt } = require('./utils')
+const log = require('./logger')
+const { ForbiddenError, RudiError } = require('./errors')
 
 // ----- Constants
-const mod = 'jwt';
+const mod = 'jwt'
 
-const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/;
+const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
-const OFFSET_USR_ID = 5000;
-const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt');
-const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600;
-const MEDIA_AUTH = getConf('rudi_media');
+const OFFSET_USR_ID = 5000
+const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt')
+const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
+const MEDIA_AUTH = getConf('rudi_media')
 
-exports.CONSOLE_TOKEN_NAME = 'consoleToken';
-exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken';
+exports.CONSOLE_TOKEN_NAME = 'consoleToken'
+exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken'
 
 // ----- Functions
 exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
-  req?.cookies ? req.cookies[cookieName] : null;
+  req?.cookies ? req.cookies[cookieName] : null
 
 exports.extractJwtFromReq = (req) => {
-  const fun = 'extractJwtFromReq';
-  const headers = req?.headers || req?.Headers;
-  const auth = headers?.Authorization || headers?.authorization;
+  const fun = 'extractJwtFromReq'
+  const headers = req?.headers || req?.Headers
+  const auth = headers?.Authorization || headers?.authorization
   if (!auth) {
-    log.d(mod, fun, `headers: ${headers}`);
-    throw new ForbiddenError('No Authorization found in request headers');
+    log.d(mod, fun, `headers: ${headers}`)
+    throw new ForbiddenError('No Authorization found in request headers')
   }
-  if (!auth.startsWith('Bearer ')) return new ForbiddenError('Request should use a JWT');
+  if (!auth.startsWith('Bearer ')) return new ForbiddenError('Request should use a JWT')
 
-  const token = auth.substring(7);
-  if (token.length === 0) return new ForbiddenError('Request provided an empty JWT');
-  return token;
-};
+  const token = auth.substring(7)
+  if (token.length === 0) return new ForbiddenError('Request provided an empty JWT')
+  return token
+}
 
 exports.readJwtBody = (jwt) => {
-  if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody');
-  if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`);
-  return jwtLib.tokenStringToJwtObject(jwt)?.payload;
-};
+  if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
+  if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
+  return jwtLib.tokenStringToJwtObject(jwt)?.payload
+}
 
 exports.createFrontUserTokens = async (userInfo) => {
-  const exp = timeEpochS(toInt(DEFAULT_EXP));
+  const exp = timeEpochS(toInt(DEFAULT_EXP))
   // console.log('T (createFrontUserTokens) exp:', new Date(exp * 1000));
-  delete userInfo.password;
+  delete userInfo.password
   return {
     [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
     [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ exp }, SECRET_KEY_JWT),
     exp,
-  };
-};
+  }
+}
 
 exports.getTokenFromMediaForUser = async (user, exp) => {
-  const fun = 'getTokenFromMediaForUser';
-  const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null);
+  const fun = 'getTokenFromMediaForUser'
+  const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null)
   // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
 
   const delegationBody = {
     user_id: user.id,
     user_name: user.username || 'rudiconsole',
     group_name: getConf('rudi_console', 'default_client_group'),
-  };
+  }
   // Let's offset the user id to not mess with Media ids
-  if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID;
+  if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
   // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
 
-  const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`;
+  const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
   // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
-    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders);
-    if (!mediaRes) throw Error(`No answer received from Media module`);
+    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
+    if (!mediaRes) throw Error(`No answer received from Media module`)
     if (!mediaRes?.data?.token)
-      throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`);
-    else return mediaRes.data.token;
+      throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`)
+    else return mediaRes.data.token
   } catch (err) {
     console.error(
       'T (getTokenFromMediaForUser) mediaError.msg/data',
       err.message,
-      err.response?.data,
-    );
+      err.response?.data
+    )
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
       `Could not forge a token for user '${user.username}' on Media: ${
-        err.response?.data?.message || err.response?.data?.msg || JSON.stringify(err.response?.data) || err.message
+        err.response?.data?.message ||
+        err.response?.data?.msg ||
+        JSON.stringify(err.response?.data) ||
+        err.message
       }`,
       mod,
-      fun,
-    );
+      fun
+    )
 
-    log.e(mod, fun, `Could not forge a token on Media: ${rudiError}`);
-    throw rudiError;
+    log.e(mod, fun, `Could not forge a token on Media: ${rudiError}`)
+    throw rudiError
   }
-};
+}
 
 exports.createPmHeadersForMedia = (body) => {
-  const pmHeadersJwt = this.createPmJwtForMedia(body);
+  const pmHeadersJwt = this.createPmJwtForMedia(body)
   return {
     headers: {
       Authorization: `Bearer ${pmHeadersJwt}`,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-  };
-};
+  }
+}
 
 exports.createPmJwtForMedia = (body) =>
   jwtLib.forgeToken(
@@ -123,8 +126,8 @@ exports.createPmJwtForMedia = (body) =>
       exp: body?.exp || timeEpochS(body?.exp_time || DEFAULT_EXP),
       sub: body?.sub || 'auth',
       client_id: body?.client_id || getConf('rudi_media', 'pm_media_id'),
-    },
-  );
+    }
+  )
 
 /**
  *
@@ -148,8 +151,8 @@ exports.createRudiMediaToken = (jwtPayload) =>
         jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || DEFAULT_EXP),
       sub: jwtPayload?.sub || 'auth',
       client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
-    },
-  );
+    }
+  )
 
 exports.createRudiApiToken = (url, req) =>
   jwtLib.forgeToken(
@@ -160,8 +163,8 @@ exports.createRudiApiToken = (url, req) =>
       sub: getConf('rudi_api', 'pm_api_id'),
       req_mtd: req.method,
       req_url: axios.getUri({ url, params: req.query }),
-    },
-  );
+    }
+  )
 
 /**
  * Shortcut to call a key by name
@@ -171,15 +174,15 @@ exports.createRudiApiToken = (url, req) =>
 const getKeyPath = (name) => {
   switch (name) {
     case 'api':
-      return getConf('rudi_api', 'pm_api_key') || getConf('auth', 'pm_prv_key');
+      return getConf('rudi_api', 'pm_api_key') || getConf('auth', 'pm_prv_key')
     case 'media':
-      return getConf('rudi_media', 'pm_media_key') || getConf('auth', 'pm_prv_key');
+      return getConf('rudi_media', 'pm_media_key') || getConf('auth', 'pm_prv_key')
     default:
-      return getConf('auth', 'pm_prv_key');
+      return getConf('auth', 'pm_prv_key')
   }
-};
+}
 
-const prvKeyCache = {};
+const prvKeyCache = {}
 
 /**
  * Access to local private keys
@@ -192,19 +195,19 @@ const getPrvKey = (name) => {
     case 'api':
     case 'api_key':
     case 'pm_api_key':
-      name = 'api';
-      break;
+      name = 'api'
+      break
     case 'media':
     case 'media_key':
     case 'pm_media_key':
-      name = 'media';
-      break;
+      name = 'media'
+      break
     default:
-      name = 'auth';
+      name = 'auth'
   }
   // If PEM is cached, let's return it
-  if (prvKeyCache[name]) return prvKeyCache[name];
-  const keyPath = getKeyPath(name);
-  prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath);
-  return prvKeyCache[name];
-};
+  if (prvKeyCache[name]) return prvKeyCache[name]
+  const keyPath = getKeyPath(name)
+  prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
+  return prvKeyCache[name]
+}

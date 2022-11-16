@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import axios from 'axios';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import PropTypes from 'prop-types';
-import MetadataCard from './metadataCard';
-import { filterConf } from './conf';
-import { GeneralContext } from '../../generalContext';
-import ThemeDisplay from '../other/themeDisplay';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { Search } from 'react-bootstrap-icons';
-import { EditObjCard } from '../generic/objCard';
-import { getApiData } from '../../App';
+import React, { useState, useEffect, useRef, useContext } from 'react'
+import axios from 'axios'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import PropTypes from 'prop-types'
+import MetadataCard from './metadataCard'
+import { filterConf } from './conf'
+import { GeneralContext } from '../../generalContext'
+import ThemeDisplay from '../other/themeDisplay'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { Search } from 'react-bootstrap-icons'
+import { EditObjCard } from '../generic/objCard'
+import { getApiData } from '../../App'
 
-const idField = 'global_id';
+const idField = 'global_id'
 
-const deleteUrl = (id) => getApiData(`resources/${id}`);
-const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`;
-const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`;
+const deleteUrl = (id) => getApiData(`resources/${id}`)
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`
+const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`
 
-const btnTextAdd = 'Ajouter un jeu de données';
-const btnTextChg = 'Modifier un jeu de données :';
+const btnTextAdd = 'Ajouter un jeu de données'
+const btnTextChg = 'Modifier un jeu de données :'
 
 /**
  * Composant : Catalogue
@@ -26,52 +26,52 @@ const btnTextChg = 'Modifier un jeu de données :';
  */
 export default function Catalogue({ display }) {
   // console.log('-- Catalogue')
-  const [metadatas, setMetadatas] = useState([]);
-  const [countBy, setCountBy] = useState([]);
-  const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }]);
-  const [formUrl, setFormUrl] = useState('');
-  const [hasMore, setHasMore] = useState(true);
-  const PAGE_SIZE = 20;
-  const [currentOffset, setCurrentOffset] = useState(-1);
+  const [metadatas, setMetadatas] = useState([])
+  const [countBy, setCountBy] = useState([])
+  const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
+  const [formUrl, setFormUrl] = useState('')
+  const [hasMore, setHasMore] = useState(true)
+  const PAGE_SIZE = 20
+  const [currentOffset, setCurrentOffset] = useState(-1)
 
-  const initialRender = useRef(true);
-  const searchText = useRef(null);
-  const isSearchMode = () => searchText?.current?.value?.length > 0;
-  const searchMode = () => (isSearchMode() ? `/search` : '');
+  const initialRender = useRef(true)
+  const searchText = useRef(null)
+  const isSearchMode = () => searchText?.current?.value?.length > 0
+  const searchMode = () => (isSearchMode() ? `/search` : '')
 
-  const generalConf = useContext(GeneralContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const generalConf = useContext(GeneralContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   useEffect(() => {
     // console.log(`-- Catalogue: ${generalConf.formUrl}`)
-    setFormUrl(`${generalConf.formUrl}`);
-  }, [generalConf]);
+    setFormUrl(`${generalConf.formUrl}`)
+  }, [generalConf])
   useEffect(() => {
     if (initialRender.current) {
-      initialRender.current = false;
+      initialRender.current = false
     } else {
-      if (currentOffset < 0) setCurrentOffset(0);
-      else fetchMoreData();
+      if (currentOffset < 0) setCurrentOffset(0)
+      else fetchMoreData()
     }
-  }, [currentOffset]);
+  }, [currentOffset])
   useEffect(() => {
     // console.log('-- useEffect: refresh')
 
-    refresh();
-  }, [currentFilters]);
+    refresh()
+  }, [currentFilters])
 
   const refresh = () => {
-    setHasMore(true);
-    setMetadatas([]);
-    getInitialData();
+    setHasMore(true)
+    setMetadatas([])
+    getInitialData()
     // console.log('-- gotInitialData')
 
     if (currentOffset === 0) {
-      setCurrentOffset(-1);
+      setCurrentOffset(-1)
     } else {
-      setCurrentOffset(0);
+      setCurrentOffset(0)
     }
-  };
+  }
 
   /**
    * crée l'object params pour la requete
@@ -79,9 +79,9 @@ export default function Catalogue({ display }) {
    * @return {*} params enrichis pour la requete
    */
   function createParams(baseParams) {
-    if (searchText.current.value) baseParams[searchText.current.value] = '';
-    currentFilters.forEach((filter) => Object.assign(baseParams, filter));
-    return baseParams;
+    if (searchText.current.value) baseParams[searchText.current.value] = ''
+    currentFilters.forEach((filter) => Object.assign(baseParams, filter))
+    return baseParams
   }
 
   /**
@@ -92,15 +92,15 @@ export default function Catalogue({ display }) {
    */
   function isSameFilterType(a, b) {
     // Create arrays of property names
-    const aProps = Object.getOwnPropertyNames(a);
-    const bProps = Object.getOwnPropertyNames(b);
+    const aProps = Object.getOwnPropertyNames(a)
+    const bProps = Object.getOwnPropertyNames(b)
 
     // If number of properties is different,
     // objects are not equivalent
     if (aProps.length != bProps.length) {
-      return false;
+      return false
     }
-    return aProps[0] === bProps[0];
+    return aProps[0] === bProps[0]
   }
 
   /**
@@ -111,16 +111,16 @@ export default function Catalogue({ display }) {
    */
   function isSameFilter(a, b) {
     // Create arrays of property names
-    const aProps = Object.getOwnPropertyNames(a);
-    const bProps = Object.getOwnPropertyNames(b);
+    const aProps = Object.getOwnPropertyNames(a)
+    const bProps = Object.getOwnPropertyNames(b)
 
     // If number of properties is different,
     // objects are not equivalent
     if (aProps.length != bProps.length) {
-      return false;
+      return false
     }
-    const propName = aProps[0];
-    return a[propName] === b[propName];
+    const propName = aProps[0]
+    return a[propName] === b[propName]
   }
 
   /**
@@ -129,7 +129,7 @@ export default function Catalogue({ display }) {
    * @return {boolean} true si le filtre est séléctionné
    */
   function isSelectedFilter(filterParam) {
-    return currentFilters.findIndex((element) => isSameFilter(element, filterParam)) >= 0;
+    return currentFilters.findIndex((element) => isSameFilter(element, filterParam)) >= 0
   }
 
   /**
@@ -137,58 +137,58 @@ export default function Catalogue({ display }) {
    * @param {*} filterParam element a rajouter
    */
   function addToFilter(filterParam) {
-    const filterList = currentFilters.slice();
-    const indexType = filterList.findIndex((element) => isSameFilterType(element, filterParam));
-    const index = filterList.findIndex((element) => isSameFilter(element, filterParam));
+    const filterList = currentFilters.slice()
+    const indexType = filterList.findIndex((element) => isSameFilterType(element, filterParam))
+    const index = filterList.findIndex((element) => isSameFilter(element, filterParam))
     // should add
     if (indexType === -1) {
-      setCurrentFilters(filterList.concat(filterParam));
+      setCurrentFilters(filterList.concat(filterParam))
     } else {
       // should replace/remove
       if (index > -1) {
-        filterList.splice(index, 1);
-        setCurrentFilters(filterList);
+        filterList.splice(index, 1)
+        setCurrentFilters(filterList)
       } else {
-        filterList.splice(indexType, 1);
-        setCurrentFilters(filterList.concat(filterParam));
+        filterList.splice(indexType, 1)
+        setCurrentFilters(filterList.concat(filterParam))
       }
     }
   }
 
-  const getFirstKey = (obj) => Object.keys(obj)[0];
+  const getFirstKey = (obj) => Object.keys(obj)[0]
   const getAbsFilterVal = (str, toggle) =>
-    `${str}`.startsWith('-') ? `${str}`.substring(1) : `${toggle ? '-' : ''}${str}`;
-  const toggleFilterVal = (str) => getAbsFilterVal(str, true);
+    `${str}`.startsWith('-') ? `${str}`.substring(1) : `${toggle ? '-' : ''}${str}`
+  const toggleFilterVal = (str) => getAbsFilterVal(str, true)
   /**
    * ajoute un filter pour la requete
    * @param {*} filterParam element a rajouter
    */
   function toggleFilter(filterParam) {
-    const filterKey = getFirstKey(filterParam);
-    const newFilterVal = filterParam[filterKey];
+    const filterKey = getFirstKey(filterParam)
+    const newFilterVal = filterParam[filterKey]
 
-    const filterList = currentFilters.slice();
+    const filterList = currentFilters.slice()
     const existingFilterIndex = filterList.findIndex(
       (existingFilter) => getFirstKey(existingFilter) === filterKey
-    );
+    )
     // should add
-    const newFilter = { [filterKey]: newFilterVal };
+    const newFilter = { [filterKey]: newFilterVal }
     if (existingFilterIndex === -1) {
-      setCurrentFilters(filterList.concat(newFilter));
+      setCurrentFilters(filterList.concat(newFilter))
     } else {
       // should replace/remove
 
-      const existingFilter = filterList[existingFilterIndex];
-      const existingFilterVal = existingFilter[filterKey];
+      const existingFilter = filterList[existingFilterIndex]
+      const existingFilterVal = existingFilter[filterKey]
       if (getAbsFilterVal(existingFilterVal) !== getAbsFilterVal(newFilterVal)) {
         // We were using another reference value for this filter type
-        filterList[existingFilterIndex] = newFilter;
+        filterList[existingFilterIndex] = newFilter
       } else {
         // Simple toggle of the actual reference value for this filter type
-        filterList[existingFilterIndex] = { [filterKey]: toggleFilterVal(existingFilterVal) };
+        filterList[existingFilterIndex] = { [filterKey]: toggleFilterVal(existingFilterVal) }
       }
       // console.log('T (toggleFilter) filterList[0]', filterList[0]);
-      setCurrentFilters(filterList);
+      setCurrentFilters(filterList)
     }
   }
 
@@ -207,12 +207,12 @@ export default function Catalogue({ display }) {
     )
       .then((values) => {
         const countByTemp = filterConf.map((count, i) => {
-          count.values = values[i].data;
-          return count;
-        });
-        setCountBy(countByTemp);
+          count.values = values[i].data
+          return count
+        })
+        setCountBy(countByTemp)
       })
-      .catch((err) => defaultErrorHandler(err));
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -224,14 +224,14 @@ export default function Catalogue({ display }) {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {
-        let data;
-        if (isSearchMode()) data = res.data.items;
-        else data = res.data;
+        let data
+        if (isSearchMode()) data = res.data.items
+        else data = res.data
 
-        if (data.length === 0) setHasMore(false);
-        setMetadatas((metadatas) => metadatas.concat(data));
+        if (data.length === 0) setHasMore(false)
+        setMetadatas((metadatas) => metadatas.concat(data))
       })
-      .catch((err) => defaultErrorHandler(err));
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -244,13 +244,13 @@ export default function Catalogue({ display }) {
     try {
       // console.log(filterElement)
       // console.log(filterConfig)
-      let result = filterElement[filterConfig?.name] || 'ERR: "name" not found';
+      let result = filterElement[filterConfig?.name] || 'ERR: "name" not found'
       if (filterConfig?.displayName && result[filterConfig?.displayName]) {
-        result = result[filterConfig.displayName];
+        result = result[filterConfig.displayName]
       }
-      return result;
+      return result
     } catch (err) {
-      defaultErrorHandler(err);
+      defaultErrorHandler(err)
     }
   }
 
@@ -377,11 +377,11 @@ export default function Catalogue({ display }) {
                                   {filterValue.count}
                                 </span>
                               </li>
-                            );
+                            )
                           })}
                         </ul>
                       </div>
-                    );
+                    )
                   })}
                 </div>
               </div>
@@ -405,7 +405,7 @@ export default function Catalogue({ display }) {
             <InfiniteScroll
               dataLength={metadatas.length}
               next={() => {
-                setCurrentOffset(currentOffset + PAGE_SIZE);
+                setCurrentOffset(currentOffset + PAGE_SIZE)
               }}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
@@ -419,17 +419,17 @@ export default function Catalogue({ display }) {
                     refresh={refresh}
                     key={metadata.global_id}
                   ></MetadataCard>
-                );
+                )
               })}
             </InfiniteScroll>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 Catalogue.propTypes = {
   display: PropTypes.object,
   specialSearch: PropTypes.object,
   editMode: PropTypes.object,
-};
+}

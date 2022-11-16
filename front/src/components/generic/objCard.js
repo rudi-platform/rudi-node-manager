@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { Pencil, Plus, Trash } from 'react-bootstrap-icons';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import { ModalContext, getOptConfirm, getOptOk } from '../modals/ModalContext';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import React, { useContext, useState } from 'react'
+import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
+import PropTypes from 'prop-types'
+import axios from 'axios'
+import { ModalContext, getOptConfirm, getOptOk } from '../modals/ModalContext'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 ObjCard.propTypes = {
   formUrl: PropTypes.string,
@@ -15,7 +15,7 @@ ObjCard.propTypes = {
   deleteConfirmMsg: PropTypes.func,
   deleteMsg: PropTypes.func,
   refresh: PropTypes.func,
-};
+}
 
 /**
  * Composant : ProducerCard
@@ -32,10 +32,10 @@ export function ObjCard({
   deleteMsg,
   refresh,
 }) {
-  const { changeOptions, toggle } = useContext(ModalContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
-  const objId = obj[propId];
-  const objName = obj[propName];
+  const { changeOptions, toggle } = useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+  const objId = obj[propId]
+  const objName = obj[propName]
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -44,19 +44,19 @@ export function ObjCard({
     axios
       .delete(deleteUrl(id))
       .then((res) => {
-        changeOptions(getOptOk(deleteMsg(id), () => refresh()));
-        toggle();
+        changeOptions(getOptOk(deleteMsg(id), () => refresh()))
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
-  };
+      .catch((e) => defaultErrorHandler(e))
+  }
   /**
    * call for confirmation before organization deletion
    * @param {*} id Identifier of the organization to delete
    */
   const triggerDeleteObj = (id) => {
-    changeOptions(getOptConfirm(deleteConfirmMsg(objName), () => deleteObj(id)));
-    toggle();
-  };
+    changeOptions(getOptConfirm(deleteConfirmMsg(objName), () => deleteObj(id)))
+    toggle()
+  }
 
   return (
     <div className="col-12" key={objId}>
@@ -90,12 +90,12 @@ export function ObjCard({
                 <p className="card-text" key={`${objId}.${key}`}>
                   {propNames[key]} : <small className="text-muted">{obj[key]}</small>
                 </p>
-              ),
+              )
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 EditObjCard.propTypes = {
@@ -108,7 +108,7 @@ EditObjCard.propTypes = {
   deleteMsg: PropTypes.func,
   btnTextAdd: PropTypes.string,
   btnTextChg: PropTypes.string,
-};
+}
 
 /**
  * Composant : EditCard
@@ -124,16 +124,16 @@ export function EditObjCard({
   deleteMsg,
   refresh,
 }) {
-  const [editID, setEditID] = useState('');
+  const [editID, setEditID] = useState('')
 
-  const { changeOptions, toggle } = useContext(ModalContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { changeOptions, toggle } = useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
    * @return {void}
    */
-  const handleChange = (event) => setEditID(event.target.value);
+  const handleChange = (event) => setEditID(event.target.value)
 
   /**
    * Call for organization deletion
@@ -143,19 +143,19 @@ export function EditObjCard({
     axios
       .delete(deleteUrl(id))
       .then((res) => {
-        changeOptions(getOptOk(deleteMsg(id), () => refresh()));
-        toggle();
+        changeOptions(getOptOk(deleteMsg(id), () => refresh()))
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
-  };
+      .catch((e) => defaultErrorHandler(e))
+  }
   /**
    * call for confirmation before object deletion
    * @param {*} id Identifier of the object to delete
    */
   const triggerDeleteObj = (id) => {
-    changeOptions(getOptConfirm(deleteConfirmMsg(id), () => deleteObj(id)));
-    toggle();
-  };
+    changeOptions(getOptConfirm(deleteConfirmMsg(id), () => deleteObj(id)))
+    toggle()
+  }
 
   return (
     <div className="col-12">
@@ -202,5 +202,5 @@ export function EditObjCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

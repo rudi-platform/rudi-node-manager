@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
-import { Plus, Trash } from 'react-bootstrap-icons';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import PropTypes from 'prop-types';
-import axios from 'axios';
+import React, { useContext, useState } from 'react'
+import { Plus, Trash } from 'react-bootstrap-icons'
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import PropTypes from 'prop-types'
+import axios from 'axios'
 
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
+import { ModalContext, DefaultOkOption } from '../modals/ModalContext'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const urlUserRoles = 'api/secu/user-roles'
 
@@ -16,11 +16,11 @@ const urlUserRoles = 'api/secu/user-roles'
  * @return {ReactNode} EditRoleModal html component
  */
 export default function EditRoleModal({ visible, toggleEdit, options }) {
-  const { changeOptions, toggle } = useContext(ModalContext);
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const { changeOptions, toggle } = useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const isInUserRole = (role, user) =>
-    user.roles ? user.roles.findIndex((element) => element === role.role) : -1;
+    user.roles ? user.roles.findIndex((element) => element === role.role) : -1
 
   /**
    * call for user_role deletion
@@ -33,14 +33,14 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
       .then((res) => {
         user.roles.splice(
           user.roles.findIndex((element) => element === role.role),
-          1,
-        );
-        const options = DefaultOkOption;
-        options.text = [`Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`];
-        changeOptions(options);
-        toggle();
+          1
+        )
+        const options = DefaultOkOption
+        options.text = [`Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`]
+        changeOptions(options)
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
 
   /**
@@ -54,14 +54,14 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         headers: { 'Content-Type': 'application/json' },
       })
       .then((res) => {
-        if (!user.roles) user.roles = [];
-        user.roles.push(role.role);
-        const options = DefaultOkOption;
-        options.text = [`Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`];
-        changeOptions(options);
-        toggle();
+        if (!user.roles) user.roles = []
+        user.roles.push(role.role)
+        const options = DefaultOkOption
+        options.text = [`Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`]
+        changeOptions(options)
+        toggle()
       })
-      .catch((e) => defaultErrorHandler(e));
+      .catch((e) => defaultErrorHandler(e))
   }
 
   return (
@@ -87,7 +87,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
                     </Button>
                   )}
                 </span>
-              );
+              )
             })}
         </Modal.Body>
         <Modal.Footer>
@@ -97,31 +97,31 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         </Modal.Footer>
       </Modal>
     </>
-  );
+  )
 }
 EditRoleModal.propTypes = {
   visible: PropTypes.bool,
   toggleEdit: PropTypes.func,
   options: PropTypes.object,
-};
+}
 
 export const useEditRoleModal = () => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
    * @return {void}
    */
-  const toggleEdit = () => setVisible(!visible);
-  return { toggleEdit, visible };
-};
+  const toggleEdit = () => setVisible(!visible)
+  return { toggleEdit, visible }
+}
 
 export const useEditRoleModalOptions = () => {
-  const [options, setOptions] = useState({});
+  const [options, setOptions] = useState({})
   /**
    * change la valeur des options
    * @param {*} param nouvelles options
    * @return {void}
    */
-  const changeOptionsEdit = (param) => setOptions(param);
-  return { changeOptionsEdit, options };
-};
+  const changeOptionsEdit = (param) => setOptions(param)
+  return { changeOptionsEdit, options }
+}

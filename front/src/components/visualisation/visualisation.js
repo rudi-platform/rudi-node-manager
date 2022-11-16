@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 // import { useNavigate } from 'react-router-dom';
-import jspreadsheet from 'jspreadsheet-ce';
-import 'jspreadsheet-ce/dist/jspreadsheet.css';
-import { Check } from 'react-bootstrap-icons';
-import axios from 'axios';
-import PropTypes from 'prop-types';
-import { JsonViewer } from '@textea/json-viewer';
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler';
-import { useParams } from 'react-router-dom';
+import jspreadsheet from 'jspreadsheet-ce'
+import 'jspreadsheet-ce/dist/jspreadsheet.css'
+import { Check } from 'react-bootstrap-icons'
+import axios from 'axios'
+import PropTypes from 'prop-types'
+import { JsonViewer } from '@textea/json-viewer'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { useParams } from 'react-router-dom'
 
 /**
  * Composant : Visualisation
  * @return {ReactNode}
  */
 function Visualisation() {
-  const { id } = useParams();
+  const { id } = useParams()
   // console.log(JSON.stringify(id));
-  const [mediaId, setMediaId] = useState(id ? id : '');
-  const [visuOption, setVisuOption] = useState({ displayType: 'CSV', data: null });
-  const { defaultErrorHandler } = useDefaultErrorHandler();
+  const [mediaId, setMediaId] = useState(id ? id : '')
+  const [visuOption, setVisuOption] = useState({ displayType: 'CSV', data: null })
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const wrapper = React.useRef();
-  const [el, setEl] = useState(null);
+  const wrapper = React.useRef()
+  const [el, setEl] = useState(null)
 
   useEffect(() => {
     setEl(
       jspreadsheet(wrapper.current, {
         data: [[]],
         minDimensions: [10, 10],
-      }),
-    );
+      })
+    )
     if (mediaId.length) {
-      handleOnClick();
+      handleOnClick()
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (el) {
-      el.destroy(wrapper.current, false);
+      el.destroy(wrapper.current, false)
     }
     if (visuOption.displayType === 'CSV') {
-      setJSpreadsheet();
+      setJSpreadsheet()
     }
-  }, [visuOption]);
+  }, [visuOption])
 
   /**
    * met a jour le state lors de la modification de l'input du mediaId
    * @param {*} event event
    */
   function handleChange(event) {
-    setMediaId(event.target.value);
+    setMediaId(event.target.value)
   }
 
   /**
@@ -60,12 +60,12 @@ function Visualisation() {
    */
   function csvToArray(str, delimiter = ',') {
     // TODO : better option => https://www.papaparse.com/ ? https://www.npmjs.com/package/csv-string ?
-    const titles = str.slice(0, str.indexOf('\n')).split(delimiter);
-    const rows = str.slice(str.indexOf('\n') + 1).split('\n');
+    const titles = str.slice(0, str.indexOf('\n')).split(delimiter)
+    const rows = str.slice(str.indexOf('\n') + 1).split('\n')
     return rows.map((row) => {
-      const values = row.split(delimiter);
-      return titles.reduce((object, curr, i) => ((object[curr] = values[i]), object), {});
-    });
+      const values = row.split(delimiter)
+      return titles.reduce((object, curr, i) => ((object[curr] = values[i]), object), {})
+    })
   }
   /**
    * setup the jspreadsheet element
@@ -85,8 +85,8 @@ function Visualisation() {
         includeHeadersOnDownload: true,
         parseTableAutoCellType: true,
         parseTableFirstRowAsHeader: true,
-      };
-      setEl(jspreadsheet(wrapper.current, options));
+      }
+      setEl(jspreadsheet(wrapper.current, options))
     }
   }
 
@@ -97,84 +97,84 @@ function Visualisation() {
     axios
       .get(`/api/data/media/${mediaId}`)
       .then((res) => {
-        const mediaUrl = res.data?.connector?.url;
-        if (!mediaUrl) return;
+        const mediaUrl = res.data?.connector?.url
+        if (!mediaUrl) return
         axios
           .get(`${mediaUrl}`)
           .then((res2) => {
             // const mediaMimeStr = res2.headers['content-type']; // Ex: 'application/json; charset=utf-8'
-            const mediaMimeStr = res.data?.file_type;
+            const mediaMimeStr = res.data?.file_type
             // console.log(mediaMimeStr);
-            const mediaMimeElements = mediaMimeStr.split(';');
-            const mediaMime = mediaMimeElements[0].trim().toLowerCase();
+            const mediaMimeElements = mediaMimeStr.split(';')
+            const mediaMime = mediaMimeElements[0].trim().toLowerCase()
 
             if (mediaMimeElements.length > 1) {
-              const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8';
+              const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
               switch (mediaCharset) {
                 case 'charset=utf-8':
                 case 'charset=us-ascii':
                 case 'charset=iso-8859-1':
                 case 'charset=iso-8859-15':
-                  break;
+                  break
                 default:
                   defaultErrorHandler({
                     message: `l'encodage ${mediaCharset} n'est pas supporté`,
-                  });
-                  break;
+                  })
+                  break
               }
             }
             switch (mediaMime) {
               case 'application/geo+json':
               case 'application/json':
               case 'text/json':
-                setVisuOption({ displayType: 'JSON', data: res2.data });
-                break;
+                setVisuOption({ displayType: 'JSON', data: res2.data })
+                break
 
               case 'text/csv':
               case 'application/vnd.oasis.opendocument.spreadsheet':
               case 'application/vnd.ms-excel':
               case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 try {
-                  const array = csvToArray(res2.data);
-                  setVisuOption({ displayType: 'CSV', data: array });
+                  const array = csvToArray(res2.data)
+                  setVisuOption({ displayType: 'CSV', data: array })
                 } catch (error) {
-                  defaultErrorHandler(error);
+                  defaultErrorHandler(error)
                 }
-                break;
+                break
 
               case 'text/plain':
               case 'text/css':
                 try {
-                  setVisuOption({ displayType: 'TXT', data: res2.data });
+                  setVisuOption({ displayType: 'TXT', data: res2.data })
                 } catch (error) {
-                  defaultErrorHandler(error);
+                  defaultErrorHandler(error)
                 }
-                break;
+                break
               case 'image/jpg':
               case 'image/jpeg':
               case 'image/png':
                 try {
-                  setVisuOption({ displayType: 'IMG', data: mediaUrl });
+                  setVisuOption({ displayType: 'IMG', data: mediaUrl })
                 } catch (error) {
-                  defaultErrorHandler(error);
+                  defaultErrorHandler(error)
                 }
-                break;
+                break
 
               default:
                 defaultErrorHandler({
                   message: `le type ${mediaMimeStr} n'est pas supporté`,
-                });
+                })
 
-                break;
+                break
             }
           })
           .catch((e) => {
-            defaultErrorHandler(e);
-          });
+            defaultErrorHandler(e)
+          })
       })
       .catch((e) => {
-        defaultErrorHandler(e);
-      });
+        defaultErrorHandler(e)
+      })
   }
 
   return (
@@ -202,8 +202,8 @@ function Visualisation() {
         }[visuOption.displayType]
       }
     </div>
-  );
+  )
 }
-Visualisation.propTypes = { match: PropTypes.object };
+Visualisation.propTypes = { match: PropTypes.object }
 
-export default Visualisation;
+export default Visualisation
