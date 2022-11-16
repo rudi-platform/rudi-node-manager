@@ -4,14 +4,13 @@ const LocalStrategy = require('passport-local').Strategy;
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt');
 
 const { getConf } = require('../config/config');
-const databaseManager = require('../database/database');
-const { extractCookieFromReq, CONSOLE_TOKEN_NAME: CONSOLE_TOKEN } = require('./jwt');
+const { dbGetUserById, dbGetUserByUsername } = require('../database/database');
+const { extractCookieFromReq, CONSOLE_TOKEN_NAME } = require('./jwt');
 
 passport.serializeUser((user, done) => done(null, user.id));
 
 passport.deserializeUser((id, done) => {
-  databaseManager
-    .getUserById(id)
+  dbGetUserById(null, id)
     .then((user) => done(null, user))
     .catch((err) => done(err, false));
 });
@@ -20,8 +19,7 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
-    databaseManager
-      .getUserByUsername(username)
+    dbGetUserByUsername(null, username)
       .then((userInfo) => {
         // Create new User
         if (!userInfo) return done(null, false, { message: 'no user found' });
@@ -51,7 +49,7 @@ passport.use(
       secretOrKey: SECRET_KEY_JWT,
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
-        (req) => extractCookieFromReq(req, CONSOLE_TOKEN),
+        (req) => extractCookieFromReq(req, CONSOLE_TOKEN_NAME),
         // Take jwt from http header
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),

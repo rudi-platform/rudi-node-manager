@@ -1,9 +1,14 @@
 const errorHandler = require('./errorHandler');
-const databaseManager = require('../database/database');
+const {
+  dbGetRoles,
+  dbGetRoleById,
+  dbGetUserRolesByUsername,
+  dbDeleteUserRole,
+  dbCreateUserRole,
+} = require('../database/database');
 
 exports.getRoleList = (req, res, next) => {
-  return databaseManager
-    .getRoles()
+  return dbGetRoles()
     .then((rows) => res.status(200).json(rows))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_roles' });
@@ -13,8 +18,7 @@ exports.getRoleList = (req, res, next) => {
 
 exports.getRoleById = (req, res, next) => {
   const { role } = req.params;
-  return databaseManager
-    .getRoleById(role)
+  return dbGetRoleById(null, role)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_role' });
@@ -25,8 +29,7 @@ exports.getRoleById = (req, res, next) => {
 // User_Roles
 exports.getUserRolesByUsername = (req, res, next) => {
   const { username } = req.params;
-  return databaseManager
-    .getUserRolesByUsername(username)
+  return dbGetUserRolesByUsername(null, username)
     .then((rows) => res.status(200).json(rows))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_userRole' });
@@ -35,8 +38,7 @@ exports.getUserRolesByUsername = (req, res, next) => {
 };
 exports.deleteUserRole = (req, res, next) => {
   const { userId, role } = req.params;
-  return databaseManager
-    .deleteUserRole(userId, role)
+  return dbDeleteUserRole(null, userId, role)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'delete_userRole' });
@@ -45,8 +47,7 @@ exports.deleteUserRole = (req, res, next) => {
 };
 exports.postUserRole = (req, res, next) => {
   const data = req.body;
-  return databaseManager
-    .createUserRole(data)
+  return dbCreateUserRole(null, data)
     .then((row) => res.status(200).json(row))
     .catch((err) => {
       console.error(err);

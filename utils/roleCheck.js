@@ -1,13 +1,12 @@
 const mod = 'roleCheck';
 
-const databaseManager = require('../database/database');
+const { dbGetUserRolesByUsername } = require('../database/database');
 const log = require('./logger');
 
 exports.checkRolePerm = (role) => (req, res, next) => {
   const fun = 'checkRolePerm';
   const { username } = req.user;
-  databaseManager
-    .getUserRolesByUsername(username)
+  dbGetUserRolesByUsername(null, username)
     .then((rows) => {
       if (rows.findIndex((elem) => elem.role === role || elem.role === 'SuperAdmin') >= 0) {
         next();
@@ -17,7 +16,7 @@ exports.checkRolePerm = (role) => (req, res, next) => {
           mod,
           fun,
           `Forbidden access by ${username} at ${req.method} ${req.url}`,
-          log.getContext(req, { opType: 'get_hash', statusCode: 403 }),
+          log.getContext(req, { opType: 'get_hash', statusCode: 403 })
         );
         res.status(403).json('Forbidden');
       }

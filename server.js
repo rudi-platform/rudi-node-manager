@@ -77,7 +77,10 @@ if (!isDevEnv()) {
 }
 
 // Init database on startup
-initDb.initDatabase();
+initDb
+  .dbInitialize()
+  .then((res) => log.d(mod, 'initDatabase', 'SQL DB init OK'))
+  .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`));
 
 // Catch any bad requests
 app.get('*', (req, res) => res.status(404).send(`Route '${req.method} ${req.url}' not found`));

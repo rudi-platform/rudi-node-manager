@@ -2,18 +2,16 @@ const mod = 'authController';
 
 // External dependencies
 const passport = require('passport');
-const bcrypt = require('bcrypt');
 
 // Internal dependencies
 const { isDevEnv } = require('../config/backOptions');
 const log = require('../utils/logger');
 const { BadRequestError } = require('../utils/errors');
 const { createFrontUserTokens, CONSOLE_TOKEN_NAME, PM_FRONT_TOKEN_NAME } = require('../utils/jwt');
-const databaseManager = require('../database/database');
+const {  dbUpdatePassword, dbRegisterUser, hashPassword } = require('../database/database');
 
 // Constants
 const SHOULD_SECURE = !isDevEnv();
-const SALT_ROUNDS = 10;
 
 // Helper functions
 const consoleCookieOpts = (exp) => {
@@ -31,30 +29,6 @@ const pmFrontCookieOpts = (exp) => {
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   };
-};
-
-/**
- * Hash and salt a password before storing it into a DB
- * @param {String} password A password
- * @param {Boolean} isNotBase64 True of the password is not base64 encoded
- * @return {String} The salted passwrod
- */
-const hashPassword = async (password) => {
-  const fun = 'hashPassword';
-  try {
-    const pwdStr = `${password}`;
-    if (pwdStr.startsWith('$')) {
-      // console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
-      return pwdStr;
-    }
-    const salt = await bcrypt.genSalt(SALT_ROUNDS);
-    const hashedPwd = await bcrypt.hash(pwdStr, salt);
-    // console.debug('T (saltPassword) hashed pwd:', hashedPwd);
-    return hashedPwd;
-  } catch (e) {
-    log.e(mod, fun, e);
-    throw e;
-  }
 };
 
 // Controllers
@@ -83,26 +57,6 @@ exports.postLogin = async (req, res, next) => {
   })(req, res, next);
 };
 
-exports.registerUser = async (data) => {
-  try {
-    const { username, email, password, id } = data;
-
-    const hashedPwd = await hashPassword(password);
-    const userCreds = {
-      username,
-      password: hashedPwd,
-      email,
-    };
-    if (id) userCreds.id = id;
-
-    const usr = await databaseManager.safeCreateUser(userCreds);
-    return { id: usr.id, username: usr.username };
-  } catch (err) {
-    log.e(mod, 'registerUser', err);
-    throw err;
-  }
-};
-
 exports.postRegister = async (req, res) => {
   const fun = 'postRegister';
   try {
@@ -112,7 +66,7 @@ exports.postRegister = async (req, res) => {
         'Password and its confirmation should not be null and be the same.'
       );
 
-    const user = await this.registerUser({ username, email, password });
+    const user = await dbRegisterUser(null, { username, email, password });
     res.status(200).send(user);
   } catch (err) {
     log.e(mod, fun, err);
@@ -128,6 +82,7 @@ exports.postForgot = (req, res, next) => {
     throw err;
   }
 };
+
 exports.putPassword = async (req, res, next) => {
   const fun = 'changePwd';
   try {
@@ -147,8 +102,7 @@ exports.putPassword = async (req, res, next) => {
       if (err) return res.status(400).send(err);
       if (!user) return res.status(401).send(info.message || 'User not found');
 
-      return databaseManager
-        .updatePassword(username, hashedPwd)
+      return dbUpdatePassword(null, username, hashedPwd)
         .then((userInfo) => res.json(userInfo))
         .catch((err) => {
           log.e(mod, fun, err);

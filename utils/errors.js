@@ -76,7 +76,7 @@ class UnauthorizedError extends RudiError {
       'Unauthorized',
       'The request requires an user authentication',
       ctxMod,
-      ctxFun,
+      ctxFun
     );
   }
 }
@@ -101,7 +101,7 @@ class MethodNotAllowedError extends RudiError {
       'Method Not Allowed',
       'Request method is not supported for the requested resource',
       ctxMod,
-      ctxFun,
+      ctxFun
     );
   }
 }
@@ -114,7 +114,7 @@ class NotAcceptableError extends RudiError {
       'Not Acceptable',
       'Headers sent in the request are not compatible with the service',
       ctxMod,
-      ctxFun,
+      ctxFun
     );
   }
 }
@@ -133,10 +133,14 @@ class NotImplementedError extends RudiError {
       'Not Implemented',
       'The server does not support the functionality required to fulfill the request',
       ctxMod,
-      ctxFun,
+      ctxFun
     );
   }
 }
+
+exports.statusOK = (message) => {
+  return { status: 'OK', message };
+};
 
 exports.BadRequestError = BadRequestError;
 exports.UnauthorizedError = UnauthorizedError;
@@ -146,4 +150,4 @@ exports.MethodNotAllowedError = MethodNotAllowedError;
 exports.NotAcceptableError = NotAcceptableError;
 exports.InternalServerError = InternalServerError;
 exports.RudiError = RudiError;
-exports.STATUS_CODE = STATUS_CODE
+exports.STATUS_CODE = STATUS_CODE;

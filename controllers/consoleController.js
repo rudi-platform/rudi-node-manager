@@ -1,4 +1,4 @@
-const mod = 'consoleCtrl'
+const mod = 'consoleCtrl';
 
 const { getConsoleFormUrl } = require('../config/config');
 const log = require('../utils/logger');
@@ -9,10 +9,8 @@ const databaseManager = require('../database/database');
 exports.getDefaultForm = (req, res) => {
   const user = req.user;
   return databaseManager
-    .getDefaultForm(user)
-    .then((rows) => {
-      res.status(200).json(rows);
-    })
+    .dbGetDefaultForm(null, user)
+    .then((rows) => res.status(200).json(rows))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_defaultForm' });
       res.status(error.statusCode).json(error);
@@ -23,10 +21,8 @@ exports.deleteDefaultForm = (req, res) => {
   const user = req.user;
   const { name } = req.params;
   return databaseManager
-    .deleteDefaultForm(user, name)
-    .then((row) => {
-      res.status(200).json(row);
-    })
+    .dbDeleteDefaultForm(null, user, name)
+    .then((row) => res.status(200).json(row))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'delete_defaultForm' });
       res.status(error.statusCode).json(error);
@@ -38,10 +34,8 @@ exports.putDefaultForm = (req, res) => {
   const user = req.user;
 
   return databaseManager
-    .updateDefaultForm(user, data)
-    .then((row) => {
-      res.status(200).json(row);
-    })
+    .dbUpdateDefaultForm(null, user, data)
+    .then((row) => res.status(200).json(row))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'put_defaultForm' });
       res.status(error.statusCode).json(error);
