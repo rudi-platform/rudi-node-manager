@@ -45,6 +45,10 @@ install_front:
     NODE_ENV: development
   script:
     - cd front && npm install
+  artifacts:
+    paths:
+      - front/node_modules/
+    expire_in: 1 hour
 
 # Quality: back
 lint_back:
