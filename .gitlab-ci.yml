@@ -1,6 +1,6 @@
 stages:
-  - npm_install_back
   - npm_install_front
+  - npm_install_back
   - build_front
   - quality
 
