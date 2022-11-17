@@ -26,7 +26,6 @@
     "@aqmo.org/jwt_lib": "^1.1.9",
     "@aqmo.org/rudi_logger": "^1.1.2",
     "@babel/preset-react": "^7.18.6",
-    "@mapbox/node-pre-gyp": "^1.0.10",
     "axios": "^1.1.3",
     "bluebird": "^3.7.2",
     "concurrently": "^7.5.0",
