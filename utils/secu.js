@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
+const { randomBytes, scryptSync } = require('crypto')
 const jwtLib = require(`@aqmo.org/jwt_lib`)
 
 // ----- Internal dependencies
@@ -211,3 +212,58 @@ const getPrvKey = (name) => {
   prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
 }
+/*
+const SALT_ROUNDS = 10
+/**
+ * Hash and salt a password before storing it into a DB
+ * @param {String} password A password
+ * @param {Boolean} isNotBase64 True of the password is not base64 encoded
+ * @return {String} The salted passwrod
+ *\/
+exports.hashPasswordBcrypt = (password) => {
+  const fun = 'hashPassword'
+  try {
+    const pwdStr = `${password}`
+    if (pwdStr.startsWith('$')) {
+      // console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
+      return pwdStr
+    }
+    const salt = genSaltSync(SALT_ROUNDS)
+    const hashedPwd = hashSync(pwdStr, salt)
+    // console.debug('T (saltPassword) hashed pwd:', hashedPwd);
+    return hashedPwd
+  } catch (e) {
+    log.e(mod, fun, e)
+    throw e
+  }
+}
+*/
+
+/**
+ * Solution using crypto native library
+ * Reworked from Malik-Bagwala & Shivam @ https://stackoverflow.com/a/70631147/1563072
+ * @param {String} password
+ * @param {String} salt
+ * @returns {String} A base64 encoded salted & hashed password
+ */
+exports.encryptPassword = (password, salt) => scryptSync(password, salt, 64).toString('base64url')
+
+/**
+ * Hash the password with randomly generated salt
+ * @param {String} password
+ * @returns {String} A base64 encoded hash of the salt+password
+ */
+exports.hashPassword = (password) => {
+  // Any random string here (ideally should be atleast 16 bytes)
+  const salt = randomBytes(30).toString('base64url')
+  return `${salt}${this.encryptPassword(password, salt)}`
+}
+
+/**
+ * Compares a clear password to a hashed one.
+ * @param {String} password
+ * @param {String} hash
+ * @returns {Boolean} True if the password matches the hash
+ */
+exports.matchPassword = (password, hash) =>
+  hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))

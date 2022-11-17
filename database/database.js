@@ -2,12 +2,13 @@ const mod = 'db'
 
 // ---- External dependencies -----
 const sqlite3 = require('sqlite3').verbose()
-const { genSaltSync, hashSync } = require('bcrypt')
+// const { genSaltSync, hashSync } = require('bcrypt')
 const Promise = require('bluebird')
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config')
 const { ForbiddenError, InternalServerError, NotFoundError, statusOK } = require('../utils/errors')
+const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
 
 // ---- Constants -----
@@ -173,7 +174,7 @@ exports.dbGetUsers = (openedDb) => {
  * @return {Promise} User id and username when successful
  * @throws {ForbiddenError} user already exists
  */
-exports.dbSafeCreateUser = (openedDb, user) => {
+exports.dbCreateUserCheckExists = (openedDb, user) => {
   const fun = 'safeCreateUser'
   const { username, password, email, id } = user
   const db = openedDb || open()
@@ -223,42 +224,16 @@ exports.dbSafeCreateUser = (openedDb, user) => {
   })
 }
 
-const SALT_ROUNDS = 10
-/**
- * Hash and salt a password before storing it into a DB
- * @param {String} password A password
- * @param {Boolean} isNotBase64 True of the password is not base64 encoded
- * @return {String} The salted passwrod
- */
-exports.hashPassword = (password) => {
-  const fun = 'hashPassword'
-  try {
-    const pwdStr = `${password}`
-    if (pwdStr.startsWith('$')) {
-      // console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
-      return pwdStr
-    }
-    const salt = genSaltSync(SALT_ROUNDS)
-    const hashedPwd = hashSync(pwdStr, salt)
-    // console.debug('T (saltPassword) hashed pwd:', hashedPwd);
-    return hashedPwd
-  } catch (e) {
-    log.e(mod, fun, e)
-    throw e
-  }
-}
-
 exports.dbRegisterUser = async (db, { username, email, password, id }) => {
   try {
-    const hashedPwd = this.hashPassword(password)
     const userCreds = {
       username,
-      password: hashedPwd,
+      password: hashPassword(password),
       email,
     }
     if (id) userCreds.id = id
 
-    const usr = await this.dbSafeCreateUser(db, userCreds)
+    const usr = await this.dbCreateUserCheckExists(db, userCreds)
     return { id: usr.id, username: usr.username }
   } catch (err) {
     log.e(mod, 'registerUser', err)
@@ -339,7 +314,7 @@ exports.dbDeleteUserWithName = (openedDb, username) => {
       log.i(
         mod,
         fun,
-        `${TBL_USERS} : A row has been deleted with username ${username}`,
+        `${TBL_USERS} : A row has been deleted with username '${username}'`,
         log.getContext(null, { opType: 'delete_user' })
       )
       resolve({ username: username })
@@ -384,7 +359,7 @@ exports.dbCreateRoles = (openedDb, roles) => {
           log.i(
             mod,
             fun,
-            `(${TBL_ROLES}) A row has been inserted with name ${role.role}`,
+            `(${TBL_ROLES}) A role has been created with name '${role.role}'`,
             log.getContext(null, { opType: 'add_role' })
           )
         })
@@ -463,7 +438,7 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
       log.i(
         mod,
         fun,
-        `${TBL_USER_ROLES} : A row was deleted with userId ${userId} and role ${role}`,
+        `${TBL_USER_ROLES}: A role was deleted with userId ${userId} and role '${role}'`,
         log.getContext(null, { opType: 'delete_userRole' })
       )
       resolve({ userId, role })
@@ -493,7 +468,7 @@ exports.dbCreateUserRole = (openedDb, userRole) => {
       log.i(
         mod,
         fun,
-        `(${TBL_USER_ROLES}) A row was inserted with userId ${userId} and role ${role}`,
+        `(${TBL_USER_ROLES}) A row was inserted with userId ${userId} and role '${role}'`,
         log.getContext(null, { opType: 'post_userRole' })
       )
       resolve(userRole)
@@ -521,7 +496,7 @@ exports.dbGetDefaultForm = (openedDb, user) => {
       })
     })
   } else {
-    return Promise.reject(new NotFoundError(`Default value for ${user.username} not found!`))
+    return Promise.reject(new NotFoundError(`Default value for '${user.username}' not found!`))
   }
 }
 exports.dbGetDefaultFormWithName = (openedDb, user, name) => {
@@ -544,7 +519,7 @@ exports.dbGetDefaultFormWithName = (openedDb, user, name) => {
     })
   } else {
     return Promise.reject(
-      new NotFoundError(`Default value for ${user.username} and name : ${name} not found!`)
+      new NotFoundError(`Default value for '${user.username}' and name: '${name}' not found!`)
     )
   }
 }
@@ -564,7 +539,7 @@ exports.dbDeleteDefaultForm = (openedDb, user, name) => {
         log.i(
           mod,
           fun,
-          `Default_Value_Form : A row was deleted with userId ${user.id} and name : ${name}`,
+          `(Default_Value_Form) A row was deleted with userId ${user.id} and name : ${name}`,
           log.getContext(null, { opType: 'delete_defaultForm' })
         )
         resolve({})

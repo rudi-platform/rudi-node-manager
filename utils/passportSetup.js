@@ -1,11 +1,11 @@
-const bcrypt = require('bcrypt')
+// const bcrypt = require('bcrypt')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
 const { getConf } = require('../config/config')
 const { dbGetUserById, dbGetUserByUsername } = require('../database/database')
-const { extractCookieFromReq, CONSOLE_TOKEN_NAME } = require('./jwt')
+const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
 
 passport.serializeUser((user, done) => done(null, user.id))
 
@@ -21,19 +21,13 @@ passport.use(
     // Match User
     dbGetUserByUsername(null, username)
       .then((userInfo) => {
-        // Create new User
-        if (!userInfo) return done(null, false, { message: 'no user found' })
-        // console.log(userInfo);
-        // Match password
-        bcrypt.compare(password, userInfo.password, (err, isMatch) => {
-          if (err) throw err
+        console.log('T (LocalStrategy) userInfo:', userInfo)
+        if (!userInfo) return done(null, false, { message: 'No user found' })
 
-          if (isMatch) {
-            return done(null, userInfo)
-          } else {
-            return done(null, false, { message: 'Wrong password' })
-          }
-        })
+        console.log('T (LocalStrategy) match:', matchPassword(password, userInfo.password))
+        if (!matchPassword(password, userInfo.password))
+          return done(null, false, { message: 'Wrong password' })
+        else return done(null, userInfo)
       })
       .catch((err) => {
         console.error('T (LocalStrategy) Error login')

@@ -2,7 +2,7 @@ const axios = require('axios')
 const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
 const { getObjectList } = require('./genericController')
-const { createRudiApiToken } = require('../utils/jwt')
+const { createRudiApiToken } = require('../utils/secu')
 
 exports.getResourcesList = (req, res, next) => getObjectList(req, res, next, 'resources')
 

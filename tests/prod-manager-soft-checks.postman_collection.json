@@ -2040,7 +2040,7 @@
 									"pm.test(\"Get user\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = pm.response.json();",
-									"    const username = pm.variables.get('softUser1username');",
+									"    const username = pm.collectionVariables.get('softUser1username');",
 									"    pm.expect(res.username).to.eq(username);",
 									"    pm.collectionVariables.set('userId',res.id)",
 									"});"

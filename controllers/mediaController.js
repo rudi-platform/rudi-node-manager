@@ -15,7 +15,7 @@ const {
   extractJwtFromReq,
   readJwtBody,
   getTokenFromMediaForUser,
-} = require('../utils/jwt')
+} = require('../utils/secu')
 const errorHandler = require('./errorHandler')
 
 // Controllers

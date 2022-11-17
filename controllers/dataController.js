@@ -4,7 +4,7 @@ const axios = require('axios')
 // Internal dependecies
 const { getConf } = require('../config/config')
 const errorHandler = require('./errorHandler')
-const { createRudiApiToken } = require('../utils/jwt')
+const { createRudiApiToken } = require('../utils/secu')
 const { getCompletedUrl } = require('../utils/utils')
 
 // Constants

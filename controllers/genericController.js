@@ -1,7 +1,7 @@
 const axios = require('axios')
 const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
-const { createRudiApiToken } = require('../utils/jwt')
+const { createRudiApiToken } = require('../utils/secu')
 
 // const axiosCurlirize = require('axios-curlirize');
 // axiosCurlirize(axios);
