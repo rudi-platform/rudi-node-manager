@@ -17,7 +17,8 @@ default:
 install_back:
   cache:
     key:
-      - 'package-lock.json'
+      files:
+        - package-lock.json
     paths:
       - node_modules/
   stage: npm_install_back
@@ -37,7 +38,8 @@ install_back:
 install_front:
   cache:
     key:
-      - 'front/package-lock.json'
+      files:
+        - front/package-lock.json
     paths:
       - front/node_modules/
   stage: npm_install_front
