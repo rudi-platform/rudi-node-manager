@@ -1,15 +1,11 @@
 stages:
-  - npm_install_front
   - npm_install_back
+  - npm_install_front
   - build_front
   - quality
 
 # This folder is cached between builds
 default:
-  cache:
-    paths:
-      - node_modules/
-      - front/node_modules/
   before_script:
     - |
       {
@@ -19,6 +15,11 @@ default:
 
 # npm install (Back)
 install_back:
+  cache:
+    key:
+      - package-lock.json
+    paths:
+      - node_modules/
   stage: npm_install_back
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -29,11 +30,16 @@ install_back:
   variables:
     NODE_ENV: development
   script:
-    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
+    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
     - npm install
 
 # npm install (Front)
 install_front:
+  cache:
+    key:
+      - front/package-lock.json
+    paths:
+      - front/node_modules/
   stage: npm_install_front
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -45,32 +51,6 @@ install_front:
     NODE_ENV: development
   script:
     - cd front && npm install
-  artifacts:
-    paths:
-      - front/node_modules/
-    expire_in: 1 hour
-
-# Quality: back
-lint_back:
-  stage: quality
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-  tags:
-    - nodejs
-  script:
-    - npm run lintBack
-
-# Quality: front
-lint_front:
-  stage: quality
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-  tags:
-    - nodejs
-  script:
-    - npm run lintFront
 
 # Build front
 build_front:
@@ -95,3 +75,25 @@ build_front:
     paths:
       - front/build/
     expire_in: 10 week
+
+# Quality: back
+lint_back:
+  stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+  tags:
+    - nodejs
+  script:
+    - npm run lintBack
+
+# Quality: front
+lint_front:
+  stage: quality
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+  tags:
+    - nodejs
+  script:
+    - npm run lintFront
