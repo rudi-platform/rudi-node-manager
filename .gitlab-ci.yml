@@ -1,10 +1,21 @@
+cache:
+  - key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+  - key:
+      files:
+        - front/package-lock.json
+    paths:
+      - front/node_modules/
+
 stages:
   - npm_install_back
   - npm_install_front
   - build_front
   - quality
 
-# This folder is cached between builds
 default:
   before_script:
     - |
@@ -15,12 +26,6 @@ default:
 
 # npm install (Back)
 install_back:
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - node_modules/
   stage: npm_install_back
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -36,12 +41,6 @@ install_back:
 
 # npm install (Front)
 install_front:
-  cache:
-    key:
-      files:
-        - front/package-lock.json
-    paths:
-      - front/node_modules/
   stage: npm_install_front
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
