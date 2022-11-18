@@ -55,8 +55,9 @@ export default function Login({ setToken }) {
         headers: { 'Content-Type': 'application/json' },
       })
       .catch((error) => {
+        const resMsg = error.response?.data
         const errMsg =
-          error.response?.data == 'No user found'
+        resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password')
             ? 'Utilisateur ou mot de passe incorrect'
             : `Echec de connexion`
         changeOptions({

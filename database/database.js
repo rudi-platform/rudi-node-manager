@@ -274,6 +274,12 @@ exports.dbCreateUser = (openedDb, user) => {
     )
   })
 }
+
+exports.dbHashAndUpdatePassword = async (openedDb, username, password) => {
+  const hashedPwd = await hashPassword(password)
+  return this.dbUpdatePassword(openedDb, username, hashedPwd)
+}
+
 exports.dbUpdatePassword = (openedDb, username, password) => {
   const fun = 'updatePassword'
   const db = openedDb || open()

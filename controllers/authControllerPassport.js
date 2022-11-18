@@ -7,8 +7,15 @@ const passport = require('passport')
 const { isDevEnv } = require('../config/backOptions')
 const log = require('../utils/logger')
 const { BadRequestError } = require('../utils/errors')
-const { createFrontUserTokens, CONSOLE_TOKEN_NAME, PM_FRONT_TOKEN_NAME, hashPassword } = require('../utils/secu')
-const { dbUpdatePassword, dbRegisterUser } = require('../database/database')
+const {
+  createFrontUserTokens,
+  CONSOLE_TOKEN_NAME,
+  PM_FRONT_TOKEN_NAME,
+} = require('../utils/secu')
+const {
+  dbRegisterUser,
+  dbHashAndUpdatePassword,
+} = require('../database/database')
 
 // Constants
 const SHOULD_SECURE = !isDevEnv()
@@ -36,7 +43,8 @@ exports.postLogin = async (req, res, next) => {
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', (err, user) => {
     if (err) return res.status(400).send(err)
-    if (!user) return res.status(401).send(`User not found or incorrect password: '${req?.body?.username}'`)
+    if (!user)
+      return res.status(401).send(`User not found or incorrect password: '${req?.body?.username}'`)
 
     req.login(user, { session: false }, async (err) => {
       if (err) return res.status(400).json({ errors: err })
@@ -94,13 +102,11 @@ exports.putPassword = async (req, res, next) => {
     )
       res.status(401).send('Prerequisites not met')
 
-    const hashedPwd = await hashPassword(newPassword)
-
     passport.authenticate('local', (err, user, info) => {
       if (err) return res.status(400).send(err)
       if (!user) return res.status(401).send(info.message || 'User not found')
 
-      return dbUpdatePassword(null, username, hashedPwd)
+      return dbHashAndUpdatePassword(null, username, newPassword)
         .then((userInfo) => res.json(userInfo))
         .catch((err) => {
           log.e(mod, fun, err)

@@ -10,6 +10,7 @@ const { getConf } = require('../config/config')
 const { timeEpochS, toInt } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
+const { compareSync } = require('bcrypt')
 
 // ----- Constants
 const mod = 'jwt'
@@ -266,4 +267,6 @@ exports.hashPassword = (password) => {
  * @returns {Boolean} True if the password matches the hash
  */
 exports.matchPassword = (password, hash) =>
-  hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))
+  hash.startsWith('$2b$10$')
+    ? compareSync(password, hash)
+    : hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))

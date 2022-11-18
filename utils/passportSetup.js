@@ -4,7 +4,12 @@ const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
 const { getConf } = require('../config/config')
-const { dbGetUserById, dbGetUserByUsername } = require('../database/database')
+const {
+  dbGetUserById,
+  dbGetUserByUsername,
+  dbHashAndUpdatePassword,
+} = require('../database/database')
+const log = require('./logger')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
 
 passport.serializeUser((user, done) => done(null, user.id))
@@ -20,14 +25,26 @@ passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
     dbGetUserByUsername(null, username)
-      .then((userInfo) => {
-        console.log('T (LocalStrategy) userInfo:', userInfo)
-        if (!userInfo) return done(null, false, { message: 'No user found' })
+      .then((dbUserInfo) => {
+        // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
+        if (!dbUserInfo) return done(null, false, { message: 'No user found' })
 
-        console.log('T (LocalStrategy) match:', matchPassword(password, userInfo.password))
-        if (!matchPassword(password, userInfo.password))
+        // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
+        if (!matchPassword(password, dbUserInfo.password))
           return done(null, false, { message: 'Wrong password' })
-        else return done(null, userInfo)
+        else {
+          // Password is OK... But if it was bcrypt-generated, let's change
+          // the hash from the DB with a crypto.scryptSync hashed password
+          // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
+          if (dbUserInfo.password.startsWith('$2b$10$')) {
+            dbHashAndUpdatePassword(null, username, password)
+              .then((res) => done(null, dbUserInfo))
+              .catch((err) => {
+                log.e(`T (LocalStrategy) Error while updating 2b10 password: ${err}`)
+                return done(null, dbUserInfo)
+              })
+          } else return done(null, dbUserInfo)
+        }
       })
       .catch((err) => {
         console.error('T (LocalStrategy) Error login')
