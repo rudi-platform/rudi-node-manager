@@ -29,7 +29,7 @@ install_back:
   variables:
     NODE_ENV: development
   script:
-    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
+    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
     - npm install
 
 # npm install (Front)
