@@ -21,6 +21,7 @@ const {
   TBL_USERS,
   dbDeleteUserWithId,
   dbGetRoles,
+  dbOpen,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -62,22 +63,22 @@ const sqlCreateUserRoleTable =
 // ---- Functions -----
 const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
   const fun = 'initTable'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   // console.log('T (initTable) db:', tableName);
   return new Promise((resolve, reject) => {
     db.get(sqlGet, [tableName], (err, row) => {
       if (err) {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         return reject(err)
         // log.e(mod, `${fun}.${tableName}.get`, err.message);
       }
       // log.i(mod, `${fun}.${tableName}.get`, row);
       if (row) {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         return resolve(statusOK(`Table exists: '${tableName}'`))
       }
       db.run(sqlCreateReq, (err) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, `${fun}.${tableName}.create`, err.message)
           return reject(err)
@@ -96,72 +97,112 @@ const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
 
 const dbNormalizeRoleTable = async (openedDb) => {
   const fun = 'dbNormalizeRoleTable'
-  const db = openedDb || open()
-  const roleList = await dbGetRoles(db)
+  const db = openedDb || dbOpen()
+  await dbNormalizeRoleTableAddHide(db)
+  await dbRenameRoles(db)
 
-  const needsRoleRenaming = roleList.find(
-    (roleDescPair) =>
-      roleDescPair.role == 'Createur' ||
-      roleDescPair.role == 'Créateur' ||
-      roleDescPair.role == 'Gestionnaire'
-  )
-  if (needsRoleRenaming) {
-  }
-
-  //   if (!openedDb) close(db)
-  //   return statusOK(`Roles needn't any normalization`)
-  // }
-  // const roles = await dbGetRoles(db)
-
-  // console.log('T (dbNormalizeRoleTable) roles', roles[0].hide)
-  if (!openedDb) close(db)
-
-  // return new Promise((resolve, reject) => {
-  //   db.run(`PRAGMA table_info(${TBL_ROLES})`, (err, res) => {
-  //     if (!openedDb) close(db)
-  //     if (err) {
-  //       log.e(mod, `${fun}.addHideCol KO`, err.message)
-  //       return reject(err)
-  //     } else {
-  //       log.d(mod, `${fun}.addHideCol OK`, res)
-  //       return resolve(res)
-  //     }
-  //   })
-  // })
+  if (!openedDb) dbClose(db)
 }
 const dbNormalizeRoleTableAddHide = (openedDb) => {
   const fun = 'dbNormalizeRoleTableAddHide'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
-    db.run(`PRAGMA table_info(Roles)`,(err)
-)
-    db.run(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1)`, (err, row) => {
+    db.all(`PRAGMA table_info(${TBL_ROLES})`, (err, rows) => {
       if (err) {
-        if (!openedDb) close(db)
-        log.d(mod, `${fun}.addHideFlag`, err.message)
-        return reject(err)
+        if (!openedDb) dbClose(db)
+        log.d(mod, `${fun}.pragma`, err.message)
+        return reject(new RudiError(`RoleHide Pragma failed: ${err.message}`))
       }
-      db.run(`UPDATE ${TBL_ROLES} SET hide=1 WHERE role=SuperAdmin OR role=Moniteur `)
+      if (rows.find((row) => row.name === 'hide')) {
+        if (!openedDb) dbClose(db)
+        log.d(mod, `${fun}`, `Column 'hide' exists`)
+        return resolve(statusOK(`Column 'hide' exists`))
+      }
+      db.run(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1) DEFAULT 0`, (err) => {
+        if (err) {
+          if (!openedDb) dbClose(db)
+          log.d(mod, `${fun}.addHide`, err.message)
+          return reject(err)
+        }
+        db.run(
+          `UPDATE ${TBL_ROLES} SET hide=1 WHERE role='SuperAdmin' OR role='Moniteur' `,
+          (err) => {
+            if (err) {
+              if (!openedDb) dbClose(db)
+              log.d(mod, `${fun}.setHideFlag`, err.message)
+              return reject(err)
+            }
+            return resolve(statusOK(`Column 'hide added & role flags set`))
+          }
+        )
+      })
     })
   })
-  // if (!openedDb) close(db)
 }
+
+const dbRenameRoles = (openedDb) => {
+  const fun = 'dbRenameRoles'
+  const db = openedDb || dbOpen()
+  return new Promise((resolve, reject) => {
+    dbGetRoles(db)
+      .then((roleList) => {
+        const found = roleList.find(
+          (roleDescPair) =>
+            roleDescPair.role == 'Createur' ||
+            roleDescPair.role == 'Créateur' ||
+            roleDescPair.role == 'Gestionnaire'
+        )
+        if (found) {
+          if (!openedDb) dbClose(db)
+          log.d(mod, `${fun}`, `Roles already renamed`)
+          return resolve(statusOK(`Roles already renamed`))
+        }
+        db.run(
+          `UPDATE ${TBL_ROLES} SET role='Lecteur', desc='lecture seule des métadonnées' WHERE role='Createur' OR role='Créateur'`,
+          (err) => {
+            if (err) {
+              if (!openedDb) dbClose(db)
+              log.d(mod, `${fun}.Lecteur`, err.message)
+              return reject(new RudiError(`${fun}.Lecteur: ${err}`))
+            }
+            db.run(
+              `UPDATE ${TBL_ROLES} SET role='Editeur',desc='édition et suppression des métadonnées' WHERE role='Gestionnaire'`,
+              (err) => {
+                if (!openedDb) dbClose(db)
+                if (err) {
+                  log.d(mod, `${fun}.Editeur`, err.message)
+                  return reject(new RudiError(`${fun}.Editeur: ${err}`))
+                }
+                log.d(mod, `${fun}`, `Column 'hide added & role flags set`)
+                return resolve(statusOK(`Column 'hide added & role flags set`))
+              }
+            )
+          }
+        )
+      })
+      .catch((err) => {
+        if (!openedDb) dbClose(db)
+        reject(new RudiError(`RenameRoles.getRoles: ${err}`))
+      })
+  })
+}
+
 const dbNormalizeUserTableName = (openedDb, oldTblName) => {
   const fun = 'dbNormalizeUsersTableName'
   const tempName = `x${oldTblName}x`
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
       `SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`,
       [],
       (err, row) => {
         if (err) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           log.d(mod, `${fun}.check`, err.message)
           return reject(err)
         }
         if (!row) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           return resolve(`No table found with name '${oldTblName}'`)
         }
 
@@ -169,13 +210,13 @@ const dbNormalizeUserTableName = (openedDb, oldTblName) => {
 
         db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`, [], (err, row) => {
           if (err) {
-            if (!openedDb) close(db)
+            if (!openedDb) dbClose(db)
             log.e(mod, `${fun}.renameToto`, err.message)
             return reject(err)
           }
           console.log(mod, `${fun}.renameToto`, JSON.stringify(row))
           db.run(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
-            if (!openedDb) close(db)
+            if (!openedDb) dbClose(db)
             if (err) {
               log.e(mod, `${fun}.renameReal`, err.message)
               reject(err)

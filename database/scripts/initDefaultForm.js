@@ -1,4 +1,4 @@
-const { dbClose } = require('../database')
+const { dbClose, dbOpen } = require('../database')
 const log = require('../../utils/logger')
 const { statusOK } = require('../../utils/errors')
 const mod = 'database'
@@ -13,7 +13,7 @@ const sqlCreateDefaultFormTable =
 
 exports.dbInitDefaultFormTable = (openedDb) => {
   const fun = 'dbInitDefaultFormTable'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
       `SELECT name FROM sqlite_master WHERE type=? AND name=?`,
