@@ -124,16 +124,17 @@ exports.createUser = async (req, res, next) => {
 exports.editUser = async (req, res, next) => {
   try {
     const userInfo = req.body
-    console.log('T (editUser) userInfo', userInfo)
+    // console.log('T (editUser) userInfo', userInfo)
+    const {id, username, email}=userInfo
     const db = dbOpen()
-    const dbUser = await dbGetUserById(db, userInfo.id)
-    const dbUserSameName = await dbGetUserByUsername(db, userInfo.username)
+    const dbUser = await dbGetUserById(db, id)
+    const dbUserSameName = await dbGetUserByUsername(db, username)
     if (dbUserSameName && dbUserSameName.id !== dbUser.id)
-      return res.status(403).json(`Ce nom est déjà utilisé: '${userInfo.username}'`)
+      return res.status(403).json(`Ce nom est déjà utilisé: '${username}'`)
 
-    const dbUserSameMail = await dbGetUserByEmail(db, userInfo.email)
+    const dbUserSameMail = await dbGetUserByEmail(db, email)
     if (dbUserSameMail && dbUserSameMail.id !== dbUser.id)
-      return res.status(403).json(`Cet email est déjà utilisé: '${userInfo.email}'`)
+      return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
 
     await dbUpdateUser(db, userInfo)
     await dbUpdateUserRoles(db, userInfo)

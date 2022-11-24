@@ -7,13 +7,17 @@ const {
   dbCreateUserRole,
 } = require('../database/database')
 
-exports.getRoleList = (req, res, next) => {
-  return dbGetRoles()
-    .then((roles) => res.status(200).json(roles))
-    .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_roles' })
-      res.status(error.statusCode).json(error)
-    })
+exports.getRoleList = async (req, res, next) => {
+  try {
+    const roles = await dbGetRoles()
+    // console.log('T (getRoleList) roles:', roles)
+    const visibleRoles = roles.filter((role) => !role.hide)
+    // console.log('T (getRoleList) unhiddenRoles:', visibleRoles)
+    res.status(200).json(visibleRoles)
+  } catch (err) {
+    const error = errorHandler.error(err, req, { opType: 'get_roles' })
+    res.status(error.statusCode).json(error)
+  }
 }
 
 exports.getRoleById = (req, res, next) => {

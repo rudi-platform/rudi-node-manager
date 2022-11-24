@@ -8,7 +8,6 @@ const { getConf } = require('../config/config')
 const {
   dbGetUserById,
   dbHashAndUpdatePassword,
-  dbGetUserByUsername,
   dbGetHashedPassword,
 } = require('../database/database')
 const log = require('./logger')

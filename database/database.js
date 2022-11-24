@@ -283,7 +283,7 @@ exports.dbUpdateUser = (openedDb, user) => {
         log.i(
           mod,
           fun,
-          `(${TBL_USERS}) user created: '${username}'`,
+          `(${TBL_USERS}) user updated: '${username}'`,
           log.getContext(null, { opType: 'post_user' })
         )
         db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
@@ -487,15 +487,19 @@ exports.dbGetUserRolesByUserId = async (openedDb, userId) => {
     if (user) {
       const db = openedDb || dbOpen()
       return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM ${TBL_USER_ROLES} WHERE userId = ?`, [user.id], function (err, rows) {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            log.e(mod, fun, err.message)
-            reject(err)
-          } else {
-            resolve(rows)
+        db.all(
+          `SELECT role FROM ${TBL_USER_ROLES} WHERE userId = ?`,
+          [user.id],
+          function (err, rows) {
+            if (!openedDb) dbClose(db)
+            if (err) {
+              log.e(mod, fun, err.message)
+              reject(err)
+            } else {
+              resolve(rows.map((row) => row?.role))
+            }
           }
-        })
+        )
       })
     } else {
       return Promise.reject(new Error(`User ${userId} not found!`))
@@ -558,46 +562,58 @@ exports.dbCreateUserRole = (openedDb, userRole) => {
 }
 
 exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
+  const fun = 'dbUpdateUserRoles'
   try {
-    const { username, id: userId, roles } = userInfo
+    const { username, id: userId, roles: targetRoles } = userInfo
     const db = openedDb || dbOpen()
-    const dbRoles = await this.dbGetUserRolesByUserId(db, userId)
-    console.debug(`T (dbUpdateUserRoles) user '${username}' -> dbRoles:`, dbRoles)
+    let origRoles = await this.dbGetUserRolesByUserId(db, userId)
+    // console.debug(`T (dbUpdateUserRoles) user '${username} (${userId})' -> dbRoles:`, origRoles)
+    // console.debug(
+    //   `T (dbUpdateUserRoles) user '${username} (${userId})' -> targetRoles:`,
+    //   targetRoles
+    // )
     await Promise.all(
-      roles.map((role) => {
-        console.debug(`T (dbUpdateUserRoles) user '${username}' -> role:`, role)
+      targetRoles.map((newRole) => {
+        // console.debug(`T (dbUpdateUserRoles) user '${username}' -> role:`, newRole)
         new Promise((resolve, reject) => {
-          const i = dbRoles.indexOf(role)
-          if (i > -1) {
-            const roleRemoved = dbRoles[i]
-            dbRoles.slice(i, 1)
-            console.log(`Role removed for user '${username}': ${roleRemoved}`)
-            resolve(`Role removed for user '${username}': ${roleRemoved}`)
-          } else {
-            this.dbCreateUserRole(db, { userId, role })
+          const i = origRoles.indexOf(newRole)
+          // console.log('T (dbUpdateUserRoles) found:', i)
+          if (i === -1) {
+            this.dbCreateUserRole(db, { userId, role: newRole })
               .then((res) => {
-                console.log(`Role added to  user '${username}'`, role)
-                resolve(`Role added to user '${username}': ${role}`)
+                log.i(mod, fun, `Role added to  user '${username}'`, newRole)
+                return resolve(`Role added to user '${username}': ${newRole}`)
               })
               .catch((err) => reject(`(dbUpdateUserRoles.addNew) ${err}`))
+          } else {
+            origRoles.splice(i, 1)
+            // console.log(`T (dbUpdateUserRoles) Role kept for user '${username}': ${newRole}`)
+            // console.log(`T (dbUpdateUserRoles) Roles left:`, origRoles)
+            resolve(`Role kept for user '${username}': ${newRole}`)
           }
         })
       })
     )
+    // console.log(`T (dbUpdateUserRoles) origRoles left:`, origRoles)
+
     await Promise.all(
-      dbRoles.map(
-        (role) =>
+      origRoles.map(
+        (roleToRemove) =>
           new Promise((resolve, reject) => {
-            this.dbDeleteUserRole(db, { userId, role })
-              .then((res) => resolve(`Role removed to user '${username}'`, role))
+            this.dbDeleteUserRole(db, userId, roleToRemove)
+              .then((res) => {
+                log.i(mod, fun, `Role removed to user '${username}': ${roleToRemove}`)
+                return resolve(`Role removed to user '${username}': ${roleToRemove}`)
+              })
               .catch((err) => reject(`(dbUpdateUserRoles.delOld) ${err}`))
           })
       )
     )
     if (!openedDb) dbClose(db)
   } catch (err) {
-    console.error(`(dbUpdateUserRoles) ${err}`)
-    throw err
+    if (!openedDb) dbClose(db)
+    log.e(mod, fun, `(dbUpdateUserRoles) ERR: ${err}`)
+    throw new RudiError(err)
   }
 }
 

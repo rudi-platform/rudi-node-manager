@@ -58,6 +58,7 @@ export default function UserCard({ user, display, refresh }) {
       .then((res) => {
         changeOptionsEdit({ user, roles: res.data })
         toggleEdit()
+        refresh()
       })
       .catch((e) => defaultErrorHandler(e))
   }
