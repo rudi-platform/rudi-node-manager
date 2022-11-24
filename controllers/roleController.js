@@ -9,7 +9,7 @@ const {
 
 exports.getRoleList = (req, res, next) => {
   return dbGetRoles()
-    .then((rows) => res.status(200).json(rows))
+    .then((roles) => res.status(200).json(roles))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_roles' })
       res.status(error.statusCode).json(error)

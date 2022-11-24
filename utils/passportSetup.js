@@ -6,8 +6,8 @@ const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 const { getConf } = require('../config/config')
 const {
   dbGetUserById,
-  dbGetUserByUsername,
   dbHashAndUpdatePassword,
+ dbGetHashedPassword,
 } = require('../database/database')
 const log = require('./logger')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
@@ -24,26 +24,25 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
-    dbGetUserByUsername(null, username)
-      .then((dbUserInfo) => {
-        // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
-        if (!dbUserInfo) return done(null, false, { message: 'No user found' })
-
-        // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-        if (!matchPassword(password, dbUserInfo.password))
+    dbGetHashedPassword(null, username)
+      .then((userInfo) => {
+        console.log('T (LocalStrategy) userInfo:', userInfo)
+        if (!userInfo) return done(null, false, { message: 'No user found' })
+        // console.log('T (LocalStrategy) match:', matchPassword(password, userInfo.password))
+        if (!matchPassword(password, userInfo.password))
           return done(null, false, { message: 'Wrong password' })
         else {
           // Password is OK... But if it was bcrypt-generated, let's change
           // the hash from the DB with a crypto.scryptSync hashed password
           // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-          if (dbUserInfo.password.startsWith('$2b$10$')) {
+          if (userInfo.password.startsWith('$2b$10$')) {
             dbHashAndUpdatePassword(null, username, password)
-              .then((res) => done(null, dbUserInfo))
+              .then((res) => done(null, userInfo))
               .catch((err) => {
                 log.e(`T (LocalStrategy) Error while updating 2b10 password: ${err}`)
-                return done(null, dbUserInfo)
+                return done(null, userInfo)
               })
-          } else return done(null, dbUserInfo)
+          } else return done(null, userInfo)
         }
       })
       .catch((err) => {

@@ -1,6 +1,6 @@
 const log = require('../utils/logger')
 
-const mod = 'controller'
+const mod = 'errHandler'
 const fun = ''
 
 exports.error = (error, req, options) => {

@@ -5,7 +5,10 @@ import axios from 'axios'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext'
-import EditUserModal, { useEditRoleModal, useEditRoleModalOptions } from '../modals/editUser'
+import EditUserModal, {
+  useEditUserInfoModal,
+  useEditUserInfoModalOptions,
+} from '../modals/editUser'
 
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
@@ -18,8 +21,8 @@ const deleteUrl = (id) => `api/secu/users/${id}`
 export default function UserCard({ user, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext)
 
-  const { toggleEdit, visible } = useEditRoleModal()
-  const { options, changeOptionsEdit } = useEditRoleModalOptions()
+  const { visible, toggleEdit } = useEditUserInfoModal()
+  const { options, changeOptionsEdit } = useEditUserInfoModalOptions()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   /**

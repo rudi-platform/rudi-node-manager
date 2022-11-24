@@ -10,17 +10,17 @@ const log = require('../../utils/logger')
 const { RudiError, statusOK } = require('../../utils/errors')
 
 const {
-  TBL_ROLES,
-  TBL_USERS,
-  TBL_USER_ROLES,
+  dbClose,
   dbCreateRoles,
-  dbExistsUser,
   dbCreateUserRole,
-  dbNormalizeUserTableName,
+  dbExistsUser,
   dbOpenOrCreate,
   dbRegisterUser,
-  dbClose,
-  dbDeleteUserWithName,
+  TBL_ROLES,
+  TBL_USER_ROLES,
+  TBL_USERS,
+  dbDeleteUserWithId,
+  dbGetRoles,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -28,32 +28,39 @@ const USER_ID_START_VALUE = 6000
 
 // ---- Constants -----
 const initialRoles = [
-  { role: 'SuperAdmin', desc: 'a tous les droits' },
+  { role: 'SuperAdmin', desc: 'a tous les droits', hide: true },
   { role: 'Admin', desc: 'administration, création et validation des comptes' },
-  { role: 'Moniteur', desc: 'accès au monitoring' },
-  { role: 'Gestionnaire', desc: 'gestion avancée des métadonnées' },
-  { role: 'Createur', desc: 'gestion simple des métadonnées' },
+  { role: 'Moniteur', desc: 'accès au monitoring', hide: true },
+  { role: 'Editeur', desc: 'édition et suppression des métadonnées' },
+  { role: 'Lecteur', desc: 'lecture seule des métadonnées' },
 ]
 
 const sqlGet = `SELECT name FROM sqlite_master WHERE type='table' AND name=?`
 const sqlCreateRoleTable =
-  `CREATE TABLE IF NOT EXISTS ${TBL_ROLES} ` + `(role TEXT PRIMARY KEY NOT NULL UNIQUE,desc TEXT);`
+  `CREATE TABLE IF NOT EXISTS ${TBL_ROLES} (` +
+  `role TEXT PRIMARY KEY NOT NULL UNIQUE,` +
+  `desc TEXT,` +
+  `hide INTEGER(1));`
 
 const sqlCreateUserTable =
   `CREATE TABLE IF NOT EXISTS ${TBL_USERS} (` +
   `id INTEGER PRIMARY KEY AUTOINCREMENT,` +
   `username TEXT NOT NULL UNIQUE,` +
-  `password TEXT NOT NULL,email TEXT);`
+  `password TEXT NOT NULL,` +
+  `email TEXT);`
 
 const sqlCreateUserRoleTable =
-  `CREATE TABLE IF NOT EXISTS ${TBL_USER_ROLES} (userId INTEGER, role TEXT, PRIMARY KEY(userId,role),` +
+  `CREATE TABLE IF NOT EXISTS ${TBL_USER_ROLES} (` +
+  `userId INTEGER,` +
+  `role TEXT,` +
+  `PRIMARY KEY(userId,role),` +
   `CONSTRAINT Roles_fk_user_Id FOREIGN KEY (userId) REFERENCES ${TBL_USERS}(id) ` +
   `ON UPDATE CASCADE ON DELETE CASCADE,` +
   `CONSTRAINT Roles_fk_role FOREIGN KEY (role) REFERENCES ${TBL_ROLES}(role) ` +
   `ON UPDATE CASCADE ON DELETE CASCADE);`
 
 // ---- Functions -----
-const initTable = (openedDb, tableName, sqlCreateReq, initializeTable) => {
+const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
   const fun = 'initTable'
   const db = openedDb || open()
   // console.log('T (initTable) db:', tableName);
@@ -67,11 +74,11 @@ const initTable = (openedDb, tableName, sqlCreateReq, initializeTable) => {
       // log.i(mod, `${fun}.${tableName}.get`, row);
       if (row) {
         if (!openedDb) close(db)
-        return resolve({ status: `Table exists: '${tableName}'` })
+        return resolve(statusOK(`Table exists: '${tableName}'`))
       }
       db.run(sqlCreateReq, (err) => {
+        if (!openedDb) close(db)
         if (err) {
-          if (!openedDb) close(db)
           log.e(mod, `${fun}.${tableName}.create`, err.message)
           return reject(err)
         }
@@ -81,61 +88,143 @@ const initTable = (openedDb, tableName, sqlCreateReq, initializeTable) => {
           `Table Created : ${tableName}`,
           log.getContext(null, { opType: `init_table_${tableName}`.toLowerCase() })
         )
-        if (!!initializeTable) {
-          initializeTable(db)
-            .then((res) => {
-              if (!openedDb) close(db)
-              resolve(statusOK(`Table initialized: ${tableName}`))
-            })
-            .catch((err) => {
-              if (!openedDb) close(db)
-              log.e(mod, `${fun}.${tableName}.init`, err.message)
-              reject(err)
-            })
-        } else {
-          resolve(statusOK(`Table created: ${tableName}`))
-        }
+        return resolve(statusOK(`Table created: ${tableName}`))
       })
     })
   })
 }
 
-const initRolesTable = (db) =>
-  initTable(db, TBL_ROLES, sqlCreateRoleTable, (openedDb) => dbCreateRoles(openedDb, initialRoles))
-const initUsersTable = async (db) => {
-  await initTable(db, TBL_USERS, sqlCreateUserTable, async (openedDb) => {
-    try {
-      const dummyUserName = 'dummy'
-      await dbRegisterUser(openedDb, {
-        username: dummyUserName,
-        email: 'x',
-        password: 'x',
-        id: USER_ID_START_VALUE,
-      })
-      await dbDeleteUserWithName(openedDb, dummyUserName)
-    } catch (err) {
-      log.e(mod, 'initUsersTable', err)
-      throw err
-    }
+const dbNormalizeRoleTable = async (openedDb) => {
+  const fun = 'dbNormalizeRoleTable'
+  const db = openedDb || open()
+  const roleList = await dbGetRoles(db)
+
+  const needsRoleRenaming = roleList.find(
+    (roleDescPair) =>
+      roleDescPair.role == 'Createur' ||
+      roleDescPair.role == 'Créateur' ||
+      roleDescPair.role == 'Gestionnaire'
+  )
+  if (needsRoleRenaming) {
+  }
+
+  //   if (!openedDb) close(db)
+  //   return statusOK(`Roles needn't any normalization`)
+  // }
+  // const roles = await dbGetRoles(db)
+
+  // console.log('T (dbNormalizeRoleTable) roles', roles[0].hide)
+  if (!openedDb) close(db)
+
+  // return new Promise((resolve, reject) => {
+  //   db.run(`PRAGMA table_info(${TBL_ROLES})`, (err, res) => {
+  //     if (!openedDb) close(db)
+  //     if (err) {
+  //       log.e(mod, `${fun}.addHideCol KO`, err.message)
+  //       return reject(err)
+  //     } else {
+  //       log.d(mod, `${fun}.addHideCol OK`, res)
+  //       return resolve(res)
+  //     }
+  //   })
+  // })
+}
+const dbNormalizeRoleTableAddHide = (openedDb) => {
+  const fun = 'dbNormalizeRoleTableAddHide'
+  const db = openedDb || open()
+  return new Promise((resolve, reject) => {
+    db.run(`PRAGMA table_info(Roles)`,(err)
+)
+    db.run(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1)`, (err, row) => {
+      if (err) {
+        if (!openedDb) close(db)
+        log.d(mod, `${fun}.addHideFlag`, err.message)
+        return reject(err)
+      }
+      db.run(`UPDATE ${TBL_ROLES} SET hide=1 WHERE role=SuperAdmin OR role=Moniteur `)
+    })
+  })
+  // if (!openedDb) close(db)
+}
+const dbNormalizeUserTableName = (openedDb, oldTblName) => {
+  const fun = 'dbNormalizeUsersTableName'
+  const tempName = `x${oldTblName}x`
+  const db = openedDb || open()
+  return new Promise((resolve, reject) => {
+    db.get(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`,
+      [],
+      (err, row) => {
+        if (err) {
+          if (!openedDb) close(db)
+          log.d(mod, `${fun}.check`, err.message)
+          return reject(err)
+        }
+        if (!row) {
+          if (!openedDb) close(db)
+          return resolve(`No table found with name '${oldTblName}'`)
+        }
+
+        console.log(mod, `${fun}.check`, JSON.stringify(row))
+
+        db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`, [], (err, row) => {
+          if (err) {
+            if (!openedDb) close(db)
+            log.e(mod, `${fun}.renameToto`, err.message)
+            return reject(err)
+          }
+          console.log(mod, `${fun}.renameToto`, JSON.stringify(row))
+          db.run(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
+            if (!openedDb) close(db)
+            if (err) {
+              log.e(mod, `${fun}.renameReal`, err.message)
+              reject(err)
+            } else {
+              console.log(mod, fun, JSON.stringify(row))
+              resolve('Users table name normalized')
+            }
+          })
+        })
+      }
+    )
   })
 }
 
-const createSuperUser = async (db) => {
-  const fun = 'createSuperUser'
+const dbNormalizeUserTableId = async (db) => {
+  try {
+    const dummyUserName = 'dummy'
+    await dbRegisterUser(db, {
+      username: dummyUserName,
+      email: 'x',
+      password: 'x',
+      id: USER_ID_START_VALUE,
+    })
+    await dbDeleteUserWithId(db, USER_ID_START_VALUE)
+    return statusOK(`Users table IDs normalized`)
+  } catch (err) {
+    log.e(mod, 'dbNormalizeUsersTableId', err)
+    throw err
+  }
+}
 
-  if (!getDbConf('db_su_usr') || !getDbConf('db_su_pwd')) {
-    log.d(mod, fun, 'No super user config was found')
+const dbCreateSuperUser = async (db) => {
+  const fun = 'dbCreateSuperUser'
+
+  const suName = getDbConf('db_su_usr')
+  const encodedSuPwd = getDbConf('db_su_pwd')
+
+  if (!suName || !encodedSuPwd) {
+    log.e(mod, fun, 'No super user config was found')
+    throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
     return
   }
 
-  const suName = getDbConf('db_su_usr')
   if (await dbExistsUser(db, suName)) {
     // log.d(mod, fun, `Super user '${suName}' already exists`);
     return
   }
-  const suId = getDbConf('db_su_id') || 1
+  const suId = getDbConf('db_su_id') || 0
 
-  const encodedSuPwd = getDbConf('db_su_pwd')
   // log.d(mod, fun, `Super user pwd: '${encodedSuPwd}'`);
   const suPwd = decodeBase64(encodedSuPwd)
 
@@ -151,13 +240,13 @@ const createSuperUser = async (db) => {
   const { id, username } = res
   try {
     await dbCreateUserRole(db, { userId: id, role: superUser.role })
-    log.i(mod, fun, `Super user created: '${username}' (id ${id})`)
+    const msg = `Super user created: '${username}' (id ${id})`
+    log.i(mod, fun, msg)
+    return statusOK(msg)
   } catch (err) {
     log.e(mod, fun, `Error: ${err}`)
   }
 }
-
-const dbInitUserRolesTable = (db) => initTable(db, TBL_USER_ROLES, sqlCreateUserRoleTable)
 
 exports.dbInitialize = async () => {
   const fun = 'dbInitialize'
@@ -171,20 +260,23 @@ exports.dbInitialize = async () => {
 
     const db = await dbOpenOrCreate()
 
-    await initRolesTable(db)
+    const initRolesRes = await dbInitTable(db, TBL_ROLES, sqlCreateRoleTable)
+    if (initRolesRes.message?.startsWith('Table created')) await dbCreateRoles(db, initialRoles)
+    else await dbNormalizeRoleTable(db)
     log.d(mod, fun, 'Table initialized: Roles')
 
-    await dbInitUserRolesTable(db)
+    await dbInitTable(db, TBL_USER_ROLES, sqlCreateUserRoleTable)
     log.d(mod, fun, 'Table initialized: UserRoles')
 
     await dbNormalizeUserTableName(db, 'totox')
     await dbNormalizeUserTableName(db, 'users')
     log.d(mod, fun, 'Table normalized: users')
 
-    await initUsersTable(db)
+    await dbInitTable(db, TBL_USERS, sqlCreateUserTable)
+    await dbNormalizeUserTableId(db)
     log.d(mod, fun, 'Table initialized: Users')
 
-    await createSuperUser(db)
+    await dbCreateSuperUser(db)
     log.d(mod, fun, 'User created: SU')
 
     await dbInitDefaultFormTable(db)
