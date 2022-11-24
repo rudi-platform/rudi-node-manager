@@ -8,7 +8,7 @@ const { getConf } = require('../config/config')
 const {
   dbGetUserById,
   dbHashAndUpdatePassword,
-  dbGetHashedPassword,
+  dbGetUserByUsername,
 } = require('../database/database')
 const log = require('./logger')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
