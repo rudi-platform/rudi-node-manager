@@ -157,8 +157,9 @@ exports.getContext = (req, options = {}) => {
   return ctx
 }
 
-exports.e = (srcMod, srcFun, msg) => {
+exports.e = (srcMod, srcFun, msg, context) => {
   console.error(createLogLine('error', srcMod, srcFun, msg))
+  this.sysWarn(srcMod, srcFun, msg, context)
 }
 
 exports.w = (srcMod, srcFun, msg) => {
