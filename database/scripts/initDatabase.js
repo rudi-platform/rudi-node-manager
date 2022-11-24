@@ -191,8 +191,8 @@ exports.dbInitialize = async () => {
     await dbInitDefaultFormTable(db)
     log.d(mod, fun, 'Table initialized: DefaultForm')
 
-    const user = await dbGetUserByUsername(db, 'Oliv')
-    log.d(mod, fun, `Users: ${JSON.stringify(user).replace(/\"/g,'\'')}`)
+    const user = await dbGetUserByUsername(db, 'Oliv') || await dbGetUserByUsername(db, 'Olivier')
+    log.d(mod, fun, `Users: ${JSON.stringify(user)?.replace(/\"/g,'\'')}`)
 
     await dbClose(db)
     log.d(mod, fun, 'DB initialized')
