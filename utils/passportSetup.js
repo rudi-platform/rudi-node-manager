@@ -1,3 +1,4 @@
+const mod = 'passSetup'
 // const bcrypt = require('bcrypt')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
@@ -30,24 +31,24 @@ passport.use(
         if (!dbUserInfo) return done(null, false, { message: 'No user found' })
 
         // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-        if (!matchPassword(password, dbUserInfo.password))
+        if (!matchPassword(password, dbUserInfo.password)) {
+          log.e(mod, 'LocalStrategy', `Password mismatch`)
           return done(null, false, { message: 'Wrong password' })
-        else {
-          // Password is OK... But if it was bcrypt-generated, let's change
-          // the hash from the DB with a crypto.scryptSync hashed password
-          // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-          if (dbUserInfo.password.startsWith('$2b$10$')) {
-            dbHashAndUpdatePassword(null, username, password)
-              .then((res) => done(null, dbUserInfo))
-              .catch((err) => {
-                log.e(`T (LocalStrategy) Error while updating 2b10 password: ${err}`)
-                return done(null, dbUserInfo)
-              })
-          } else return done(null, dbUserInfo)
         }
+        // Password is OK... But if it was bcrypt-generated, let's change
+        // the hash from the DB with a crypto.scryptSync hashed password
+        // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
+        if (dbUserInfo.password.startsWith('$2b$10$')) {
+          dbHashAndUpdatePassword(null, username, password)
+            .then((res) => done(null, dbUserInfo))
+            .catch((err) => {
+              log.e(mod, 'LocalStrategy', `Error while updating 2b10 password: ${err}`)
+              return done(null, dbUserInfo)
+            })
+        } else return done(null, dbUserInfo)
       })
       .catch((err) => {
-        console.error('T (LocalStrategy) Error login')
+        log.e(mod, 'LocalStrategy', `Error login: ${err}`)
         return done(null, false, { message: err })
       })
   })

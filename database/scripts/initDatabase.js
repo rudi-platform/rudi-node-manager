@@ -21,7 +21,6 @@ const {
   dbRegisterUser,
   dbClose,
   dbDeleteUserWithName,
-  dbGetUsers,
   dbGetUserByUsername,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
