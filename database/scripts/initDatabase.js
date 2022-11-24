@@ -21,6 +21,7 @@ const {
   dbRegisterUser,
   dbClose,
   dbDeleteUserWithName,
+  dbGetUsers,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -189,6 +190,9 @@ exports.dbInitialize = async () => {
 
     await dbInitDefaultFormTable(db)
     log.d(mod, fun, 'Table initialized: DefaultForm')
+
+    const users = await dbGetUsers(db)
+    log.d(mod, fun, `Users: ${JSON.stringify(users).replace(/\"/g,'\'')}`)
 
     await dbClose(db)
     log.d(mod, fun, 'DB initialized')
