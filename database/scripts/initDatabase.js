@@ -22,6 +22,7 @@ const {
   dbDeleteUserWithId,
   dbGetRoles,
   dbOpen,
+  dbGetUserRoles,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -96,11 +97,10 @@ const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
 }
 
 const dbNormalizeRoleTable = async (openedDb) => {
-  const fun = 'dbNormalizeRoleTable'
   const db = openedDb || dbOpen()
   await dbNormalizeRoleTableAddHide(db)
   await dbRenameRoles(db)
-
+  await dbRenameUserRoles(db)
   if (!openedDb) dbClose(db)
 }
 const dbNormalizeRoleTableAddHide = (openedDb) => {
@@ -139,7 +139,44 @@ const dbNormalizeRoleTableAddHide = (openedDb) => {
     })
   })
 }
-
+const dbRenameUserRoles = (openedDb) => {
+  const fun = 'dbRenameUserRoles'
+  const db = openedDb || dbOpen()
+  return new Promise((resolve, reject) => {
+    dbGetUserRoles(db).then((roleList) => {
+      const found = roleList.find(
+        (roleDescPair) =>
+          roleDescPair.role == 'Createur' ||
+          roleDescPair.role == 'Créateur' ||
+          roleDescPair.role == 'Gestionnaire'
+      )
+      if (!found) {
+        if (!openedDb) dbClose(db)
+        log.d(mod, `${fun}`, `UserRoles already renamed`)
+        return resolve(statusOK(`UserRoles already renamed`))
+      }
+      db.run(
+        `UPDATE ${TBL_USER_ROLES} SET role='Lecteur' WHERE role='Createur' OR role='Créateur'`,
+        (err) => {
+          if (err) {
+            if (!openedDb) dbClose(db)
+            log.d(mod, `${fun}.Lecteur`, err.message)
+            return reject(new RudiError(`${fun}.Lecteur: ${err}`))
+          }
+          db.run(`UPDATE ${TBL_USER_ROLES} SET role='Editeur' WHERE role='Gestionnaire'`, (err) => {
+            if (!openedDb) dbClose(db)
+            if (err) {
+              log.d(mod, `${fun}.Editeur`, err.message)
+              return reject(new RudiError(`${fun}.Editeur: ${err}`))
+            }
+            log.d(mod, `${fun}`, `UserRoles renamed`)
+            return resolve(statusOK(`UserRoles renamed`))
+          })
+        }
+      )
+    })
+  })
+}
 const dbRenameRoles = (openedDb) => {
   const fun = 'dbRenameRoles'
   const db = openedDb || dbOpen()
@@ -152,7 +189,7 @@ const dbRenameRoles = (openedDb) => {
             roleDescPair.role == 'Créateur' ||
             roleDescPair.role == 'Gestionnaire'
         )
-        if (found) {
+        if (!found) {
           if (!openedDb) dbClose(db)
           log.d(mod, `${fun}`, `Roles already renamed`)
           return resolve(statusOK(`Roles already renamed`))
@@ -173,8 +210,8 @@ const dbRenameRoles = (openedDb) => {
                   log.d(mod, `${fun}.Editeur`, err.message)
                   return reject(new RudiError(`${fun}.Editeur: ${err}`))
                 }
-                log.d(mod, `${fun}`, `Column 'hide added & role flags set`)
-                return resolve(statusOK(`Column 'hide added & role flags set`))
+                log.d(mod, `${fun}`, `Roles renamed`)
+                return resolve(statusOK(`Roles renamed`))
               }
             )
           }

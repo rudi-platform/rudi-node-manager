@@ -25,7 +25,7 @@ const TBL_USER_ROLES = 'User_Roles'
 exports.TBL_USER_ROLES = TBL_USER_ROLES
 
 // ---- Functions -----
-const open = function () {
+const dbOpen = () => {
   const fun = 'open'
   const db = new sqlite3.Database(DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -38,28 +38,28 @@ const open = function () {
   return db.exec('PRAGMA foreign_keys = ON')
 }
 
-const close = (db) => {
+const dbClose = (db) => {
   db.close((err) => {
     if (err) log.e(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
 }
 
-exports.dbExec = (openedDb, sqlReq, params) => {
-  const fun = 'dbExec'
-  const db = openedDb || open()
-  return new Promise((resolve, reject) => {
-    db.run(`SELECT username, password FROM Users WHERE username = 'Oliv'`, [], (err, row) => {
-      if (!openedDb) close(db)
-      if (err) {
-        log.e(mod, fun, err)
-        return reject(err)
-      }
-      log.d(mod, fun, row)
-      return resolve(row)
-    })
-  })
-}
+// exports.dbExec = (openedDb, sqlReq, params) => {
+//   const fun = 'dbExec'
+//   const db = openedDb || open()
+//   return new Promise((resolve, reject) => {
+//     db.run(`SELECT username, password FROM Users WHERE username = 'Oliv'`, [], (err, row) => {
+//       if (!openedDb) close(db)
+//       if (err) {
+//         log.e(mod, fun, err)
+//         return reject(err)
+//       }
+//       log.d(mod, fun, row)
+//       return resolve(row)
+//     })
+//   })
+// }
 
 exports.dbOpenOrCreate = () => {
   const fun = 'dbOpenOrCreate'
@@ -78,13 +78,13 @@ exports.dbOpenOrCreate = () => {
 // ---- Controllers -----
 exports.dbGetHashedPassword = async (openedDb, username) => {
   const fun = 'dbGetHashedPassword'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
       `SELECT username, password FROM ${TBL_USERS} WHERE username = ?`,
       [username],
       (err, pwd) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           reject(err)
@@ -98,13 +98,13 @@ exports.dbGetHashedPassword = async (openedDb, username) => {
 
 exports.dbGetUserByField = (openedDb, field, val) => {
   const fun = 'dbGetUserByField'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
       `SELECT id, username, email FROM ${TBL_USERS} WHERE ${field} = ?`,
       [val],
       (err, userInfo) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           reject(err)
@@ -127,14 +127,14 @@ exports.dbExistsUser = async (openedDb, username) => {
 
 exports.dbGetUsers = (openedDb) => {
   const fun = 'getUsers'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.all(
       `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role) ` +
         `AS roles FROM ${TBL_USERS} LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id ` +
         `GROUP BY ${TBL_USERS}.id;`,
       (err, rows) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           reject(err)
@@ -159,16 +159,16 @@ exports.dbGetUsers = (openedDb) => {
 exports.dbCreateUserCheckExists = (openedDb, user) => {
   const fun = 'safeCreateUser'
   const { username, password, email, id } = user
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], (err, row) => {
       if (err) {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         log.e(mod, fun + ' doesUserExist', err.message)
         return reject(err)
       }
       if (row?.id) {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         const errMsg = `User '${username}' already exists`
         log.e(mod, fun + ' userExists', errMsg)
         return reject(new ForbiddenError(errMsg))
@@ -179,7 +179,7 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
           [username, password, email, id],
           (err) => {
             if (err) {
-              if (!openedDb) close(db)
+              if (!openedDb) dbClose(db)
               log.e(mod, fun + ' cannotCreateUser', err.message)
               return reject(err)
             }
@@ -190,7 +190,7 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
               log.getContext(null, { opType: 'post_user' })
             )
             db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, userInfo) => {
-              if (!openedDb) close(db)
+              if (!openedDb) dbClose(db)
               if (err) {
                 log.e(mod, fun + ' retrieveUserInfo', err.message)
                 reject(err)
@@ -228,14 +228,14 @@ exports.dbCreateUser = (openedDb, user) => {
   const fun = 'dbCreateUser'
   const { username, password, email } = user
 
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(
       `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
       [username, password, email],
       (err) => {
         if (err) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           log.e(mod, fun + ' insert', err.message)
           return reject(err)
         }
@@ -246,7 +246,7 @@ exports.dbCreateUser = (openedDb, user) => {
           log.getContext(null, { opType: 'post_user' })
         )
         db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun + ' select', err.message)
             return reject(err)
@@ -261,14 +261,16 @@ exports.dbCreateUser = (openedDb, user) => {
 exports.dbUpdateUser = (openedDb, user) => {
   const fun = 'dbUpdateUser'
   const { username, password, email } = user
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(
-      `UPDATE ${TBL_USERS} SET password = ?, email= ? WHERE username = ?`,
-      [password, email, username],
+      `UPDATE ${TBL_USERS} SET email= ?${
+        !!password ? `,password='${password}'` : ''
+      } WHERE username = ?`,
+      [email, username],
       (err) => {
         if (err) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           log.e(mod, fun + ' insert', err.message)
           return reject(err)
         }
@@ -279,7 +281,7 @@ exports.dbUpdateUser = (openedDb, user) => {
           log.getContext(null, { opType: 'post_user' })
         )
         db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun + ' select', err.message)
             return reject(err)
@@ -298,14 +300,14 @@ exports.dbHashAndUpdatePassword = async (openedDb, username, password) => {
 
 exports.dbUpdatePassword = (openedDb, username, password) => {
   const fun = 'updatePassword'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     // db.serialize(() => { // Needed for consecutive transactions
     db.run(
       `UPDATE ${TBL_USERS} SET password = ? WHERE username = ?`,
       [password, username],
       (err) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           return reject(err.message)
@@ -325,10 +327,10 @@ exports.dbUpdatePassword = (openedDb, username, password) => {
 
 exports.dbDeleteUserWithName = (openedDb, username) => {
   const fun = 'deleteUserWithName'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USERS} WHERE username = ?`, [username], function (err) {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         return reject(err)
@@ -346,10 +348,10 @@ exports.dbDeleteUserWithName = (openedDb, username) => {
 
 exports.dbDeleteUserWithId = (openedDb, id) => {
   const fun = 'deleteUser'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USERS} WHERE id = ?`, [id], (err) => {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         return reject(err)
@@ -368,7 +370,7 @@ exports.dbDeleteUserWithId = (openedDb, id) => {
 // ROLES
 exports.dbCreateRoles = (openedDb, roles) => {
   const fun = 'createRoles'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       roles.forEach((role) => {
@@ -378,7 +380,7 @@ exports.dbCreateRoles = (openedDb, roles) => {
           (err) => {
             if (err) {
               log.e(mod, fun, err.message)
-              if (!openedDb) close(db)
+              if (!openedDb) dbClose(db)
               return reject(err)
             }
             log.i(
@@ -390,7 +392,7 @@ exports.dbCreateRoles = (openedDb, roles) => {
           }
         )
       })
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       resolve({ roles })
     })
   })
@@ -398,10 +400,10 @@ exports.dbCreateRoles = (openedDb, roles) => {
 
 exports.dbGetRoles = (openedDb) => {
   const fun = 'getRoles'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.all(`SELECT * FROM ${TBL_ROLES}`, (err, rows) => {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         return reject(err)
@@ -415,12 +417,27 @@ exports.dbGetRoles = (openedDb) => {
     })
   })
 }
+exports.dbGetUserRoles = (openedDb) => {
+  const fun = 'getRoles'
+  const db = openedDb || dbOpen()
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM ${TBL_USER_ROLES}`, (err, rows) => {
+      if (!openedDb) dbClose(db)
+      if (err) {
+        log.e(mod, fun, err.message)
+        return reject(err)
+      } else {
+        return resolve(rows)
+      }
+    })
+  })
+}
 exports.dbGetRoleById = (openedDb, role) => {
   const fun = 'getRoleById'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM ${TBL_ROLES} WHERE role = ?`, [role], function (err, row) {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         reject(err)
@@ -436,10 +453,10 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
   try {
     const user = await this.dbGetUserByUsername(openedDb, username)
     if (user) {
-      const db = openedDb || open()
+      const db = openedDb || dbOpen()
       return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM ${TBL_USER_ROLES} WHERE userId = ?`, [user.id], function (err, rows) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun, err.message)
             reject(err)
@@ -462,10 +479,10 @@ exports.dbGetUserRolesByUserId = async (openedDb, userId) => {
   try {
     const user = await this.dbGetUserById(openedDb, userId)
     if (user) {
-      const db = openedDb || open()
+      const db = openedDb || dbOpen()
       return new Promise((resolve, reject) => {
         db.all(`SELECT * FROM ${TBL_USER_ROLES} WHERE userId = ?`, [user.id], function (err, rows) {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun, err.message)
             reject(err)
@@ -485,10 +502,10 @@ exports.dbGetUserRolesByUserId = async (openedDb, userId) => {
 
 exports.dbDeleteUserRole = (openedDb, userId, role) => {
   const fun = 'deleteUserRole'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USER_ROLES} WHERE userId = ? AND role = ?`, [userId, role], (err) => {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         return reject(err)
@@ -507,10 +524,10 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
 exports.dbCreateUserRole = (openedDb, userRole) => {
   const fun = 'dbCreateUserRole'
   const { userId, role } = userRole
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`, [userId, role], (err) => {
-      if (!openedDb) close(db)
+      if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
         if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
@@ -537,7 +554,7 @@ exports.dbCreateUserRole = (openedDb, userRole) => {
 exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
   try {
     const { username, id: userId, roles } = userInfo
-    const db = openedDb || open()
+    const db = openedDb || dbOpen()
     const dbRoles = await this.dbGetUserRolesByUserId(db, userId)
     console.debug(`T (dbUpdateUserRoles) user '${username}' -> dbRoles:`, dbRoles)
     await Promise.all(
@@ -571,7 +588,7 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
           })
       )
     )
-    if (!openedDb) close(db)
+    if (!openedDb) dbClose(db)
   } catch (err) {
     console.error(`(dbUpdateUserRoles) ${err}`)
     throw err
@@ -582,10 +599,10 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
 exports.dbGetDefaultForm = (openedDb, user) => {
   const fun = 'getDefaultForm'
   if (user) {
-    const db = openedDb || open()
+    const db = openedDb || dbOpen()
     return new Promise((resolve, reject) => {
       db.all(`SELECT * FROM Default_Value_Form WHERE userId = ?`, [user.id], function (err, rows) {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           return reject(err)
@@ -604,13 +621,13 @@ exports.dbGetDefaultForm = (openedDb, user) => {
 exports.dbGetDefaultFormWithName = (openedDb, user, name) => {
   const fun = 'getDefaultFormWithName'
   if (user) {
-    const db = openedDb || open()
+    const db = openedDb || dbOpen()
     return new Promise((resolve, reject) => {
       db.get(
         `SELECT * FROM Default_Value_Form WHERE userId = ? and name = ?`,
         [user.id, name],
         (err, row) => {
-          if (!openedDb) close(db)
+          if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun, err.message)
             return reject(err)
@@ -627,13 +644,13 @@ exports.dbGetDefaultFormWithName = (openedDb, user, name) => {
 }
 exports.dbDeleteDefaultForm = (openedDb, user, name) => {
   const fun = 'deleteDefaultForm'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(
       `DELETE FROM Default_Value_Form WHERE userId = ? AND name = ?`,
       [user.id, name],
       (err) => {
-        if (!openedDb) close(db)
+        if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
           return reject(err)
@@ -652,7 +669,7 @@ exports.dbDeleteDefaultForm = (openedDb, user, name) => {
 
 exports.dbUpdateDefaultForm = (openedDb, user, data) => {
   const fun = 'updateDefaultForm'
-  const db = openedDb || open()
+  const db = openedDb || dbOpen()
   return this.dbGetDefaultFormWithName(db, user, data.name).then((defaultValue) => {
     if (!defaultValue) {
       return new Promise((resolve, reject) => {
@@ -660,7 +677,7 @@ exports.dbUpdateDefaultForm = (openedDb, user, data) => {
           `INSERT INTO Default_Value_Form(userId,name,defaultValue) VALUES(?,?,?)`,
           [user.id, data.name, JSON.stringify(data.defaultValue)],
           (err) => {
-            if (!openedDb) close(db)
+            if (!openedDb) dbClose(db)
 
             if (err) {
               log.e(mod, fun, err.message)
@@ -683,7 +700,7 @@ exports.dbUpdateDefaultForm = (openedDb, user, data) => {
           `UPDATE Default_Value_Form SET defaultValue = ? WHERE userId = ? and name = ?`,
           [JSON.stringify(data.defaultValue), user.id, data.name],
           (err) => {
-            if (!openedDb) close(db)
+            if (!openedDb) dbClose(db)
             if (err) {
               log.e(mod, fun, err.message)
               return reject(err)
@@ -703,5 +720,5 @@ exports.dbUpdateDefaultForm = (openedDb, user, data) => {
 }
 
 // OTHER
-exports.dbOpen = open
-exports.dbClose = close
+exports.dbOpen = dbOpen
+exports.dbClose = dbClose

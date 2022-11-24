@@ -1,6 +1,6 @@
 const express = require('express')
 const router = new express.Router()
-const { getUserByUsername, getUsersList, deleteUserWithId: deleteUser, editUser } = require('../controllers/usersControllers')
+const { getUserByUsername, getUsersList, deleteUserWithId, editUser } = require('../controllers/usersControllers')
 const {
   getRoleList,
   getRoleById,
@@ -11,7 +11,7 @@ const {
 
 router.get('/users', getUsersList)
 router.get('/users/:username', getUserByUsername)
-router.delete('/users/:id', deleteUser)
+router.delete('/users/:id', deleteUserWithId)
 
 router.get('/roles', getRoleList)
 router.get('/roles/:role', getRoleById)
