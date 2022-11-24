@@ -7,7 +7,13 @@ const Promise = require('bluebird')
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config')
-const { ForbiddenError, InternalServerError, NotFoundError, statusOK } = require('../utils/errors')
+const {
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  statusOK,
+  RudiError,
+} = require('../utils/errors')
 const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
 
@@ -530,15 +536,15 @@ exports.dbCreateUserRole = (openedDb, userRole) => {
       if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
-        if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
+        if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
           return reject(
             new InternalServerError(`Role already assigned to user (${err.message})`, mod, fun)
           )
-        if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
+        if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
           return reject(
             new InternalServerError(`User or role not found (${err.message})`, mod, fun)
           )
-        reject(err)
+        reject(new InternalServerError(err))
       }
       log.i(
         mod,

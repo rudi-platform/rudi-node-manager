@@ -9,6 +9,7 @@ const {
   dbGetUserById,
   dbHashAndUpdatePassword,
   dbGetUserByUsername,
+  dbGetHashedPassword,
 } = require('../database/database')
 const log = require('./logger')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
@@ -25,13 +26,13 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
-    dbGetUserByUsername(null, username)
+    dbGetHashedPassword(null, username)
       .then((dbUserInfo) => {
         // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
         if (!dbUserInfo) return done(null, false, { message: 'No user found' })
 
         // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-        if (!matchPassword(password, dbUserInfo.password)) {
+        if (!matchPassword(password, dbUserInfo?.password)) {
           log.e(mod, 'LocalStrategy', `Password mismatch`)
           return done(null, false, { message: 'Wrong password' })
         } else {
