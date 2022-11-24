@@ -295,7 +295,7 @@ exports.dbUpdateUser = (openedDb, user) => {
 
 exports.dbHashAndUpdatePassword = async (openedDb, username, password) => {
   const hashedPwd = await hashPassword(password)
-  return this.dbUpdatePassword(openedDb, username, hashedPwd)
+  return await this.dbUpdatePassword(openedDb, username, hashedPwd)
 }
 
 exports.dbUpdatePassword = (openedDb, username, password) => {
