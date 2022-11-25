@@ -1,4 +1,8 @@
 const errorHandler = require('./errorHandler')
+const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
+const { decodeBase64 } = require('../utils/utils')
+const { getDbConf } = require('../config/config')
+const { hashPassword } = require('../utils/secu')
 const {
   dbCreateUser,
   dbDeleteUserWithId,
@@ -12,9 +16,8 @@ const {
   dbUpdateUser,
   dbUpdateUserRoles,
 } = require('../database/database')
-const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
-const { getDbConf } = require('../config/config')
-const { hashPassword } = require('../utils/secu')
+
+const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
 
 exports.getUsersList = async (req, res, next) => {
   try {
@@ -68,18 +71,6 @@ exports.deleteUserWithId = async (req, res, next) => {
     res.status(error.statusCode).json(new RudiError(error.message))
   }
 }
-
-exports.resetPassword = async (req, res, next) => {
-  try {
-    // ONLY ADMIN !
-    const { username } = req.body
-    dbUpdatePassword(null, username, ' ')
-  } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
-    return res.status(500).json(new RudiError(error.message))
-  }
-}
-const INIT_PWD = getDbConf('db_no_pwd')
 
 exports.createUser = async (req, res, next) => {
   try {

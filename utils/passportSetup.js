@@ -26,26 +26,26 @@ passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
     dbGetHashedPassword(null, username)
-      .then((dbUserInfo) => {
+      .then((dbUserHash) => {
         // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
-        if (!dbUserInfo) return done(null, false, { message: 'No user found' })
+        if (!dbUserHash) return done(null, false, { message: 'No user found' })
 
         // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-        if (!matchPassword(password, dbUserInfo?.password)) {
+        if (!matchPassword(password, dbUserHash)) {
           log.e(mod, 'LocalStrategy', `Password mismatch`)
           return done(null, false, { message: 'Wrong password' })
         } else {
           // Password is OK... But if it was bcrypt-generated, let's change
           // the hash from the DB with a crypto.scryptSync hashed password
           // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-          if (dbUserInfo.password.startsWith('$2b$10$')) {
+          if (dbUserHash.startsWith('$2b$10$')) {
             dbHashAndUpdatePassword(null, username, password)
-              .then((res) => done(null, dbUserInfo))
-              .catch((err) => {
+              .then((res) => done(null, dbUserHash))
+              .catch((err) =>
                 log.e(mod, 'LocalStrategy', `Error while updating 2b10 password: ${err}`)
-                return done(null, dbUserInfo)
-              })
-          } else return done(null, dbUserInfo)
+              )
+          }
+          return done(null, true)
         }
       })
       .catch((err) => {

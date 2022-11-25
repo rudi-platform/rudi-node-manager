@@ -57,7 +57,7 @@ export default function Login({ setToken }) {
       .catch((error) => {
         const resMsg = error.response?.data
         const errMsg =
-        resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password')
+          resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password')
             ? 'Utilisateur ou mot de passe incorrect'
             : `Echec de connexion`
         changeOptions({
@@ -79,15 +79,11 @@ export default function Login({ setToken }) {
    * @param {*} event
    */
   function handleSubmit(event) {
-    // console.log('-- handleSubmit');
     event.preventDefault()
     loginUser({
       username,
       password,
-    }).then((res) => {
-      // console.log('-- handleSubmit res: ' + JSON.stringify(res));
-      setToken()
-    })
+    }).then((res) => setToken())
   }
 
   const inputPassword = () => {

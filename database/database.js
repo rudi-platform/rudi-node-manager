@@ -87,19 +87,16 @@ exports.dbGetHashedPassword = async (openedDb, username) => {
   const fun = 'dbGetHashedPassword'
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
-    db.get(
-      `SELECT username, password FROM ${TBL_USERS} WHERE username = ?`,
-      [username],
-      (err, pwd) => {
-        if (!openedDb) dbClose(db)
-        if (err) {
-          log.e(mod, fun, err.message)
-          reject(err)
-        } else {
-          resolve(pwd)
-        }
+    db.get(`SELECT  password FROM ${TBL_USERS} WHERE username = ?`, [username], (err, row) => {
+      if (!openedDb) dbClose(db)
+      if (err) {
+        log.e(mod, fun, err.message)
+        reject(err)
+      } else {
+        if (!row) return reject('No user found')
+        return resolve(row.password)
       }
-    )
+    })
   })
 }
 

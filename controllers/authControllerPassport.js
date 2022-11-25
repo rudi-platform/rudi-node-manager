@@ -4,17 +4,26 @@ const mod = 'authController'
 const passport = require('passport')
 
 // Internal dependencies
+const { decodeBase64 } = require('../utils/utils')
 const { isDevEnv } = require('../config/backOptions')
 const log = require('../utils/logger')
-const { BadRequestError } = require('../utils/errors')
+const { BadRequestError, RudiError } = require('../utils/errors')
+const { getDbConf } = require('../config/config')
+
+const errorHandler = require('./errorHandler')
 const {
-  createFrontUserTokens,
   CONSOLE_TOKEN_NAME,
+  createFrontUserTokens,
+  hashPassword,
   PM_FRONT_TOKEN_NAME,
+  matchPassword,
 } = require('../utils/secu')
 const {
-  dbRegisterUser,
   dbHashAndUpdatePassword,
+  dbRegisterUser,
+  dbUpdatePassword,
+  dbGetHashedPassword,
+  dbOpen,
 } = require('../database/database')
 
 // Constants
@@ -89,6 +98,8 @@ exports.postForgot = (req, res, next) => {
   }
 }
 
+const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
+
 exports.putPassword = async (req, res, next) => {
   const fun = 'changePwd'
   try {
@@ -102,11 +113,15 @@ exports.putPassword = async (req, res, next) => {
     )
       res.status(401).send('Prerequisites not met')
 
+    const db = dbOpen()
+    const dbUserHash = await dbGetHashedPassword(db, username)
+
     passport.authenticate('local', (err, user, info) => {
       if (err) return res.status(400).send(err)
-      if (!user) return res.status(401).send(info.message || 'User not found')
+      if (!user && !matchPassword(INIT_PWD, dbUserHash))
+        return res.status(401).send(info.message || 'User not found')
 
-      return dbHashAndUpdatePassword(null, username, newPassword)
+      return dbHashAndUpdatePassword(db, username, newPassword)
         .then((userInfo) => res.json(userInfo))
         .catch((err) => {
           log.e(mod, fun, err)
@@ -116,6 +131,17 @@ exports.putPassword = async (req, res, next) => {
   } catch (err) {
     log.e(mod, fun, err)
     res.status(400).send(err)
+  }
+}
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    // ONLY ADMIN !
+    const { id } = req.body
+    dbUpdatePassword(null, id, hashPassword(INIT_PWD))
+  } catch (err) {
+    const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
+    return res.status(500).json(new RudiError(error.message))
   }
 }
 
