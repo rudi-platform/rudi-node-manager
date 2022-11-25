@@ -1,16 +1,16 @@
 const errorHandler = require('./errorHandler')
 const {
-  dbDeleteUserWithId: dbDeleteUser,
+  dbCreateUser,
+  dbDeleteUserWithId,
   dbDeleteUserWithName,
   dbGetUserByEmail,
   dbGetUserById,
   dbGetUserByUsername,
   dbGetUsers,
   dbOpen,
-  dbUpdateUserRoles,
-  dbUpdateUser,
-  dbCreateUser,
   dbUpdatePassword,
+  dbUpdateUser,
+  dbUpdateUserRoles,
 } = require('../database/database')
 const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
 const { getDbConf } = require('../config/config')
@@ -61,7 +61,7 @@ exports.deleteUserWithId = async (req, res, next) => {
     const db = dbOpen()
     const userInfo = await dbGetUserById(db, id)
     if (!userInfo) return res.status(404).json(new NotFoundError(`User '${id}' not found`))
-    await dbDeleteUser(db, id)
+    await dbDeleteUserWithId(db, id)
     return res.status(200).json({ message: `User deleted: ${userInfo?.username}` })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_user' })

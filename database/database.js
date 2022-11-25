@@ -137,9 +137,9 @@ exports.dbGetUsers = (openedDb) => {
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.all(
-      `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role) ` +
-        `AS roles FROM ${TBL_USERS} LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id ` +
-        `GROUP BY ${TBL_USERS}.id;`,
+      `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role)` +
+        ` AS roles FROM ${TBL_USERS} LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id` +
+        ` GROUP BY ${TBL_USERS}.id HAVING ${TBL_USERS}.id > 0;`,
       (err, rows) => {
         if (!openedDb) dbClose(db)
         if (err) {
