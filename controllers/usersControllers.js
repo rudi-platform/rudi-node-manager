@@ -13,6 +13,8 @@ const {
   dbUpdatePassword,
 } = require('../database/database')
 const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
+const { getDbConf } = require('../config/config')
+const { hashPassword } = require('../utils/secu')
 
 exports.getUsersList = async (req, res, next) => {
   try {
@@ -60,7 +62,7 @@ exports.deleteUserWithId = async (req, res, next) => {
     const userInfo = await dbGetUserById(db, id)
     if (!userInfo) return res.status(404).json(new NotFoundError(`User '${id}' not found`))
     await dbDeleteUser(db, id)
-    return res.status(200).json({ message: `User deleted: ${userInfo.username}` })
+    return res.status(200).json({ message: `User deleted: ${userInfo?.username}` })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_user' })
     res.status(error.statusCode).json(new RudiError(error.message))
@@ -77,14 +79,13 @@ exports.resetPassword = async (req, res, next) => {
     return res.status(500).json(new RudiError(error.message))
   }
 }
+const INIT_PWD = getDbConf('db_no_pwd')
 
 exports.createUser = async (req, res, next) => {
   try {
     const userInfo = req.body
     console.log('T (addUser) userInfo', userInfo)
-    const { id, username, email, password, roles } = userInfo
-    if (!id)
-      return res.status(400).json(new BadRequestError('La requête doit comporter un id non null'))
+    const { username, email, password, roles } = userInfo
     if (!username)
       return res
         .status(400)
@@ -93,26 +94,21 @@ exports.createUser = async (req, res, next) => {
       return res
         .status(400)
         .json(new BadRequestError('La requête doit comporter un email non null'))
-    if (!password)
-      return res
-        .status(400)
-        .json(new BadRequestError('La requête doit comporter un mot de passe non null'))
+
+    const hashedPassword = hashPassword(password || INIT_PWD)
 
     const db = dbOpen()
-
-    const dbUserSameId = await dbGetUserById(db, id)
-    if (!!dbUserSameId)
-      return res.status(403).json(new ForbiddenError(`Un utilisateur existe déjà avec l'id ${id}`))
 
     const dbUserSameName = await dbGetUserByUsername(db, username)
     if (!!dbUserSameName)
       return res.status(403).json(new ForbiddenError(`Ce nom est déjà utilisé: '${username}'`))
 
     const dbUserSameMail = await dbGetUserByEmail(db, email)
-    if (dbUserSameMail)
+    if (!!dbUserSameMail)
       return res.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
 
-    await dbCreateUser(db, { username, password, email })
+    const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
+    console.log('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
@@ -123,9 +119,11 @@ exports.createUser = async (req, res, next) => {
 
 exports.editUser = async (req, res, next) => {
   try {
-    const userInfo = req.body
-    // console.log('T (editUser) userInfo', userInfo)
-    const { id, username, email } = userInfo
+    const { id, username, email, roles } = req.body
+    if (!id || !username || !email || !roles)
+      return res
+        .status(400)
+        .json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
     const db = dbOpen()
     const dbUser = await dbGetUserById(db, id)
     const dbUserSameName = await dbGetUserByUsername(db, username)
@@ -136,8 +134,8 @@ exports.editUser = async (req, res, next) => {
     if (dbUserSameMail && dbUserSameMail.id !== dbUser.id)
       return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
 
-    await dbUpdateUser(db, userInfo)
-    await dbUpdateUserRoles(db, userInfo)
+    await dbUpdateUser(db, { id, username, email })
+    await dbUpdateUserRoles(db, { userId: id, username, roles })
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'edit_user' })

@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
-import { ModalContext, DefaultOkOption } from '../modals/ModalContext'
+import { ModalContext, DefaultOkOption } from './modalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const urlUserRoles = 'api/secu/user-roles'

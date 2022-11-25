@@ -15,7 +15,6 @@ const propId = 'id'
  */
 export default function CatalogueUser({ display }) {
   const [objList, setListObj] = useState([])
-  const [formUrl, setFormUrl] = useState('')
   const [hasMore, setHasMore] = useState(false)
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
@@ -24,7 +23,6 @@ export default function CatalogueUser({ display }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   useEffect(() => getInitialData(), [])
-  useEffect(() => setFormUrl(`${generalConf.formUrl}users`), [generalConf])
 
   const refresh = () => getInitialData()
 
@@ -63,7 +61,7 @@ export default function CatalogueUser({ display }) {
         <div className="col-9">
           <div className="row">
             {display && display.editJDD && (
-              <EditUserCard formUrl={formUrl} refresh={refresh}></EditUserCard>
+              <EditUserCard refresh={refresh}></EditUserCard>
             )}
             <InfiniteScroll
               dataLength={objList.length}

@@ -4,11 +4,11 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/ModalContext'
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
 import EditUserModal, {
   useEditUserInfoModal,
   useEditUserInfoModalOptions,
-} from '../modals/editUser'
+} from '../modals/editUserModal'
 
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
@@ -20,16 +20,16 @@ const deleteUrl = (id) => `api/secu/users/${id}`
  */
 export default function UserCard({ user, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext)
+  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { visible, toggleEdit } = useEditUserInfoModal()
   const { options, changeOptionsEdit } = useEditUserInfoModalOptions()
-  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   /**
    * call for user deletion
    * @param {*} user utilisateur
    */
-  const deleteUser = (user) => {
+  const deleteUser = (user) =>
     axios
       .delete(deleteUrl(user.id))
       .then((res) => {
@@ -37,7 +37,6 @@ export default function UserCard({ user, display, refresh }) {
         toggle()
       })
       .catch((err) => defaultErrorHandler(err))
-  }
 
   /**
    * call for confirmation before user deletion

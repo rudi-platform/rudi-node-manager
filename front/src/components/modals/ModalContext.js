@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
+import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal'
 
 export const ModalContext = React.createContext()
 const { Provider } = ModalContext

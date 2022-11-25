@@ -13,6 +13,7 @@ const {
   NotFoundError,
   statusOK,
   RudiError,
+  BadRequestError,
 } = require('../utils/errors')
 const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
@@ -264,16 +265,16 @@ exports.dbCreateUser = (openedDb, userInfo) => {
   })
 }
 
-exports.dbUpdateUser = (openedDb, user) => {
+exports.dbUpdateUser = (openedDb, userInfo) => {
   const fun = 'dbUpdateUser'
-  const { username, password, email } = user
+  const { id, username, password, email } = userInfo
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(
-      `UPDATE ${TBL_USERS} SET email= ?${
-        !!password ? `,password='${password}'` : ''
-      } WHERE username = ?`,
-      [email, username],
+      `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
+        (!!password ? `, password = '${password}'` : '') +
+        ` WHERE id = ?`,
+      [username, email, id],
       (err) => {
         if (err) {
           if (!openedDb) dbClose(db)
@@ -289,8 +290,12 @@ exports.dbUpdateUser = (openedDb, user) => {
         db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
           if (!openedDb) dbClose(db)
           if (err) {
-            log.e(mod, fun + ' select', err.message)
+            log.e(mod, fun + '.select', err.message)
             return reject(err)
+          }
+          if (!row) {
+            log.e(mod, fun + '.select', `User doesn't exist: ${username}`)
+            return reject(new BadRequestError(`User doesn't exist: ${username}`))
           }
           resolve({ id: row.id, username: row.username })
         })
@@ -564,7 +569,7 @@ exports.dbCreateUserRole = (openedDb, userInfo) => {
 exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
   const fun = 'dbUpdateUserRoles'
   try {
-    const { username, id: userId, roles: targetRoles } = userInfo
+    const { userId, username, roles: targetRoles } = userInfo
     const db = openedDb || dbOpen()
     let origRoles = await this.dbGetUserRolesByUserId(db, userId)
     // console.debug(`T (dbUpdateUserRoles) user '${username} (${userId})' -> dbRoles:`, origRoles)
@@ -611,7 +616,6 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
     )
     if (!openedDb) dbClose(db)
   } catch (err) {
-    if (!openedDb) dbClose(db)
     log.e(mod, fun, `(dbUpdateUserRoles) ERR: ${err}`)
     throw new RudiError(err)
   }

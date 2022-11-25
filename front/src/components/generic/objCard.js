@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import { ModalContext, getOptConfirm, getOptOk } from '../modals/ModalContext'
+import { ModalContext, getOptConfirm, getOptOk } from '../modals/modalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 ObjCard.propTypes = {

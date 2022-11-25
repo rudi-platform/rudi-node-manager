@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import axios from 'axios'
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import Button from 'react-bootstrap/Button'
@@ -10,11 +9,10 @@ import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
 
-import { ModalContext, getOptOk } from './ModalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation'
+// import { showObj } from '../../utils/utils'
 
-const urlUserRoles = 'api/secu/user-roles'
 const urlUser = 'api/secu/users'
 const modalTitle = 'Modifier l‘utilisateur'
 const modalSubmitBtnTxt = 'Sauver'
@@ -23,15 +21,6 @@ const validation = {
   username: [VALID_NOT_EMPTY_WORD],
   email: [VALID_EMAIL],
 }
-
-// const defaultState = {
-//   name: '',
-//   email: '',
-//   password: '',
-//   nameError: '',
-//   emailError: '',
-//   passwordError: '',
-// };
 
 EditUserModal.propTypes = {
   visible: PropTypes.bool,
@@ -47,20 +36,19 @@ EditUserModal.propTypes = {
  * @return {ReactNode} EditRoleModal html component
  */
 export default function EditUserModal({ visible, toggleEdit, user, roles, refresh }) {
-  const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
-
-  const originalUserInfo = { id: user.id, email: user.email, username: user.username }
   const [userInfo, setUserInfo] = useState(user)
-  const [touched, setTouched] = useState({})
-  const [validated, setValidated] = useState(false)
 
   const hasErrors = (prop, val) => {
+    if (!userInfo) return true
     if (!val) val = userInfo[prop]
-    if (prop === 'roles') {
+    if (prop === 'roles')
       return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
+
+    if (!val) {
+      console.error('T (hasErrors)', prop, userInfo[prop])
+      return 'Ce champ est requis'
     }
-    if (!val) return 'Ce champ est requis'
     let isInvalid
     validation[prop]?.map((valid) => {
       if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val)
@@ -71,32 +59,18 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
   const [errors, setErrors] = useState({
     username: hasErrors('username'),
     email: hasErrors('email'),
-    roles: hasErrors('role'),
+    roles: hasErrors('roles'),
   })
+  const isValid = (prop) =>
+    !!prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
 
   const editUserInfo = (prop, val) => {
     setErrors((errors) => {
       return { ...errors, [prop]: hasErrors(prop, val) }
     })
-    setValidated(isValid())
-    setTouched((touched) => {
-      return { ...touched, [prop]: true }
-    })
     setUserInfo((userInfo) => {
       return { ...userInfo, [prop]: val }
     })
-  }
-  const isValid = (prop) =>
-    !prop ? !errors.username && !errors.email && !errors.roles : !errors[prop]
-
-  const show = (obj, option = 2) => {
-    try {
-      return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${
-        option != null ? '\n' : ''
-      }`
-    } catch (err) {
-      return `${obj}`
-    }
   }
 
   const isInUserRole = (role, rolesList) =>
@@ -105,27 +79,15 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
   const handleChange = (event) => {
     const prop = event.target.id
     const val = event.target.value
-    console.log('(handleChange)', prop, '=>', val)
-
+    // console.log('T (handleChange)', prop, '=>', val)
     editUserInfo(prop, val)
-
-    if (errors[prop]) console.error('(handleChange) errorDetected:', errors[prop])
-
-    // editErrors(prop, validateProp(prop, val));
-    // console.log('(handleChange)', errors[prop]);
-
-    // setValidated(!errors?.length);
-    // console.log('(user)', show(user));
-    console.log('(handleChange) userInfo after:', show(userInfo))
-
-    // userInfo[prop] = val;
-    // editUserInfo(prop, val);
-    // changeOptions();
+    // if (errors[prop]) console.error('(handleChange) errorDetected:', errors[prop])
+    // console.log('T (handleChange) userInfo after:', showObj(userInfo))
   }
 
   const handleRoleChange = (event) => {
     const toggledRole = event.target.id
-    const userRoles = userInfo.roles
+    const userRoles = userInfo?.roles
     let nextUserRoles
     if (!userRoles || userRoles.length == 0) {
       nextUserRoles = [toggledRole]
@@ -152,23 +114,22 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
   //     event.stopPropagation();
   //   }
 
-  //   setValidated(true);
   //   // toggleEdit()
   // };
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const form = event.target
-    console.log('(handleSubmit)', 'username:', event.target.username.value)
-    console.log('(handleSubmit)', 'email:', event.target.email.value)
-    console.log('(handleSubmit)', 'userInfo:', userInfo)
-    if (form.checkValidity() === false) {
-      event.stopPropagation()
-    }
+    // console.log('(handleSubmit)', 'username:', event.target.username.value)
+    // console.log('(handleSubmit)', 'email:', event.target.email.value)
+    // console.log('(handleSubmit)', 'userInfo:', userInfo)
+    // if (!event.target.checkValidity()) event.stopPropagation()
     if (isValid()) {
-      await updateUserInfo(userInfo)
+      await sendUserInfo(userInfo)
       toggleEdit()
       refresh()
+    } else {
+      console.warn('(handleSubmit)', 'userInfo:', userInfo)
+      console.warn('(handleSubmit)', 'errors:', errors)
     }
   }
 
@@ -177,52 +138,15 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
    * @param {*} role role
    * @param {*} user utilisateur
    */
-  const updateUserInfo = async () => {
+  const sendUserInfo = async () => {
     try {
+      console.log('T (edit.sendingUserInfo)', userInfo)
       const res = await axios.put(`${urlUser}`, userInfo)
-      console.log(res.data)
+      console.log('T (edit.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
     }
   }
-  // function removeUserRole(role, user) {
-  //   axios
-  //     .delete(`${urlUserRoles}/${user.id}/${role.role}`)
-  //     .then((res) => {
-  //       user.roles.splice(
-  //         user.roles.findIndex((element) => element === role.role),
-  //         1
-  //       )
-  //       const options = getOptOk(
-  //         `Le role ${role.role} a été supprimé pour l'utilisateur ${user.username}`
-  //       )
-  //       changeOptions(options)
-  //       toggle()
-  //     })
-  //     .catch((err) => defaultErrorHandler(err))
-  // }
-
-  /**
-   * call for user_role addition
-   * @param {*} role role
-   * @param {*} user utilisateur
-   */
-  // function assignUserRole(role, user) {
-  //   axios
-  //     .post(urlUserRoles, JSON.stringify({ userId: user.id, role: role.role }), {
-  //       headers: { 'Content-Type': 'application/json' },
-  //     })
-  //     .then((res) => {
-  //       if (!user.roles) user.roles = []
-  //       user.roles.push(role.role)
-  //       const options = getOptOk(
-  //         `Le role ${role.role} a été ajouté à l'utilisateur ${user.username}`
-  //       )
-  //       changeOptions(options)
-  //       toggle()
-  //     })
-  //     .catch((err) => defaultErrorHandler(err))
-  // }
 
   return (
     <Modal show={visible} onHide={toggleEdit} animation={false}>
@@ -239,7 +163,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
                   required
                   type="text"
                   placeholder="Nom"
-                  defaultValue={user?.username}
+                  defaultValue={userInfo?.username}
                   onChange={handleChange}
                   isValid={isValid('username')}
                   isInvalid={hasErrors('username')}
@@ -279,8 +203,8 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
                       key={role.role}
                       label={`${role.role} (${role.desc})`}
                       id={role.role}
-                      defaultChecked={isInUserRole(role, user.roles)}
-                      value={isInUserRole(role, userInfo.roles)}
+                      defaultChecked={isInUserRole(role, userInfo?.roles)}
+                      value={isInUserRole(role, userInfo?.roles)}
                       onChange={handleRoleChange}
                       isInvalid={hasErrors('roles')}
                     />
