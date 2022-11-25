@@ -38,7 +38,7 @@ export default function CatalogueUser({ display }) {
         setCurrentOffset(PAGE_SIZE)
         setListObj(res.data)
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -54,7 +54,7 @@ export default function CatalogueUser({ display }) {
         if (partialObjList.length === 0) setHasMore(false)
         setListObj(objList.concat(partialObjList))
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (

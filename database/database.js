@@ -230,9 +230,9 @@ exports.dbRegisterUser = async (db, { username, email, password, id }) => {
   }
 }
 
-exports.dbCreateUser = (openedDb, user) => {
+exports.dbCreateUser = (openedDb, userInfo) => {
   const fun = 'dbCreateUser'
-  const { username, password, email } = user
+  const { username, password, email } = userInfo
 
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
@@ -531,9 +531,9 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
   })
 }
 
-exports.dbCreateUserRole = (openedDb, userRole) => {
+exports.dbCreateUserRole = (openedDb, userInfo) => {
   const fun = 'dbCreateUserRole'
-  const { userId, role } = userRole
+  const { userId, role } = userInfo
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`, [userId, role], (err) => {
@@ -556,7 +556,7 @@ exports.dbCreateUserRole = (openedDb, userRole) => {
         `(${TBL_USER_ROLES}) A row was inserted with userId ${userId} and role '${role}'`,
         log.getContext(null, { opType: 'post_userRole' })
       )
-      resolve(userRole)
+      resolve(userInfo)
     })
   })
 }

@@ -168,13 +168,9 @@ function Visualisation() {
                 break
             }
           })
-          .catch((e) => {
-            defaultErrorHandler(e)
-          })
+          .catch((err) => defaultErrorHandler(err))
       })
-      .catch((e) => {
-        defaultErrorHandler(e)
-      })
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (

@@ -41,7 +41,7 @@ export default function EditUserCard({ refresh }) {
         changeOptions(options)
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**

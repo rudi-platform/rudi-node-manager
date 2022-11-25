@@ -36,7 +36,7 @@ export default function UserCard({ user, display, refresh }) {
         changeOptions(getOptOk(deleteMsg(user.username), () => refresh()))
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -60,7 +60,7 @@ export default function UserCard({ user, display, refresh }) {
         toggleEdit()
         refresh()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (
@@ -87,6 +87,7 @@ export default function UserCard({ user, display, refresh }) {
               options={options}
               user={user}
               roles={options.roles}
+              refresh={refresh}
             ></EditUserModal>
           </div>
         </h5>

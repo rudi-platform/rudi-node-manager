@@ -38,8 +38,8 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         document.body.appendChild(link);
         link.click();
       })
-      .catch((e) => {
-        defaultErrorHandler(e);
+      .catch((err) => {
+        defaultErrorHandler(err);
       });
   }
    */
@@ -56,15 +56,13 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
         options.buttons = [
           {
             text: 'Ok',
-            action: () => {
-              refresh()
-            },
+            action: () => refresh(),
           },
         ]
         changeOptions(options)
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
   /**
    * call for confirmation before metadata deletion

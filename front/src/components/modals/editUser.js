@@ -38,6 +38,7 @@ EditUserModal.propTypes = {
   toggleEdit: PropTypes.func,
   user: PropTypes.object,
   roles: PropTypes.array,
+  refresh: PropTypes.func,
 }
 
 /**
@@ -45,7 +46,7 @@ EditUserModal.propTypes = {
  * @param {*} props Modal properties
  * @return {ReactNode} EditRoleModal html component
  */
-export default function EditUserModal({ visible, toggleEdit, user, roles }) {
+export default function EditUserModal({ visible, toggleEdit, user, roles, refresh }) {
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
@@ -167,6 +168,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
     if (isValid()) {
       await updateUserInfo(userInfo)
       toggleEdit()
+      refresh()
     }
   }
 
@@ -176,8 +178,12 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
    * @param {*} user utilisateur
    */
   const updateUserInfo = async () => {
-    const res = await axios.put(`${urlUser}`, userInfo)
-    console.log(res.data)
+    try {
+      const res = await axios.put(`${urlUser}`, userInfo)
+      console.log(res.data)
+    } catch (err) {
+      defaultErrorHandler(err)
+    }
   }
   // function removeUserRole(role, user) {
   //   axios
@@ -193,7 +199,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
   //       changeOptions(options)
   //       toggle()
   //     })
-  //     .catch((e) => defaultErrorHandler(e))
+  //     .catch((err) => defaultErrorHandler(err))
   // }
 
   /**
@@ -215,7 +221,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles }) {
   //       changeOptions(options)
   //       toggle()
   //     })
-  //     .catch((e) => defaultErrorHandler(e))
+  //     .catch((err) => defaultErrorHandler(err))
   // }
 
   return (

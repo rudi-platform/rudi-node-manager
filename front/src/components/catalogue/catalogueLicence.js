@@ -19,12 +19,8 @@ export default function CatalogueLicence({ display }) {
   useEffect(() => {
     axios
       .get(`api/front/formUrl`)
-      .then((res) => {
-        setFormUrl(res.data)
-      })
-      .catch((e) => {
-        defaultErrorHandler(e)
-      })
+      .then((res) => setFormUrl(res.data))
+      .catch((err) => defaultErrorHandler(err))
     getInitialData()
   }, [])
   /**
@@ -33,12 +29,8 @@ export default function CatalogueLicence({ display }) {
   function getInitialData() {
     axios
       .get(`api/data/licences`)
-      .then((res) => {
-        setMetadatas(res.data)
-      })
-      .catch((e) => {
-        defaultErrorHandler(e)
-      })
+      .then((res) => setMetadatas(res.data))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (

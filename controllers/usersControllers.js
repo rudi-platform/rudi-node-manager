@@ -82,7 +82,7 @@ exports.createUser = async (req, res, next) => {
   try {
     const userInfo = req.body
     console.log('T (addUser) userInfo', userInfo)
-    const { id, username, email, password } = userInfo
+    const { id, username, email, password, roles } = userInfo
     if (!id)
       return res.status(400).json(new BadRequestError('La requête doit comporter un id non null'))
     if (!username)
@@ -112,8 +112,8 @@ exports.createUser = async (req, res, next) => {
     if (dbUserSameMail)
       return res.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
 
-    await dbCreateUser(db, userInfo)
-    await dbUpdateUserRoles(db, userInfo)
+    await dbCreateUser(db, { username, password, email })
+    await dbUpdateUserRoles(db, { userId: id, username, roles })
     return res.status(200).json({ status: 'OK' })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'add_user' })
@@ -125,7 +125,7 @@ exports.editUser = async (req, res, next) => {
   try {
     const userInfo = req.body
     // console.log('T (editUser) userInfo', userInfo)
-    const {id, username, email}=userInfo
+    const { id, username, email } = userInfo
     const db = dbOpen()
     const dbUser = await dbGetUserById(db, id)
     const dbUserSameName = await dbGetUserByUsername(db, username)

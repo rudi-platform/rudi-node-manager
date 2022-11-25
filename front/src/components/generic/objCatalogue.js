@@ -76,7 +76,7 @@ export default function ObjCatalogue({
         setListObj(res.data)
         // if (res.data?.length < PAGE_SIZE) setHasMore(false);
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -102,7 +102,7 @@ export default function ObjCatalogue({
           setListObj(listObj.concat(partialListObj))
         }
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (

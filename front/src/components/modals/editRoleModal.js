@@ -40,7 +40,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         changeOptions(options)
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   /**
@@ -61,7 +61,7 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
         changeOptions(options)
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
 
   return (

@@ -47,7 +47,7 @@ export function ObjCard({
         changeOptions(getOptOk(deleteMsg(id), () => refresh()))
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
   /**
    * call for confirmation before organization deletion
@@ -146,7 +146,7 @@ export function EditObjCard({
         changeOptions(getOptOk(deleteMsg(id), () => refresh()))
         toggle()
       })
-      .catch((e) => defaultErrorHandler(e))
+      .catch((err) => defaultErrorHandler(err))
   }
   /**
    * call for confirmation before object deletion
