@@ -12,7 +12,6 @@ const {
   dbGetUserByUsername,
   dbGetUsers,
   dbOpen,
-  dbUpdatePassword,
   dbUpdateUser,
   dbUpdateUserRoles,
 } = require('../database/database')

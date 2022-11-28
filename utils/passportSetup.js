@@ -26,8 +26,9 @@ passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
     dbGetHashedPassword(null, username)
-      .then((dbUserHash) => {
+      .then((dbUserInfo) => {
         // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
+        const dbUserHash = dbUserInfo.password
         if (!dbUserHash) return done(null, false, { message: 'No user found' })
 
         // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
@@ -45,7 +46,7 @@ passport.use(
                 log.e(mod, 'LocalStrategy', `Error while updating 2b10 password: ${err}`)
               )
           }
-          return done(null, true)
+          return done(null, { username })
         }
       })
       .catch((err) => {

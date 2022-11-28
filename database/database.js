@@ -94,7 +94,7 @@ exports.dbGetHashedPassword = async (openedDb, username) => {
         reject(err)
       } else {
         if (!row) return reject('No user found')
-        return resolve(row.password)
+        return resolve({ username, password: row.password })
       }
     })
   })
@@ -111,9 +111,12 @@ exports.dbGetUserByField = (openedDb, field, val) => {
         if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err.message)
-          reject(err)
+          // console.log(' T (dbGetUserByField) 00')
+          return reject(err)
         } else {
-          resolve(userInfo)
+          // console.log(' T (dbGetUserByField) 01')
+          // console.log(' T (dbGetUserByField) userInfo',userInfo)
+          return resolve(userInfo)
         }
       }
     )
@@ -441,7 +444,7 @@ exports.dbGetUserRoles = (openedDb) => {
   })
 }
 exports.dbGetRoleById = (openedDb, role) => {
-  const fun = 'getRoleById'
+  const fun = 'dbGetRoleById'
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM ${TBL_ROLES} WHERE role = ?`, [role], function (err, row) {
@@ -457,25 +460,18 @@ exports.dbGetRoleById = (openedDb, role) => {
 }
 
 exports.dbGetUserRolesByUsername = async (openedDb, username) => {
-  const fun = 'getUserRolesByUsername'
+  const fun = 'dbGetUserRolesByUsername'
   try {
-    const user = await this.dbGetUserByUsername(openedDb, username)
-    if (user) {
-      const db = openedDb || dbOpen()
-      return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM ${TBL_USER_ROLES} WHERE userId = ?`, [user.id], function (err, rows) {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            log.e(mod, fun, err.message)
-            reject(err)
-          } else {
-            resolve(rows)
-          }
-        })
-      })
-    } else {
-      return Promise.reject(new Error(`User ${username} not found!`))
+    const db = openedDb || dbOpen()
+    const id = (await this.dbGetUserByUsername(db, username))?.id
+    if (!id) {
+      if (!openedDb) dbClose(db)
+      return Promise.reject(new Error(`User not found: ${username}`))
     }
+
+    const roles = await this.dbGetUserRolesByUserId(db, id)
+    if (!openedDb) dbClose(db)
+    return roles
   } catch (err) {
     log.e(mod, fun, err)
     throw err
@@ -485,23 +481,20 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
 exports.dbGetUserRolesByUserId = async (openedDb, userId) => {
   const fun = 'dbGetUserRolesByUserId'
   try {
-    const user = await this.dbGetUserById(openedDb, userId)
-    if (user) {
+    const { id } = await this.dbGetUserById(openedDb, userId)
+    if (id) {
       const db = openedDb || dbOpen()
       return new Promise((resolve, reject) => {
-        db.all(
-          `SELECT role FROM ${TBL_USER_ROLES} WHERE userId = ?`,
-          [user.id],
-          function (err, rows) {
-            if (!openedDb) dbClose(db)
-            if (err) {
-              log.e(mod, fun, err.message)
-              reject(err)
-            } else {
-              resolve(rows.map((row) => row?.role))
-            }
+        db.all(`SELECT role FROM ${TBL_USER_ROLES} WHERE userId = ?`, [id], (err, rows) => {
+          if (!openedDb) dbClose(db)
+          if (err) {
+            log.e(mod, fun, err.message)
+            reject(err)
+          } else {
+            // console.debug('T (dbGetUserRolesByUserId) roles', rows.map((row) => row?.role))
+            resolve(rows.map((row) => row?.role))
           }
-        )
+        })
       })
     } else {
       return Promise.reject(new Error(`User ${userId} not found!`))

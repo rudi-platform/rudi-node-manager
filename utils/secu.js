@@ -53,6 +53,7 @@ exports.readJwtBody = (jwt) => {
 exports.createFrontUserTokens = async (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   // console.log('T (createFrontUserTokens) exp:', new Date(exp * 1000));
+  console.log('T (createFrontUserTokens) userInfo:', userInfo);
   delete userInfo?.password
   return {
     [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),

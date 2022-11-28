@@ -114,7 +114,8 @@ exports.putPassword = async (req, res, next) => {
       res.status(401).send('Prerequisites not met')
 
     const db = dbOpen()
-    const dbUserHash = await dbGetHashedPassword(db, username)
+    const dbUserInfo = await dbGetHashedPassword(db, username)
+    const dbUserHash = dbUserInfo?.password
 
     passport.authenticate('local', (err, user, info) => {
       if (err) return res.status(400).send(err)

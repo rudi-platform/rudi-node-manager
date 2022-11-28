@@ -356,7 +356,7 @@ exports.dbInitialize = async () => {
     log.d(mod, fun, 'Table initialized: Users')
 
     await dbCreateSuperUser(db)
-    log.d(mod, fun, 'User created: SU')
+    log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
 
     await dbInitDefaultFormTable(db)
     log.d(mod, fun, 'Table initialized: DefaultForm')
