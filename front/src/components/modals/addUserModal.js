@@ -228,22 +228,22 @@ export default function AddUserModal({ visible, toggleEdit, roles, refresh }) {
 }
 
 export const useAddUserInfoModal = () => {
-  const [visible, setVisible] = useState(false)
+  const [isVisibleAddModal, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
    * @return {void}
    */
-  const toggleEdit = () => setVisible(!visible)
-  return { visible, toggleEdit }
+  const toggleAddModal = () => setVisible(!isVisibleAddModal)
+  return { isVisibleAddModal, toggleAddModal }
 }
 
 export const useAddUserInfoModalOptions = () => {
-  const [options, setOptions] = useState({})
+  const [addModalOptions, setOptions] = useState({})
   /**
    * change la valeur des options
    * @param {*} param nouvelles options
    * @return {void}
    */
-  const changeOptionsEdit = (param) => setOptions(param)
-  return { options, changeOptionsEdit }
+  const changeAddModalOptions = (param) => setOptions(param)
+  return { addModalOptions, changeAddModalOptions }
 }

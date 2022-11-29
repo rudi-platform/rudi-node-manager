@@ -5,7 +5,7 @@ const axios = require('axios')
 
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
-const { ForbiddenError, STATUS_CODE } = require('../utils/errors')
+const { ForbiddenError, STATUS_CODE, UnauthorizedError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   createRudiApiToken,
@@ -27,7 +27,7 @@ exports.getMediaToken = async (req, res, next) => {
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwtFromReq(req)
     if (!jwt) {
       console.error('T (getMediaToken) req:', req)
-      throw new ForbiddenError('No JWT was found in the request')
+      throw new UnauthorizedError('No JWT was found in the request')
     }
     // console.error('T (getMediaToken) jwt:', jwt);
 
@@ -35,7 +35,7 @@ exports.getMediaToken = async (req, res, next) => {
     const user = jwtPayload.user
     const exp = jwtPayload.exp
     if (!user)
-      throw new ForbiddenError(`JWT body token should contain an identified user: ${jwtPayload}`)
+      throw new UnauthorizedError(`JWT body token should contain an identified user: ${jwtPayload}`)
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 

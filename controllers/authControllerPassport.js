@@ -19,11 +19,12 @@ const {
   matchPassword,
 } = require('../utils/secu')
 const {
+  dbGetHashedPassword,
+  dbGetUserRolesByUsername,
   dbHashAndUpdatePassword,
+  dbOpen,
   dbRegisterUser,
   dbUpdatePassword,
-  dbGetHashedPassword,
-  dbOpen,
 } = require('../database/database')
 
 // Constants
@@ -49,28 +50,41 @@ const pmFrontCookieOpts = (exp) => {
 
 // Controllers
 exports.postLogin = async (req, res, next) => {
+  const fun = 'postLogin'
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', (err, user) => {
     if (err) return res.status(400).send(err)
     if (!user)
       return res.status(401).send(`User not found or incorrect password: '${req?.body?.username}'`)
 
-    req.login(user, { session: false }, async (err) => {
-      if (err) return res.status(400).json({ errors: err })
-      const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user)
+    dbGetUserRolesByUsername(null, user.username)
+      .then(() => {
+        req.login(user, { session: false }, async (err) => {
+          if (err) return res.status(400).json({ errors: err })
+          const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user)
 
-      // sameSite: 'Lax' ?
-      return res
-        .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
-        .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
-        .json({
-          success: `logged as '${user.username}'`,
-          // [CONSOLE_TOKEN_NAME]: consoleToken,
-          expires: new Date(exp * 1000),
+          // sameSite: 'Lax' ?
+          return res
+            .status(200)
+            .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
+            .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
+            .json({
+              success: `logged as '${user.username}'`,
+              // [CONSOLE_TOKEN_NAME]: consoleToken,
+              expires: new Date(exp * 1000),
+            })
         })
-      // TODO : remove .json() for cookie only? or give refresh token instead
-    })
+      })
+      .catch((er) => {
+        log.e(mod, fun, er)
+        res
+          .status(401)
+          .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
+          .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
+          .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
+          .send(`Admin validation is required for this user: '${user.username}'`)
+      })
+    // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, res, next)
 }
 
@@ -138,8 +152,8 @@ exports.putPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   try {
     // ONLY ADMIN !
-    const { id } = req.body
-    dbUpdatePassword(null, id, hashPassword(INIT_PWD))
+    const { id } = req.params
+    await dbUpdatePassword(null, id, hashPassword(INIT_PWD))
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
     return res.status(500).json(new RudiError(error.message))

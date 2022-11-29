@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
+import { ArrowCounterclockwise } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation'
@@ -148,6 +149,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
     }
   }
 
+  const resetPassword = () => {}
   return (
     <Modal show={visible} onHide={toggleEdit} animation={false}>
       <Form noValidate onSubmit={handleSubmit}>
@@ -242,22 +244,22 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
 }
 
 export const useEditUserInfoModal = () => {
-  const [visible, setVisible] = useState(false)
+  const [isVisibleEditModal, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
    * @return {void}
    */
-  const toggleEdit = () => setVisible(!visible)
-  return { visible, toggleEdit }
+  const toggleEditModal = () => setVisible(!isVisibleEditModal)
+  return { isVisibleEditModal, toggleEditModal }
 }
 
 export const useEditUserInfoModalOptions = () => {
-  const [options, setOptions] = useState({})
+  const [editModalOptions, setOptions] = useState({})
   /**
    * change la valeur des options
    * @param {*} param nouvelles options
    * @return {void}
    */
-  const changeOptionsEdit = (param) => setOptions(param)
-  return { options, changeOptionsEdit }
+  const changeEditModalOptions = (param) => setOptions(param)
+  return { editModalOptions, changeEditModalOptions }
 }

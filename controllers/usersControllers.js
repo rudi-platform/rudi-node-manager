@@ -14,6 +14,7 @@ const {
   dbOpen,
   dbUpdateUser,
   dbUpdateUserRoles,
+  dbClose,
 } = require('../database/database')
 
 const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
@@ -47,8 +48,12 @@ exports.deleteUserWithName = async (req, res, next) => {
     const { username } = req.params
     const db = dbOpen()
     const userInfo = await dbGetUserByUsername(db, username)
-    if (!userInfo) return res.status(404).json(new NotFoundError(`User not found: ${username}`))
+    if (!userInfo) {
+      dbClose(db)
+      return res.status(404).json(new NotFoundError(`User not found: ${username}`))
+    }
     await dbDeleteUserWithName(db, username)
+    dbClose(db)
     return res.status(200).json({ message: `User deleted: ${username}` })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_user' })

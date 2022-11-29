@@ -1,5 +1,5 @@
 import React from 'react'
-import { Pencil, Trash } from 'react-bootstrap-icons'
+import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
@@ -10,10 +10,20 @@ import EditUserModal, {
   useEditUserInfoModalOptions,
 } from '../modals/editUserModal'
 
+const resetPwdConfirmMsg = (id) =>
+  `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
+const resetPwdCaption =
+  `L'utilisateur devra utiliser l'invite "Modifier le mot de passe" pour changer son mot de passe. ` +
+  `Le champ "mot de passe actuel" pourra être un simple espace`
+
+const resetPwdMsg = (id) => `Le mot de passe de l'utilisateur ${id} a été réinitialisé.\n\nplou`
+
+const resetPasswordUrl = (id) => `api/front/users/${id}/reset-password`
+
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
 const deleteUrl = (id) => `api/secu/users/${id}`
-
+// put('/users/:id/reset-password'
 /**
  * Composant : UserCard
  * @return {ReactNode}
@@ -22,8 +32,8 @@ export default function UserCard({ user, display, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const { visible, toggleEdit } = useEditUserInfoModal()
-  const { options, changeOptionsEdit } = useEditUserInfoModalOptions()
+  const { isVisibleEditModal, toggleEditModal } = useEditUserInfoModal()
+  const { editModalOptions, changeEditModalOptions } = useEditUserInfoModalOptions()
 
   /**
    * call for user deletion
@@ -48,6 +58,29 @@ export default function UserCard({ user, display, refresh }) {
   }
 
   /**
+   * Call for reseting a user's password
+   * @param {*} user The user info
+   * @returns
+   */
+  const resetPassword = (user) =>
+    axios
+      .put(resetPasswordUrl(user.id))
+      .then((res) => {
+        changeOptions(getOptOk(resetPwdMsg(user.username), () => refresh(), resetPwdCaption))
+        toggle()
+      })
+      .catch((err) => defaultErrorHandler(err))
+
+  /**
+   * call for confirmation before resetting user password
+   * @param {*} user user a suppr
+   */
+  const triggerResetPwd = (user) => {
+    changeOptions(getOptConfirm(resetPwdConfirmMsg(user.username), () => resetPassword(user)))
+    toggle()
+  }
+
+  /**
    * call for user update
    * @param {*} user utilisateur
    */
@@ -55,8 +88,8 @@ export default function UserCard({ user, display, refresh }) {
     axios
       .get(`api/secu/roles`)
       .then((res) => {
-        changeOptionsEdit({ user, roles: res.data })
-        toggleEdit()
+        changeEditModalOptions({ user, roles: res.data })
+        toggleEditModal()
         refresh()
       })
       .catch((err) => defaultErrorHandler(err))
@@ -72,6 +105,14 @@ export default function UserCard({ user, display, refresh }) {
               <button type="button" className="btn btn-warning" onClick={() => updateUser(user)}>
                 <Pencil />
               </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => triggerResetPwd(user)}
+              >
+                <ArrowCounterclockwise />
+              </button>
               <button
                 type="button"
                 className="btn btn-danger"
@@ -81,11 +122,11 @@ export default function UserCard({ user, display, refresh }) {
               </button>
             </div>
             <EditUserModal
-              visible={visible}
-              toggleEdit={toggleEdit}
-              options={options}
+              visible={isVisibleEditModal}
+              toggleEdit={toggleEditModal}
+              options={editModalOptions}
               user={user}
-              roles={options.roles}
+              roles={editModalOptions.roles}
               refresh={refresh}
             ></EditUserModal>
           </div>

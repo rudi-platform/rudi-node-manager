@@ -30,12 +30,18 @@ const { dbInitDefaultFormTable } = require('./initDefaultForm')
 const USER_ID_START_VALUE = 6000
 
 // ---- Constants -----
+exports.ROLE_SU = 'SuperAdmin'
+exports.ROLE_ADMIN = 'Admin'
+exports.ROLE_EDIT = 'Editeur'
+exports.ROLE_READ = 'Lecteur'
+exports.ROLE_ALL = 'All'
+
 const initialRoles = [
-  { role: 'SuperAdmin', desc: 'a tous les droits', hide: true },
-  { role: 'Admin', desc: 'administration, création et validation des comptes' },
+  { role: this.ROLE_SU, desc: 'a tous les droits', hide: true },
+  { role: this.ROLE_ADMIN, desc: 'administration, création et validation des comptes' },
   { role: 'Moniteur', desc: 'accès au monitoring', hide: true },
-  { role: 'Editeur', desc: 'édition et suppression des métadonnées' },
-  { role: 'Lecteur', desc: 'lecture seule des métadonnées' },
+  { role: this.ROLE_EDIT, desc: 'édition et suppression des métadonnées' },
+  { role: this.ROLE_READ, desc: 'lecture seule des métadonnées' },
 ]
 
 const sqlGet = `SELECT name FROM sqlite_master WHERE type='table' AND name=?`
@@ -126,7 +132,7 @@ const dbNormalizeRoleTableAddHide = (openedDb) => {
           return reject(err)
         }
         db.run(
-          `UPDATE ${TBL_ROLES} SET hide=1 WHERE role='SuperAdmin' OR role='Moniteur' `,
+          `UPDATE ${TBL_ROLES} SET hide=1 WHERE role='${this.ROLE_SU}' OR role='Moniteur' `,
           (err) => {
             if (err) {
               if (!openedDb) dbClose(db)
@@ -312,7 +318,7 @@ const dbCreateSuperUser = async (db) => {
     username: suName,
     password: suPwd,
     email: 'security@rudi-univ-rennes1.fr',
-    role: 'SuperAdmin',
+    role: this.ROLE_SU,
   }
 
   const res = await dbRegisterUser(db, superUser)

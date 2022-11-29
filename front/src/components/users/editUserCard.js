@@ -4,9 +4,17 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import AddUserModal, { useAddUserInfoModal, useAddUserInfoModalOptions } from '../modals/addUserModal'
+import AddUserModal, {
+  useAddUserInfoModal,
+  useAddUserInfoModalOptions,
+} from '../modals/addUserModal'
+import EditUserModal, {
+  useEditUserInfoModal,
+  useEditUserInfoModalOptions,
+} from '../modals/editUserModal'
 
 const urlUser = 'api/secu/users'
+const urlRoles = 'api/secu/roles'
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
 
@@ -23,26 +31,29 @@ export default function EditUserCard({ refresh }) {
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [editID, setEditID] = useState('')
-  const { visible, toggleEdit } = useAddUserInfoModal()
-  const { options, changeOptionsEdit } = useAddUserInfoModalOptions()
+  const [editId, setUser] = useState('')
+  const { isVisibleAddModal, toggleAddModal } = useAddUserInfoModal()
+  const { addModalOptions, changeAddModalOptions } = useAddUserInfoModalOptions()
+
+  const { isVisibleEditModal, toggleEditModal } = useEditUserInfoModal()
+  const { editModalOptions, changeEditModalOptions } = useEditUserInfoModalOptions()
 
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
    * @return {void}
    */
-  const handleChange = (event) => setEditID(event.target.value)
+  const handleChange = (event) => setUser(event.target.value)
 
   /**
    * call for user deletion
    */
   const deleteUser = () => {
-    if (!editID) return
+    if (!editId) return
     axios
-      .delete(`${urlUser}/${editID}`)
+      .delete(`${urlUser}/${editId}`)
       .then((res) => {
-        const options = getOptOk(deleteMsg(editID), () => refresh())
+        const options = getOptOk(deleteMsg(editId), () => refresh())
         changeOptions(options)
         toggle()
       })
@@ -51,11 +62,29 @@ export default function EditUserCard({ refresh }) {
 
   const createNewUser = () => {
     axios
-      .get(`api/secu/roles`)
+      .get(urlRoles)
       .then((res) => {
-        changeOptionsEdit({ roles: res.data })
-        toggleEdit()
+        changeAddModalOptions({ roles: res.data })
+        toggleAddModal()
         refresh()
+      })
+      .catch((err) => defaultErrorHandler(err))
+  }
+
+  const editUser = () => {
+    if (!editId) return
+    axios
+      .get(urlUser(id))
+      .then((user) => {
+        console.info('T (editUser)',user)
+        axios
+          .get(urlRoles)
+          .then((res) => {
+            changeEditModalOptions({ user, roles: res.data })
+            toggleEditModal()
+            refresh()
+          })
+          .catch((err) => defaultErrorHandler(err))
       })
       .catch((err) => defaultErrorHandler(err))
   }
@@ -64,7 +93,7 @@ export default function EditUserCard({ refresh }) {
    * call for confirmation before organization deletion
    */
   function triggerDeleteUser() {
-    const options = getOptConfirm(deleteConfirmMsg(editID), () => deleteUser())
+    const options = getOptConfirm(deleteConfirmMsg(editId), () => deleteUser())
     changeOptions(options)
     toggle()
   }
@@ -84,23 +113,31 @@ export default function EditUserCard({ refresh }) {
                 type="text"
                 className="form-control"
                 placeholder="nom"
-                value={editID}
+                value={editId}
                 onChange={handleChange}
               />
-              <a className="btn btn-warning">
+              <button type="button" className="btn btn-warning" onClick={() => editUser()}>
                 <Pencil />
-              </a>
+              </button>
               <button type="button" className="btn btn-danger" onClick={() => triggerDeleteUser()}>
                 <Trash />
               </button>
             </div>
             <AddUserModal
-              visible={visible}
-              toggleEdit={toggleEdit}
-              options={options}
-              roles={options.roles}
+              visible={isVisibleAddModal}
+              toggleEdit={toggleAddModal}
+              options={addModalOptions}
+              roles={addModalOptions.roles}
               refresh={refresh}
             ></AddUserModal>
+            <EditUserModal
+              visible={isVisibleEditModal}
+              toggleEdit={toggleEditModal}
+              options={editModalOptions}
+              user={editId}
+              roles={editModalOptions.roles}
+              refresh={refresh}
+            ></EditUserModal>
           </div>
         </div>
       </div>

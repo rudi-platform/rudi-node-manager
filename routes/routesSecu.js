@@ -8,18 +8,21 @@ const {
   postUserRole,
   deleteUserRole,
 } = require('../controllers/roleController')
-
-router.get('/users', getUsersList)
-router.get('/users/:username', getUserByUsername)
-router.delete('/users/:id', deleteUserWithId)
+const { resetPassword } = require('../controllers/authControllerPassport')
 
 router.get('/roles', getRoleList)
 router.get('/roles/:role', getRoleById)
+
 router.get('/user-roles/:username', getUserRolesByUsername)
+router.post('/user-roles', postUserRole)
 router.delete('/user-roles/:userId/:role', deleteUserRole)
 
-router.post('/user-roles', postUserRole)
+router.get('/users', getUsersList)
+router.get('/users/:username', getUserByUsername)
 router.post('/users', createUser)
 router.put('/users', editUser)
+router.put('/users/:id/reset-password', resetPassword) // Admin action that resets a user pwd
+router.delete('/users/:id', deleteUserWithId)
+
 
 module.exports = router

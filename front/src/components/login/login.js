@@ -56,10 +56,13 @@ export default function Login({ setToken }) {
       })
       .catch((error) => {
         const resMsg = error.response?.data
-        const errMsg =
-          resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password')
-            ? 'Utilisateur ou mot de passe incorrect'
-            : `Echec de connexion`
+        let errMsg
+        if (resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password'))
+          errMsg = 'Utilisateur ou mot de passe incorrect'
+        else if (resMsg.startsWith('Admin validation required for user')) {
+          errMsg = 'Cet utilisateur requiert une validation: contactez votre contact Rudi'
+        } else errMsg = `Echec de connexion`
+
         changeOptions({
           text: [errMsg],
           title: 'Une erreur est survenue',

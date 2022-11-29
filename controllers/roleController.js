@@ -6,6 +6,7 @@ const {
   dbDeleteUserRole,
   dbCreateUserRole,
 } = require('../database/database')
+const { BadRequestError } = require('../utils/errors')
 
 exports.getRoleList = async (req, res, next) => {
   try {
@@ -31,15 +32,20 @@ exports.getRoleById = (req, res, next) => {
 }
 
 // User_Roles
-exports.getUserRolesByUsername = (req, res, next) => {
+exports.getUserRolesByUsername = async (req, res, next) => {
   const { username } = req.params
-  return dbGetUserRolesByUsername(null, username)
-    .then((rows) => res.status(200).json(rows))
-    .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_userRole' })
-      res.status(error.statusCode).json(error)
-    })
+  if (!username)
+    return res.status(400).json(new BadRequestError('Request should provide a username'))
+
+  try {
+    const roles = await dbGetUserRolesByUsername(null, username)
+    return res.status(200).json(roles)
+  } catch (err) {
+    const error = errorHandler.error(err, req, { opType: 'get_userRole' })
+    res.status(error.statusCode).json(error)
+  }
 }
+
 exports.deleteUserRole = (req, res, next) => {
   const { userId, role } = req.params
   return dbDeleteUserRole(null, userId, role)

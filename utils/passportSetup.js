@@ -5,12 +5,16 @@ const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
 const { getConf } = require('../config/config')
+const log = require('./logger')
+const { ForbiddenError, statusOK, UnauthorizedError } = require('./errors')
 const {
   dbGetUserById,
   dbHashAndUpdatePassword,
   dbGetHashedPassword,
+  dbGetUserRolesByUsername,
+  dbClose,
+  dbOpen,
 } = require('../database/database')
-const log = require('./logger')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
 
 passport.serializeUser((user, done) => done(null, user.id))
@@ -18,43 +22,63 @@ passport.serializeUser((user, done) => done(null, user.id))
 passport.deserializeUser((id, done) => {
   dbGetUserById(null, id)
     .then((user) => done(null, user))
-    .catch((err) => done(err, false))
+    .catch((err) => done(err, false, new UnauthorizedError('User not found')))
 })
 
 // Local Strategy
 passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
-    dbGetHashedPassword(null, username)
-      .then((dbUserInfo) => {
-        // console.log('T (LocalStrategy) userInfo:', dbUserInfo)
-        const dbUserHash = dbUserInfo.password
-        if (!dbUserHash) return done(null, false, { message: 'No user found' })
-
-        // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-        if (!matchPassword(password, dbUserHash)) {
-          log.e(mod, 'LocalStrategy', `Password mismatch`)
-          return done(null, false, { message: 'Wrong password' })
-        } else {
-          // Password is OK... But if it was bcrypt-generated, let's change
-          // the hash from the DB with a crypto.scryptSync hashed password
-          // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
-          if (dbUserHash.startsWith('$2b$10$')) {
-            dbHashAndUpdatePassword(null, username, password)
-              .then((res) => done(null, dbUserHash))
-              .catch((err) =>
-                log.e(mod, 'LocalStrategy', `Error while updating 2b10 password: ${err}`)
-              )
-          }
-          return done(null, { username })
-        }
-      })
+    checkPassport(username, password)
+      .then(() => done(null, { username }))
       .catch((err) => {
         log.e(mod, 'LocalStrategy', `Error login: ${err}`)
-        return done(null, false, { message: err })
+        return done(null, false, err)
       })
   })
 )
+
+const checkPassport = async (username, password) => {
+  const fun = 'checkPassport'
+  const db = dbOpen()
+  try {
+    const dbUserInfo = await dbGetHashedPassword(db, username)
+    const dbUserHash = dbUserInfo.password
+    if (!dbUserHash) {
+      throw new UnauthorizedError('No user found')
+    }
+
+    // console.log('T (LocalStrategy) match:', matchPassword(password, dbUserInfo.password))
+    if (!matchPassword(password, dbUserHash)) {
+      log.e(mod, fun, `Password mismatch`)
+      throw new UnauthorizedError('Wrong password')
+    }
+
+    // Password is OK... But if it was bcrypt-generated, so let's change
+    // the hash stored in the DB with a crypto.scryptSync hashed password
+    try {
+      if (dbUserHash.startsWith('$2b$10$')) {
+        await dbHashAndUpdatePassword(db, username, password)
+        log.i(mod, fun, `Password updated for user '${username}'`)
+      }
+    } catch (err) {
+      log.e(mod, fun, `Error while updating 2b10 password: ${err}`)
+    }
+    try {
+      const roles = await dbGetUserRolesByUsername(db, username)
+      console.log('T (checkPassport) user roles:', roles)
+      if (!roles) throw new ForbiddenError(`Admin validation required for user: '${username}'`)
+      console.log('T (checkPassport)', 'User may login')
+      dbClose(db)
+      return statusOK('User may login')
+    } catch (err) {
+      throw new ForbiddenError(`Admin validation required for user: '${username}'`)
+    }
+  } catch (err) {
+    dbClose(db)
+    throw err
+  }
+}
 
 const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt')
 passport.use(

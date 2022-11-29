@@ -65,38 +65,36 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
   }
 
   return (
-    <>
-      <Modal show={visible} onHide={toggleEdit} animation={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edition des rôles pour {options.user?.username}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {options.roles &&
-            options.roles.map((role, i) => {
-              return (
-                <span key={i}>
-                  {isInUserRole(role, options.user) < 0 && (
-                    <Button variant="light" onClick={() => assignUserRole(role, options.user)}>
-                      {role.role}
-                      <Plus color="green" />
-                    </Button>
-                  )}
-                  {isInUserRole(role, options.user) >= 0 && (
-                    <Button variant="light" onClick={() => removeUserRole(role, options.user)}>
-                      {role.role} <Trash color="red" />
-                    </Button>
-                  )}
-                </span>
-              )
-            })}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={() => toggleEdit()}>
-            Terminer
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+    <Modal show={visible} onHide={toggleEdit} animation={false}>
+      <Modal.Header closeButton>
+        <Modal.Title>Edition des rôles pour {options.user?.username}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {options.roles &&
+          options.roles.map((role, i) => {
+            return (
+              <span key={i}>
+                {isInUserRole(role, options.user) < 0 && (
+                  <Button variant="light" onClick={() => assignUserRole(role, options.user)}>
+                    {role.role}
+                    <Plus color="green" />
+                  </Button>
+                )}
+                {isInUserRole(role, options.user) >= 0 && (
+                  <Button variant="light" onClick={() => removeUserRole(role, options.user)}>
+                    {role.role} <Trash color="red" />
+                  </Button>
+                )}
+              </span>
+            )
+          })}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="primary" onClick={() => toggleEdit()}>
+          Terminer
+        </Button>
+      </Modal.Footer>
+    </Modal>
   )
 }
 EditRoleModal.propTypes = {

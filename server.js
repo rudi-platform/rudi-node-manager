@@ -5,12 +5,14 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const path = require('path')
 const helmet = require('helmet')
+
 // Require Route
 const apiOpen = require('./routes/routesOpen')
 const apiFront = require('./routes/routesFront')
 const apiData = require('./routes/routesData')
 const apiMedia = require('./routes/routesMedia')
 const apiSecu = require('./routes/routesSecu')
+
 // Require Config
 const { getConf } = require('./config/config')
 const log = require('./utils/logger')
@@ -18,7 +20,11 @@ const log = require('./utils/logger')
 const mod = 'server'
 
 const passport = require('./utils/passportSetup')
-const initDb = require('./database/scripts/initDatabase')
+const {
+  ROLE_ADMIN,
+  dbInitialize,
+  ROLE_ALL,
+} = require('./database/scripts/initDatabase')
 const { isDevEnv } = require('./config/backOptions')
 const { checkRolePerm } = require('./utils/roleCheck')
 
@@ -62,9 +68,9 @@ const authenticate = passport.authenticate('jwt', { session: false })
 // Configure app to use routes
 app.use(`/api/open/`, apiOpen)
 app.use(`/api/front/`, apiFront)
-app.use(`/api/data/`, authenticate, apiData)
-app.use(`/api/media/`, authenticate, apiMedia)
-app.use(`/api/secu/`, authenticate, checkRolePerm('Admin'), apiSecu)
+app.use(`/api/data/`, authenticate, checkRolePerm([ROLE_ALL]), apiData)
+app.use(`/api/media/`, authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+app.use(`/api/secu/`, authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
@@ -77,8 +83,8 @@ if (!isDevEnv()) {
 }
 
 // Init database on startup
-initDb
-  .dbInitialize()
+
+dbInitialize()
   .then((res) => log.d(mod, 'initDatabase', 'SQL DB init OK'))
   .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`))
 

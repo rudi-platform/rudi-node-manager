@@ -1,9 +1,7 @@
 const mod = 'db'
 
 // ---- External dependencies -----
-const sqlite3 = require('sqlite3').verbose()
-// const { genSaltSync, hashSync } = require('bcrypt')
-const Promise = require('bluebird')
+const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
 
 // ---- Internal dependencies -----
 const { getDbConf } = require('../config/config')
@@ -14,6 +12,8 @@ const {
   statusOK,
   RudiError,
   BadRequestError,
+  STATUS_CODE,
+  UnauthorizedError,
 } = require('../utils/errors')
 const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
@@ -34,7 +34,7 @@ exports.TBL_USER_ROLES = TBL_USER_ROLES
 // ---- Functions -----
 const dbOpen = () => {
   const fun = 'open'
-  const db = new sqlite3.Database(DB_FILE, sqlite3.OPEN_READWRITE, (err) => {
+  const db = new Database(DB_FILE, OPEN_READWRITE, (err) => {
     if (err) {
       log.e(mod, fun, err)
       log.e(mod, fun, err.message)
@@ -52,26 +52,10 @@ const dbClose = (db) => {
   return statusOK('DB closed')
 }
 
-// exports.dbExec = (openedDb, sqlReq, params) => {
-//   const fun = 'dbExec'
-//   const db = openedDb || open()
-//   return new Promise((resolve, reject) => {
-//     db.run(`SELECT username, password FROM Users WHERE username = 'Oliv'`, [], (err, row) => {
-//       if (!openedDb) close(db)
-//       if (err) {
-//         log.e(mod, fun, err)
-//         return reject(err)
-//       }
-//       log.d(mod, fun, row)
-//       return resolve(row)
-//     })
-//   })
-// }
-
 exports.dbOpenOrCreate = () => {
   const fun = 'dbOpenOrCreate'
   return new Promise((resolve, reject) => {
-    const db = new sqlite3.Database(DB_FILE, (err) => {
+    const db = new Database(DB_FILE, (err) => {
       if (err) {
         log.e(mod, fun, err)
         return reject(err)
@@ -93,13 +77,20 @@ exports.dbGetHashedPassword = async (openedDb, username) => {
         log.e(mod, fun, err.message)
         reject(err)
       } else {
-        if (!row) return reject('No user found')
+        if (!row) return reject(new UnauthorizedError('No user found'))
         return resolve({ username, password: row.password })
       }
     })
   })
 }
 
+/**
+ * Retrieve the user info in DB from a key+value pair
+ * @param {Database?} openedDb an sqlite3 database (possibly null)
+ * @param {String} field the field used to find the user
+ * @param {String | number} val the value for above field
+ * @returns {Object} the user info
+ */
 exports.dbGetUserByField = (openedDb, field, val) => {
   const fun = 'dbGetUserByField'
   const db = openedDb || dbOpen()
@@ -110,26 +101,54 @@ exports.dbGetUserByField = (openedDb, field, val) => {
       (err, userInfo) => {
         if (!openedDb) dbClose(db)
         if (err) {
-          log.e(mod, fun, err.message)
-          // console.log(' T (dbGetUserByField) 00')
+          log.e(mod, fun, err)
+          console.error(' T (dbGetUserByField) ERR', err)
           return reject(err)
         } else {
-          // console.log(' T (dbGetUserByField) 01')
-          // console.log(' T (dbGetUserByField) userInfo',userInfo)
+          if (!userInfo || Object.keys(userInfo).length === 0) {
+            console.error(' T (dbGetUserByField) Not found', err)
+            return reject(new UnauthorizedError(`User not found: ${val}`))
+          }
           return resolve(userInfo)
         }
       }
     )
   })
 }
+
+/**
+ * Retrieve the user info in DB from their username
+ * @param {Database?} openedDb an sqlite3 database (possibly null)
+ * @param {String} username the user's username
+ * @returns {Object} the user info
+ */
 exports.dbGetUserByUsername = (openedDb, username) =>
   this.dbGetUserByField(openedDb, 'username', username)
+
+/**
+ * Retrieve the user info in DB from their id
+ * @param {Database?} openedDb an sqlite3 database (possibly null)
+ * @param {number} id the user's id
+ * @returns {Object} the user info
+ */
 exports.dbGetUserById = (openedDb, id) => this.dbGetUserByField(openedDb, 'id', id)
+/**
+ * Retrieve the user info in DB from their e-mail
+ * @param {Database?} openedDb an sqlite3 database (possibly null)
+ * @param {String} email the user's e-mail
+ * @returns {Object} the user info
+ */
 exports.dbGetUserByEmail = (openedDb, email) => this.dbGetUserByField(openedDb, 'email', email)
 
+/**
+ * Checks if the user was created
+ * @param {Database?} openedDb an sqlite3 database (possibly null)
+ * @param {String} username the user's e-mail
+ * @returns {Object} the user info
+ */
 exports.dbExistsUser = async (openedDb, username) => {
-  const user = await this.dbGetUserByUsername(openedDb, username)
-  return !!user?.username
+  const userInfo = await this.dbGetUserByUsername(openedDb, username)
+  return !!userInfo?.username
 }
 
 exports.dbGetUsers = (openedDb) => {
@@ -329,7 +348,7 @@ exports.dbUpdatePassword = (openedDb, username, password) => {
           `${TBL_USERS}: password reset for user '${username}'`,
           log.getContext(null, { opType: 'put_password' })
         )
-        resolve({ username: username })
+        resolve({ username })
       }
     )
     // });
@@ -352,7 +371,7 @@ exports.dbDeleteUserWithName = (openedDb, username) => {
         `${TBL_USERS} : A row has been deleted with username '${username}'`,
         log.getContext(null, { opType: 'delete_user' })
       )
-      resolve({ username: username })
+      resolve({ username })
     })
   })
 }
@@ -459,50 +478,87 @@ exports.dbGetRoleById = (openedDb, role) => {
   })
 }
 
+/**
+ * Retrieves user's roles from their username
+ * @param {Database} openedDb
+ * @param {String} username The user's username
+ * @returns {Array} The array of user's roles
+ */
 exports.dbGetUserRolesByUsername = async (openedDb, username) => {
   const fun = 'dbGetUserRolesByUsername'
+  const db = openedDb || dbOpen()
   try {
-    const db = openedDb || dbOpen()
-    const id = (await this.dbGetUserByUsername(db, username))?.id
-    if (!id) {
-      if (!openedDb) dbClose(db)
-      return Promise.reject(new Error(`User not found: ${username}`))
-    }
-
+    const userInfo = await this.dbGetUserByUsername(db, username)
+    const id = userInfo?.id
+    if (!id) throw new UnauthorizedError(`User not found: ${username}`)
     const roles = await this.dbGetUserRolesByUserId(db, id)
     if (!openedDb) dbClose(db)
     return roles
   } catch (err) {
+    if (!openedDb) dbClose(db)
     log.e(mod, fun, err)
+    if (err[STATUS_CODE] === 400)
+      throw new ForbiddenError(`Admin validation required for user '${username}'`)
     throw err
   }
 }
 
-exports.dbGetUserRolesByUserId = async (openedDb, userId) => {
-  const fun = 'dbGetUserRolesByUserId'
+exports.isValidatedUser = async (openedDb, userInfo) => {
+  const db = openedDb || dbOpen()
   try {
-    const { id } = await this.dbGetUserById(openedDb, userId)
-    if (id) {
-      const db = openedDb || dbOpen()
-      return new Promise((resolve, reject) => {
+    let roles
+    if (userInfo.id) roles = await this.dbGetUserRolesByUserId(db, userInfo.id)
+    else if (userInfo.username) roles = await this.dbGetUserRolesByUsername(db, userInfo.username)
+    else throw new UnauthorizedError(`User not found: ${userInfo.username || userInfo.id}`)
+    if (!openedDb) dbClose(db)
+    return roles
+  } catch (err) {
+    if (!openedDb) dbClose(db)
+    console.error('T (isValidatedUser)', userInfo.username || userInfo.id)
+    throw err
+  }
+}
+
+/**
+ * Retrieves user's roles from their id
+ * @param {Database} openedDb
+ * @param {String} username The user's id
+ * @returns {Array} The array of user's roles
+ */
+exports.dbGetUserRolesByUserId = (openedDb, userId) => {
+  const fun = 'dbGetUserRolesByUserId'
+  return new Promise((resolve, reject) => {
+    if (!userId) return reject(new BadRequestError(`User id not provided`))
+    const db = openedDb || dbOpen()
+    this.dbGetUserById(db, userId)
+      .catch((err) => {
+        if (!openedDb) dbClose(db)
+        reject(err)
+      })
+      .then((userInfo) => {
+        const id = userInfo?.id
+        if (!id) {
+          if (!openedDb) dbClose(db)
+          return reject(new Error(`User ${userId} not found!`))
+        }
+
         db.all(`SELECT role FROM ${TBL_USER_ROLES} WHERE userId = ?`, [id], (err, rows) => {
           if (!openedDb) dbClose(db)
           if (err) {
             log.e(mod, fun, err.message)
-            reject(err)
+            return reject(err)
           } else {
-            // console.debug('T (dbGetUserRolesByUserId) roles', rows.map((row) => row?.role))
-            resolve(rows.map((row) => row?.role))
+            if (rows.length === 0)
+              return reject(new ForbiddenError(`Admin validation required for user '${userId}'`))
+            console.debug(
+              'T (dbGetUserRolesByUserId) roles',
+              rows.map((row) => row?.role)
+            )
+            return resolve(rows.map((row) => row?.role))
           }
         })
       })
-    } else {
-      return Promise.reject(new Error(`User ${userId} not found!`))
-    }
-  } catch (err) {
-    log.e(mod, fun, err)
-    throw err
-  }
+  })
 }
 
 exports.dbDeleteUserRole = (openedDb, userId, role) => {
