@@ -6,6 +6,7 @@ import { ModalContext, getOptConfirm, getOptOk } from '../modals/modalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 ObjCard.propTypes = {
+  display: PropTypes.object,
   formUrl: PropTypes.string,
   obj: PropTypes.object,
   propId: PropTypes.string,
@@ -22,6 +23,7 @@ ObjCard.propTypes = {
  * @return {ReactNode}
  */
 export function ObjCard({
+  display,
   formUrl,
   obj,
   propId,
@@ -64,23 +66,27 @@ export function ObjCard({
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{objName}</a>
-            <div className="btn-group" role="group">
-              <a
-                href={`${formUrl}?update=${objId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-warning"
-              >
-                <Pencil />
-              </a>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => triggerDeleteObj(objId)}
-              >
-                <Trash />
-              </button>
-            </div>
+            {!display?.editJDD ? (
+              ''
+            ) : (
+              <div className="btn-group" role="group">
+                <a
+                  href={`${formUrl}?update=${objId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-warning"
+                >
+                  <Pencil />
+                </a>
+                <button
+                  type={'button'}
+                  className="btn btn-danger"
+                  onClick={() => triggerDeleteObj(objId)}
+                >
+                  <Trash />
+                </button>
+              </div>
+            )}
           </div>
         </h5>
         <div className="card-body">

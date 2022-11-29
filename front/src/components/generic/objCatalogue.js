@@ -30,8 +30,6 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   display,
-  // specialSearch,
-  // editMode,
   formUrlObj,
   propId,
   propName,
@@ -134,6 +132,7 @@ export default function ObjCatalogue({
                   obj={obj}
                   propId={propId}
                   propName={propName}
+                  display={display}
                   displayFields={propNamesToDisplay}
                   deleteUrl={deleteUrl}
                   deleteConfirmMsg={deleteConfirmMsg}
