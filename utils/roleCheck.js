@@ -11,7 +11,7 @@ exports.checkRolePerm = (expectedRoles) => (req, res, next) => {
   if (!req.user) return res.status(400).json(new BadRequestError('User info required'))
   const { username } = req.user
   if (!username) return res.status(400).json(new BadRequestError('Username required'))
-  console.log('T (checkRolePerm) username', username)
+  // console.log('T (checkRolePerm) username', username)
   dbGetUserRolesByUsername(null, username)
     .catch((err) => {
       log.e(mod, fun, err)

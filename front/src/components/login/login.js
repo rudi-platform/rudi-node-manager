@@ -25,7 +25,7 @@ export const showPill = (condition, showState) =>
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Login html component
  */
-export default function Login({ setToken }) {
+export default function Login({ setToken, setUser }) {
   // console.log('-- Login');
 
   const [username, setUserName] = useState('')
@@ -58,13 +58,16 @@ export default function Login({ setToken }) {
         const resMsg = error.response?.data
         let errMsg
         if (resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password'))
-          errMsg = 'Utilisateur ou mot de passe incorrect'
+          errMsg = ['Utilisateur ou mot de passe incorrect']
         else if (resMsg.startsWith('Admin validation required for user')) {
-          errMsg = 'Cet utilisateur requiert une validation: contactez votre contact Rudi'
+          errMsg = [
+            'Ce compte utilisateur requiert une validation.',
+            'Veuillez contacter l‘administrateur de votre nœud Rudi',
+          ]
         } else errMsg = `Echec de connexion`
 
         changeOptions({
-          text: [errMsg],
+          text: errMsg,
           title: 'Une erreur est survenue',
           type: 'error',
           buttons: [
@@ -86,7 +89,12 @@ export default function Login({ setToken }) {
     loginUser({
       username,
       password,
-    }).then((res) => setToken())
+    }).then((res) => {
+      setToken()
+      const user = res.data
+      console.debug('T (Login) user', user)
+      setUser(user)
+    })
   }
 
   const inputPassword = () => {

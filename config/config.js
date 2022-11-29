@@ -59,3 +59,4 @@ exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl(`/download/${id}`)
 exports.getConsoleFormUrl = () => config.rudi_console.console_form_url
 
 exports.getDbConf = (subSection) => config.database[subSection]
+exports.SU_NAME = config?.database?.db_su_usr

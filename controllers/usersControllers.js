@@ -79,7 +79,7 @@ exports.deleteUserWithId = async (req, res, next) => {
 exports.createUser = async (req, res, next) => {
   try {
     const userInfo = req.body
-    console.log('T (addUser) userInfo', userInfo)
+    // console.log('T (addUser) userInfo', userInfo)
     const { username, email, password, roles } = userInfo
     if (!username)
       return res
@@ -103,7 +103,7 @@ exports.createUser = async (req, res, next) => {
       return res.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
 
     const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
-    console.log('T (createUser) id:', id)
+    // console.log('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
     return res.status(200).json({ status: 'OK' })
   } catch (err) {

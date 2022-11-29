@@ -45,10 +45,13 @@ export default function App() {
   // console.log('-- App');
 
   const { token, updateToken } = useToken()
+
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+  const [isReadOnly, setIsReadOnly] = useState(true)
   const [generalConf, setGeneralConf] = useState({})
+  const [userInfo, setUserInfo] = useState({})
 
   const showLoginBox = () => {
     setIsLoginOpen(true)
@@ -66,6 +69,35 @@ export default function App() {
     setIsLoginOpen(false)
     setIsChgPwdOpen(false)
     setIsRegisterOpen(true)
+  }
+
+  const setUser = (user) => {
+    if (!token) {
+      console.debug('T (setIsReadOnly) 0')
+      setIsReadOnly(true)
+    }
+    setUserInfo(user)
+
+    if (
+      !user?.roles ||
+      user.roles.length === 0 ||
+      (user.roles.length === 1 && user.roles[0] === 'Lecteur')
+    ) {
+      console.debug('T (setIsReadOnly) 1')
+      console.debug('T (setIsReadOnly) roles', user.roles)
+      setIsReadOnly(true)
+    } else if (
+      user.roles.findIndex(
+        (role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur'
+      ) > -1
+    ) {
+      console.debug('T (setIsReadOnly) 2')
+      setIsReadOnly(false)
+    } else {
+      console.debug('T (setIsReadOnly) 3')
+      setIsReadOnly(true)
+    }
+
   }
 
   useEffect(() => {
@@ -117,15 +149,12 @@ export default function App() {
   /**
    * logout
    */
-  function logout() {
-    // console.log('-- logout');
-    axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken())
-  }
+  const logout = () => axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken())
 
   if (!token) {
     return (
       <div>
-        {isLoginOpen && <Login setToken={updateToken} />}
+        {isLoginOpen && <Login setToken={updateToken} setUser={setUser} />}
         {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
@@ -166,8 +195,7 @@ export default function App() {
                     {navItem('', 'Catalogue')}
                     {navItem('licence', 'Licence')}
                     {navItem('show', 'Visualisation')}
-
-                    <li className="nav-item">
+                    <li className={isReadOnly ? 'nav-item hide-wip' : 'nav-item'}>
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
                           Métadonnées
@@ -185,7 +213,7 @@ export default function App() {
                     </li>
 
                     {navItem('monitoring', 'Monitoring', 'hide')}
-                    {navItem('user', 'Utilisateurs')}
+                    {navItem('user', 'Utilisateurs', isReadOnly)}
                     {navItem('conf', 'Configuration', 'hide')}
 
                     <li className="nav-item center">
@@ -217,7 +245,7 @@ export default function App() {
               path={getBackUrl('metadata')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: true }}
+                  display={{ searchbar: true, editJDD: !isReadOnly }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -227,7 +255,7 @@ export default function App() {
               path={getBackUrl('gestion')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: true }}
+                  display={{ searchbar: true, editJDD: !isReadOnly }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -237,7 +265,7 @@ export default function App() {
               path={getBackUrl('producer')}
               element={
                 <CatalogueProducer
-                  display={{ searchbar: true, editJDD: true }}
+                  display={{ searchbar: true, editJDD: !isReadOnly }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -247,7 +275,7 @@ export default function App() {
               path={getBackUrl('contact')}
               element={
                 <CatalogueContact
-                  display={{ searchbar: true, editJDD: true }}
+                  display={{ searchbar: true, editJDD: !isReadOnly }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -257,7 +285,7 @@ export default function App() {
               path={getBackUrl('pub_key')}
               element={
                 <CataloguePubKeys
-                  display={{ searchbar: true, editJDD: true }}
+                  display={{ searchbar: true, editJDD: !isReadOnly }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -272,7 +300,9 @@ export default function App() {
             <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
             <Route
               path={getBackUrl('user')}
-              element={<CatalogueUser display={{ searchbar: true, editJDD: true }} editMode={{}} />}
+              element={
+                <CatalogueUser display={{ searchbar: true, editJDD: !isReadOnly }} editMode={{}} />
+              }
             />
             <Route
               path={getBackUrl('conf')}

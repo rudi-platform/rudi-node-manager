@@ -141,9 +141,9 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
    */
   const sendUserInfo = async () => {
     try {
-      console.log('T (edit.sendingUserInfo)', userInfo)
+      // console.log('T (edit.sendingUserInfo)', userInfo)
       const res = await axios.put(`${urlUser}`, userInfo)
-      console.log('T (edit.sendUserInfo)', res.data)
+      // console.log('T (edit.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
     }

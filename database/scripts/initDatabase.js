@@ -4,7 +4,7 @@ const mod = 'initDb'
 const fs = require('fs')
 
 // ---- Internal dependencies -----
-const { getDbConf } = require('../../config/config')
+const { getDbConf, SU_NAME } = require('../../config/config')
 const { decodeBase64 } = require('../../utils/utils')
 const log = require('../../utils/logger')
 const { RudiError, statusOK } = require('../../utils/errors')
@@ -295,16 +295,15 @@ const dbNormalizeUserTableId = async (db) => {
 const dbCreateSuperUser = async (db) => {
   const fun = 'dbCreateSuperUser'
 
-  const suName = getDbConf('db_su_usr')
   const encodedSuPwd = getDbConf('db_su_pwd')
 
-  if (!suName || !encodedSuPwd) {
+  if (!SU_NAME || !encodedSuPwd) {
     log.e(mod, fun, 'No super user config was found')
     throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
     return
   }
 
-  if (await dbExistsUser(db, suName)) {
+  if (await dbExistsUser(db, SU_NAME)) {
     // log.d(mod, fun, `Super user '${suName}' already exists`);
     return
   }
@@ -315,7 +314,7 @@ const dbCreateSuperUser = async (db) => {
 
   const superUser = {
     id: suId,
-    username: suName,
+    username: SU_NAME,
     password: suPwd,
     email: 'security@rudi-univ-rennes1.fr',
     role: this.ROLE_SU,

@@ -66,9 +66,10 @@ const checkPassport = async (username, password) => {
     }
     try {
       const roles = await dbGetUserRolesByUsername(db, username)
-      console.log('T (checkPassport) user roles:', roles)
-      if (!roles) throw new ForbiddenError(`Admin validation required for user: '${username}'`)
-      console.log('T (checkPassport)', 'User may login')
+      // console.log('T (checkPassport) user roles:', roles)
+      if (!roles?.length)
+        throw new ForbiddenError(`Admin validation required for user: '${username}'`)
+      // console.log('T (checkPassport)', 'User may login')
       dbClose(db)
       return statusOK('User may login')
     } catch (err) {

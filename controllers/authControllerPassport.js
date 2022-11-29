@@ -49,16 +49,33 @@ const pmFrontCookieOpts = (exp) => {
 }
 
 // Controllers
+/**
+ * Used for a user to login
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ * @returns {Object} user info
+ */
 exports.postLogin = async (req, res, next) => {
   const fun = 'postLogin'
   // log.d(mod, 'postLogin', '<--')
-  passport.authenticate('local', (err, user) => {
+  passport.authenticate('local', (err, user, info) => {
     if (err) return res.status(400).send(err)
     if (!user)
-      return res.status(401).send(`User not found or incorrect password: '${req?.body?.username}'`)
+      return res
+        .status(401)
+        .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
 
     dbGetUserRolesByUsername(null, user.username)
-      .then(() => {
+      .then((roles) => {
+        if (!roles?.length)
+          return res
+            .status(401)
+            .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
+            .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
+            .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
+            .send(`Admin validation is required for this user: '${user.username}'`)
+
         req.login(user, { session: false }, async (err) => {
           if (err) return res.status(400).json({ errors: err })
           const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user)
@@ -68,21 +85,12 @@ exports.postLogin = async (req, res, next) => {
             .status(200)
             .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
             .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
-            .json({
-              success: `logged as '${user.username}'`,
-              // [CONSOLE_TOKEN_NAME]: consoleToken,
-              expires: new Date(exp * 1000),
-            })
+            .json({ username: user.username, roles })
         })
       })
       .catch((er) => {
         log.e(mod, fun, er)
-        res
-          .status(401)
-          .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
-          .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-          .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
-          .send(`Admin validation is required for this user: '${user.username}'`)
+        res.status(501).send(er)
       })
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, res, next)

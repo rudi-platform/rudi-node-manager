@@ -4,7 +4,7 @@ const mod = 'db'
 const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
 
 // ---- Internal dependencies -----
-const { getDbConf } = require('../config/config')
+const { getDbConf, SU_NAME } = require('../config/config')
 const {
   ForbiddenError,
   InternalServerError,
@@ -488,9 +488,10 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
   const fun = 'dbGetUserRolesByUsername'
   const db = openedDb || dbOpen()
   try {
+    if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await this.dbGetUserByUsername(db, username)
     const id = userInfo?.id
-    if (!id) throw new UnauthorizedError(`User not found: ${username}`)
+    if (!id && username != SU_NAME) throw new UnauthorizedError(`User not found: ${username}`)
     const roles = await this.dbGetUserRolesByUserId(db, id)
     if (!openedDb) dbClose(db)
     return roles
@@ -528,7 +529,7 @@ exports.isValidatedUser = async (openedDb, userInfo) => {
 exports.dbGetUserRolesByUserId = (openedDb, userId) => {
   const fun = 'dbGetUserRolesByUserId'
   return new Promise((resolve, reject) => {
-    if (!userId) return reject(new BadRequestError(`User id not provided`))
+    if (userId != 0 && !userId) return reject(new BadRequestError(`User id not provided`))
     const db = openedDb || dbOpen()
     this.dbGetUserById(db, userId)
       .catch((err) => {
@@ -536,11 +537,11 @@ exports.dbGetUserRolesByUserId = (openedDb, userId) => {
         reject(err)
       })
       .then((userInfo) => {
-        const id = userInfo?.id
-        if (!id) {
+        if (!userInfo) {
           if (!openedDb) dbClose(db)
           return reject(new Error(`User ${userId} not found!`))
         }
+        const id = userInfo?.id
 
         db.all(`SELECT role FROM ${TBL_USER_ROLES} WHERE userId = ?`, [id], (err, rows) => {
           if (!openedDb) dbClose(db)
@@ -548,12 +549,6 @@ exports.dbGetUserRolesByUserId = (openedDb, userId) => {
             log.e(mod, fun, err.message)
             return reject(err)
           } else {
-            if (rows.length === 0)
-              return reject(new ForbiddenError(`Admin validation required for user '${userId}'`))
-            console.debug(
-              'T (dbGetUserRolesByUserId) roles',
-              rows.map((row) => row?.role)
-            )
             return resolve(rows.map((row) => row?.role))
           }
         })
