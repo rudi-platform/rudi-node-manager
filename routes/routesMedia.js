@@ -7,9 +7,11 @@ const {
   getDownloadById,
   getMediaById,
 } = require('../controllers/mediaController')
+const { ROLE_EDIT, ROLE_ADMIN } = require('../database/scripts/initDatabase')
+const { checkRolePerm } = require('../utils/roleCheck')
 
-router.get('/jwt', getMediaToken)
-router.post('/commit', commitMedia)
+router.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getMediaToken)
+router.post('/commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitMedia)
 
 router.get('/:id', getMediaById)
 router.get('/download/:id', getDownloadById)
