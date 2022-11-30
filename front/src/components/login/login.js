@@ -25,9 +25,8 @@ export const showPill = (condition, showState) =>
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Login html component
  */
-export default function Login({ setToken, setDisplayFlags }) {
+export default function Login({ setToken }) {
   // console.log('-- Login');
-
   const [username, setUserName] = useState('')
   const [password, setPassword] = useState('')
 
@@ -91,9 +90,11 @@ export default function Login({ setToken, setDisplayFlags }) {
       password,
     }).then((res) => {
       setToken()
-      const user = res.data
-      console.debug('T (Login) user', user)
-      setDisplayFlags(user)
+      const userInfo = res.data
+      console.debug('T (Login) user', userInfo)
+      // setFrontContext((frontContext) => {
+      //   return { ...frontContext, userInfo }
+      // })
     })
   }
 

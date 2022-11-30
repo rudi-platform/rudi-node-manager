@@ -47,6 +47,7 @@ export default function App() {
   const { token, updateToken } = useToken()
   // const [generalConf, setGeneralConf] = useState({})
   const frontContext = usePMFrontContext()
+  const [appInfo, setAppInfo] = useState({})
 
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
@@ -70,70 +71,9 @@ export default function App() {
     setIsRegisterOpen(true)
   }
 
-  const setFrontContext = (context = defaultFrontContext) => {
-    frontContext.formUrl = context.formUrl
-    frontContext.themeLabels = context.themeLabels
-
-    setDisplayFlags(context.userInfo)
-  }
-
-  const setDisplayFlags = (userInfo) => {
-    frontContext.userInfo = userInfo
-    if (
-      !userInfo?.roles ||
-      userInfo.roles.length === 0 ||
-      (userInfo.roles.length === 1 && userInfo.roles[0] === 'Lecteur')
-    ) {
-      frontContext.isEditor = false
-      frontContext.isAdmin = false
-    } else if (userInfo.roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1) {
-      frontContext.isEditor = true
-      frontContext.isAdmin = true
-    } else if (userInfo.roles.findIndex((role) => role === 'Editeur') > -1) {
-      frontContext.isEditor = true
-      frontContext.isAdmin = false
-    }
-    console.debug('T (setDisplayFlags) frontContext:', frontContext)
-    console.debug('T (setDisplayFlags) isEditor', isEditor())
-    console.debug('T (setDisplayFlags) isAdmin', isAdmin())
-  }
-
-  const isEditor = () => !!frontContext?.isEditor
-  const isAdmin = () => !!frontContext?.isAdmin
-
-  // const getUserInfo = () => {
-  //   setUser(generalConf?.userInfo)
-  // }
-  // if (!userInfo) getUserInfo()
-
   useEffect(() => {
-    if (!token) {
-      console.debug('T (setGeneralConf) disconnected: conf=', frontContext)
-      frontContext.userInfo = {}
-    } else {
-      Promise.all([
-        axios.get(getApiFront('formUrl')).catch((er) => {
-          console.error('T (setGeneralConf) err', er.message)
-          return { data: '' }
-        }),
-        axios.get(getApiData('enum/themes/fr')).catch((er) => {
-          console.error('T (setGeneralConf) err', er.message)
-          return { data: {} }
-        }),
-        axios.get(getApiFront('user-info')).catch((er) => {
-          console.error('T (setGeneralConf) err', er.message)
-          return { data: {} }
-        }),
-      ]).then((values) => {
-        setFrontContext({
-          formUrl: `${values[0].data}`,
-          themeLabels: values[1].data,
-          userInfo: values[2].data,
-        })
-      })
-      console.debug('T (setGeneralConf) connected: conf=', frontContext)
-    }
-  }, [token])
+    setAppInfo(frontContext.data)
+  }, [frontContext.loading])
 
   /**
    * Returns the code to display the version tag (if defined)
@@ -173,7 +113,7 @@ export default function App() {
   if (!token) {
     return (
       <div>
-        {isLoginOpen && <Login setToken={updateToken} setDisplayFlags={setDisplayFlags} />}
+        {isLoginOpen && <Login setToken={updateToken} />}
         {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
@@ -186,8 +126,8 @@ export default function App() {
   }
   return (
     <Router>
-      <ModalProvider>
-        <PMFrontContextProvider value={frontContext}>
+      <PMFrontContextProvider>
+        <ModalProvider>
           <noscript>You need to enable JavaScript to run this app.</noscript>
           <div id="modal-test"></div>
           <header>
@@ -214,7 +154,7 @@ export default function App() {
                     {navItem('', 'Catalogue')}
                     {navItem('licence', 'Licence')}
                     {navItem('show', 'Visualisation')}
-                    <li className={isEditor() ? 'nav-item' : 'nav-item hide-wip'}>
+                    <li className={appInfo?.isEditor ? 'nav-item' : 'nav-item hide-wip'}>
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
                           Métadonnées
@@ -232,7 +172,7 @@ export default function App() {
                     </li>
 
                     {navItem('monitoring', 'Monitoring', false)}
-                    {navItem('user', 'Utilisateurs', isAdmin())}
+                    {navItem('user', 'Utilisateurs', appInfo?.isAdmin)}
                     {navItem('conf', 'Configuration', false)}
 
                     <li className="nav-item center">
@@ -264,7 +204,7 @@ export default function App() {
               path={getBackUrl('metadata')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: isEditor() }}
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -274,7 +214,7 @@ export default function App() {
               path={getBackUrl('gestion')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: isEditor() }}
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -284,7 +224,7 @@ export default function App() {
               path={getBackUrl('producer')}
               element={
                 <CatalogueProducer
-                  display={{ searchbar: true, editJDD: isEditor() }}
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -294,7 +234,7 @@ export default function App() {
               path={getBackUrl('contact')}
               element={
                 <CatalogueContact
-                  display={{ searchbar: true, editJDD: isEditor() }}
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -304,7 +244,7 @@ export default function App() {
               path={getBackUrl('pub_key')}
               element={
                 <CataloguePubKeys
-                  display={{ searchbar: true, editJDD: isEditor() }}
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -320,7 +260,10 @@ export default function App() {
             <Route
               path={getBackUrl('user')}
               element={
-                <CatalogueUser display={{ searchbar: true, editJDD: isEditor() }} editMode={{}} />
+                <CatalogueUser
+                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
+                  editMode={{}}
+                />
               }
             />
             <Route
@@ -328,8 +271,8 @@ export default function App() {
               element={<div className="tempPaddingTop">Work in progress</div>}
             />
           </Routes>
-        </PMFrontContextProvider>
-      </ModalProvider>
+        </ModalProvider>
+      </PMFrontContextProvider>
     </Router>
   )
 }

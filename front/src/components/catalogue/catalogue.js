@@ -39,13 +39,14 @@ export default function Catalogue({ display }) {
   const isSearchMode = () => searchText?.current?.value?.length > 0
   const searchMode = () => (isSearchMode() ? `/search` : '')
 
-  const frontCotnext = usePMFrontContext()
+  const frontContext = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   useEffect(() => {
     // console.log(`-- Catalogue: ${generalConf.formUrl}`)
-    setFormUrl(`${frontCotnext.formUrl}`)
-  }, [frontCotnext])
+    setFormUrl(`${frontContext.formUrl}`)
+  }, [frontContext])
+
   useEffect(() => {
     if (initialRender.current) {
       initialRender.current = false

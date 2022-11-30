@@ -74,9 +74,9 @@ export default function EditUserCard({ refresh }) {
   const editUser = () => {
     if (!editId) return
     axios
-      .get(urlUser(id))
+      .get(urlUser(editId))
       .then((user) => {
-        console.info('T (editUser)',user)
+        console.info('T (editUser)', user)
         axios
           .get(urlRoles)
           .then((res) => {

@@ -1,7 +1,8 @@
 import axios from 'axios'
 import React, { createContext, useEffect, useState } from 'react'
-import { getApiData, getApiFront } from './App'
+
 import useToken from './useToken'
+import { getApiData, getApiFront } from './App'
 
 /**
  * We use this context to memorize
@@ -20,11 +21,18 @@ export const defaultFrontContext = {
 }
 const PMFrontContext = createContext(defaultFrontContext)
 
+export const usePMFrontContext = () => React.useContext(PMFrontContext)
+
 export const PMFrontContextProvider = ({ children }) => {
   const { token } = useToken()
 
-  const [data, setData] = useState(null)
+  const [appInfo, setAppInfo] = useState({})
   const [loading, setLoading] = useState(false)
+
+  const isAdmin = (roles = []) =>
+    roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1
+  const isEditor = (roles = []) =>
+    roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1
 
   const callBackApi = async (token) => {
     if (!token) return defaultFrontContext
@@ -35,52 +43,39 @@ export const PMFrontContextProvider = ({ children }) => {
         axios.get(getApiData('enum/themes/fr')),
         axios.get(getApiFront('user-info')),
       ])
-
-      const backData = {
+      const userInfo = values[2].data?.roles
+      const backValues = {
         formUrl: `${values[0].data}`,
         themeLabels: values[1].data,
-        userInfo: values[2].data,
+        userInfo,
+        isEditor: isEditor(userInfo),
+        isAdmin: isAdmin(userInfo),
       }
-      const userInfo = backData.userInfo || {}
-      if (
-        !userInfo?.roles ||
-        userInfo.roles.length === 0 ||
-        (userInfo.roles.length === 1 && userInfo.roles[0] === 'Lecteur')
-      ) {
-        backData.isEditor = false
-        backData.isAdmin = false
-      } else if (
-        userInfo.roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1
-      ) {
-        backData.isEditor = true
-        backData.isAdmin = true
-      } else if (userInfo.roles.findIndex((role) => role === 'Editeur') > -1) {
-        backData.isEditor = true
-        backData.isAdmin = false
-      }
-      return backData
+
+      return backValues
     } catch (err) {
       console.error('T (callBackApi) ERR:', err)
       return defaultFrontContext
     }
   }
 
-  const isEditor = () => !!data?.isEditor
-  const isAdmin = () => !!data?.isAdmin
-
   const getBackData = async (token) => {
     setLoading(true)
+    console.log('T (getBackData) Loading 1:', loading)
     const newData = await callBackApi(token)
-    setData(newData)
+    setAppInfo(newData)
     setLoading(false)
+    console.log('T (getBackData) Loading 2:', loading)
+    console.log('T (getBackData) Data received:', newData)
+    console.log('T (getBackData) Data received:', newData)
+    console.log('T (getBackData) Data loaded:', appInfo)
   }
+
   useEffect(() => {
     getBackData(token)
   }, [token])
+
   return (
-    <PMFrontContext.Provider value={{ loading, frontContext: data }}>
-      {children}
-    </PMFrontContext.Provider>
+    <PMFrontContext.Provider value={{ loading, data: appInfo }}>{children}</PMFrontContext.Provider>
   )
 }
-export const usePMFrontContext = () => React.useContext(PMFrontContext)
