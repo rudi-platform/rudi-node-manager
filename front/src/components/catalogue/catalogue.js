@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import PropTypes from 'prop-types'
 import MetadataCard from './metadataCard'
 import { filterConf } from './conf'
-import { GeneralContext } from '../../generalContext'
+import { usePMFrontContext } from '../../generalContext'
 import ThemeDisplay from '../other/themeDisplay'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { Search } from 'react-bootstrap-icons'
@@ -39,13 +39,13 @@ export default function Catalogue({ display }) {
   const isSearchMode = () => searchText?.current?.value?.length > 0
   const searchMode = () => (isSearchMode() ? `/search` : '')
 
-  const generalConf = useContext(GeneralContext)
+  const frontCotnext = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   useEffect(() => {
     // console.log(`-- Catalogue: ${generalConf.formUrl}`)
-    setFormUrl(`${generalConf.formUrl}`)
-  }, [generalConf])
+    setFormUrl(`${frontCotnext.formUrl}`)
+  }, [frontCotnext])
   useEffect(() => {
     if (initialRender.current) {
       initialRender.current = false
@@ -390,7 +390,7 @@ export default function Catalogue({ display }) {
         )}
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && formUrl && (
+            {display?.editJDD && formUrl && (
               <EditObjCard
                 idField={idField}
                 formUrl={formUrl}

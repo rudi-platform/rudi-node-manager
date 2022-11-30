@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import PropTypes from 'prop-types'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { GeneralContext } from '../../generalContext'
+import { usePMFrontContext } from '../../generalContext'
 import { EditObjCard, ObjCard } from '../generic/objCard'
 import { getApiData } from '../../App'
 
@@ -46,12 +46,12 @@ export default function ObjCatalogue({
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const generalConf = useContext(GeneralContext)
-  const editUrl = `${generalConf.formUrl}${formUrlObj}`
+  const frontContext = usePMFrontContext()
+  const editUrl = `${frontContext.formUrl}${formUrlObj}`
   const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
   useEffect(() => getInitialData(), [])
-  useEffect(() => setFormUrl(editUrl), [generalConf])
+  useEffect(() => setFormUrl(editUrl), [frontContext])
 
   const deleteUrl = (id) => getApiUrlObj(id)
   const refresh = () => {

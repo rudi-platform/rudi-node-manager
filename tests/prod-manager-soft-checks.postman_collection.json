@@ -139,9 +139,11 @@
 									"pm.test(\"Store token\", () => {",
 									"    pm.expect(pm.response.code).to.eql(200);",
 									"    const res = pm.response.json()",
-									"    pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
-									"    const expirationTime = new Date(res.expires).getTime()",
-									"    pm.expect(expirationTime).to.gt(new Date().getTime())",
+									"    pm.expect(res.username).to.eq(pm.variables.get('adminusername'))",
+									"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
+									"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
+									"    //const expirationTime = new Date(res.expires).getTime()",
+									"    //pm.expect(expirationTime).to.gt(new Date().getTime())",
 									"});",
 									""
 								],
@@ -445,7 +447,7 @@
 			]
 		},
 		{
-			"name": "02. Get rudi objects",
+			"name": "04. Get rudi objects",
 			"item": [
 				{
 					"name": "API Clean",
@@ -1888,7 +1890,7 @@
 			]
 		},
 		{
-			"name": "02. Check API front",
+			"name": "05. Check API front",
 			"item": [
 				{
 					"name": "GET formUrl",
@@ -1934,11 +1936,11 @@
 			]
 		},
 		{
-			"name": "02. Check API Media",
+			"name": "06. Check API Media",
 			"item": []
 		},
 		{
-			"name": "03. Add/get user",
+			"name": "07. Add/get user",
 			"item": [
 				{
 					"name": "Get all users",
@@ -2062,6 +2064,42 @@
 								"secu",
 								"users",
 								"{{softUser1username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user: not found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get user\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.statusCode).to.eq(404);",
+									"    pm.expect(res.message).to.eq(\"User not found: 'grul'\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{pmBackUrl}}/api/secu/users/grul",
+							"host": [
+								"{{pmBackUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								"grul"
 							]
 						}
 					},
@@ -2624,14 +2662,6 @@
 			"value": ""
 		},
 		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
 			"key": "mediaToken",
 			"value": ""
 		},
@@ -2700,19 +2730,11 @@
 			"value": ""
 		},
 		{
-			"key": "softUser1username",
+			"key": "apiJwt",
 			"value": ""
 		},
 		{
-			"key": "softUser1email",
-			"value": ""
-		},
-		{
-			"key": "softUser1password",
-			"value": ""
-		},
-		{
-			"key": "userId",
+			"key": "portalJwt",
 			"value": ""
 		}
 	]

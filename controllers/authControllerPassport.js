@@ -65,8 +65,8 @@ exports.postLogin = async (req, res, next) => {
       return res
         .status(401)
         .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
-
-    dbGetUserRolesByUsername(null, user.username)
+    const username = user.username
+    dbGetUserRolesByUsername(null, username)
       .then((roles) => {
         if (!roles?.length)
           return res
@@ -78,6 +78,7 @@ exports.postLogin = async (req, res, next) => {
 
         req.login(user, { session: false }, async (err) => {
           if (err) return res.status(400).json({ errors: err })
+          user.roles = roles
           const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user)
 
           // sameSite: 'Lax' ?
@@ -85,7 +86,7 @@ exports.postLogin = async (req, res, next) => {
             .status(200)
             .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
             .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
-            .json({ username: user.username, roles })
+            .json({ username, roles })
         })
       })
       .catch((er) => {

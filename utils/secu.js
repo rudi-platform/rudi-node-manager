@@ -57,7 +57,7 @@ exports.createFrontUserTokens = async (userInfo) => {
   delete userInfo?.password
   return {
     [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
-    [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ exp }, SECRET_KEY_JWT),
+    [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ roles: userInfo.roles, exp }, SECRET_KEY_JWT),
     exp,
   }
 }
@@ -74,7 +74,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
-  // console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody);
+  console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
   // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);

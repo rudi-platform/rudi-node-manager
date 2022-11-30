@@ -5,6 +5,7 @@ const axios = require('axios')
 
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
+const { dbGetUserByUsername } = require('../database/database')
 const { ForbiddenError, STATUS_CODE, UnauthorizedError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
@@ -32,13 +33,14 @@ exports.getMediaToken = async (req, res, next) => {
     // console.error('T (getMediaToken) jwt:', jwt);
 
     const jwtPayload = readJwtBody(jwt)
-    const user = jwtPayload.user
+    const payloadUser = jwtPayload.user
     const exp = jwtPayload.exp
-    if (!user)
+    if (!payloadUser)
       throw new UnauthorizedError(`JWT body token should contain an identified user: ${jwtPayload}`)
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
+    const user = await dbGetUserByUsername(null, payloadUser.username)
     const mediaToken = await getTokenFromMediaForUser(user, exp)
     // T (The following is just for debugging)
     /*

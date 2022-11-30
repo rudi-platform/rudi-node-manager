@@ -1,19 +1,21 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { GeneralContext } from '../../generalContext'
+import { usePMFrontContext } from '../../generalContext'
 
 /**
  * Composant : ThemeDisplay
  * @return {ReactNode}
  */
 export default function ThemeDisplay({ value }) {
-  const generalConf = useContext(GeneralContext)
+  const generalConf = usePMFrontContext()
   /**
    * get Theme Label
    * @return {String} text to display
    */
   const getLabel = () =>
-    generalConf.themeLabel && generalConf.themeLabel[value] ? generalConf.themeLabel[value] : value
+    generalConf.themeLabels && generalConf.themeLabels[value]
+      ? generalConf.themeLabels[value]
+      : value
 
   return <span>{getLabel()}</span>
 }

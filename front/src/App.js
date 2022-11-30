@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { defaultFrontContext, PMFrontContextProvider, usePMFrontContext } from './generalContext'
 import './styles/App.scss'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import DropdownButton from 'react-bootstrap/DropdownButton'
@@ -15,7 +16,6 @@ import Login, { showPill as showPillLogin } from './components/login/login'
 import Register, { showPill as showPillRegister } from './components/login/register'
 import useToken from './useToken'
 import { ModalProvider } from './components/modals/modalContext'
-import { GeneralContext } from './generalContext'
 import axios from 'axios'
 import Monitoring from './components/monitoring/monitoring'
 import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions'
@@ -45,13 +45,12 @@ export default function App() {
   // console.log('-- App');
 
   const { token, updateToken } = useToken()
+  // const [generalConf, setGeneralConf] = useState({})
+  const frontContext = usePMFrontContext()
 
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
-  const [isReadOnly, setIsReadOnly] = useState(true)
-  const [generalConf, setGeneralConf] = useState({})
-  const [userInfo, setUserInfo] = useState({})
 
   const showLoginBox = () => {
     setIsLoginOpen(true)
@@ -71,48 +70,68 @@ export default function App() {
     setIsRegisterOpen(true)
   }
 
-  const setUser = (user) => {
-    if (!token) {
-      console.debug('T (setIsReadOnly) 0')
-      setIsReadOnly(true)
-    }
-    setUserInfo(user)
+  const setFrontContext = (context = defaultFrontContext) => {
+    frontContext.formUrl = context.formUrl
+    frontContext.themeLabels = context.themeLabels
 
-    if (
-      !user?.roles ||
-      user.roles.length === 0 ||
-      (user.roles.length === 1 && user.roles[0] === 'Lecteur')
-    ) {
-      console.debug('T (setIsReadOnly) 1')
-      console.debug('T (setIsReadOnly) roles', user.roles)
-      setIsReadOnly(true)
-    } else if (
-      user.roles.findIndex(
-        (role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur'
-      ) > -1
-    ) {
-      console.debug('T (setIsReadOnly) 2')
-      setIsReadOnly(false)
-    } else {
-      console.debug('T (setIsReadOnly) 3')
-      setIsReadOnly(true)
-    }
-
+    setDisplayFlags(context.userInfo)
   }
 
+  const setDisplayFlags = (userInfo) => {
+    frontContext.userInfo = userInfo
+    if (
+      !userInfo?.roles ||
+      userInfo.roles.length === 0 ||
+      (userInfo.roles.length === 1 && userInfo.roles[0] === 'Lecteur')
+    ) {
+      frontContext.isEditor = false
+      frontContext.isAdmin = false
+    } else if (userInfo.roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1) {
+      frontContext.isEditor = true
+      frontContext.isAdmin = true
+    } else if (userInfo.roles.findIndex((role) => role === 'Editeur') > -1) {
+      frontContext.isEditor = true
+      frontContext.isAdmin = false
+    }
+    console.debug('T (setDisplayFlags) frontContext:', frontContext)
+    console.debug('T (setDisplayFlags) isEditor', isEditor())
+    console.debug('T (setDisplayFlags) isAdmin', isAdmin())
+  }
+
+  const isEditor = () => !!frontContext?.isEditor
+  const isAdmin = () => !!frontContext?.isAdmin
+
+  // const getUserInfo = () => {
+  //   setUser(generalConf?.userInfo)
+  // }
+  // if (!userInfo) getUserInfo()
+
   useEffect(() => {
-    if (!!token && !generalConf.formUrl) {
+    if (!token) {
+      console.debug('T (setGeneralConf) disconnected: conf=', frontContext)
+      frontContext.userInfo = {}
+    } else {
       Promise.all([
-        axios.get(getApiFront('formUrl')).catch(() => {
+        axios.get(getApiFront('formUrl')).catch((er) => {
+          console.error('T (setGeneralConf) err', er.message)
           return { data: '' }
         }),
-        axios.get(getApiData('enum/themes/fr')).catch(() => {
-          // console.error('Error getting themes: ', e);
+        axios.get(getApiData('enum/themes/fr')).catch((er) => {
+          console.error('T (setGeneralConf) err', er.message)
+          return { data: {} }
+        }),
+        axios.get(getApiFront('user-info')).catch((er) => {
+          console.error('T (setGeneralConf) err', er.message)
           return { data: {} }
         }),
       ]).then((values) => {
-        setGeneralConf({ formUrl: `${values[0].data}`, themeLabel: values[1].data })
+        setFrontContext({
+          formUrl: `${values[0].data}`,
+          themeLabels: values[1].data,
+          userInfo: values[2].data,
+        })
       })
+      console.debug('T (setGeneralConf) connected: conf=', frontContext)
     }
   }, [token])
 
@@ -133,11 +152,11 @@ export default function App() {
    *
    * @param {*} destUrl
    * @param {*} buttonText
-   * @param {*} hide
+   * @param {*} show
    * @return {ReactNode}
    */
-  const navItem = (destUrl, buttonText, hide = false) => (
-    <li className={hide ? 'nav-item hide-wip' : 'nav-item'}>
+  const navItem = (destUrl, buttonText, show = true) => (
+    <li className={show ? 'nav-item' : 'nav-item hide-wip'}>
       <Link to={getBackUrl(destUrl)}>
         <button type="button" className="btn btn-primary">
           {buttonText}
@@ -154,7 +173,7 @@ export default function App() {
   if (!token) {
     return (
       <div>
-        {isLoginOpen && <Login setToken={updateToken} setUser={setUser} />}
+        {isLoginOpen && <Login setToken={updateToken} setDisplayFlags={setDisplayFlags} />}
         {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
@@ -168,7 +187,7 @@ export default function App() {
   return (
     <Router>
       <ModalProvider>
-        <GeneralContext.Provider value={generalConf}>
+        <PMFrontContextProvider value={frontContext}>
           <noscript>You need to enable JavaScript to run this app.</noscript>
           <div id="modal-test"></div>
           <header>
@@ -195,7 +214,7 @@ export default function App() {
                     {navItem('', 'Catalogue')}
                     {navItem('licence', 'Licence')}
                     {navItem('show', 'Visualisation')}
-                    <li className={isReadOnly ? 'nav-item hide-wip' : 'nav-item'}>
+                    <li className={isEditor() ? 'nav-item' : 'nav-item hide-wip'}>
                       <DropdownButton id="dropdown-gestion-button" title="Gestion">
                         <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
                           Métadonnées
@@ -212,9 +231,9 @@ export default function App() {
                       </DropdownButton>
                     </li>
 
-                    {navItem('monitoring', 'Monitoring', 'hide')}
-                    {navItem('user', 'Utilisateurs', isReadOnly)}
-                    {navItem('conf', 'Configuration', 'hide')}
+                    {navItem('monitoring', 'Monitoring', false)}
+                    {navItem('user', 'Utilisateurs', isAdmin())}
+                    {navItem('conf', 'Configuration', false)}
 
                     <li className="nav-item center">
                       <button type="button" className="btn btn-secondary" onClick={() => logout()}>
@@ -245,7 +264,7 @@ export default function App() {
               path={getBackUrl('metadata')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: !isReadOnly }}
+                  display={{ searchbar: true, editJDD: isEditor() }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -255,7 +274,7 @@ export default function App() {
               path={getBackUrl('gestion')}
               element={
                 <Catalogue
-                  display={{ searchbar: true, editJDD: !isReadOnly }}
+                  display={{ searchbar: true, editJDD: isEditor() }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -265,7 +284,7 @@ export default function App() {
               path={getBackUrl('producer')}
               element={
                 <CatalogueProducer
-                  display={{ searchbar: true, editJDD: !isReadOnly }}
+                  display={{ searchbar: true, editJDD: isEditor() }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -275,7 +294,7 @@ export default function App() {
               path={getBackUrl('contact')}
               element={
                 <CatalogueContact
-                  display={{ searchbar: true, editJDD: !isReadOnly }}
+                  display={{ searchbar: true, editJDD: isEditor() }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -285,7 +304,7 @@ export default function App() {
               path={getBackUrl('pub_key')}
               element={
                 <CataloguePubKeys
-                  display={{ searchbar: true, editJDD: !isReadOnly }}
+                  display={{ searchbar: true, editJDD: isEditor() }}
                   specialSearch={{}}
                   editMode={{}}
                 />
@@ -301,7 +320,7 @@ export default function App() {
             <Route
               path={getBackUrl('user')}
               element={
-                <CatalogueUser display={{ searchbar: true, editJDD: !isReadOnly }} editMode={{}} />
+                <CatalogueUser display={{ searchbar: true, editJDD: isEditor() }} editMode={{}} />
               }
             />
             <Route
@@ -309,7 +328,7 @@ export default function App() {
               element={<div className="tempPaddingTop">Work in progress</div>}
             />
           </Routes>
-        </GeneralContext.Provider>
+        </PMFrontContextProvider>
       </ModalProvider>
     </Router>
   )

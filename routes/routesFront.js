@@ -2,7 +2,7 @@ const express = require('express')
 const router = new express.Router()
 
 const passport = require('../utils/passportSetup')
-const { getFormUrl } = require('../controllers/consoleController')
+const { getFormUrl, getUserInfo } = require('../controllers/consoleController')
 const {
   logout,
   postLogin,
@@ -12,6 +12,7 @@ const {
 
 router.get('/formUrl', passport.authenticate('jwt', { session: false }), getFormUrl)
 router.get('/logout', passport.authenticate('jwt', { session: false }), logout)
+router.get('/user-info', passport.authenticate('jwt', { session: false }), getUserInfo)
 
 router.post('/register', postRegister)
 router.put('/change-password', putPassword) // Delayed auth

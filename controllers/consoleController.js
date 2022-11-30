@@ -4,6 +4,7 @@ const { getConsoleFormUrl } = require('../config/config')
 const log = require('../utils/logger')
 const errorHandler = require('./errorHandler')
 const databaseManager = require('../database/database')
+const {  UnauthorizedError } = require('../utils/errors')
 
 // Default Value for rudi_console
 exports.getDefaultForm = (req, res) => {
@@ -50,4 +51,11 @@ exports.getFormUrl = (req, res) => {
     log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_formUrl' }))
     throw err
   }
+}
+
+exports.getUserInfo = (req, res) => {
+  const user = req.user
+  if (!user) return res.status(401).send(new UnauthorizedError('User info not available'))
+  const { username, roles } = user
+  return res.status(200).json({ username, roles })
 }

@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import PropTypes from 'prop-types'
 import EditUserCard from './editUserCard'
 import UserCard from './userCard'
-import { GeneralContext } from '../../generalContext'
+import { usePMFrontContext } from '../../generalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const propId = 'id'
@@ -18,7 +18,7 @@ export default function CatalogueUser({ display }) {
   const [hasMore, setHasMore] = useState(false)
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
-  const generalConf = useContext(GeneralContext)
+  const frontContext = usePMFrontContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
@@ -60,9 +60,7 @@ export default function CatalogueUser({ display }) {
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && (
-              <EditUserCard refresh={refresh}></EditUserCard>
-            )}
+            {display && display.editJDD && <EditUserCard refresh={refresh}></EditUserCard>}
             <InfiniteScroll
               dataLength={objList.length}
               next={fetchMoreData}
