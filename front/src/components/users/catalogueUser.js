@@ -20,7 +20,7 @@ export default function CatalogueUser({ display }) {
   const [hasMore, setHasMore] = useState(false)
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
-  // const frontContext = usePMFrontContext()
+  // const { appInfo } = usePMFrontContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 

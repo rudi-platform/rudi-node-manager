@@ -46,12 +46,12 @@ export default function ObjCatalogue({
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const frontContext = usePMFrontContext()
-  const editUrl = `${frontContext.formUrl}${formUrlObj}`
+  const { appInfo } = usePMFrontContext()
+  const editUrl = `${appInfo.formUrl}${formUrlObj}`
   const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
   useEffect(() => getInitialData(), [])
-  useEffect(() => setFormUrl(editUrl), [frontContext])
+  useEffect(() => setFormUrl(editUrl), [appInfo])
 
   const deleteUrl = (id) => getApiUrlObj(id)
   const refresh = () => {

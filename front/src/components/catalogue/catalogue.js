@@ -25,6 +25,9 @@ const btnTextChg = 'Modifier un jeu de données :'
  * @return {ReactNode}
  */
 export default function Catalogue({ display }) {
+  const { appInfo } = usePMFrontContext()
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+
   // console.log('-- Catalogue')
   const [metadatas, setMetadatas] = useState([])
   const [countBy, setCountBy] = useState([])
@@ -39,13 +42,10 @@ export default function Catalogue({ display }) {
   const isSearchMode = () => searchText?.current?.value?.length > 0
   const searchMode = () => (isSearchMode() ? `/search` : '')
 
-  const frontContext = usePMFrontContext()
-  const { defaultErrorHandler } = useDefaultErrorHandler()
-
   useEffect(() => {
-    // console.log(`-- Catalogue: ${generalConf.formUrl}`)
-    setFormUrl(`${frontContext.formUrl}`)
-  }, [frontContext])
+    console.log(`-- Catalogue: ${appInfo.formUrl}`)
+    setFormUrl(`${appInfo.formUrl}`)
+  }, [appInfo])
 
   useEffect(() => {
     if (initialRender.current) {
@@ -55,6 +55,7 @@ export default function Catalogue({ display }) {
       else fetchMoreData()
     }
   }, [currentOffset])
+
   useEffect(() => {
     // console.log('-- useEffect: refresh')
 

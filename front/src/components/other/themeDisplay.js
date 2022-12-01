@@ -11,15 +11,13 @@ ThemeDisplay.propTypes = {
  * @return {ReactNode}
  */
 export default function ThemeDisplay({ value }) {
-  const generalConf = usePMFrontContext()
+  const { appInfo } = usePMFrontContext()
   /**
    * get Theme Label
    * @return {String} text to display
    */
   const getLabel = () =>
-    generalConf.themeLabels && generalConf.themeLabels[value]
-      ? generalConf.themeLabels[value]
-      : value
+    appInfo.themeLabels && appInfo.themeLabels[value] ? appInfo.themeLabels[value] : value
 
   return <span>{getLabel()}</span>
 }

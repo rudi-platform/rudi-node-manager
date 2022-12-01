@@ -52,7 +52,7 @@ export const PMFrontContextProvider = ({ children }) => {
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
         }
-        // console.debug('T (context.useEffect) backValues:', backValues)
+        console.debug('T (context.useEffect) backValues:', backValues)
 
         return backValues
       } catch (err) {
