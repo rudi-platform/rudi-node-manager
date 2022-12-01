@@ -15,6 +15,7 @@ const {
   dbUpdateUser,
   dbUpdateUserRoles,
   dbClose,
+  dbGetUserInfoByUsername,
 } = require('../database/database')
 
 const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
@@ -34,8 +35,21 @@ exports.getUserByUsername = async (req, res, next) => {
     const { username: name } = req.params
     const userInfo = await dbGetUserByUsername(null, name)
     if (!userInfo) return res.status(404).json(new NotFoundError(`User not found: '${name}'`))
-    const { id, username, email } = userInfo
-    return res.status(200).json({ id, username, email })
+    const { id, username, email, roles } = userInfo
+    return res.status(200).json({ id, username, email, roles })
+  } catch (err) {
+    const error = errorHandler.error(err, req, { opType: 'get_user' })
+    return res.status(error.statusCode || 500).json(new RudiError(error.message))
+  }
+}
+
+exports.getUserInfoByUsername = async (req, res, next) => {
+  try {
+    const { username: name } = req.params
+    const userInfo = await dbGetUserInfoByUsername(null, name)
+    if (!userInfo) return res.status(404).json(new NotFoundError(`User not found: '${name}'`))
+    const { id, username, email, roles } = userInfo
+    return res.status(200).json({ id, username, email, roles })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_user' })
     return res.status(error.statusCode || 500).json(new RudiError(error.message))
@@ -124,11 +138,9 @@ exports.editUser = async (req, res, next) => {
     const dbUserSameName = await dbGetUserByUsername(db, username)
     if (dbUserSameName && dbUserSameName.id !== dbUser.id)
       return res.status(403).json(`Ce nom est déjà utilisé: '${username}'`)
-
     const dbUserSameMail = await dbGetUserByEmail(db, email)
     if (dbUserSameMail && dbUserSameMail.id !== dbUser.id)
       return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
-
     await dbUpdateUser(db, { id, username, email })
     await dbUpdateUserRoles(db, { userId: id, username, roles })
     return res.status(200).json({ status: 'OK' })

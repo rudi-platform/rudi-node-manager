@@ -8,7 +8,6 @@ import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
-import { ArrowCounterclockwise } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation'
@@ -24,11 +23,11 @@ const validation = {
 }
 
 EditUserModal.propTypes = {
-  visible: PropTypes.bool,
-  toggleEdit: PropTypes.func,
-  user: PropTypes.object,
-  roles: PropTypes.array,
-  refresh: PropTypes.func,
+  user: PropTypes.object.isRequired,
+  roleList: PropTypes.array.isRequired,
+  visible: PropTypes.bool.isRequired,
+  toggleEdit: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired,
 }
 
 /**
@@ -36,7 +35,7 @@ EditUserModal.propTypes = {
  * @param {*} props Modal properties
  * @return {ReactNode} EditRoleModal html component
  */
-export default function EditUserModal({ visible, toggleEdit, user, roles, refresh }) {
+export default function EditUserModal({ user, roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
   const [userInfo, setUserInfo] = useState(user)
 
@@ -47,7 +46,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
       return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
 
     if (!val) {
-      console.error('T (hasErrors)', prop, userInfo[prop])
+      // console.error('T (hasErrors)', prop, user[prop])
       return 'Ce champ est requis'
     }
     let isInvalid
@@ -74,8 +73,8 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
     })
   }
 
-  const isInUserRole = (role, rolesList) =>
-    !!(rolesList && rolesList.findIndex((element) => element === role.role) >= 0)
+  const isInUserRole = (userRoles, role) =>
+    !!(userRoles?.findIndex((element) => element === role.role) >= 0)
 
   const handleChange = (event) => {
     const prop = event.target.id
@@ -135,9 +134,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
   }
 
   /**
-   * call for user_role deletion
-   * @param {*} role role
-   * @param {*} user utilisateur
+   * Update user information
    */
   const sendUserInfo = async () => {
     try {
@@ -149,7 +146,6 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
     }
   }
 
-  const resetPassword = () => {}
   return (
     <Modal show={visible} onHide={toggleEdit} animation={false}>
       <Form noValidate onSubmit={handleSubmit}>
@@ -199,18 +195,17 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
             <Form.Group className="mb-1" id="formRoles" controlId="roles">
               <Form.Label>Rôles</Form.Label>
               <InputGroup hasValidation>
-                {roles &&
-                  roles.map((role) => (
-                    <Form.Check
-                      key={role.role}
-                      label={`${role.role} (${role.desc})`}
-                      id={role.role}
-                      defaultChecked={isInUserRole(role, userInfo?.roles)}
-                      value={isInUserRole(role, userInfo?.roles)}
-                      onChange={handleRoleChange}
-                      isInvalid={hasErrors('roles')}
-                    />
-                  ))}
+                {roleList.map((role) => (
+                  <Form.Check
+                    key={role.role}
+                    label={`${role.role} (${role.desc})`}
+                    id={role.role}
+                    defaultChecked={isInUserRole(userInfo?.roles, role)}
+                    value={isInUserRole(userInfo?.roles, role)}
+                    onChange={handleRoleChange}
+                    isInvalid={hasErrors('roles')}
+                  />
+                ))}
                 <Form.Control.Feedback type="invalid" tooltip>
                   {errors.roles}
                 </Form.Control.Feedback>
@@ -220,7 +215,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
           <Row>
             <Form.Group as={Col}>
               <p className="card-text on-right">
-                id : <small className="text-muted">{user?.id}</small>
+                id : <small className="text-muted">{userInfo?.id}</small>
               </p>
             </Form.Group>
             {/* <pre>{JSON.stringify(userInfo, null, 2)}</pre>
@@ -243,7 +238,7 @@ export default function EditUserModal({ visible, toggleEdit, user, roles, refres
   )
 }
 
-export const useEditUserInfoModal = () => {
+export const useEditUserModal = () => {
   const [isVisibleEditModal, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
@@ -253,7 +248,7 @@ export const useEditUserInfoModal = () => {
   return { isVisibleEditModal, toggleEditModal }
 }
 
-export const useEditUserInfoModalOptions = () => {
+export const useEditUserModalOptions = () => {
   const [editModalOptions, setOptions] = useState({})
   /**
    * change la valeur des options

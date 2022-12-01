@@ -5,10 +5,7 @@ import axios from 'axios'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
-import EditUserModal, {
-  useEditUserInfoModal,
-  useEditUserInfoModalOptions,
-} from '../modals/editUserModal'
+import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 
 const resetPwdConfirmMsg = (id) =>
   `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
@@ -23,23 +20,32 @@ const resetPasswordUrl = (id) => `api/front/users/${id}/reset-password`
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
 const deleteUrl = (id) => `api/secu/users/${id}`
+
+UserCard.propTypes = {
+  user: PropTypes.object,
+  roleList: PropTypes.array,
+  display: PropTypes.object,
+  refresh: PropTypes.func,
+}
+
 // put('/users/:id/reset-password'
 /**
  * Composant : UserCard
  * @return {ReactNode}
  */
-export default function UserCard({ user, display, refresh }) {
+export default function UserCard({ user, roleList, refresh }) {
   const { changeOptions, toggle } = React.useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const { isVisibleEditModal, toggleEditModal } = useEditUserInfoModal()
-  const { editModalOptions, changeEditModalOptions } = useEditUserInfoModalOptions()
+  const { isVisibleEditModal, toggleEditModal } = useEditUserModal()
+  // const { editModalOptions, changeEditModalOptions } = useEditUserModalOptions()
 
   /**
    * call for user deletion
    * @param {*} user utilisateur
+   * @return {void}
    */
-  const deleteUser = (user) =>
+  const deleteUser = () =>
     axios
       .delete(deleteUrl(user.id))
       .then((res) => {
@@ -50,19 +56,18 @@ export default function UserCard({ user, display, refresh }) {
 
   /**
    * call for confirmation before user deletion
-   * @param {*} user user a suppr
+   * @return {void}
    */
-  const triggerDeleteUser = (user) => {
-    changeOptions(getOptConfirm(deleteConfirmMsg(user.username), () => deleteUser(user)))
+  const triggerDeleteUser = () => {
+    changeOptions(getOptConfirm(deleteConfirmMsg(user.username), () => deleteUser()))
     toggle()
   }
 
   /**
    * Call for reseting a user's password
-   * @param {*} user The user info
-   * @returns
+   * @return {void}
    */
-  const resetPassword = (user) =>
+  const resetPassword = () =>
     axios
       .put(resetPasswordUrl(user.id))
       .then((res) => {
@@ -73,26 +78,20 @@ export default function UserCard({ user, display, refresh }) {
 
   /**
    * call for confirmation before resetting user password
-   * @param {*} user user a suppr
+   * @return {void}
    */
-  const triggerResetPwd = (user) => {
+  const triggerResetPwd = () => {
     changeOptions(getOptConfirm(resetPwdConfirmMsg(user.username), () => resetPassword(user)))
     toggle()
   }
 
   /**
    * call for user update
-   * @param {*} user utilisateur
+   * @return {void}
    */
-  const updateUser = (user) => {
-    axios
-      .get(`api/secu/roles`)
-      .then((res) => {
-        changeEditModalOptions({ user, roles: res.data })
-        toggleEditModal()
-        refresh()
-      })
-      .catch((err) => defaultErrorHandler(err))
+  const updateUser = () => {
+    toggleEditModal()
+    refresh()
   }
 
   return (
@@ -124,9 +123,8 @@ export default function UserCard({ user, display, refresh }) {
             <EditUserModal
               visible={isVisibleEditModal}
               toggleEdit={toggleEditModal}
-              options={editModalOptions}
               user={user}
-              roles={editModalOptions.roles}
+              roleList={roleList}
               refresh={refresh}
             ></EditUserModal>
           </div>
@@ -151,9 +149,4 @@ export default function UserCard({ user, display, refresh }) {
       </div>
     </div>
   )
-}
-UserCard.propTypes = {
-  user: PropTypes.object,
-  display: PropTypes.object,
-  refresh: PropTypes.func,
 }

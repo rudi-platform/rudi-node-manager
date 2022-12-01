@@ -15,7 +15,7 @@ const {
   STATUS_CODE,
   UnauthorizedError,
 } = require('../utils/errors')
-const { hashPassword } = require('../utils/secu')
+const { hashPassword, CONSOLE_TOKEN_NAME } = require('../utils/secu')
 const log = require('../utils/logger')
 
 // ---- Constants -----
@@ -33,7 +33,7 @@ exports.TBL_USER_ROLES = TBL_USER_ROLES
 
 // ---- Functions -----
 const dbOpen = () => {
-  const fun = 'open'
+  const fun = 'dbOpen'
   const db = new Database(DB_FILE, OPEN_READWRITE, (err) => {
     if (err) {
       log.e(mod, fun, err)
@@ -44,6 +44,7 @@ const dbOpen = () => {
   })
   return db.exec('PRAGMA foreign_keys = ON')
 }
+exports.dbOpen = dbOpen
 
 const dbClose = (db) => {
   db.close((err) => {
@@ -51,6 +52,7 @@ const dbClose = (db) => {
   })
   return statusOK('DB closed')
 }
+exports.dbClose = dbClose
 
 exports.dbOpenOrCreate = () => {
   const fun = 'dbOpenOrCreate'
@@ -96,7 +98,11 @@ exports.dbGetUserByField = (openedDb, field, val) => {
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
-      `SELECT id, username, email FROM ${TBL_USERS} WHERE ${field} = ?`,
+      `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email,` +
+        ` GROUP_CONCAT(${TBL_USER_ROLES}.role) AS roles FROM ${TBL_USERS}` +
+        ` LEFT JOIN ${TBL_USER_ROLES} ON ${TBL_USER_ROLES}.userId = ${TBL_USERS}.id` +
+        ` GROUP BY ${TBL_USERS}.id HAVING ${TBL_USERS}.${field} = ?;`,
+      // `SELECT id, username, email FROM ${TBL_USERS} WHERE ${field} = ?`,
       [val],
       (err, userInfo) => {
         if (!openedDb) dbClose(db)
@@ -107,7 +113,7 @@ exports.dbGetUserByField = (openedDb, field, val) => {
         } else {
           if (!userInfo || Object.keys(userInfo).length === 0) {
             console.error(' T (dbGetUserByField) Not found', err)
-            return reject(new UnauthorizedError(`User not found: ${val}`))
+            return resolve(0)
           }
           return resolve(userInfo)
         }
@@ -556,6 +562,14 @@ exports.dbGetUserRolesByUserId = (openedDb, userId) => {
   })
 }
 
+exports.dbGetUserInfoByUsername = async (openedDb, username) => {
+  const db = openedDb || dbOpen()
+  const userInfo = await this.dbGetUserByUsername(db, username)
+  userInfo.roles = await this.dbGetUserRolesByUserId(db, userInfo.id)
+  if (!openedDb) dbClose(db)
+  return userInfo
+}
+
 exports.dbDeleteUserRole = (openedDb, userId, role) => {
   const fun = 'deleteUserRole'
   const db = openedDb || dbOpen()
@@ -580,6 +594,7 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
 exports.dbCreateUserRole = (openedDb, userInfo) => {
   const fun = 'dbCreateUserRole'
   const { userId, role } = userInfo
+  console.log('T (dbCreateUserRole)', userInfo)
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`, [userId, role], (err) => {
@@ -587,14 +602,10 @@ exports.dbCreateUserRole = (openedDb, userInfo) => {
       if (err) {
         log.e(mod, fun, err.message)
         if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
-          return reject(
-            new InternalServerError(`Role already assigned to user (${err.message})`, mod, fun)
-          )
+          return reject(new BadRequestError(`Role already assigned to user`, mod, fun))
         if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
-          return reject(
-            new InternalServerError(`User or role not found (${err.message})`, mod, fun)
-          )
-        reject(new InternalServerError(err))
+          return reject(new BadRequestError(`User or role not found`, mod, fun))
+        return reject(new InternalServerError(err))
       }
       log.i(
         mod,
@@ -785,7 +796,3 @@ exports.dbUpdateDefaultForm = (openedDb, user, data) => {
     }
   })
 }
-
-// OTHER
-exports.dbOpen = dbOpen
-exports.dbClose = dbClose

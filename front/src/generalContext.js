@@ -34,48 +34,56 @@ export const PMFrontContextProvider = ({ children }) => {
   const isEditor = (roles = []) =>
     roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1
 
-  const callBackApi = async (token) => {
-    if (!token) return defaultFrontContext
-
-    try {
-      const values = await Promise.all([
-        axios.get(getApiFront('formUrl')),
-        axios.get(getApiData('enum/themes/fr')),
-        axios.get(getApiFront('user-info')),
-      ])
-      const userInfo = values[2].data?.roles
-      const backValues = {
-        formUrl: `${values[0].data}`,
-        themeLabels: values[1].data,
-        userInfo,
-        isEditor: isEditor(userInfo),
-        isAdmin: isAdmin(userInfo),
-      }
-
-      return backValues
-    } catch (err) {
-      console.error('T (callBackApi) ERR:', err)
-      return defaultFrontContext
-    }
-  }
-
-  const getBackData = async (token) => {
-    setLoading(true)
-    console.log('T (getBackData) Loading 1:', loading)
-    const newData = await callBackApi(token)
-    setAppInfo(newData)
-    setLoading(false)
-    console.log('T (getBackData) Loading 2:', loading)
-    console.log('T (getBackData) Data received:', newData)
-    console.log('T (getBackData) Data received:', newData)
-    console.log('T (getBackData) Data loaded:', appInfo)
-  }
-
   useEffect(() => {
-    getBackData(token)
+    const callBackApi = async () => {
+      if (!token) return defaultFrontContext
+
+      try {
+        const values = await Promise.all([
+          axios.get(getApiFront('formUrl')),
+          axios.get(getApiData('enum/themes/fr')),
+          axios.get(getApiFront('user-info')),
+        ])
+        const userInfo = values[2].data
+        const backValues = {
+          formUrl: `${values[0].data}`,
+          themeLabels: values[1].data,
+          userInfo,
+          isEditor: !!isEditor(userInfo?.roles || []),
+          isAdmin: !!isAdmin(userInfo?.roles || []),
+        }
+        // console.debug('T (context.useEffect) backValues:', backValues)
+
+        return backValues
+      } catch (err) {
+        console.error('T (callBackApi) ERR:', err)
+        return defaultFrontContext
+      }
+    }
+
+    const getBackData = async () => {
+      setLoading(true)
+      const newData = await callBackApi()
+      setAppInfo(newData)
+      setLoading(false)
+      // console.log('T (getBackData) Data received:', newData)
+    }
+
+    getBackData()
   }, [token])
 
+  const setUserInfo = (userInfo) => {
+    setAppInfo((appInfo) => {
+      return {
+        ...appInfo,
+        userInfo,
+        isAdmin: isAdmin(userInfo?.roles || []),
+        isEditor: isEditor(userInfo?.roles || []),
+      }
+    })
+  }
+
   return (
-    <PMFrontContext.Provider value={{ loading, data: appInfo }}>{children}</PMFrontContext.Provider>
+    <PMFrontContext.Provider value={{ appInfo, setUserInfo }}>{children}</PMFrontContext.Provider>
   )
 }

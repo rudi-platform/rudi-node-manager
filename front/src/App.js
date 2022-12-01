@@ -42,13 +42,29 @@ TODO :
  * @return {ReactNode} main html or login component
  */
 export default function App() {
-  // console.log('-- App');
-
+  return (
+    <PMFrontContextProvider>
+      <Main />
+    </PMFrontContextProvider>
+  )
+}
+const Main = () => {
   const { token, updateToken } = useToken()
-  // const [generalConf, setGeneralConf] = useState({})
-  const frontContext = usePMFrontContext()
-  const [appInfo, setAppInfo] = useState({})
 
+  // ---------------- Loading context
+  const { appInfo, setUserInfo } = usePMFrontContext()
+
+  const [isEditor, setIsEditor] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    // const { userInfo } = appInfo
+    // console.log('T (App.UseEffect) appInfo', appInfo)
+    setIsEditor(!!appInfo?.isEditor)
+    setIsAdmin(!!appInfo?.isAdmin)
+  }, [appInfo, token])
+
+  // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
@@ -70,10 +86,6 @@ export default function App() {
     setIsChgPwdOpen(false)
     setIsRegisterOpen(true)
   }
-
-  useEffect(() => {
-    setAppInfo(frontContext.data)
-  }, [frontContext.loading])
 
   /**
    * Returns the code to display the version tag (if defined)
@@ -107,13 +119,19 @@ export default function App() {
 
   /**
    * logout
+   * @return {void}
    */
-  const logout = () => axios.get(getBackUrl(getApiFront('logout'))).then((res) => updateToken())
+  const logout = () => {
+    axios.get(getBackUrl(getApiFront('logout'))).then((res) => {
+      updateToken()
+      setUserInfo(defaultFrontContext)
+    })
+  }
 
   if (!token) {
     return (
       <div>
-        {isLoginOpen && <Login setToken={updateToken} />}
+        {isLoginOpen && <Login setToken={updateToken} setUserInfo={setUserInfo} />}
         {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
         {isRegisterOpen && <Register backToLogin={showLoginBox} />}
         <div className="login-switch">
@@ -126,153 +144,148 @@ export default function App() {
   }
   return (
     <Router>
-      <PMFrontContextProvider>
-        <ModalProvider>
-          <noscript>You need to enable JavaScript to run this app.</noscript>
-          <div id="modal-test"></div>
-          <header>
-            <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
-              <div className="container-fluid">
-                <img
-                  className="icon-navbar logo-margin"
-                  src={`logo_blanc_orange.png`}
-                  alt="Rudi logo"
-                />
-                <button
-                  className="navbar-toggler align-right"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarCollapse"
-                  aria-controls="navbarCollapse"
-                  aria-expanded="false"
-                  aria-label="Toggle navigation"
-                >
-                  <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarCollapse">
-                  <ul className="navbar-nav me-auto mb-2 mb-md-0">
-                    {navItem('', 'Catalogue')}
-                    {navItem('licence', 'Licence')}
-                    {navItem('show', 'Visualisation')}
-                    <li className={appInfo?.isEditor ? 'nav-item' : 'nav-item hide-wip'}>
-                      <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                        <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
-                          Métadonnées
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('producer')}>
-                          Producteurs
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('contact')}>
-                          Contacts
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
-                          Clés
-                        </Dropdown.Item>
-                      </DropdownButton>
-                    </li>
+      <ModalProvider>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="modal-test"></div>
+        <header>
+          <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
+            <div className="container-fluid">
+              <img
+                className="icon-navbar logo-margin"
+                src={`logo_blanc_orange.png`}
+                alt="Rudi logo"
+              />
+              <button
+                className="navbar-toggler align-right"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span className="navbar-toggler-icon"></span>
+              </button>
+              <div className="collapse navbar-collapse" id="navbarCollapse">
+                <ul className="navbar-nav me-auto mb-2 mb-md-0">
+                  {navItem('', 'Catalogue')}
+                  {navItem('licence', 'Licence')}
+                  {navItem('show', 'Visualisation')}
+                  <li className={isEditor ? 'nav-item' : 'nav-item hide-wip'}>
+                    <DropdownButton id="dropdown-gestion-button" title="Gestion">
+                      <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
+                        Métadonnées
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={getBackUrl('producer')}>
+                        Producteurs
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={getBackUrl('contact')}>
+                        Contacts
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
+                        Clés
+                      </Dropdown.Item>
+                    </DropdownButton>
+                  </li>
 
-                    {navItem('monitoring', 'Monitoring', false)}
-                    {navItem('user', 'Utilisateurs', appInfo?.isAdmin)}
-                    {navItem('conf', 'Configuration', false)}
+                  {navItem('monitoring', 'Monitoring', false)}
+                  {navItem('user', 'Utilisateurs', isAdmin)}
+                  {navItem('conf', 'Configuration', false)}
 
-                    <li className="nav-item center">
-                      <button type="button" className="btn btn-secondary" onClick={() => logout()}>
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                  <li className="nav-item center">
+                    <button type="button" className="btn btn-secondary" onClick={() => logout()}>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
               </div>
-              {displayVersion()}
-            </nav>
-          </header>
+            </div>
+            {displayVersion()}
+          </nav>
+        </header>
 
-          <div id="root"></div>
+        <div id="root"></div>
 
-          <Routes>
-            <Route
-              path={getBackUrl()}
-              element={
-                <Catalogue
-                  display={{ searchbar: true, editJDD: false }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('metadata')}
-              element={
-                <Catalogue
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('gestion')}
-              element={
-                <Catalogue
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('producer')}
-              element={
-                <CatalogueProducer
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('contact')}
-              element={
-                <CatalogueContact
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('pub_key')}
-              element={
-                <CataloguePubKeys
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  specialSearch={{}}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('licence')}
-              element={<CatalogueLicence display={{ editJDD: false }} editMode={{}} />}
-            />
-            <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
-            <Route path={getBackUrl('show')} element={<Visualisation />} />
-            <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
-            <Route
-              path={getBackUrl('user')}
-              element={
-                <CatalogueUser
-                  display={{ searchbar: true, editJDD: appInfo?.isEditor }}
-                  editMode={{}}
-                />
-              }
-            />
-            <Route
-              path={getBackUrl('conf')}
-              element={<div className="tempPaddingTop">Work in progress</div>}
-            />
-          </Routes>
-        </ModalProvider>
-      </PMFrontContextProvider>
+        <Routes>
+          <Route
+            path={getBackUrl()}
+            element={
+              <Catalogue
+                display={{ searchbar: true, editJDD: false }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('metadata')}
+            element={
+              <Catalogue
+                display={{ searchbar: true, editJDD: isEditor }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('gestion')}
+            element={
+              <Catalogue
+                display={{ searchbar: true, editJDD: isEditor }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('producer')}
+            element={
+              <CatalogueProducer
+                display={{ searchbar: true, editJDD: isEditor }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('contact')}
+            element={
+              <CatalogueContact
+                display={{ searchbar: true, editJDD: isEditor }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('pub_key')}
+            element={
+              <CataloguePubKeys
+                display={{ searchbar: true, editJDD: isEditor }}
+                specialSearch={{}}
+                editMode={{}}
+              />
+            }
+          />
+          <Route
+            path={getBackUrl('licence')}
+            element={<CatalogueLicence display={{ editJDD: false }} editMode={{}} />}
+          />
+          <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
+          <Route path={getBackUrl('show')} element={<Visualisation />} />
+          <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
+          <Route
+            path={getBackUrl('user')}
+            element={
+              <CatalogueUser display={{ searchbar: true, editJDD: isEditor }} editMode={{}} />
+            }
+          />
+          <Route
+            path={getBackUrl('conf')}
+            element={<div className="tempPaddingTop">Work in progress</div>}
+          />
+        </Routes>
+      </ModalProvider>
     </Router>
   )
 }

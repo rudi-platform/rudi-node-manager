@@ -22,10 +22,10 @@ const validation = {
 }
 
 AddUserModal.propTypes = {
-  visible: PropTypes.bool,
-  toggleEdit: PropTypes.func,
-  roles: PropTypes.array,
-  refresh: PropTypes.func,
+  roleList: PropTypes.array.isRequired,
+  visible: PropTypes.bool.isRequired,
+  toggleEdit: PropTypes.func.isRequired,
+  refresh: PropTypes.func.isRequired,
 }
 
 /**
@@ -33,13 +33,13 @@ AddUserModal.propTypes = {
  * @param {*} param0 Modal properties
  * @return {ReactNode} AddUserModal html component
  */
-export default function AddUserModal({ visible, toggleEdit, roles, refresh }) {
+export default function AddUserModal({ roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
   const [userInfo, setUserInfo] = useState({})
 
   const hasErrors = (prop, val) => {
     if (!userInfo) {
-      console.error('T (hasErrors) No userInfo')
+      // console.error('T (hasErrors) No userInfo')
       return true
     }
     if (!val) val = userInfo[prop]
@@ -57,7 +57,7 @@ export default function AddUserModal({ visible, toggleEdit, roles, refresh }) {
     validation[prop]?.map((valid) => {
       if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val)
     })
-    if (isInvalid) console.error(`T (hasErrors) isInvalid: '${prop}'='${val}'`)
+    // if (isInvalid) console.error(`T (hasErrors) isInvalid: '${prop}'='${val}'`)
     return isInvalid
   }
 
@@ -193,8 +193,8 @@ export default function AddUserModal({ visible, toggleEdit, roles, refresh }) {
             <Form.Group className="mb-1" id="formRoles" controlId="roles">
               <Form.Label>Rôles</Form.Label>
               <InputGroup hasValidation>
-                {roles &&
-                  roles.map((role) => (
+                {roleList &&
+                  roleList.map((role) => (
                     <Form.Check
                       key={role.role}
                       label={`${role.role} (${role.desc})`}
@@ -227,7 +227,7 @@ export default function AddUserModal({ visible, toggleEdit, roles, refresh }) {
   )
 }
 
-export const useAddUserInfoModal = () => {
+export const useAddUserModal = () => {
   const [isVisibleAddModal, setVisible] = useState(false)
   /**
    * toggle l'affichage de la modal
@@ -235,15 +235,4 @@ export const useAddUserInfoModal = () => {
    */
   const toggleAddModal = () => setVisible(!isVisibleAddModal)
   return { isVisibleAddModal, toggleAddModal }
-}
-
-export const useAddUserInfoModalOptions = () => {
-  const [addModalOptions, setOptions] = useState({})
-  /**
-   * change la valeur des options
-   * @param {*} param nouvelles options
-   * @return {void}
-   */
-  const changeAddModalOptions = (param) => setOptions(param)
-  return { addModalOptions, changeAddModalOptions }
 }

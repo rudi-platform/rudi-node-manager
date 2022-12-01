@@ -2,39 +2,45 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import PropTypes from 'prop-types'
-import EditUserCard from './editUserCard'
+import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
-import { usePMFrontContext } from '../../generalContext'
+// import { usePMFrontContext } from '../../generalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const propId = 'id'
-
+const urlUsers = `api/secu/users`
+const urlRoles = `api/secu/roles`
 /**
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
 export default function CatalogueUser({ display }) {
-  const [objList, setListObj] = useState([])
+  const [roleList, setRoleList] = useState([])
+  const [userList, setUserList] = useState([])
   const [hasMore, setHasMore] = useState(false)
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
-  const frontContext = usePMFrontContext()
+  // const frontContext = usePMFrontContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  useEffect(() => getInitialData(), [])
+  useEffect(() => fetchInitialData(), [])
 
-  const refresh = () => getInitialData()
+  const refresh = () => fetchInitialData()
 
   /**
    * recup la 1er page des métadonnéees et les countBy
    */
-  function getInitialData() {
+  function fetchInitialData() {
     axios
-      .get(`api/secu/users`)
+      .get(urlRoles)
+      .then((res) => setRoleList(res.data))
+      .catch((err) => defaultErrorHandler(err))
+    axios
+      .get(urlUsers)
       .then((res) => {
         setCurrentOffset(PAGE_SIZE)
-        setListObj(res.data)
+        setUserList(res.data)
       })
       .catch((err) => defaultErrorHandler(err))
   }
@@ -45,12 +51,12 @@ export default function CatalogueUser({ display }) {
    */
   const fetchMoreData = () => {
     axios
-      .get(`api/secu/users`, { params: { limit: PAGE_SIZE, offset: currentOffset } })
+      .get(urlUsers, { params: { limit: PAGE_SIZE, offset: currentOffset } })
       .then((res) => {
         const partialObjList = res.data
         setCurrentOffset(currentOffset + PAGE_SIZE)
         if (partialObjList.length === 0) setHasMore(false)
-        setListObj(objList.concat(partialObjList))
+        setUserList(userList.concat(partialObjList))
       })
       .catch((err) => defaultErrorHandler(err))
   }
@@ -60,19 +66,22 @@ export default function CatalogueUser({ display }) {
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && <EditUserCard refresh={refresh}></EditUserCard>}
+            {display && display.editJDD && (
+              <ActOnUserCard refresh={refresh} roleList={roleList}></ActOnUserCard>
+            )}
             <InfiniteScroll
-              dataLength={objList.length}
+              dataLength={userList.length}
               next={fetchMoreData}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {objList.map((obj) => (
+              {userList.map((user) => (
                 <UserCard
-                  user={obj}
+                  roleList={roleList}
+                  user={user}
                   display={display}
+                  key={user[propId]}
                   refresh={refresh}
-                  key={obj[propId]}
                 ></UserCard>
               ))}
             </InfiniteScroll>

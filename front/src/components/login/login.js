@@ -20,12 +20,17 @@ export const showPill = (condition, showState) =>
     ''
   )
 
+  Login.propTypes = {
+    setToken: PropTypes.func.isRequired,
+    setUserInfo: PropTypes.func.isRequired,
+  }
+
 /**
  * Login component
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Login html component
  */
-export default function Login({ setToken }) {
+export default function Login({ setToken, setUserInfo }) {
   // console.log('-- Login');
   const [username, setUserName] = useState('')
   const [password, setPassword] = useState('')
@@ -92,9 +97,7 @@ export default function Login({ setToken }) {
       setToken()
       const userInfo = res.data
       console.debug('T (Login) user', userInfo)
-      // setFrontContext((frontContext) => {
-      //   return { ...frontContext, userInfo }
-      // })
+      setUserInfo(userInfo)
     })
   }
 
@@ -149,7 +152,4 @@ export default function Login({ setToken }) {
       </Form>
     </div>
   )
-}
-Login.propTypes = {
-  setToken: PropTypes.func.isRequired,
 }

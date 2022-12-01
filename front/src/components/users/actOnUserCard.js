@@ -1,90 +1,81 @@
 import React, { useContext, useState } from 'react'
-import { Plus, Pencil, Trash } from 'react-bootstrap-icons'
+import { Plus } from 'react-bootstrap-icons'
+// import { Plus, Pencil, Trash } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import AddUserModal, {
-  useAddUserInfoModal,
-  useAddUserInfoModalOptions,
-} from '../modals/addUserModal'
-import EditUserModal, {
-  useEditUserInfoModal,
-  useEditUserInfoModalOptions,
-} from '../modals/editUserModal'
+import AddUserModal, { useAddUserModal } from '../modals/addUserModal'
+import EditUserModal, { useEditUserModal, useEditUserModalOptions } from '../modals/editUserModal'
 
-const urlUser = 'api/secu/users'
-const urlRoles = 'api/secu/roles'
-const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
-const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
+const urlUser = (username) => `api/secu/users/${username}`
+const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur '${id}'?`
+const deleteMsg = (id) => `L'utilisateur '${id}' a été supprimé`
 
-EditUserCard.propTypes = {
-  formUrl: PropTypes.string,
-  refresh: PropTypes.func,
+ActOnUserCard.propTypes = {
+  roleList: PropTypes.array.isRequired,
+  refresh: PropTypes.func.isRequired,
 }
 
 /**
  * Composant : EditCard
  * @return {ReactNode}
  */
-export default function EditUserCard({ refresh }) {
+export default function ActOnUserCard({ roleList, refresh }) {
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [editId, setUser] = useState('')
-  const { isVisibleAddModal, toggleAddModal } = useAddUserInfoModal()
-  const { addModalOptions, changeAddModalOptions } = useAddUserInfoModalOptions()
+  const [username, setUsername] = useState('')
+  const { editModalOptions, changeEditModalOptions } = useEditUserModalOptions()
 
-  const { isVisibleEditModal, toggleEditModal } = useEditUserInfoModal()
-  const { editModalOptions, changeEditModalOptions } = useEditUserInfoModalOptions()
+  const { isVisibleAddModal, toggleAddModal } = useAddUserModal()
+  const { isVisibleEditModal, toggleEditModal } = useEditUserModal()
 
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
    * @return {void}
    */
-  const handleChange = (event) => setUser(event.target.value)
+  const handleChange = (event) => setUsername(event.target.value)
 
   /**
    * call for user deletion
    */
   const deleteUser = () => {
-    if (!editId) return
+    if (!username) return
     axios
-      .delete(`${urlUser}/${editId}`)
-      .then((res) => {
-        const options = getOptOk(deleteMsg(editId), () => refresh())
-        changeOptions(options)
-        toggle()
-      })
+      .get(urlUser(username))
       .catch((err) => defaultErrorHandler(err))
+      .then((res) => {
+        const user = res?.data
+        const userId = user?.id
+        if (!userId) return defaultErrorHandler(`L'utilisateur n'a pas été trouvé: '${username}'`)
+        axios
+          .delete(urlUser(userId))
+          .catch((err) => defaultErrorHandler(err))
+          .then((res) => {
+            const options = getOptOk(deleteMsg(username), () => refresh())
+            changeOptions(options)
+            toggle()
+          })
+      })
   }
 
   const createNewUser = () => {
-    axios
-      .get(urlRoles)
-      .then((res) => {
-        changeAddModalOptions({ roles: res.data })
-        toggleAddModal()
-        refresh()
-      })
-      .catch((err) => defaultErrorHandler(err))
+    toggleAddModal()
+    refresh()
   }
 
   const editUser = () => {
-    if (!editId) return
+    if (!username) return
     axios
-      .get(urlUser(editId))
-      .then((user) => {
-        console.info('T (editUser)', user)
-        axios
-          .get(urlRoles)
-          .then((res) => {
-            changeEditModalOptions({ user, roles: res.data })
-            toggleEditModal()
-            refresh()
-          })
-          .catch((err) => defaultErrorHandler(err))
+      .get(urlUser(username))
+      .then((res) => {
+        const user = res?.data
+        changeEditModalOptions(user)
+        console.log('T (editUser) opts', editModalOptions)
+        toggleEditModal()
+        refresh()
       })
       .catch((err) => defaultErrorHandler(err))
   }
@@ -93,7 +84,7 @@ export default function EditUserCard({ refresh }) {
    * call for confirmation before organization deletion
    */
   function triggerDeleteUser() {
-    const options = getOptConfirm(deleteConfirmMsg(editId), () => deleteUser())
+    const options = getOptConfirm(deleteConfirmMsg(username), () => deleteUser())
     changeOptions(options)
     toggle()
   }
@@ -106,6 +97,7 @@ export default function EditUserCard({ refresh }) {
               Ajouter un utilisateur <Plus />
             </a>
           </div>
+
           <div className="inline card-text on-right">
             Modifier un utilisateur&nbsp;:&nbsp;
             <div className="btn-group" role="group">
@@ -113,29 +105,29 @@ export default function EditUserCard({ refresh }) {
                 type="text"
                 className="form-control"
                 placeholder="nom"
-                value={editId}
+                value={username}
                 onChange={handleChange}
               />
+              {/*
               <button type="button" className="btn btn-warning" onClick={() => editUser()}>
                 <Pencil />
               </button>
               <button type="button" className="btn btn-danger" onClick={() => triggerDeleteUser()}>
                 <Trash />
               </button>
+              */}
             </div>
             <AddUserModal
+              roleList={roleList}
               visible={isVisibleAddModal}
               toggleEdit={toggleAddModal}
-              options={addModalOptions}
-              roles={addModalOptions.roles}
               refresh={refresh}
             ></AddUserModal>
             <EditUserModal
+              user={editModalOptions}
+              roleList={roleList}
               visible={isVisibleEditModal}
               toggleEdit={toggleEditModal}
-              options={editModalOptions}
-              user={editId}
-              roles={editModalOptions.roles}
               refresh={refresh}
             ></EditUserModal>
           </div>

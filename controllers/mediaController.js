@@ -6,7 +6,7 @@ const axios = require('axios')
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
-const { ForbiddenError, STATUS_CODE, UnauthorizedError } = require('../utils/errors')
+const { ForbiddenError, STATUS_CODE, UnauthorizedError, NotFoundError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   createRudiApiToken,
@@ -41,6 +41,9 @@ exports.getMediaToken = async (req, res, next) => {
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
     const user = await dbGetUserByUsername(null, payloadUser.username)
+    if (!user)
+      return res.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
+
     const mediaToken = await getTokenFromMediaForUser(user, exp)
     // T (The following is just for debugging)
     /*

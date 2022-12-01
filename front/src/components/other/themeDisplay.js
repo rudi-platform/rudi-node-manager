@@ -1,6 +1,10 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { usePMFrontContext } from '../../generalContext'
+
+ThemeDisplay.propTypes = {
+  value: PropTypes.string,
+}
 
 /**
  * Composant : ThemeDisplay
@@ -18,7 +22,4 @@ export default function ThemeDisplay({ value }) {
       : value
 
   return <span>{getLabel()}</span>
-}
-ThemeDisplay.propTypes = {
-  value: PropTypes.string,
 }

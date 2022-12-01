@@ -14,7 +14,11 @@ exports.getRoleList = async (req, res, next) => {
     // console.log('T (getRoleList) roles:', roles)
     const visibleRoles = roles.filter((role) => !role.hide)
     // console.log('T (getRoleList) unhiddenRoles:', visibleRoles)
-    res.status(200).json(visibleRoles)
+    res.status(200).json(
+      visibleRoles.map((roleInfo) => {
+        return { role: roleInfo.role, desc: roleInfo.desc }
+      })
+    )
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_roles' })
     res.status(error.statusCode).json(error)

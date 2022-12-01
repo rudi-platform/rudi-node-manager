@@ -1,6 +1,6 @@
 const express = require('express')
 const router = new express.Router()
-const { getUserByUsername, getUsersList, deleteUserWithId, editUser, createUser } = require('../controllers/usersControllers')
+const { getUserByUsername, getUsersList, deleteUserWithId, editUser, createUser, getUserInfoByUsername } = require('../controllers/usersControllers')
 const {
   getRoleList,
   getRoleById,
