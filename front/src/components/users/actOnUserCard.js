@@ -66,6 +66,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
     refresh()
   }
 
+  // eslint-disable-next-line
   const editUser = () => {
     if (!username) return
     axios
@@ -83,6 +84,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
   /**
    * call for confirmation before organization deletion
    */
+  // eslint-disable-next-line
   function triggerDeleteUser() {
     const options = getOptConfirm(deleteConfirmMsg(username), () => deleteUser())
     changeOptions(options)

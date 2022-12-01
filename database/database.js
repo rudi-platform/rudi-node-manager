@@ -15,7 +15,7 @@ const {
   STATUS_CODE,
   UnauthorizedError,
 } = require('../utils/errors')
-const { hashPassword, CONSOLE_TOKEN_NAME } = require('../utils/secu')
+const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
 
 // ---- Constants -----
