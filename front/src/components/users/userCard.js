@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext_'
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 
 const resetPwdConfirmMsg = (id) =>
