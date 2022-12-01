@@ -1,5 +1,5 @@
 import React from 'react'
-import { ModalContext, DefaultErrorOption } from '../components/modals/modalContext'
+import { ModalContext, DefaultErrorOption } from '../components/modals/modalContext_'
 
 /**
  * defaultErrorHandler hooks
