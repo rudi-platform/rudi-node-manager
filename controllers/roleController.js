@@ -5,6 +5,9 @@ const {
   dbGetUserRolesByUsername,
   dbDeleteUserRole,
   dbCreateUserRole,
+  dbGetUserById,
+  dbOpen,
+  dbClose,
 } = require('../database/database')
 const { BadRequestError } = require('../utils/errors')
 
@@ -50,22 +53,29 @@ exports.getUserRolesByUsername = async (req, res, next) => {
   }
 }
 
-exports.deleteUserRole = (req, res, next) => {
-  const { userId, role } = req.params
-  return dbDeleteUserRole(null, userId, role)
-    .then((row) => res.status(200).json(row))
-    .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'delete_userRole' })
-      res.status(error.statusCode).json(error)
-    })
+exports.deleteUserRole = async (req, res, next) => {
+  try {
+    const db = dbOpen()
+    const { userId, role } = req.params
+    const { userId: id } = await dbDeleteUserRole(null, userId, role)
+    const user = await dbGetUserById(db, id)
+    res.status(200).json(user)
+  } catch (err) {
+    const error = errorHandler.error(err, req, { opType: 'delete_userRole' })
+    res.status(error.statusCode).json(error)
+  }
 }
-exports.postUserRole = (req, res, next) => {
-  const data = req.body
-  return dbCreateUserRole(null, data)
-    .then((row) => res.status(200).json(row))
-    .catch((err) => {
-      console.error(err)
-      const error = errorHandler.error(err, req, { opType: 'post_userRole' })
-      res.status(error.statusCode).json(error)
-    })
+exports.postUserRole = async (req, res, next) => {
+  try {
+    const db = dbOpen()
+    const data = req.body
+    const { userId: id } = await dbCreateUserRole(db, data)
+    const user = await dbGetUserById(db, id)
+    dbClose(db)
+    res.status(200).json(user)
+  } catch (err) {
+    console.error(err)
+    const error = errorHandler.error(err, req, { opType: 'post_userRole' })
+    res.status(error.statusCode).json(error)
+  }
 }

@@ -112,9 +112,10 @@ exports.dbGetUserByField = (openedDb, field, val) => {
           return reject(err)
         } else {
           if (!userInfo || Object.keys(userInfo).length === 0) {
-            console.error(' T (dbGetUserByField) Not found', err)
-            return resolve(0)
+            console.error(`T (dbGetUserByField) User not found with '${field}' = '${val}'`, err)
+            return resolve(null)
           }
+          // console.log(` T (dbGetUserByField) Found with '${field}' = '${val}'`, userInfo)
           return resolve(userInfo)
         }
       }
@@ -596,6 +597,8 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
   const fun = 'dbUpdateUserRoles'
   try {
     const { userId, username, roles: targetRoles } = userInfo
+    if (!Array.isArray(targetRoles))
+      throw new BadRequestError(`Parameter 'roles' should be an array`)
     const db = openedDb || dbOpen()
     let origRoles = await this.dbGetUserRolesByUserId(db, userId)
     // console.debug(`T (dbUpdateUserRoles) user '${username} (${userId})' -> dbRoles:`, origRoles)

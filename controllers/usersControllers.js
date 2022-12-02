@@ -137,13 +137,16 @@ exports.editUser = async (req, res, next) => {
     const dbUser = await dbGetUserById(db, id)
     const dbUserSameName = await dbGetUserByUsername(db, username)
     if (dbUserSameName && dbUserSameName.id !== dbUser.id)
-      return res.status(403).json(`Ce nom est déjà utilisé: '${username}'`)
+      return res
+        .status(403)
+        .json(`Ce nom est déjà utilisé: '${username}' (${dbUserSameName.id} !== ${dbUser.id})`)
     const dbUserSameMail = await dbGetUserByEmail(db, email)
     if (dbUserSameMail && dbUserSameMail.id !== dbUser.id)
       return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
     await dbUpdateUser(db, { id, username, email })
     await dbUpdateUserRoles(db, { userId: id, username, roles })
-    return res.status(200).json({ status: 'OK' })
+    const userInfo = await dbGetUserById(db, id)
+    return res.status(200).json(userInfo)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'edit_user' })
     return res.status(500).json(new RudiError(error.message))
