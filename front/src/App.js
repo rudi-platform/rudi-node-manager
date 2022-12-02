@@ -212,79 +212,23 @@ const Main = () => {
         <div id="root"></div>
 
         <Routes>
-          <Route
-            path={getBackUrl()}
-            element={
-              <Catalogue
-                display={{ searchbar: true, editJDD: false }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
-          />
-          <Route
-            path={getBackUrl('metadata')}
-            element={
-              <Catalogue
-                display={{ searchbar: true, editJDD: isEditor }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
-          />
-          <Route
-            path={getBackUrl('gestion')}
-            element={
-              <Catalogue
-                display={{ searchbar: true, editJDD: isEditor }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
-          />
+          <Route path={getBackUrl()} element={<Catalogue editMode={false} />} />
+          <Route path={getBackUrl('metadata')} element={<Catalogue editMode={isEditor} />} />
+          <Route path={getBackUrl('gestion')} element={<Catalogue editMode={isEditor} />} />
           <Route
             path={getBackUrl('producer')}
-            element={
-              <CatalogueProducer
-                display={{ searchbar: true, editJDD: isEditor }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
+            element={<CatalogueProducer editMode={isEditor} />}
           />
-          <Route
-            path={getBackUrl('contact')}
-            element={
-              <CatalogueContact
-                display={{ searchbar: true, editJDD: isEditor }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
-          />
-          <Route
-            path={getBackUrl('pub_key')}
-            element={
-              <CataloguePubKeys
-                display={{ searchbar: true, editJDD: isEditor }}
-                specialSearch={{}}
-                editMode={{}}
-              />
-            }
-          />
+          <Route path={getBackUrl('contact')} element={<CatalogueContact editMode={isEditor} />} />
+          <Route path={getBackUrl('pub_key')} element={<CataloguePubKeys editMode={isEditor} />} />
           <Route
             path={getBackUrl('licence')}
-            element={<CatalogueLicence display={{ editJDD: false }} editMode={{}} />}
+            element={<CatalogueLicence display={{ editJDD: false }} editMode={false} />}
           />
           <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
           <Route path={getBackUrl('show')} element={<Visualisation />} />
           <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
-          <Route
-            path={getBackUrl('user')}
-            element={
-              <CatalogueUser display={{ searchbar: true, editJDD: isEditor }} editMode={{}} />
-            }
-          />
+          <Route path={getBackUrl('user')} element={<CatalogueUser editMode={isEditor} />} />
           <Route
             path={getBackUrl('conf')}
             element={<div className="tempPaddingTop">Work in progress</div>}

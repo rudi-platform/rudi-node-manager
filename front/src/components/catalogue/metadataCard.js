@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
@@ -8,15 +8,18 @@ import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { nowLocaleFormatted } from '../../utils/utils'
 import { getBackUrl } from '../../utils/frontOptions'
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/genericModalContext'
+import {
+  DefaultOkOption,
+  DefaultConfirmOption,
+  useModalContext,
+} from '../modals/genericModalContext'
 import ThemeDisplay from '../other/themeDisplay'
 import FileSizeDisplay from '../other/fileSizeDisplay'
-
+import { usePMFrontContext } from '../../generalContext'
 
 MetadataCard.propTypes = {
+  editMode: PropTypes.bool,
   metadata: PropTypes.object,
-  formUrl: PropTypes.string,
-  display: PropTypes.object,
   refresh: PropTypes.func,
 }
 
@@ -24,9 +27,16 @@ MetadataCard.propTypes = {
  * Composant : metadataCard
  * @return {ReactNode}
  */
-export default function MetadataCard({ formUrl, metadata, display, refresh }) {
-  const { changeOptions, toggle } = React.useContext(ModalContext)
+export default function MetadataCard({ editMode, metadata, refresh }) {
+  const { appInfo } = usePMFrontContext()
+  const { changeOptions, toggle } = useModalContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(!!editMode), [editMode])
+
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
 
   /**
    * download le fichier via media_id
@@ -156,7 +166,7 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
               </span>
             </a>
             {displayStatus()}
-            {display && display.editJDD && (
+            {isEdit && (
               <div className="btn-group" role="group">
                 <button type="button" className="btn btn-success">
                   <Check />

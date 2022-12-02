@@ -12,9 +12,7 @@ import { getApiData } from '../../App'
 const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
+  editMode: PropTypes.bool,
   formUrlObj: PropTypes.string,
   propId: PropTypes.string,
   propName: PropTypes.string,
@@ -30,7 +28,7 @@ ObjCatalogue.propTypes = {
  * @return {void}
  */
 export default function ObjCatalogue({
-  display,
+  editMode,
   formUrlObj,
   propId,
   propName,
@@ -43,16 +41,18 @@ export default function ObjCatalogue({
   const { appInfo } = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(editMode), [editMode])
+
   const [listObj, setListObj] = useState([])
   const [formUrl, setFormUrl] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  const editUrl = `${appInfo.formUrl}${formUrlObj}`
   const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
+  useEffect(() => setFormUrl(`${appInfo.formUrl}${formUrlObj}`), [appInfo])
   useEffect(() => getInitialData(), [])
-  useEffect(() => setFormUrl(editUrl), [appInfo])
 
   const deleteUrl = (id) => getApiUrlObj(id)
   const refresh = () => {
@@ -109,7 +109,7 @@ export default function ObjCatalogue({
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && formUrl && (
+            {isEdit && formUrl && (
               <EditObjCard
                 idField={propId}
                 formUrl={formUrl}
@@ -129,11 +129,10 @@ export default function ObjCatalogue({
             >
               {listObj.map((obj, i) => (
                 <ObjCard
-                  formUrl={formUrl}
+                  editMode={isEdit}
                   obj={obj}
                   propId={propId}
                   propName={propName}
-                  display={display}
                   displayFields={propNamesToDisplay}
                   deleteUrl={deleteUrl}
                   deleteConfirmMsg={deleteConfirmMsg}

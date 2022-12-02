@@ -1,23 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import ObjCatalogue from './objCatalogue'
 
 CatalogueProducer.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
+  editMode: PropTypes.bool,
 }
 
 /**
  * Composant : CatalogueProducer
  * @return {void}
  */
-export default function CatalogueProducer({ display, specialSearch, editMode }) {
+export default function CatalogueProducer({ editMode }) {
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(editMode), [editMode])
+
   return (
     <ObjCatalogue
-      display={display}
-      specialSearch={specialSearch}
-      editMode={editMode}
+      editMode={isEdit}
       formUrlObj="organizations"
       propId="organization_id"
       propName="organization_name"

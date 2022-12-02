@@ -7,38 +7,31 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import LicenceCard from './licenceCard'
 
-
 CatalogueLicence.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
+  editMode: PropTypes.bool,
 }
 
 /**
  * Composant : CatalogueLicence
  * @return {ReactNode}
  */
-export default function CatalogueLicence({ display }) {
+export default function CatalogueLicence({ editMode }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [metadatas, setMetadatas] = useState([])
-  const [formUrl, setFormUrl] = useState('')
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(!!editMode), [editMode])
+
+  const [licences, setLicences] = useState([])
   const [hasMore] = useState(false)
 
-  useEffect(() => {
-    axios
-      .get(`api/front/formUrl`)
-      .then((res) => setFormUrl(res.data))
-      .catch((err) => defaultErrorHandler(err))
-    getInitialData()
-  }, [])
+  useEffect(() => getInitialData(), [])
   /**
    * recup la 1er page des métadonnéees
    */
   function getInitialData() {
     axios
       .get(`api/data/licences`)
-      .then((res) => setMetadatas(res.data))
+      .then((res) => setLicences(res.data))
       .catch((err) => defaultErrorHandler(err))
   }
 
@@ -48,19 +41,12 @@ export default function CatalogueLicence({ display }) {
         <div className="col-9">
           <div className="row">
             <InfiniteScroll
-              dataLength={metadatas.length}
+              dataLength={licences.length}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
             >
-              {metadatas.map((metadata) => {
-                return (
-                  <LicenceCard
-                    metadata={metadata}
-                    formUrl={formUrl}
-                    display={display}
-                    key={metadata.concept_id}
-                  ></LicenceCard>
-                )
+              {licences.map((licence) => {
+                return <LicenceCard obj={licence} editMode={isEdit} key={licence.concept_id}></LicenceCard>
               })}
             </InfiniteScroll>
           </div>

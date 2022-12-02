@@ -1,15 +1,15 @@
 import axios from 'axios'
 
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
+import { usePMFrontContext } from '../../generalContext'
 
 ObjCard.propTypes = {
-  display: PropTypes.object,
-  formUrl: PropTypes.string,
+  editMode: PropTypes.bool,
   obj: PropTypes.object,
   propId: PropTypes.string,
   propName: PropTypes.string,
@@ -25,8 +25,7 @@ ObjCard.propTypes = {
  * @return {ReactNode}
  */
 export function ObjCard({
-  display,
-  formUrl,
+  editMode,
   obj,
   propId,
   propName,
@@ -36,8 +35,16 @@ export function ObjCard({
   deleteMsg,
   refresh,
 }) {
+  const { appInfo } = usePMFrontContext()
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(!!editMode), [editMode])
+
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
+
   const objId = obj[propId]
   const objName = obj[propName]
   /**
@@ -68,9 +75,7 @@ export function ObjCard({
         <h5 className="card-header">
           <div className="d-flex justify-content-between align-items-center">
             <a>{objName}</a>
-            {!display?.editJDD ? (
-              ''
-            ) : (
+            {isEdit && (
               <div className="btn-group" role="group">
                 <a
                   href={`${formUrl}?update=${objId}`}

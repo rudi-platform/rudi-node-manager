@@ -10,12 +10,20 @@ import UserCard from './userCard'
 const propId = 'id'
 const urlUsers = `api/secu/users`
 const urlRoles = `api/secu/roles`
+
+CatalogueUser.propTypes = {
+  editMode: PropTypes.bool,
+}
+
 /**
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
-export default function CatalogueUser({ display }) {
+export default function CatalogueUser({ editMode }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(!!editMode), [editMode])
 
   const [roleList, setRoleList] = useState([])
   const [userList, setUserList] = useState([])
@@ -65,9 +73,7 @@ export default function CatalogueUser({ display }) {
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {display && display.editJDD && (
-              <ActOnUserCard refresh={refresh} roleList={roleList}></ActOnUserCard>
-            )}
+            {isEdit && <ActOnUserCard refresh={refresh} roleList={roleList}></ActOnUserCard>}
             <InfiniteScroll
               dataLength={userList.length}
               next={fetchMoreData}
@@ -78,7 +84,6 @@ export default function CatalogueUser({ display }) {
                 <UserCard
                   roleList={roleList}
                   user={user}
-                  display={display}
                   key={user[propId]}
                   refresh={refresh}
                 ></UserCard>
@@ -89,8 +94,4 @@ export default function CatalogueUser({ display }) {
       </div>
     </div>
   )
-}
-CatalogueUser.propTypes = {
-  display: PropTypes.object,
-  editMode: PropTypes.object,
 }

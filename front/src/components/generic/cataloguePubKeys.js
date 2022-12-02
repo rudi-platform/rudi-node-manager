@@ -3,20 +3,16 @@ import PropTypes from 'prop-types'
 import ObjCatalogue from './objCatalogue'
 
 CataloguePubKeys.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
+  editMode: PropTypes.bool,
 }
 
 /**
  * Composant : CataloguePubKeys
  * @return {void}
  */
-export default function CataloguePubKeys({ display, specialSearch, editMode }) {
+export default function CataloguePubKeys({  editMode }) {
   return (
     <ObjCatalogue
-      display={display}
-      specialSearch={specialSearch}
       editMode={editMode}
       formUrlObj="pub_keys"
       propId="name"

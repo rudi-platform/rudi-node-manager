@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal'
 
 export const ModalContext = React.createContext('modal')
+export const useModalContext = () => React.useContext(ModalContext)
 const { Provider } = ModalContext
 
 ModalProvider.propTypes = { children: PropTypes.node }

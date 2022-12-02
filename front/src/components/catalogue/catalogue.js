@@ -21,55 +21,39 @@ const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supp
 
 const btnTextAdd = 'Ajouter un jeu de données'
 const btnTextChg = 'Modifier un jeu de données :'
-
+const PAGE_SIZE = 20
 
 Catalogue.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
+  editMode: PropTypes.bool,
 }
 
 /**
  * Composant : Catalogue
  * @return {ReactNode}
  */
-export default function Catalogue({ display }) {
+export default function Catalogue({ editMode }) {
   const { appInfo } = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
+  const [isEdit, setEdit] = useState(!!editMode)
+  useEffect(() => setEdit(!!editMode), [editMode])
+
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
+
   const [metadatas, setMetadatas] = useState([])
   const [countBy, setCountBy] = useState([])
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
-  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => refresh(), [currentFilters])
+
   const [hasMore, setHasMore] = useState(true)
-  const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(-1)
 
   const initialRender = useRef(true)
   const searchText = useRef(null)
   const isSearchMode = () => searchText?.current?.value?.length > 0
   const searchMode = () => (isSearchMode() ? `/search` : '')
-
-  useEffect(() => {
-    // console.log(`-- Catalogue: ${appInfo.formUrl}`)
-    setFormUrl(`${appInfo.formUrl}`)
-  }, [appInfo])
-
-  useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = false
-    } else {
-      if (currentOffset < 0) setCurrentOffset(0)
-      else fetchMoreData()
-    }
-  }, [currentOffset])
-
-  useEffect(() => {
-    // console.log('-- useEffect: refresh')
-
-    refresh()
-  }, [currentFilters])
 
   const refresh = () => {
     setHasMore(true)
@@ -83,6 +67,15 @@ export default function Catalogue({ display }) {
       setCurrentOffset(0)
     }
   }
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false
+    } else {
+      if (currentOffset < 0) setCurrentOffset(0)
+      else fetchMoreData()
+    }
+  }, [currentOffset])
 
   /**
    * crée l'object params pour la requete
@@ -269,139 +262,137 @@ export default function Catalogue({ display }) {
   return (
     <div className="tempPaddingTop">
       <div className="row catalogue">
-        {display && display.searchbar && (
-          <div className="col-3 rounded temp-align">
-            <div className="row">
-              <div className="left-hand-blocks">
-                <div className="label-lv1">Trier</div>
-                <div className="btn-group" role="group" aria-label="sort">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => toggleFilter({ sort_by: `-updatedAt` })}
-                  >
-                    Modifié
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => toggleFilter({ sort_by: `resource_title` })}
-                  >
-                    A à Z
-                  </button>
+        <div className="col-3 rounded temp-align">
+          <div className="row">
+            <div className="left-hand-blocks">
+              <div className="label-lv1">Trier</div>
+              <div className="btn-group" role="group" aria-label="sort">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => toggleFilter({ sort_by: `-updatedAt` })}
+                >
+                  Modifié
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => toggleFilter({ sort_by: `resource_title` })}
+                >
+                  A à Z
+                </button>
 
-                  <div className="btn-group" role="group">
-                    <button
-                      id="sortDrop"
-                      type="button"
-                      className="btn btn-secondary dropdown-toggle"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                    >
-                      ...
-                    </button>
-                    <div className="dropdown-menu" aria-labelledby="sortDrop">
-                      <a
-                        className="dropdown-item"
-                        onClick={() => addToFilter({ sort_by: `resource_title` })}
-                      >
-                        Alphabétique
-                      </a>
-                      <a
-                        className="dropdown-item"
-                        onClick={() => addToFilter({ sort_by: `-resource_title` })}
-                      >
-                        Anti alphabétique
-                      </a>
-                      <a
-                        className="dropdown-item"
-                        onClick={() => addToFilter({ sort_by: `-updatedAt` })}
-                      >
-                        Récemment modifiés
-                      </a>
-                      <a
-                        className="dropdown-item"
-                        onClick={() => addToFilter({ sort_by: `updatedAt` })}
-                      >
-                        Anciennement modifiés
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="left-hand-blocks">
-                <div className="label-lv1">Rechercher</div>
-                <div className="input-group flex-nowrap">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Recherche"
-                    ref={searchText}
-                    aria-label="Recherche"
-                    aria-describedby="addon-wrapping"
-                  />
-                  <button type="button" className="btn btn-success" onClick={() => refresh()}>
-                    <Search />
+                <div className="btn-group" role="group">
+                  <button
+                    id="sortDrop"
+                    type="button"
+                    className="btn btn-secondary dropdown-toggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    ...
                   </button>
-                </div>
-                <div>
-                  <div className="on-right">
-                    <label htmlFor="ext_search_on">Étendre la recherche</label>
-                    <input
-                      type="checkbox"
-                      className="checkbox"
-                      id="ext_search_on"
-                      name="ext_search_on"
-                    />
+                  <div className="dropdown-menu" aria-labelledby="sortDrop">
+                    <a
+                      className="dropdown-item"
+                      onClick={() => addToFilter({ sort_by: `resource_title` })}
+                    >
+                      Alphabétique
+                    </a>
+                    <a
+                      className="dropdown-item"
+                      onClick={() => addToFilter({ sort_by: `-resource_title` })}
+                    >
+                      Anti alphabétique
+                    </a>
+                    <a
+                      className="dropdown-item"
+                      onClick={() => addToFilter({ sort_by: `-updatedAt` })}
+                    >
+                      Récemment modifiés
+                    </a>
+                    <a
+                      className="dropdown-item"
+                      onClick={() => addToFilter({ sort_by: `updatedAt` })}
+                    >
+                      Anciennement modifiés
+                    </a>
                   </div>
-                </div>
-              </div>
-              <div className="left-hand-blocks">
-                <div className="label-lv1">Filtrer</div>
-                <div className="row no-row-margin">
-                  {countBy.map((filter) => {
-                    return (
-                      <div className="col border rounded" key={filter.name}>
-                        <div className="label-lv2">{filter.text}</div>
-                        <ul className="list-group">
-                          {filter.values.map((filterValue, i) => {
-                            return (
-                              <li
-                                className="filter-items"
-                                key={getFilterLabel(filterValue, filter) + i}
-                                onClick={() => addToFilter(filter.toFilterParam(filterValue))}
-                              >
-                                {filter.name === 'theme' && (
-                                  <ThemeDisplay
-                                    value={getFilterLabel(filterValue, filter)}
-                                  ></ThemeDisplay>
-                                )}
-                                {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
-                                <span
-                                  className={`badge rounded-pill text-bg-${
-                                    isSelectedFilter(filter.toFilterParam(filterValue))
-                                      ? 'success'
-                                      : 'primary'
-                                  }`}
-                                >
-                                  {filterValue.count}
-                                </span>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </div>
-                    )
-                  })}
                 </div>
               </div>
             </div>
+            <div className="left-hand-blocks">
+              <div className="label-lv1">Rechercher</div>
+              <div className="input-group flex-nowrap">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Recherche"
+                  ref={searchText}
+                  aria-label="Recherche"
+                  aria-describedby="addon-wrapping"
+                />
+                <button type="button" className="btn btn-success" onClick={() => refresh()}>
+                  <Search />
+                </button>
+              </div>
+              <div>
+                <div className="on-right">
+                  <label htmlFor="ext_search_on">Étendre la recherche</label>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    id="ext_search_on"
+                    name="ext_search_on"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="left-hand-blocks">
+              <div className="label-lv1">Filtrer</div>
+              <div className="row no-row-margin">
+                {countBy.map((filter) => {
+                  return (
+                    <div className="col border rounded" key={filter.name}>
+                      <div className="label-lv2">{filter.text}</div>
+                      <ul className="list-group">
+                        {filter.values.map((filterValue, i) => {
+                          return (
+                            <li
+                              className="filter-items"
+                              key={getFilterLabel(filterValue, filter) + i}
+                              onClick={() => addToFilter(filter.toFilterParam(filterValue))}
+                            >
+                              {filter.name === 'theme' && (
+                                <ThemeDisplay
+                                  value={getFilterLabel(filterValue, filter)}
+                                ></ThemeDisplay>
+                              )}
+                              {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
+                              <span
+                                className={`badge rounded-pill text-bg-${
+                                  isSelectedFilter(filter.toFilterParam(filterValue))
+                                    ? 'success'
+                                    : 'primary'
+                                }`}
+                              >
+                                {filterValue.count}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
         <div className="col-9">
           <div className="row">
-            {display?.editJDD && formUrl && (
+            {isEdit && formUrl && (
               <EditObjCard
                 idField={idField}
                 formUrl={formUrl}
@@ -426,7 +417,6 @@ export default function Catalogue({ display }) {
                   <MetadataCard
                     metadata={metadata}
                     formUrl={formUrl}
-                    display={display}
                     refresh={refresh}
                     key={metadata.global_id}
                   ></MetadataCard>

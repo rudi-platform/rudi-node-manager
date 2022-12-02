@@ -4,7 +4,11 @@ import PropTypes from 'prop-types'
 import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/genericModalContext'
+import {
+  getOptOk,
+  getOptConfirm,
+  useModalContext,
+} from '../modals/genericModalContext'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 
 const resetPwdConfirmMsg = (id) =>
@@ -34,7 +38,7 @@ UserCard.propTypes = {
  * @return {ReactNode}
  */
 export default function UserCard({ user, roleList, refresh }) {
-  const { changeOptions, toggle } = React.useContext(ModalContext)
+  const { changeOptions, toggle } = useModalContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { isVisibleEditModal, toggleEditModal } = useEditUserModal()
