@@ -1,10 +1,10 @@
-import React from 'react'
-import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
-import PropTypes from 'prop-types'
 import axios from 'axios'
+import React from 'react'
+import PropTypes from 'prop-types'
+import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/genericModalContext'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 
 const resetPwdConfirmMsg = (id) =>
@@ -13,9 +13,9 @@ const resetPwdCaption =
   `L'utilisateur devra utiliser l'invite "Modifier le mot de passe" pour changer son mot de passe. ` +
   `Le champ "mot de passe actuel" pourra être un simple espace`
 
-const resetPwdMsg = (id) => `Le mot de passe de l'utilisateur ${id} a été réinitialisé.\n\nplou`
+const resetPwdMsg = (id) => `Le mot de passe de l'utilisateur ${id} a été réinitialisé.`
 
-const resetPasswordUrl = (id) => `api/front/users/${id}/reset-password`
+const resetPasswordUrl = (id) => `api/secu/users/${id}/reset-password`
 
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
 const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`

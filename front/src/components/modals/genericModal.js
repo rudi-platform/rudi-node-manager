@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
-import PropTypes from 'prop-types'
 import { Check, ExclamationTriangleFill } from 'react-bootstrap-icons'
+
+GenericModal.propTypes = {
+  visible: PropTypes.bool,
+  toggle: PropTypes.func,
+  options: PropTypes.object,
+}
 
 /**
  * GenericModal component
@@ -21,10 +28,13 @@ export default function GenericModal({ visible, toggle, options }) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {options.text &&
-            options.text.map((text, i) => {
+          {options.text && Array.isArray(options.text) ? (
+            options.text?.map((text, i) => {
               return <p key={`text-${i}`}>{text}</p>
-            })}
+            })
+          ) : (
+            <p>{`${options.text}`}</p>
+          )}
         </Modal.Body>
         <Modal.Footer>
           {options.buttons &&
@@ -46,11 +56,6 @@ export default function GenericModal({ visible, toggle, options }) {
       </Modal>
     </>
   )
-}
-GenericModal.propTypes = {
-  visible: PropTypes.bool,
-  toggle: PropTypes.func,
-  options: PropTypes.object,
 }
 
 export const useGenericModal = () => {

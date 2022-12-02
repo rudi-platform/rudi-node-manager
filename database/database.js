@@ -331,53 +331,27 @@ exports.dbUpdateUser = (openedDb, userInfo) => {
 
 exports.dbHashAndUpdatePassword = async (openedDb, username, password) => {
   const hashedPwd = await hashPassword(password)
-  return await this.dbUpdatePassword(openedDb, username, hashedPwd)
+  return await this.dbUpdatePasswordWithField(openedDb, 'username', username, hashedPwd)
 }
 
-exports.dbUpdatePassword = (openedDb, username, password) => {
-  const fun = 'updatePassword'
+exports.dbUpdatePasswordWithField = (openedDb, key, val, password) => {
+  const fun = 'dbUpdatePasswordWithField'
   const db = openedDb || dbOpen()
+  log.i(mod, fun, `Password reset for user '${val}'`)
   return new Promise((resolve, reject) => {
-    // db.serialize(() => { // Needed for consecutive transactions
-    db.run(
-      `UPDATE ${TBL_USERS} SET password = ? WHERE username = ?`,
-      [password, username],
-      (err) => {
-        if (!openedDb) dbClose(db)
-        if (err) {
-          log.e(mod, fun, err.message)
-          return reject(err.message)
-        }
-        log.i(
-          mod,
-          fun,
-          `${TBL_USERS}: password reset for user '${username}'`,
-          log.getContext(null, { opType: 'put_password' })
-        )
-        resolve({ username })
-      }
-    )
-    // });
-  })
-}
-
-exports.dbDeleteUserWithName = (openedDb, username) => {
-  const fun = 'deleteUserWithName'
-  const db = openedDb || dbOpen()
-  return new Promise((resolve, reject) => {
-    db.run(`DELETE FROM ${TBL_USERS} WHERE username = ?`, [username], function (err) {
+    db.run(`UPDATE ${TBL_USERS} SET password = ? WHERE ${key} = ?`, [password, val], (err) => {
       if (!openedDb) dbClose(db)
       if (err) {
         log.e(mod, fun, err.message)
-        return reject(err)
+        return reject(err.message)
       }
       log.i(
         mod,
         fun,
-        `${TBL_USERS} : A row has been deleted with username '${username}'`,
-        log.getContext(null, { opType: 'delete_user' })
+        `${TBL_USERS}: password reset for user '${val}'`,
+        log.getContext(null, { opType: 'put_password' })
       )
-      resolve({ username })
+      resolve({ key: val })
     })
   })
 }
@@ -594,7 +568,7 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
 exports.dbCreateUserRole = (openedDb, userInfo) => {
   const fun = 'dbCreateUserRole'
   const { userId, role } = userInfo
-  console.log('T (dbCreateUserRole)', userInfo)
+  // console.log('T (dbCreateUserRole)', userInfo)
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`, [userId, role], (err) => {

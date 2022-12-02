@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import InfiniteScroll from 'react-infinite-scroll-component'
+
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import LicenceCard from './licenceCard'
+import InfiniteScroll from 'react-infinite-scroll-component'
+
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import LicenceCard from './licenceCard'
+
+
+CatalogueLicence.propTypes = {
+  display: PropTypes.object,
+  specialSearch: PropTypes.object,
+  editMode: PropTypes.object,
+}
 
 /**
  * Composant : CatalogueLicence
@@ -59,9 +68,4 @@ export default function CatalogueLicence({ display }) {
       </div>
     </div>
   )
-}
-CatalogueLicence.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
 }

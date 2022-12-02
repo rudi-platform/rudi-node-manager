@@ -1,12 +1,17 @@
-import React, { useState } from 'react'
-import Form from 'react-bootstrap/Form'
-import InputGroup from 'react-bootstrap/InputGroup'
 import './login.css'
-import PropTypes from 'prop-types'
+
 import axios from 'axios'
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
-import { Eye, EyeSlash } from 'react-bootstrap-icons'
+
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+
+import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/esm/Button'
+import InputGroup from 'react-bootstrap/InputGroup'
+import { Eye, EyeSlash } from 'react-bootstrap-icons'
+
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'success'
 export const btnText = 'Accéder à l‘application'
@@ -20,10 +25,10 @@ export const showPill = (condition, showState) =>
     ''
   )
 
-  Login.propTypes = {
-    setToken: PropTypes.func.isRequired,
-    setUserInfo: PropTypes.func.isRequired,
-  }
+Login.propTypes = {
+  setToken: PropTypes.func.isRequired,
+  setUserInfo: PropTypes.func.isRequired,
+}
 
 /**
  * Login component
@@ -31,6 +36,7 @@ export const showPill = (condition, showState) =>
  * @return {ReactNode} Login html component
  */
 export default function Login({ setToken, setUserInfo }) {
+  const { defaultErrorHandler } = useDefaultErrorHandler()
   // console.log('-- Login');
   const [username, setUserName] = useState('')
   const [password, setPassword] = useState('')
@@ -68,10 +74,10 @@ export default function Login({ setToken, setUserInfo }) {
             'Ce compte utilisateur requiert une validation.',
             'Veuillez contacter l‘administrateur de votre nœud Rudi',
           ]
-        } else errMsg = `Echec de connexion`
+        } else errMsg = `Mot de passe incorrect`
 
         changeOptions({
-          text: errMsg,
+          text: [errMsg],
           title: 'Une erreur est survenue',
           type: 'error',
           buttons: [
@@ -93,12 +99,17 @@ export default function Login({ setToken, setUserInfo }) {
     loginUser({
       username,
       password,
-    }).then((res) => {
-      setToken()
-      const userInfo = res.data
-      console.debug('T (Login) user', userInfo)
-      setUserInfo(userInfo)
     })
+      .then((res) => {
+        setToken()
+        const userInfo = res?.data
+        // console.debug('T (Login) user', userInfo)
+        setUserInfo(userInfo)
+      })
+      .catch((err) => {
+        console.error('T (handleSubmit) handleSubmit ERR', err)
+        defaultErrorHandler(err)
+      })
   }
 
   const inputPassword = () => {

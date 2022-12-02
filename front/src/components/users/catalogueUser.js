@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import InfiniteScroll from 'react-infinite-scroll-component'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import InfiniteScroll from 'react-infinite-scroll-component'
+
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
-// import { usePMFrontContext } from '../../generalContext'
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const propId = 'id'
 const urlUsers = `api/secu/users`
@@ -15,14 +15,13 @@ const urlRoles = `api/secu/roles`
  * @return {ReactNode}
  */
 export default function CatalogueUser({ display }) {
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+
   const [roleList, setRoleList] = useState([])
   const [userList, setUserList] = useState([])
   const [hasMore, setHasMore] = useState(false)
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
-  // const { appInfo } = usePMFrontContext()
-
-  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   useEffect(() => fetchInitialData(), [])
 

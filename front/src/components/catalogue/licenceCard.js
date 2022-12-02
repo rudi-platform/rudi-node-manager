@@ -2,6 +2,13 @@ import React from 'react'
 import { Pencil, Trash, Check } from 'react-bootstrap-icons'
 import PropTypes from 'prop-types'
 
+
+LicenceCard.propTypes = {
+  metadata: PropTypes.object,
+  formUrl: PropTypes.string,
+  display: PropTypes.object,
+}
+
 /**
  * Composant : LicenceCard
  * @return {ReactNode}
@@ -62,9 +69,4 @@ export default function LicenceCard({ metadata, display }) {
       </div>
     </div>
   )
-}
-LicenceCard.propTypes = {
-  metadata: PropTypes.object,
-  formUrl: PropTypes.string,
-  display: PropTypes.object,
 }

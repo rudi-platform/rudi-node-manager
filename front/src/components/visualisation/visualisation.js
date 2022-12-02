@@ -1,24 +1,27 @@
+import axios from 'axios'
+
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
+import { useParams } from 'react-router-dom'
+import { Check } from 'react-bootstrap-icons'
 // import { useNavigate } from 'react-router-dom';
+
 import jspreadsheet from 'jspreadsheet-ce'
 import 'jspreadsheet-ce/dist/jspreadsheet.css'
-import { Check } from 'react-bootstrap-icons'
-import axios from 'axios'
-import PropTypes from 'prop-types'
 import { JsonViewer } from '@textea/json-viewer'
+
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { useParams } from 'react-router-dom'
 
 /**
  * Composant : Visualisation
  * @return {ReactNode}
  */
 function Visualisation() {
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+
   const { id } = useParams()
-  // console.log(JSON.stringify(id));
   const [mediaId, setMediaId] = useState(id ? id : '')
   const [visuOption, setVisuOption] = useState({ displayType: 'CSV', data: null })
-  const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const wrapper = React.useRef()
   const [el, setEl] = useState(null)

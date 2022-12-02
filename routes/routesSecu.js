@@ -1,12 +1,18 @@
 const express = require('express')
 const router = new express.Router()
-const { getUserByUsername, getUsersList, deleteUserWithId, editUser, createUser, getUserInfoByUsername } = require('../controllers/usersControllers')
 const {
-  getRoleList,
+  createUser,
+  deleteUserWithId,
+  editUser,
+  getUserByUsername,
+  getUsersList,
+} = require('../controllers/usersControllers')
+const {
+  deleteUserRole,
   getRoleById,
+  getRoleList,
   getUserRolesByUsername,
   postUserRole,
-  deleteUserRole,
 } = require('../controllers/roleController')
 const { resetPassword } = require('../controllers/authControllerPassport')
 
@@ -23,6 +29,5 @@ router.post('/users', createUser)
 router.put('/users', editUser)
 router.put('/users/:id/reset-password', resetPassword) // Admin action that resets a user pwd
 router.delete('/users/:id', deleteUserWithId)
-
 
 module.exports = router

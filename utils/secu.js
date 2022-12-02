@@ -157,8 +157,9 @@ exports.createRudiMediaToken = (jwtPayload) =>
     }
   )
 
-exports.createRudiApiToken = (url, req) =>
-  jwtLib.forgeToken(
+exports.createRudiApiToken = (url, req) => {
+  // console.log('T (createRudiApiToken) url JWT', axios.getUri({ url, params: req.query }))
+  const jwt = jwtLib.forgeToken(
     getPrvKey('api'),
     {},
     {
@@ -168,6 +169,9 @@ exports.createRudiApiToken = (url, req) =>
       req_url: axios.getUri({ url, params: req.query }),
     }
   )
+  // console.log('T (createRudiApiToken) JWT', jwt)
+  return jwt
+}
 
 /**
  * Shortcut to call a key by name

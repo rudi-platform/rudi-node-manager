@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import InfiniteScroll from 'react-infinite-scroll-component'
+
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { usePMFrontContext } from '../../generalContext'
@@ -39,14 +40,14 @@ export default function ObjCatalogue({
   deleteConfirmMsg,
   deleteMsg,
 }) {
+  const { appInfo } = usePMFrontContext()
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+
   const [listObj, setListObj] = useState([])
   const [formUrl, setFormUrl] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  const { defaultErrorHandler } = useDefaultErrorHandler()
-
-  const { appInfo } = usePMFrontContext()
   const editUrl = `${appInfo.formUrl}${formUrlObj}`
   const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
@@ -91,11 +92,11 @@ export default function ObjCatalogue({
         setCurrentOffset(currentOffset + PAGE_SIZE)
         if (partialListObj.length === 0) {
           setHasMore(false)
-          console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length)
-          console.log('(fetchMoreData 0) hasMore=', hasMore)
+          // console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length)
+          // console.log('(fetchMoreData 0) hasMore=', hasMore)
         } else {
-          console.log('(fetchMoreData +) partialListObj.length=', partialListObj.length)
-          console.log('(fetchMoreData +) hasMore=', hasMore)
+          // console.log('(fetchMoreData +) partialListObj.length=', partialListObj.length)
+          // console.log('(fetchMoreData +) hasMore=', hasMore)
 
           setListObj(listObj.concat(partialListObj))
         }

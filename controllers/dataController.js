@@ -16,8 +16,17 @@ const getApiShortUrl = (suffix) => getCompletedUrl(API_PREFIX, suffix)
 
 const callApiModule = (req, reply, url, opType) => {
   const token = createRudiApiToken(url, req)
+  const completeUrl = new URL(url, API_MODULE_URL)
+  if (req.query) completeUrl.search = new URLSearchParams(req.query)
+
+  // console.log(
+  //   'T (callApiModule) completeUrl',
+  //   { baseUrl: API_MODULE_URL, url, params: req.query },
+  //   '->',
+  //   `${completeUrl}`
+  // )
   return axios
-    .get(getCompletedUrl(API_MODULE_URL, url), {
+    .get(`${completeUrl}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((res) => {

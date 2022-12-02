@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
@@ -137,9 +138,9 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
         console.error('T (sendUserInfo) No user info!')
         return
       }
-      console.log('T (add.sendingUserInfo)', userInfo)
+      // console.log('T (add.sendingUserInfo)', userInfo)
       const res = await axios.post(`${urlUser}`, userInfo)
-      console.log('T (add.sendUserInfo)', res.data)
+      // console.log('T (add.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
     }

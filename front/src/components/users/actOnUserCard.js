@@ -1,10 +1,12 @@
+import axios from 'axios'
+
 import React, { useContext, useState } from 'react'
+import PropTypes from 'prop-types'
 import { Plus } from 'react-bootstrap-icons'
 // import { Plus, Pencil, Trash } from 'react-bootstrap-icons'
-import PropTypes from 'prop-types'
-import axios from 'axios'
-import { ModalContext, getOptOk, getOptConfirm } from '../modals/modalContext'
+
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { ModalContext, getOptOk, getOptConfirm } from '../modals/genericModalContext'
 import AddUserModal, { useAddUserModal } from '../modals/addUserModal'
 import EditUserModal, { useEditUserModal, useEditUserModalOptions } from '../modals/editUserModal'
 
@@ -74,7 +76,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
       .then((res) => {
         const user = res?.data
         changeEditModalOptions(user)
-        console.log('T (editUser) opts', editModalOptions)
+        // console.log('T (editUser) opts', editModalOptions)
         toggleEditModal()
         refresh()
       })

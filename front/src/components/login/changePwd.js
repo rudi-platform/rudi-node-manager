@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
-import Form from 'react-bootstrap/Form'
-import InputGroup from 'react-bootstrap/InputGroup'
-import Button from 'react-bootstrap/Button'
-import './login.css'
-import PropTypes from 'prop-types'
 import axios from 'axios'
-import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+
+import './login.css'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
+
+import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'secondary'
 export const btnText = 'Modifier le mot de passe'
@@ -19,6 +21,10 @@ export const showPill = (condition, showState) =>
   ) : (
     ''
   )
+
+ChangePwd.propTypes = {
+  backToLogin: PropTypes.func.isRequired,
+}
 
 /**
  * Register component
@@ -75,9 +81,9 @@ export default function ChangePwd({ backToLogin }) {
       confirmNewPassword,
     })
       .then((res) => {
-        console.log(res)
+        // console.log(res.data)
         changeOptions({
-          text: [`Le mot de passe a bien été changé pour l'utilisateur '${res.data.username}'`],
+          text: [`Le mot de passe a bien été changé pour l'utilisateur '${username}'`],
           title: 'Action Validée',
           type: 'success',
           buttons: [
@@ -92,8 +98,13 @@ export default function ChangePwd({ backToLogin }) {
         toggle()
       })
       .catch((error) => {
+        const errMsg =
+          error.response?.data?.message === 'No user found'
+            ? `Cet utilisateur n'existe pas`
+            : `Erreur: ${error.response?.data?.message}`
+        // console.error('T (ChgPwd) ERR', JSON.stringify(error?.response?.data))
         changeOptions({
-          text: ['' + error.response.data],
+          text: [errMsg],
           title: 'Une erreur est survenue',
           type: 'error',
           buttons: [
@@ -171,7 +182,4 @@ export default function ChangePwd({ backToLogin }) {
       </Form>
     </div>
   )
-}
-ChangePwd.propTypes = {
-  backToLogin: PropTypes.func.isRequired,
 }

@@ -1,13 +1,16 @@
+import axios from 'axios'
+
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup'
+import { Eye, EyeSlash } from 'react-bootstrap-icons'
 
 import './login.css'
-import PropTypes from 'prop-types'
-import axios from 'axios'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
-import { Eye, EyeSlash } from 'react-bootstrap-icons'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 export const btnColor = 'warning'
 export const btnText = 'Créer un compte'
@@ -21,12 +24,18 @@ export const showPill = (condition, showState) =>
     ''
   )
 
+Register.propTypes = {
+  backToLogin: PropTypes.func.isRequired,
+}
+
 /**
  * Register component
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Register html component
  */
 export default function Register({ backToLogin }) {
+  const { defaultErrorHandler } = useDefaultErrorHandler()
+
   const [username, setUserName] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
@@ -71,33 +80,21 @@ export default function Register({ backToLogin }) {
     })
       .then((res) => {
         changeOptions({
-          text: [`L'utilisateur '${res.data.username}' a bien été créé.`],
+          text: [`L'utilisateur '${username}' a bien été créé.`],
           title: 'Action Validée',
           type: 'success',
           buttons: [
             {
               text: 'Connexion',
-              action: () => {
-                backToLogin()
-              },
+              action: () => backToLogin(),
             },
           ],
         })
         toggle()
       })
-      .catch((error) => {
-        changeOptions({
-          text: ['' + error.response.data],
-          title: 'Une erreur est survenue',
-          type: 'error',
-          buttons: [
-            {
-              text: 'Ok',
-              action: () => {},
-            },
-          ],
-        })
+      .catch((err) => {
         toggle()
+        defaultErrorHandler(err)
       })
   }
 
@@ -160,7 +157,4 @@ export default function Register({ backToLogin }) {
       </Form>
     </div>
   )
-}
-Register.propTypes = {
-  backToLogin: PropTypes.func.isRequired,
 }

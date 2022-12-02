@@ -1,11 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+
 import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal'
 
-export const ModalContext = React.createContext()
+export const ModalContext = React.createContext('modal')
 const { Provider } = ModalContext
 
-export const ModalProvider = ({ children }) => {
+ModalProvider.propTypes = { children: PropTypes.node }
+
+/**
+ * Provides a context for modals
+ * @param {*} param0
+ * @return {Provider}
+ */
+export function ModalProvider({ children }) {
   const { toggle, visible } = useGenericModal()
   const { options, changeOptions } = useGenericModalOptions()
   return (
@@ -20,7 +28,6 @@ export const ModalProvider = ({ children }) => {
     </Provider>
   )
 }
-ModalProvider.propTypes = { children: PropTypes.node }
 
 export const DefaultErrorOption = {
   text: ``,

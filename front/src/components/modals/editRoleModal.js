@@ -1,14 +1,22 @@
+import axios from 'axios'
+
 import React, { useContext, useState } from 'react'
+import PropTypes from 'prop-types'
+
 import { Plus, Trash } from 'react-bootstrap-icons'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import PropTypes from 'prop-types'
-import axios from 'axios'
 
-import { ModalContext, DefaultOkOption } from './modalContext'
+import { ModalContext, DefaultOkOption } from './genericModalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 const urlUserRoles = 'api/secu/user-roles'
+
+EditRoleModal.propTypes = {
+  visible: PropTypes.bool,
+  toggleEdit: PropTypes.func,
+  options: PropTypes.object,
+}
 
 /**
  * EditRoleModal component
@@ -97,12 +105,6 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
     </Modal>
   )
 }
-EditRoleModal.propTypes = {
-  visible: PropTypes.bool,
-  toggleEdit: PropTypes.func,
-  options: PropTypes.object,
-}
-
 export const useEditRoleModal = () => {
   const [visible, setVisible] = useState(false)
   /**

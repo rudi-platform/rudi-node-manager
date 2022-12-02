@@ -8,7 +8,7 @@ export const getCookie = (name) =>
 
 /**
  * Token hooks
- * @return {*} Token hooks
+ * @return {object} Token hooks
  */
 export default function useToken() {
   // console.log('-- useToken');

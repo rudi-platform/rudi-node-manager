@@ -1,5 +1,6 @@
-import axios from 'axios'
 import React, { createContext, useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import axios from 'axios'
 
 import useToken from './useToken'
 import { getApiData, getApiFront } from './App'
@@ -23,11 +24,19 @@ const PMFrontContext = createContext(defaultFrontContext)
 
 export const usePMFrontContext = () => React.useContext(PMFrontContext)
 
-export const PMFrontContextProvider = ({ children }) => {
+PMFrontContextProvider.propTypes = {
+  children: PropTypes.object,
+}
+/**
+ * Returns the app general Context
+ * @param {Object} param0
+ * @return {React.Context.Provider}
+ */
+export function PMFrontContextProvider({ children }) {
   const { token } = useToken()
 
   const [appInfo, setAppInfo] = useState({})
-  const [loading, setLoading] = useState(false)
+  // const [loading, setLoading] = useState(false)
 
   const isAdmin = (roles = []) =>
     roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1
@@ -52,7 +61,7 @@ export const PMFrontContextProvider = ({ children }) => {
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
         }
-        console.debug('T (context.useEffect) backValues:', backValues)
+        // console.debug('T (context.useEffect) backValues:', backValues)
 
         return backValues
       } catch (err) {
@@ -62,10 +71,10 @@ export const PMFrontContextProvider = ({ children }) => {
     }
 
     const getBackData = async () => {
-      setLoading(true)
+      // setLoading(true)
       const newData = await callBackApi()
       setAppInfo(newData)
-      setLoading(false)
+      // setLoading(false)
       // console.log('T (getBackData) Data received:', newData)
     }
 

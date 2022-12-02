@@ -7,7 +7,7 @@ const passport = require('passport')
 const { decodeBase64 } = require('../utils/utils')
 const { isDevEnv } = require('../config/backOptions')
 const log = require('../utils/logger')
-const { BadRequestError, RudiError } = require('../utils/errors')
+const { BadRequestError, RudiError, UnauthorizedError } = require('../utils/errors')
 const { getDbConf } = require('../config/config')
 
 const errorHandler = require('./errorHandler')
@@ -24,7 +24,7 @@ const {
   dbHashAndUpdatePassword,
   dbOpen,
   dbRegisterUser,
-  dbUpdatePassword,
+  dbUpdatePasswordWithField,
 } = require('../database/database')
 
 // Constants
@@ -162,7 +162,10 @@ exports.resetPassword = async (req, res, next) => {
   try {
     // ONLY ADMIN !
     const { id } = req.params
-    await dbUpdatePassword(null, id, hashPassword(INIT_PWD))
+    if (id === 0)
+      throw new UnauthorizedError(`Le mot de passe du SU ne peut être modifié via l'API`)
+    await dbUpdatePasswordWithField(null, 'id', id, hashPassword(INIT_PWD))
+    res.status(200).send(`Password reiniitalized for user ${id}`)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
     return res.status(500).json(new RudiError(error.message))

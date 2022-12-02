@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import InfiniteScroll from 'react-infinite-scroll-component'
+
+import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { Search } from 'react-bootstrap-icons'
+
+import { usePMFrontContext } from '../../generalContext'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { getApiData } from '../../App'
 import MetadataCard from './metadataCard'
 import { filterConf } from './conf'
-import { usePMFrontContext } from '../../generalContext'
 import ThemeDisplay from '../other/themeDisplay'
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { Search } from 'react-bootstrap-icons'
 import { EditObjCard } from '../generic/objCard'
-import { getApiData } from '../../App'
 
 const idField = 'global_id'
 
@@ -19,6 +21,13 @@ const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supp
 
 const btnTextAdd = 'Ajouter un jeu de données'
 const btnTextChg = 'Modifier un jeu de données :'
+
+
+Catalogue.propTypes = {
+  display: PropTypes.object,
+  specialSearch: PropTypes.object,
+  editMode: PropTypes.object,
+}
 
 /**
  * Composant : Catalogue
@@ -43,7 +52,7 @@ export default function Catalogue({ display }) {
   const searchMode = () => (isSearchMode() ? `/search` : '')
 
   useEffect(() => {
-    console.log(`-- Catalogue: ${appInfo.formUrl}`)
+    // console.log(`-- Catalogue: ${appInfo.formUrl}`)
     setFormUrl(`${appInfo.formUrl}`)
   }, [appInfo])
 
@@ -429,9 +438,4 @@ export default function Catalogue({ display }) {
       </div>
     </div>
   )
-}
-Catalogue.propTypes = {
-  display: PropTypes.object,
-  specialSearch: PropTypes.object,
-  editMode: PropTypes.object,
 }

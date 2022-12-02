@@ -1,15 +1,24 @@
+import axios from 'axios'
+
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
-import PropTypes from 'prop-types'
-import axios from 'axios'
-import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/modalContext'
+
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { nowLocaleFormatted } from '../../utils/utils'
+import { getBackUrl } from '../../utils/frontOptions'
+import { ModalContext, DefaultOkOption, DefaultConfirmOption } from '../modals/genericModalContext'
 import ThemeDisplay from '../other/themeDisplay'
 import FileSizeDisplay from '../other/fileSizeDisplay'
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getBackUrl } from '../../utils/frontOptions'
-import { nowLocaleFormatted } from '../../utils/utils'
-// import { getFrontPath } from '../../utils/frontOptions';
+
+
+MetadataCard.propTypes = {
+  metadata: PropTypes.object,
+  formUrl: PropTypes.string,
+  display: PropTypes.object,
+  refresh: PropTypes.func,
+}
 
 /**
  * Composant : metadataCard
@@ -226,10 +235,4 @@ export default function MetadataCard({ formUrl, metadata, display, refresh }) {
       </div>
     </div>
   )
-}
-MetadataCard.propTypes = {
-  metadata: PropTypes.object,
-  formUrl: PropTypes.string,
-  display: PropTypes.object,
-  refresh: PropTypes.func,
 }

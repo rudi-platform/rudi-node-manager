@@ -1,25 +1,30 @@
-import React, { useState, useEffect } from 'react'
-import { defaultFrontContext, PMFrontContextProvider, usePMFrontContext } from './generalContext'
 import './styles/App.scss'
+
+import axios from 'axios'
+
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
+
+import { getBackUrl, getFrontOptions, OPT_TAG } from './utils/frontOptions'
+import { createBrowserHistory } from 'history'
+import useToken from './useToken'
+import { defaultFrontContext, PMFrontContextProvider, usePMFrontContext } from './generalContext'
+
+import Login, { showPill as showPillLogin } from './components/login/login'
+import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
+import Register, { showPill as showPillRegister } from './components/login/register'
+
 import Catalogue from './components/catalogue/catalogue'
-import { CatalogueProducer } from './components/generic/catalogueProducer'
-import { CatalogueContact } from './components/generic/catalogueContact'
-import { CataloguePubKeys } from './components/generic/cataloguePubKeys'
 import CatalogueLicence from './components/catalogue/catalogueLicence'
+import CatalogueProducer from './components/generic/catalogueProducer'
+import CatalogueContact from './components/generic/catalogueContact'
+import CataloguePubKeys from './components/generic/cataloguePubKeys'
 import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
-import { createBrowserHistory } from 'history'
-import Login, { showPill as showPillLogin } from './components/login/login'
-import Register, { showPill as showPillRegister } from './components/login/register'
-import useToken from './useToken'
-import { ModalProvider } from './components/modals/modalContext'
-import axios from 'axios'
+import { ModalProvider } from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
-import { getFrontOptions, OPT_TAG, getBackUrl } from './utils/frontOptions'
-import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
 
 const VERSION_TAG = getFrontOptions(OPT_TAG)
 const HAST_TAG = getBackUrl('front/hash')

@@ -1,5 +1,6 @@
 import React from 'react'
-import { ModalContext, DefaultErrorOption } from '../components/modals/modalContext'
+
+import { DefaultErrorOption, ModalContext } from '../components/modals/genericModalContext'
 
 /**
  * defaultErrorHandler hooks
@@ -8,16 +9,17 @@ import { ModalContext, DefaultErrorOption } from '../components/modals/modalCont
 export default function useDefaultErrorHandler() {
   const { changeOptions, toggle } = React.useContext(ModalContext)
   const errorHandler = (err) => {
-    console.error(err)
+    // console.error(err)
     const options = DefaultErrorOption
-    if (err.response) {
-      if (err.response.data && err.response.data.message) {
+    if (!err.response) {
+      options.text = [`${err.message}`]
+    } else {
+      if (err.response.data?.message) {
         options.text = [`${err.response.data.message}`]
-        if (err.response.data.moreInfo && err.response.data.moreInfo.message) {
+        if (err.response.data.moreInfo?.message)
           options.text.push(`${err.response.data.moreInfo.message}`)
-        }
       } else options.text = [`${err.response.data}`]
-    } else options.text = [`${err.message}`]
+    }
 
     changeOptions(options)
     toggle()
