@@ -2227,58 +2227,6 @@
 							"response": []
 						},
 						{
-							"name": "Add user role",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Role assigned to user\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const res = pm.response.json();",
-											"    pm.expect(res.id).to.eq(pm.collectionVariables.get('userId'));",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"userId\": \"{{userId}}\",\n    \"role\": \"Lecteur\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{pmBackUrl}}/api/secu/user-roles",
-									"host": [
-										"{{pmBackUrl}}"
-									],
-									"path": [
-										"api",
-										"secu",
-										"user-roles"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Get all users",
 							"event": [
 								{
@@ -2412,41 +2360,6 @@
 										"secu",
 										"roles",
 										"Admin"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get 1 user role",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Database accessible\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const responseJson = pm.response.json()",
-											"    // responseJson.map(coll => console.log(coll))",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{pmBackUrl}}/api/secu/user-roles/{{adminusername}}",
-									"host": [
-										"{{pmBackUrl}}"
-									],
-									"path": [
-										"api",
-										"secu",
-										"user-roles",
-										"{{adminusername}}"
 									]
 								}
 							},
@@ -2784,14 +2697,6 @@
 			"value": ""
 		},
 		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
 			"key": "mediaToken",
 			"value": ""
 		},
@@ -2873,6 +2778,14 @@
 		},
 		{
 			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
 			"value": ""
 		}
 	]

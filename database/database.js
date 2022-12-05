@@ -6,13 +6,12 @@ const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
 // ---- Internal dependencies -----
 const { getDbConf, SU_NAME } = require('../config/config')
 const {
+  BadRequestError,
   ForbiddenError,
   InternalServerError,
-  NotFoundError,
-  statusOK,
   RudiError,
-  BadRequestError,
   STATUS_CODE,
+  statusOK,
   UnauthorizedError,
 } = require('../utils/errors')
 const { hashPassword } = require('../utils/secu')
@@ -664,152 +663,4 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
     log.e(mod, fun, `(dbUpdateUserRoles) ERR: ${err}`)
     throw new RudiError(err)
   }
-}
-
-// Default Form
-exports.dbGetDefaultForm = (openedDb, user) => {
-  const fun = 'getDefaultForm'
-  if (user) {
-    const db = openedDb || dbOpen()
-    return new Promise((resolve, reject) => {
-      try {
-        db.all(
-          `SELECT * FROM Default_Value_Form WHERE userId = ?`,
-          [user.id],
-          function (err, rows) {
-            if (!openedDb) dbClose(db)
-            if (err) {
-              log.e(mod, fun, err.message)
-              return reject(err)
-            }
-            resolve(
-              rows.map((row) => {
-                return { name: row.name, defaultValue: JSON.parse(row.defaultValue) }
-              })
-            )
-          }
-        )
-      } catch (e) {
-        reject(e)
-      }
-    })
-  } else {
-    return Promise.reject(new NotFoundError(`Default value for '${user.username}' not found!`))
-  }
-}
-exports.dbGetDefaultFormWithName = (openedDb, user, name) => {
-  const fun = 'getDefaultFormWithName'
-  if (user) {
-    const db = openedDb || dbOpen()
-    return new Promise((resolve, reject) => {
-      try {
-        db.get(
-          `SELECT * FROM Default_Value_Form WHERE userId = ? and name = ?`,
-          [user.id, name],
-          (err, row) => {
-            if (!openedDb) dbClose(db)
-            if (err) {
-              log.e(mod, fun, err.message)
-              return reject(err)
-            }
-            resolve(JSON.parse(row.defaultValue))
-          }
-        )
-      } catch (e) {
-        reject(e)
-      }
-    })
-  } else {
-    return Promise.reject(
-      new NotFoundError(`Default value for '${user.username}' and name: '${name}' not found!`)
-    )
-  }
-}
-exports.dbDeleteDefaultForm = (openedDb, user, name) => {
-  const fun = 'deleteDefaultForm'
-  const db = openedDb || dbOpen()
-  return new Promise((resolve, reject) => {
-    try {
-      db.run(
-        `DELETE FROM Default_Value_Form WHERE userId = ? AND name = ?`,
-        [user.id, name],
-        (err) => {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            log.e(mod, fun, err.message)
-            return reject(err)
-          }
-          log.i(
-            mod,
-            fun,
-            `(Default_Value_Form) A row was deleted with userId ${user.id} and name : ${name}`,
-            log.getContext(null, { opType: 'delete_defaultForm' })
-          )
-          resolve({})
-        }
-      )
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-exports.dbUpdateDefaultForm = (openedDb, user, data) => {
-  const fun = 'updateDefaultForm'
-  const db = openedDb || dbOpen()
-  return this.dbGetDefaultFormWithName(db, user, data.name).then((defaultValue) => {
-    if (!defaultValue) {
-      return new Promise((resolve, reject) => {
-        try {
-          db.run(
-            `INSERT INTO Default_Value_Form(userId,name,defaultValue) VALUES(?,?,?)`,
-            [user.id, data.name, JSON.stringify(data.defaultValue)],
-            (err) => {
-              if (!openedDb) dbClose(db)
-
-              if (err) {
-                log.e(mod, fun, err.message)
-                return reject(err)
-              }
-              log.i(
-                mod,
-                fun,
-                `(Default_Value_Form) A row was inserted with userId ${user.id} and name : ${data.name}`,
-                log.getContext(null, { opType: 'post_defaultForm' })
-              )
-              resolve(data)
-            }
-          )
-        } catch (e) {
-          reject(e)
-        }
-      })
-    } else {
-      // edit
-      return new Promise((resolve, reject) => {
-        try {
-          db.run(
-            `UPDATE Default_Value_Form SET defaultValue = ? WHERE userId = ? and name = ?`,
-            [JSON.stringify(data.defaultValue), user.id, data.name],
-            (err) => {
-              if (!openedDb) dbClose(db)
-              if (err) {
-                log.e(mod, fun, err.message)
-                return reject(err)
-              }
-              log.i(
-                mod,
-                fun,
-                `Default_Value_Form : A row has been edited with userId ${user.id} and name : ${data.name}`,
-                log.getContext(null, { opType: 'put_defaultForm' })
-              )
-              resolve(data)
-            }
-          )
-        } catch (e) {
-          reject(e)
-        }
-      })
-    }
-  })
 }
