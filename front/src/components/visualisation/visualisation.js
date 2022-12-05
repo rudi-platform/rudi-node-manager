@@ -98,7 +98,7 @@ function Visualisation() {
    */
   function handleOnClick() {
     axios
-      .get(`/api/data/media/${mediaId}`)
+      .get(`/api/media/${mediaId}`)
       .then((res) => {
         const mediaUrl = res.data?.connector?.url
         if (!mediaUrl) return
