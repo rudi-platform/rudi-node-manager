@@ -579,17 +579,13 @@ exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
         if (err) {
           log.e(mod, fun, err.message)
           if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
-            return reject(new BadRequestError(`Role already assigned to user`, mod, fun))
+            return reject(new BadRequestError(`Role already assigned to user`))
           if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
-            {
-              return reject(
-                new BadRequestError(
-                  `User ${userId}${username ? ` (${username})` : ''} or role '${role}' not found`,
-                  mod,
-                  fun
-                )
+            return reject(
+              new BadRequestError(
+                `User ${userId}${username ? ` (${username})` : ''} or role '${role}' not found`
               )
-            }
+            )
           }
           return reject(new InternalServerError(err))
         }
@@ -615,6 +611,7 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
     const { userId, username, roles: targetRoles } = userInfo
     if (!Array.isArray(targetRoles))
       throw new BadRequestError(`Parameter 'roles' should be an array`)
+    log.d(mod, fun, `Updating roles for user '${username}': ${JSON.stringify(targetRoles)}`)
     const db = openedDb || dbOpen()
     let origRoles = await this.dbGetUserRolesByUserId(db, userId)
     // console.debug(`T (dbUpdateUserRoles) user '${username} (${userId})' -> dbRoles:`, origRoles)
@@ -629,7 +626,7 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
           const i = origRoles.indexOf(newRole)
           // console.log('T (dbUpdateUserRoles) found:', i)
           if (i === -1) {
-            this.dbCreateUserRole(db, { userId, role: newRole })
+            this.dbCreateUserRole(db, { userId, role: newRole, username })
               .then((res) => {
                 log.i(mod, fun, `Role added to  user '${username}'`, newRole)
                 return resolve(`Role added to user '${username}': ${newRole}`)
