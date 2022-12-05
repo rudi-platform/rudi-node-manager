@@ -83,8 +83,18 @@ a {
   text-decoration: none;
 }
 
+
+
+.smallPaddingTop {
+  padding-top: 60px;
+  padding-bottom: 60px;
+  margin-left: $marginSides;
+  margin-right: $marginSides;
+}
+
+
 .tempPaddingTop {
-  padding-top: 65px;
+  padding-top: 75px;
   padding-bottom: 60px;
   margin-left: $marginSides;
   margin-right: $marginSides;
