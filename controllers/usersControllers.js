@@ -119,7 +119,9 @@ exports.createUser = async (req, res, next) => {
     const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
     // console.log('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
-    return res.status(200).json({ status: 'OK' })
+
+    const updatedUser = await dbGetUserById(db, id)
+    return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'add_user' })
     return res.status(500).json(new RudiError(error.message))
@@ -145,8 +147,8 @@ exports.editUser = async (req, res, next) => {
       return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
     await dbUpdateUser(db, { id, username, email })
     await dbUpdateUserRoles(db, { userId: id, username, roles })
-    const userInfo = await dbGetUserById(db, id)
-    return res.status(200).json(userInfo)
+    const updatedUser = await dbGetUserById(db, id)
+    return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'edit_user' })
     return res.status(500).json(new RudiError(error.message))
