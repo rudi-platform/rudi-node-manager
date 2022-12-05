@@ -71,8 +71,8 @@ export default function Login({ setToken, setUserInfo }) {
           errMsg = ['Utilisateur ou mot de passe incorrect']
         else if (resMsg.startsWith('Admin validation required for user')) {
           errMsg = [
-            'Ce compte utilisateur requiert une validation.',
-            'Veuillez contacter l‘administrateur de votre nœud Rudi',
+            'Ce compte utilisateur requiert une validation : ',
+            'veuillez contacter l‘administrateur de votre nœud Rudi.',
           ]
         } else errMsg = `Mot de passe incorrect`
 
