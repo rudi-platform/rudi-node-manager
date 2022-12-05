@@ -24,6 +24,7 @@ const {
   TBL_USER_ROLES,
   TBL_USERS,
   dbGetUserByUsername,
+  dbGetUsers,
 } = require('../database')
 const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -370,6 +371,10 @@ exports.dbInitialize = async () => {
       (await dbGetUserByUsername(db, 'Oliv')) || (await dbGetUserByUsername(db, 'Olivier'))
     log.d(mod, fun, `Users: ${JSON.stringify(user)?.replace(/\"/g, "'")}`)
 
+    const userList = await dbGetUsers(db)
+    log.d(mod, fun, userList)
+    const userRoles = await dbGetUserRoles(db)
+    log.d(mod, fun, userRoles)
     await dbClose(db)
     log.d(mod, fun, 'DB initialized')
   } catch (error) {

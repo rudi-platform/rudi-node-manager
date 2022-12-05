@@ -18,6 +18,7 @@ const APP_NAME = getConf('logging', 'app_name')
  */
 function extractIpRedirections(req) {
   const headers = req.headers
+  if (!headers) return []
   const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
   let result = []
   if (Array.isArray(redirections)) {

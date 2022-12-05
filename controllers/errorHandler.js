@@ -1,3 +1,4 @@
+const { RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
 
 const mod = 'errHandler'
@@ -5,13 +6,17 @@ const fun = ''
 
 exports.error = (error, req, options) => {
   let errorToDisplay
-
+  if (!error) return new RudiError(`Error was unidentified: ${error}`)
   // log.e(mod, fun, error);
   // log.e(mod, fun, error.response?.data);
   // log.e(mod, fun, error.response?.status);
   // log.e(mod, fun, error.response?.headers);
   const statusCode =
-    error.statusCode || error.status || error.response?.statusCode || error.response?.status || 501
+    error?.statusCode ||
+    error?.status ||
+    error?.response?.statusCode ||
+    error?.response?.status ||
+    501
   options.statusCode = statusCode
   error.statusCode = statusCode
 

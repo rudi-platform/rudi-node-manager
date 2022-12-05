@@ -579,8 +579,12 @@ exports.dbCreateUserRole = (openedDb, userInfo) => {
           log.e(mod, fun, err.message)
           if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
             return reject(new BadRequestError(`Role already assigned to user`, mod, fun))
-          if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed'))
-            return reject(new BadRequestError(`User or role not found`, mod, fun))
+          if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
+            {
+
+              return reject(new BadRequestError(`User or role not found`, mod, fun))
+            }
+          }
           return reject(new InternalServerError(err))
         }
         log.i(
