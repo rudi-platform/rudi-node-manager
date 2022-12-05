@@ -372,9 +372,9 @@ exports.dbInitialize = async () => {
     log.d(mod, fun, `Users: ${JSON.stringify(user)?.replace(/\"/g, "'")}`)
 
     const userList = await dbGetUsers(db)
-    log.d(mod, fun, userList)
     const userRoles = await dbGetUserRoles(db)
-    log.d(mod, fun, userRoles)
+    const roles = await dbGetRoles(db)
+    log.d(mod, fun, { users: userList, userRoles, roles: roles.map((role) => role.role) })
     await dbClose(db)
     log.d(mod, fun, 'DB initialized')
   } catch (error) {
