@@ -68,8 +68,10 @@ exports.deleteUserRole = async (req, res, next) => {
 exports.postUserRole = async (req, res, next) => {
   try {
     const db = dbOpen()
-    const data = req.body
-    const { userId: id } = await dbCreateUserRole(db, data)
+    const { userId, username, role } = req.body
+    if (!userId) return res.status(400).json(new BadRequestError('UserId should be provided'))
+    if (!role) return res.status(400).json(new BadRequestError('UserId should be provided'))
+    const { userId: id } = await dbCreateUserRole(db, { userId, username, role })
     const user = await dbGetUserById(db, id)
     dbClose(db)
     res.status(200).json(user)

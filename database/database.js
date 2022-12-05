@@ -566,9 +566,10 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
   })
 }
 
-exports.dbCreateUserRole = (openedDb, userInfo) => {
+exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
   const fun = 'dbCreateUserRole'
-  const { userId, username, role } = userInfo
+  if (!userId) Promise.reject(new BadRequestError('Input parameter userId must be defined'))
+  if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
   // console.log('T (dbCreateUserRole)', userInfo)
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
@@ -581,8 +582,13 @@ exports.dbCreateUserRole = (openedDb, userInfo) => {
             return reject(new BadRequestError(`Role already assigned to user`, mod, fun))
           if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
             {
-
-              return reject(new BadRequestError(`User or role not found`, mod, fun))
+              return reject(
+                new BadRequestError(
+                  `User ${userId}${username ? ` (${username})` : ''} or role '${role}' not found`,
+                  mod,
+                  fun
+                )
+              )
             }
           }
           return reject(new InternalServerError(err))
@@ -593,7 +599,7 @@ exports.dbCreateUserRole = (openedDb, userInfo) => {
           `(${TBL_USER_ROLES}) A row was inserted with userId ${userId} and role '${role}'`,
           log.getContext(null, { opType: 'post_userRole' })
         )
-        resolve(userInfo)
+        resolve({ userId, role })
       })
     } catch (e) {
       reject(

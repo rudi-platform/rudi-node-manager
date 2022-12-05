@@ -58,9 +58,13 @@ export default function EditRoleModal({ visible, toggleEdit, options }) {
    */
   function assignUserRole(role, user) {
     axios
-      .post(urlUserRoles, JSON.stringify({ userId: user.id, role: role.role }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
+      .post(
+        urlUserRoles,
+        JSON.stringify({ userId: user.id, role: role.role, username: user.username }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
       .then((res) => {
         if (!user.roles) user.roles = []
         user.roles.push(role.role)
