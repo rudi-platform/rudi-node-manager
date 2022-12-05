@@ -32,9 +32,9 @@ EditUserModal.propTypes = {
 }
 
 /**
- * EditRoleModal component
+ * EditUserModal component
  * @param {*} props Modal properties
- * @return {ReactNode} EditRoleModal html component
+ * @return {ReactNode} EditUserModal html component
  */
 export default function EditUserModal({ user, roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
@@ -140,7 +140,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
   const sendUserInfo = async () => {
     try {
       // console.log('T (edit.sendingUserInfo)', userInfo)
-      const res = await axios.put(`${urlUser}`, userInfo)
+      const res = await axios.put(urlUser, userInfo)
       // console.log('T (edit.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
