@@ -108,7 +108,7 @@ exports.getHashFun = (req, res, next) => {
       .status(200)
       .send(hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD'))
   } catch (err) {
-    throw err
+    res.status(200).send('v0_0:')
   }
 }
 
