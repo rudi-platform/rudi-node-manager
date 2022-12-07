@@ -35,9 +35,6 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
-
   /**
    * download le fichier via media_id
    * @param {*} ressource connector du fichier
@@ -157,7 +154,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={`${formUrl}?read-only=${metadata.global_id}`}
+              href={`${appInfo.formUrl}?read-only=${metadata.global_id}`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -176,7 +173,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
                 ) : (
                   <a
                     className="btn btn-warning"
-                    href={`${formUrl}?update=${metadata.global_id}`}
+                    href={`${appInfo.formUrl}?update=${metadata.global_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

@@ -42,9 +42,6 @@ export function ObjCard({
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
-
   const objId = obj[propId]
   const objName = obj[propName]
   /**
@@ -78,7 +75,7 @@ export function ObjCard({
             {isEdit && (
               <div className="btn-group" role="group">
                 <a
-                  href={`${formUrl}?update=${objId}`}
+                  href={`${appInfo.formUrl}?update=${objId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-warning"
@@ -114,7 +111,6 @@ export function ObjCard({
 EditObjCard.propTypes = {
   idField: PropTypes.string,
   objName: PropTypes.string,
-  formUrl: PropTypes.string,
   refresh: PropTypes.func,
   deleteUrl: PropTypes.func,
   deleteConfirmMsg: PropTypes.func,
@@ -128,7 +124,6 @@ EditObjCard.propTypes = {
  * @return {ReactNode}
  */
 export function EditObjCard({
-  formUrl,
   idField,
   btnTextAdd,
   btnTextChg,
@@ -137,6 +132,7 @@ export function EditObjCard({
   deleteMsg,
   refresh,
 }) {
+  const { appInfo } = usePMFrontContext()
   const [editID, setEditID] = useState('')
 
   const { changeOptions, toggle } = useContext(ModalContext)
@@ -176,7 +172,7 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              href={formUrl}
+              href={appInfo.formUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
@@ -196,7 +192,7 @@ export function EditObjCard({
                 onChange={handleChange}
               />
               <a
-                href={`${formUrl}?update=${editID}`}
+                href={`${appInfo.formUrl}?update=${editID}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-warning"

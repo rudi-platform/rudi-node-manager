@@ -39,9 +39,6 @@ export default function Catalogue({ editMode }) {
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(`${appInfo.formUrl}`), [appInfo])
-
   const [metadatas, setMetadatas] = useState([])
   const [countBy, setCountBy] = useState([])
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
@@ -392,10 +389,9 @@ export default function Catalogue({ editMode }) {
         </div>
         <div className="col-9">
           <div className="row">
-            {isEdit && formUrl && (
+            {isEdit && (
               <EditObjCard
                 idField={idField}
-                formUrl={formUrl}
                 deleteUrl={deleteUrl}
                 deleteConfirmMsg={deleteConfirmMsg}
                 deleteMsg={deleteMsg}
@@ -416,7 +412,7 @@ export default function Catalogue({ editMode }) {
                 return (
                   <MetadataCard
                     metadata={metadata}
-                    formUrl={formUrl}
+                    formUrl={appInfo.formUrl}
                     refresh={refresh}
                     key={metadata.global_id}
                   ></MetadataCard>

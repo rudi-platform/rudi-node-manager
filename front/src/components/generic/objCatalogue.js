@@ -45,13 +45,11 @@ export default function ObjCatalogue({
   useEffect(() => setEdit(editMode), [editMode])
 
   const [listObj, setListObj] = useState([])
-  const [formUrl, setFormUrl] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
   const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
 
-  useEffect(() => setFormUrl(`${appInfo.formUrl}${formUrlObj}`), [appInfo])
   useEffect(() => getInitialData(), [])
 
   const deleteUrl = (id) => getApiUrlObj(id)
@@ -109,10 +107,10 @@ export default function ObjCatalogue({
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {isEdit && formUrl && (
+            {isEdit && (
               <EditObjCard
                 idField={propId}
-                formUrl={formUrl}
+                formUrl={appInfo.formUrl}
                 deleteUrl={deleteUrl}
                 deleteConfirmMsg={deleteConfirmMsg}
                 deleteMsg={deleteMsg}
