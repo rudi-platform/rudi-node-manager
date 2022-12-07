@@ -109,18 +109,22 @@ exports.createUser = async (req, res, next) => {
     const db = dbOpen()
 
     const dbUserSameName = await dbGetUserByUsername(db, username)
-    if (!!dbUserSameName)
+    if (!!dbUserSameName) {
+      dbClose(db)
       return res.status(403).json(new ForbiddenError(`Ce nom est déjà utilisé: '${username}'`))
+    }
 
     const dbUserSameMail = await dbGetUserByEmail(db, email)
-    if (!!dbUserSameMail)
+    if (!!dbUserSameMail) {
+      dbClose(db)
       return res.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
-
+    }
     const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
     // console.log('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
 
     const updatedUser = await dbGetUserById(db, id)
+    dbClose(db)
     return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'add_user' })
@@ -131,23 +135,29 @@ exports.createUser = async (req, res, next) => {
 exports.editUser = async (req, res, next) => {
   try {
     const { id, username, email, roles } = req.body
-    if (!id || !username || !email || !roles)
+    if ((id !== 0 && !id) || !username || !email || !roles) {
       return res
         .status(400)
         .json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
+    }
     const db = dbOpen()
     const dbUser = await dbGetUserById(db, id)
     const dbUserSameName = await dbGetUserByUsername(db, username)
-    if (dbUserSameName && dbUserSameName.id !== dbUser.id)
+    if (dbUserSameName && dbUserSameName.id !== dbUser.id) {
+      dbClose(db)
       return res
         .status(403)
         .json(`Ce nom est déjà utilisé: '${username}' (${dbUserSameName.id} !== ${dbUser.id})`)
+    }
     const dbUserSameMail = await dbGetUserByEmail(db, email)
-    if (dbUserSameMail && dbUserSameMail.id !== dbUser.id)
+    if (dbUserSameMail && dbUserSameMail.id !== dbUser.id) {
+      dbClose(db)
       return res.status(403).json(`Cet email est déjà utilisé: '${email}'`)
+    }
     await dbUpdateUser(db, { id, username, email })
     await dbUpdateUserRoles(db, { userId: id, username, roles })
     const updatedUser = await dbGetUserById(db, id)
+    dbClose(db)
     return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'edit_user' })

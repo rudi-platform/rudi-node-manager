@@ -69,7 +69,8 @@ exports.postUserRole = async (req, res, next) => {
   try {
     const db = dbOpen()
     const { userId, username, role } = req.body
-    if (!userId) return res.status(400).json(new BadRequestError('A userId should be provided'))
+    if (userId !== 0 && !userId)
+      return res.status(400).json(new BadRequestError('A userId should be provided'))
     if (!role) return res.status(400).json(new BadRequestError('A role should be provided'))
     const { userId: id } = await dbCreateUserRole(db, { userId, username, role })
     const user = await dbGetUserById(db, id)

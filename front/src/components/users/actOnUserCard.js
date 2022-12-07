@@ -51,7 +51,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
       .then((res) => {
         const user = res?.data
         const userId = user?.id
-        if (!userId) return defaultErrorHandler(`L'utilisateur n'a pas été trouvé: '${username}'`)
+        if (userId !== 0 && !userId) return defaultErrorHandler(`L'utilisateur n'a pas été trouvé: '${username}'`)
         axios
           .delete(urlUser(userId))
           .catch((err) => defaultErrorHandler(err))

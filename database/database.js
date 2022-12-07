@@ -111,7 +111,7 @@ exports.dbGetUserByField = (openedDb, field, val) => {
           return reject(err)
         } else {
           if (!userInfo || Object.keys(userInfo).length === 0) {
-            console.error(`T (dbGetUserByField) User not found with '${field}' = '${val}'`, err)
+            // console.error(`T (dbGetUserByField) User not found with '${field}' = '${val}'`, err)
             return resolve(null)
           }
           // console.log(` T (dbGetUserByField) Found with '${field}' = '${val}'`, userInfo)
@@ -471,7 +471,10 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
     if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await this.dbGetUserByUsername(db, username)
     const id = userInfo?.id
-    if (!id && username != SU_NAME) throw new UnauthorizedError(`User not found: ${username}`)
+    if (!id && username != SU_NAME) {
+      dbClose(db)
+      throw new UnauthorizedError(`User not found: ${username}`)
+    }
     const roles = await this.dbGetUserRolesByUserId(db, id)
     if (!openedDb) dbClose(db)
     return roles
@@ -509,7 +512,7 @@ exports.isValidatedUser = async (openedDb, userInfo) => {
 exports.dbGetUserRolesByUserId = (openedDb, userId) => {
   const fun = 'dbGetUserRolesByUserId'
   return new Promise((resolve, reject) => {
-    if (userId != 0 && !userId) return reject(new BadRequestError(`User id not provided`))
+    if (userId !== 0 && !userId) return reject(new BadRequestError(`User id not provided`))
     const db = openedDb || dbOpen()
     this.dbGetUserById(db, userId)
       .catch((err) => {
@@ -567,7 +570,8 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
 
 exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
   const fun = 'dbCreateUserRole'
-  if (!userId) Promise.reject(new BadRequestError('Input parameter userId must be defined'))
+  if (userId !== 0 && !userId)
+    Promise.reject(new BadRequestError('Input parameter userId must be defined'))
   if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
   console.log('T (dbCreateUserRole)', { userId, username, role })
   const db = openedDb || dbOpen()
@@ -608,7 +612,8 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
   const fun = 'dbUpdateUserRoles'
   try {
     const { userId, username, roles: targetRoles } = userInfo
-    if (!userId) Promise.reject(new BadRequestError(`Input parameter 'userId' must be defined`))
+    if (userId !== 0 && !userId)
+      Promise.reject(new BadRequestError(`Input parameter 'userId' must be defined`))
     if (!targetRoles) Promise.reject(new BadRequestError(`Input parameter 'roles' must be defined`))
     if (!Array.isArray(targetRoles))
       throw new BadRequestError(`Parameter 'roles' should be an array`)
