@@ -2,7 +2,7 @@ import './styles/App.scss'
 
 import axios from 'axios'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -52,16 +52,6 @@ const Main = () => {
 
   // ---------------- Loading context
   const { appInfo, setUserInfo } = usePMFrontContext()
-
-  const [isEditor, setIsEditor] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-
-  useEffect(() => {
-    // const { userInfo } = appInfo
-    // console.log('T (App.UseEffect) appInfo', appInfo)
-    setIsEditor(!!appInfo?.isEditor)
-    setIsAdmin(!!appInfo?.isAdmin)
-  }, [appInfo, token])
 
   // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
@@ -168,7 +158,7 @@ const Main = () => {
                   {navItem('', 'Catalogue')}
                   {navItem('licence', 'Licence')}
                   {navItem('show', 'Visualisation')}
-                  <li className={isEditor ? 'nav-item' : 'nav-item hide-wip'}>
+                  <li className={appInfo.isEditor ? 'nav-item' : 'nav-item hide-wip'}>
                     <DropdownButton id="dropdown-gestion-button" title="Gestion">
                       <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
                         Métadonnées
@@ -179,18 +169,28 @@ const Main = () => {
                       <Dropdown.Item as={Link} to={getBackUrl('contact')}>
                         Contacts
                       </Dropdown.Item>
+                    </DropdownButton>
+                  </li>
+                  <li className={appInfo.isAdmin ? 'nav-item' : 'nav-item hide-wip'}>
+                    <DropdownButton id="dropdown-gestion-button" title="Admin">
                       <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
                         Clés
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={getBackUrl('user')}>
+                        Utilisateurs
                       </Dropdown.Item>
                     </DropdownButton>
                   </li>
 
                   {navItem('monitoring', 'Monitoring', false)}
-                  {navItem('user', 'Utilisateurs', isAdmin)}
                   {navItem('conf', 'Configuration', false)}
 
-                  <li className="nav-item center">
-                    <button type="button" className="btn btn-secondary" onClick={() => logout()}>
+                  <li className="nav-item center ">
+                    <button
+                      type="button"
+                      className="margin-logout btn btn-secondary"
+                      onClick={() => logout()}
+                    >
                       Logout
                     </button>
                   </li>
@@ -205,14 +205,23 @@ const Main = () => {
 
         <Routes>
           <Route path={getBackUrl()} element={<Catalogue editMode={false} />} />
-          <Route path={getBackUrl('metadata')} element={<Catalogue editMode={isEditor} />} />
-          <Route path={getBackUrl('gestion')} element={<Catalogue editMode={isEditor} />} />
+          <Route
+            path={getBackUrl('metadata')}
+            element={<Catalogue editMode={appInfo.isEditor} />}
+          />
+          <Route path={getBackUrl('gestion')} element={<Catalogue editMode={appInfo.isEditor} />} />
           <Route
             path={getBackUrl('producer')}
-            element={<CatalogueProducer editMode={isEditor} />}
+            element={<CatalogueProducer editMode={appInfo.isEditor} />}
           />
-          <Route path={getBackUrl('contact')} element={<CatalogueContact editMode={isEditor} />} />
-          <Route path={getBackUrl('pub_key')} element={<CataloguePubKeys editMode={isEditor} />} />
+          <Route
+            path={getBackUrl('contact')}
+            element={<CatalogueContact editMode={appInfo.isEditor} />}
+          />
+          <Route
+            path={getBackUrl('pub_key')}
+            element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
+          />
           <Route
             path={getBackUrl('licence')}
             element={<CatalogueLicence display={{ editJDD: false }} editMode={false} />}
@@ -220,7 +229,7 @@ const Main = () => {
           <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
           <Route path={getBackUrl('show')} element={<Visualisation />} />
           <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
-          <Route path={getBackUrl('user')} element={<CatalogueUser editMode={isEditor} />} />
+          <Route path={getBackUrl('user')} element={<CatalogueUser editMode={appInfo.isAdmin} />} />
           <Route
             path={getBackUrl('conf')}
             element={<div className="tempPaddingTop">Work in progress</div>}

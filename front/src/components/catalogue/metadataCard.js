@@ -34,7 +34,6 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
 
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
-
   /**
    * download le fichier via media_id
    * @param {*} ressource connector du fichier

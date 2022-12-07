@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Search } from 'react-bootstrap-icons'
 
-import { usePMFrontContext } from '../../generalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import MetadataCard from './metadataCard'
 import { filterConf } from './conf'
@@ -32,7 +31,6 @@ Catalogue.propTypes = {
  * @return {ReactNode}
  */
 export default function Catalogue({ editMode }) {
-  const { appInfo } = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
@@ -411,8 +409,8 @@ export default function Catalogue({ editMode }) {
               {metadatas.map((metadata) => {
                 return (
                   <MetadataCard
+                    editMode={isEdit}
                     metadata={metadata}
-                    formUrl={appInfo.formUrl}
                     refresh={refresh}
                     key={metadata.global_id}
                   ></MetadataCard>

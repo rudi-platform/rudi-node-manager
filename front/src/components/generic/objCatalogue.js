@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { usePMFrontContext } from '../../generalContext'
 import { EditObjCard, ObjCard } from '../generic/objCard'
 import { getApiData } from '../../utils/frontOptions'
 
@@ -38,7 +37,6 @@ export default function ObjCatalogue({
   deleteConfirmMsg,
   deleteMsg,
 }) {
-  const { appInfo } = usePMFrontContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setEdit] = useState(!!editMode)
@@ -110,7 +108,6 @@ export default function ObjCatalogue({
             {isEdit && (
               <EditObjCard
                 idField={propId}
-                formUrl={appInfo.formUrl}
                 deleteUrl={deleteUrl}
                 deleteConfirmMsg={deleteConfirmMsg}
                 deleteMsg={deleteMsg}
