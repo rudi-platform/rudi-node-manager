@@ -3,6 +3,7 @@
 // ------------------------------------------------------------------------------------------------
 exports.OPT_USER_CONF = 'conf'
 exports.OPT_GIT_HASH = 'hash'
+exports.OPT_APP_TAG = 'tag'
 exports.OPT_NODE_ENV = 'nodeEnv'
 exports.OPT_BACK_PATH = 'backPath'
 
@@ -29,6 +30,11 @@ exports.OPTIONS = {
     text: 'Git hash',
     cli: '--hash',
     env: 'RUDI_PROD_MANAGER_GIT_REV',
+  },
+  [this.OPT_APP_TAG]: {
+    text: 'Version tag displayed',
+    cli: '--tag',
+    env: 'RUDI_PROD_MANAGER_APP_TAG',
   },
   [this.OPT_BACK_PATH]: {
     text: 'Back-end path',
@@ -106,10 +112,19 @@ exports.getHashFun = (req, res, next) => {
     const hashId = this.getBackOptions(this.OPT_GIT_HASH)
     res
       .status(200)
-      .send(hashId ? hashId : require('child_process').execSync('git rev-parse --short HEAD'))
+      .send(hashId || require('child_process').execSync('git rev-parse --short HEAD'))
   } catch (err) {
     console.error('WARNING: no --hash option provided + giv rev parse does not work')
     res.status(200).send('v0_0;')
+  }
+}
+
+exports.getAppTag = (req, res, next) => {
+  try {
+    const appTag = this.getBackOptions(this.OPT_APP_TAG)
+    res.status(200).send(appTag || '')
+  } catch (err) {
+    res.status(200).send('')
   }
 }
 

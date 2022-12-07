@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
 
-import { getBackUrl, getFrontOptions, OPT_TAG } from './utils/frontOptions'
+import { getApiFront, getBackUrl } from './utils/frontOptions'
 import { createBrowserHistory } from 'history'
 import useToken from './useToken'
 import { defaultFrontContext, PMFrontContextProvider, usePMFrontContext } from './generalContext'
@@ -25,12 +25,6 @@ import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
 import { ModalProvider } from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
-
-const VERSION_TAG = getFrontOptions(OPT_TAG)
-const HAST_TAG = getBackUrl('front/hash')
-
-export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`)
-export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`)
 
 export const history = createBrowserHistory({ basename: getBackUrl() })
 
@@ -96,14 +90,12 @@ const Main = () => {
    * Returns the code to display the version tag (if defined)
    * @return {ReactNode} the code to display the version tag (if defined)
    */
-  const displayVersion = () =>
-    !VERSION_TAG ? (
-      ''
-    ) : (
-      <div>
-        <div className="version">v.{VERSION_TAG}</div> <div>{HAST_TAG}</div>
-      </div>
-    )
+  const displayVersion = () => (
+    <div>
+      <div className="appTag">{appInfo.appTag}</div>
+      <div className="gitTag">{appInfo.gitHash}</div>
+    </div>
+  )
 
   /**
    *

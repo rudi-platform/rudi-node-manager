@@ -83,15 +83,12 @@ a {
   text-decoration: none;
 }
 
-
-
 .smallPaddingTop {
   padding-top: 60px;
   padding-bottom: 60px;
   margin-left: $marginSides;
   margin-right: $marginSides;
 }
-
 
 .tempPaddingTop {
   padding-top: 75px;
@@ -183,7 +180,14 @@ a {
 .center {
   margin: auto;
 }
-.version {
+.appTag {
+  color: $header-font;
+  font-size: 0.9em;
+  font-weight: bold;
+  float: right;
+  margin: 0px $marginSides;
+}
+.gitTag {
   color: $header-font;
   font-size: 0.7em;
   float: right;

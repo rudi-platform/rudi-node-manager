@@ -3,7 +3,7 @@
 // ------------------------------------------------------------------------------------------------
 export const OPT_FRONT_PATH = 'PUBLIC_URL'
 // export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
-export const OPT_TAG = 'REACT_APP_TAG'
+// export const OPT_TAG = 'REACT_APP_TAG'
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -13,7 +13,7 @@ export const OPT_TAG = 'REACT_APP_TAG'
 // 'file': option given through the configuration file
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
-const OPTIONS = [OPT_FRONT_PATH, OPT_TAG]
+const OPTIONS = [OPT_FRONT_PATH]
 
 const frontOptions = {}
 
@@ -52,3 +52,8 @@ if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/'
 //   if (!getFrontOptions(varName))
 //     throw new Error(`This environment variable should be defined: ${varName}`);
 // };
+
+
+export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`)
+export const getApiOpen = (suffix) => (!suffix ? 'incorrect' : `api/open/${suffix}`)
+export const getApiData = (suffix) => (!suffix ? 'incorrect' : `api/data/${suffix}`)

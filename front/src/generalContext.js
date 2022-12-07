@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 
 import useToken from './useToken'
-import { getApiData, getApiFront } from './App'
+import { getApiData, getApiFront, getApiOpen } from './utils/frontOptions'
 
 /**
  * We use this context to memorize
@@ -12,7 +12,6 @@ import { getApiData, getApiFront } from './App'
  * - the user info (username + roles)
  * - the display flags that set if the user sees the Users menu (isAdmin) + the Data management menu (isEditor))
  */
-
 export const defaultFrontContext = {
   formUrl: '', // the URL for the console formular
   themeLabels: {}, // the theme labels
@@ -52,11 +51,15 @@ export function PMFrontContextProvider({ children }) {
           axios.get(getApiFront('formUrl')),
           axios.get(getApiData('enum/themes/fr')),
           axios.get(getApiFront('user-info')),
+          axios.get(getApiOpen('tag')),
+          axios.get(getApiOpen('hash')),
         ])
         const userInfo = values[2].data
         const backValues = {
           formUrl: `${values[0].data}`,
           themeLabels: values[1].data,
+          appTag: `${values[3].data}`,
+          gitHash: `${values[4].data}`,
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),

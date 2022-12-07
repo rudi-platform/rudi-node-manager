@@ -7,11 +7,11 @@ import { Search } from 'react-bootstrap-icons'
 
 import { usePMFrontContext } from '../../generalContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getApiData } from '../../App'
 import MetadataCard from './metadataCard'
 import { filterConf } from './conf'
 import ThemeDisplay from '../other/themeDisplay'
 import { EditObjCard } from '../generic/objCard'
+import { getApiData } from '../../utils/frontOptions'
 
 const idField = 'global_id'
 

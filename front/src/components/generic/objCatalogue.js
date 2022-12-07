@@ -7,7 +7,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { usePMFrontContext } from '../../generalContext'
 import { EditObjCard, ObjCard } from '../generic/objCard'
-import { getApiData } from '../../App'
+import { getApiData } from '../../utils/frontOptions'
 
 const PAGE_SIZE = 20
 
