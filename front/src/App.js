@@ -23,7 +23,7 @@ import CatalogueContact from './components/generic/catalogueContact'
 import CataloguePubKeys from './components/generic/cataloguePubKeys'
 import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
-import { ModalProvider } from './components/modals/genericModalContext'
+import ModalProvider from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
 
 export const history = createBrowserHistory({ basename: getBackUrl() })
@@ -203,38 +203,43 @@ const Main = () => {
 
         <div id="root"></div>
 
-        <Routes>
-          <Route path={getBackUrl()} element={<Catalogue editMode={false} />} />
-          <Route
-            path={getBackUrl('metadata')}
-            element={<Catalogue editMode={appInfo.isEditor} />}
-          />
-          <Route path={getBackUrl('gestion')} element={<Catalogue editMode={appInfo.isEditor} />} />
-          <Route
-            path={getBackUrl('producer')}
-            element={<CatalogueProducer editMode={appInfo.isEditor} />}
-          />
-          <Route
-            path={getBackUrl('contact')}
-            element={<CatalogueContact editMode={appInfo.isEditor} />}
-          />
-          <Route
-            path={getBackUrl('pub_key')}
-            element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
-          />
-          <Route
-            path={getBackUrl('licence')}
-            element={<CatalogueLicence display={{ editJDD: false }} editMode={false} />}
-          />
-          <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
-          <Route path={getBackUrl('show')} element={<Visualisation />} />
-          <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
-          <Route path={getBackUrl('user')} element={<CatalogueUser editMode={appInfo.isAdmin} />} />
-          <Route
-            path={getBackUrl('conf')}
-            element={<div className="tempPaddingTop">Work in progress</div>}
-          />
-        </Routes>
+        <PMFrontContextProvider>
+          <Routes>
+            <Route path={getBackUrl()} element={<Catalogue editMode={false} />} />
+            <Route
+              path={getBackUrl('metadata')}
+              element={<Catalogue editMode={appInfo.isEditor} />}
+            />
+            <Route
+              path={getBackUrl('gestion')}
+              element={<Catalogue editMode={appInfo.isEditor} />}
+            />
+            <Route
+              path={getBackUrl('producer')}
+              element={<CatalogueProducer editMode={appInfo.isEditor} />}
+            />
+            <Route
+              path={getBackUrl('contact')}
+              element={<CatalogueContact editMode={appInfo.isEditor} />}
+            />
+            <Route
+              path={getBackUrl('pub_key')}
+              element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
+            />
+            <Route
+              path={getBackUrl('licence')}
+              element={<CatalogueLicence display={{ editJDD: false }} editMode={false} />}
+            />
+            <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
+            <Route path={getBackUrl('show')} element={<Visualisation />} />
+            <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
+            <Route
+              path={getBackUrl('user')}
+              element={<CatalogueUser editMode={appInfo.isAdmin} />}
+            />
+            <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
+          </Routes>
+        </PMFrontContextProvider>
       </ModalProvider>
     </Router>
   )

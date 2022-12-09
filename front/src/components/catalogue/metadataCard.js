@@ -30,6 +30,7 @@ MetadataCard.propTypes = {
 export default function MetadataCard({ editMode, metadata, refresh }) {
   const { appInfo } = usePMFrontContext()
   const { changeOptions, toggle } = useModalContext()
+
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setEdit] = useState(!!editMode)
@@ -172,7 +173,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
                 ) : (
                   <a
                     className="btn btn-warning"
-                    href={`${appInfo.formUrl}?update=${metadata.global_id}`}
+                    href={`${appInfo.formUrl}?read-only=${metadata.global_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

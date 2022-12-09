@@ -106,6 +106,46 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get app tag",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get app hash\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseStr = codec.streamToString(pm.response)",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableCookies": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{pmBackUrl}}/api/open/tag",
+									"host": [
+										"{{pmBackUrl}}"
+									],
+									"path": [
+										"api",
+										"open",
+										"tag"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"event": [
@@ -2697,6 +2737,14 @@
 			"value": ""
 		},
 		{
+			"key": "apiJwt",
+			"value": ""
+		},
+		{
+			"key": "portalJwt",
+			"value": ""
+		},
+		{
 			"key": "mediaToken",
 			"value": ""
 		},
@@ -2778,14 +2826,6 @@
 		},
 		{
 			"key": "userId",
-			"value": ""
-		},
-		{
-			"key": "apiJwt",
-			"value": ""
-		},
-		{
-			"key": "portalJwt",
 			"value": ""
 		}
 	]

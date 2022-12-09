@@ -133,10 +133,11 @@ export function EditObjCard({
   refresh,
 }) {
   const { appInfo } = usePMFrontContext()
-  const [editID, setEditID] = useState('')
-
-  const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [editID, setEditID] = useState('')
+  const { changeOptions, toggle } = useContext(ModalContext)
+
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
@@ -172,13 +173,12 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
+              className="btn btn-secondary"
               href={appInfo.formUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-secondary"
             >
-              {btnTextAdd}
-              <Plus />
+              {btnTextAdd} <Plus />
             </a>
           </div>
           <div className="inline card-text on-right">

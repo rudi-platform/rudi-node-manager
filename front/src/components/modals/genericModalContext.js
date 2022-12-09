@@ -14,7 +14,7 @@ ModalProvider.propTypes = { children: PropTypes.node }
  * @param {*} param0
  * @return {Provider}
  */
-export function ModalProvider({ children }) {
+export default function ModalProvider({ children }) {
   const { toggle, visible } = useGenericModal()
   const { options, changeOptions } = useGenericModalOptions()
   return (

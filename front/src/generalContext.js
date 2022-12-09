@@ -35,7 +35,7 @@ export function PMFrontContextProvider({ children }) {
   const { token } = useToken()
 
   const [appInfo, setAppInfo] = useState({})
-  // const [loading, setLoading] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const isAdmin = (roles = []) =>
     roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1
@@ -45,7 +45,6 @@ export function PMFrontContextProvider({ children }) {
   useEffect(() => {
     const callBackApi = async () => {
       if (!token) return defaultFrontContext
-
       try {
         const values = await Promise.all([
           axios.get(getApiFront('formUrl')),
@@ -74,11 +73,10 @@ export function PMFrontContextProvider({ children }) {
     }
 
     const getBackData = async () => {
-      // setLoading(true)
+      setIsLoaded(false)
       const newData = await callBackApi()
       setAppInfo(newData)
-      // setLoading(false)
-      // console.log('T (getBackData) Data received:', newData)
+      setIsLoaded(true)
     }
 
     getBackData()
@@ -96,6 +94,8 @@ export function PMFrontContextProvider({ children }) {
   }
 
   return (
-    <PMFrontContext.Provider value={{ appInfo, setUserInfo }}>{children}</PMFrontContext.Provider>
+    <PMFrontContext.Provider value={{ appInfo, isLoaded, setUserInfo }}>
+      {children}
+    </PMFrontContext.Provider>
   )
 }
