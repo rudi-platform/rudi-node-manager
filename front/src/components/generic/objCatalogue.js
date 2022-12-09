@@ -12,7 +12,7 @@ const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
   editMode: PropTypes.bool,
-  formUrlObj: PropTypes.string,
+  objType: PropTypes.string,
   propId: PropTypes.string,
   propName: PropTypes.string,
   propNamesToDisplay: PropTypes.object,
@@ -28,7 +28,7 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   editMode,
-  formUrlObj,
+  objType,
   propId,
   propName,
   propNamesToDisplay,
@@ -46,7 +46,7 @@ export default function ObjCatalogue({
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  const getApiUrlObj = (suffix) => getApiData(`${formUrlObj}${suffix ? `/${suffix}` : ''}`)
+  const getApiUrlObj = (suffix) => getApiData(`${objType}${suffix ? `/${suffix}` : ''}`)
 
   useEffect(() => getInitialData(), [])
 
@@ -107,6 +107,7 @@ export default function ObjCatalogue({
           <div className="row">
             {isEdit && (
               <EditObjCard
+                objType={objType}
                 idField={propId}
                 deleteUrl={deleteUrl}
                 deleteConfirmMsg={deleteConfirmMsg}
@@ -125,6 +126,7 @@ export default function ObjCatalogue({
               {listObj.map((obj, i) => (
                 <ObjCard
                   editMode={isEdit}
+                  objType={objType}
                   obj={obj}
                   propId={propId}
                   propName={propName}

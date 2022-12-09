@@ -14,7 +14,7 @@ export default function CataloguePubKeys({  editMode }) {
   return (
     <ObjCatalogue
       editMode={editMode}
-      formUrlObj="pub_keys"
+      objType="pub_keys"
       propId="name"
       propName="name"
       propNamesToDisplay={{

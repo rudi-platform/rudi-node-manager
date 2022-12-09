@@ -24,7 +24,7 @@ const OBJECT_TYPES = {
  * @param {String} objectType The type of the object
  * @param {String} id The UUID of the object
  */
-function raiseError(req, res, initialError, errCode, fun, objectType, id) {
+function handleError(req, res, initialError, errCode, fun, objectType, id) {
   try {
     console.log('req params:', req.params)
     console.log('req url:', req.originalUrl)
@@ -49,7 +49,7 @@ function raiseError(req, res, initialError, errCode, fun, objectType, id) {
 
 const checkObjectType = (req, res, fun, objectType) => {
   if (!OBJECT_TYPES[objectType]) {
-    raiseError(req, res, new Error('Object type unkown: ' + objectType), 400, fun, objectType)
+    handleError(req, res, new Error('Object type unkown: ' + objectType), 400, fun, objectType)
     return false
   }
   return true
@@ -75,8 +75,7 @@ exports.getObjectList = (req, res, next) => {
     })
     .then((resRudiApi) => res.status(200).json(resRudiApi.data))
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType })
-      res.status(error.statusCode).json(error)
+      handleError(req, res, err, 501, opType, objectType)
     })
 }
 
@@ -97,8 +96,7 @@ exports.getObjectById = (req, res, next) => {
       res.status(200).json(rudiObj)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType, id })
-      res.status(error.statusCode).json(error)
+      handleError(req, res, err, 501, opType, objectType, id)
     })
 }
 
@@ -121,8 +119,7 @@ exports.postObject = (req, res, next) => {
     })
     .catch((err) => {
       const id = req.body[OBJECT_TYPES[objectType].id]
-      const error = errorHandler.error(err, req, { opType, id })
-      res.status(error.statusCode).json(error)
+      handleError(req, res, err, 501, opType, objectType, id)
     })
 }
 
@@ -140,7 +137,7 @@ exports.putObject = (req, res, next) => {
     .then((resRudiApi) => res.status(200).json(resRudiApi.data))
     .catch((error) => {
       const id = req.body[OBJECT_TYPES[objectType].id]
-      raiseError(req, res, error, 501, fun, objectType, id)
+      handleError(req, res, error, 501, fun, objectType, id)
     })
 }
 
@@ -160,5 +157,5 @@ exports.deleteObject = (req, res, next) => {
       const rudiObj = resRudiApi.data
       res.status(200).json(rudiObj)
     })
-    .catch((error) => raiseError(req, res, error, 501, fun, objectType, id))
+    .catch((error) => handleError(req, res, error, 501, fun, objectType, id))
 }

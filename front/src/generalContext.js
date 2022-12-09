@@ -53,9 +53,10 @@ export function PMFrontContextProvider({ children }) {
           axios.get(getApiOpen('tag')),
           axios.get(getApiOpen('hash')),
         ])
+        const formUrlReceived = `${values[0].data}`
         const userInfo = values[2].data
         const backValues = {
-          formUrl: `${values[0].data}`,
+          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : formUrlReceived + '/',
           themeLabels: values[1].data,
           appTag: `${values[3].data}`,
           gitHash: `${values[4].data}`,

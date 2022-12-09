@@ -17,7 +17,7 @@ export default function CatalogueProducer({ editMode }) {
   return (
     <ObjCatalogue
       editMode={isEdit}
-      formUrlObj="organizations"
+      objType="organizations"
       propId="organization_id"
       propName="organization_name"
       propNamesToDisplay={{

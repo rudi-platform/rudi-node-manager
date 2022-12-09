@@ -26,3 +26,6 @@ exports.showObj = (obj, option = 2) => {
     return `${obj}`
   }
 }
+
+exports.getObjFormUrl = (formUrl, objType = '', queryParams = '') =>
+  formUrl + objType + queryParams

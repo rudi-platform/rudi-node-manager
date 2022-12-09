@@ -7,9 +7,11 @@ import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 import { usePMFrontContext } from '../../generalContext'
+import { getObjFormUrl } from '../../utils/utils'
 
 ObjCard.propTypes = {
   editMode: PropTypes.bool,
+  objType: PropTypes.string,
   obj: PropTypes.object,
   propId: PropTypes.string,
   propName: PropTypes.string,
@@ -26,10 +28,11 @@ ObjCard.propTypes = {
  */
 export function ObjCard({
   editMode,
+  objType,
   obj,
   propId,
   propName,
-  displayFields: propNames,
+  displayFields,
   deleteUrl,
   deleteConfirmMsg,
   deleteMsg,
@@ -44,6 +47,7 @@ export function ObjCard({
 
   const objId = obj[propId]
   const objName = obj[propName]
+
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -75,7 +79,7 @@ export function ObjCard({
             {isEdit && (
               <div className="btn-group" role="group">
                 <a
-                  href={`${appInfo.formUrl}?update=${objId}`}
+                  href={getObjFormUrl(appInfo.formUrl, objType, `?update=${objId}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-warning"
@@ -94,11 +98,11 @@ export function ObjCard({
           </div>
         </h5>
         <div className="card-body">
-          {Object.keys(propNames).map(
+          {Object.keys(displayFields).map(
             (key) =>
               obj[key] && (
                 <p className="card-text" key={`${objId}.${key}`}>
-                  {propNames[key]} : <small className="text-muted">{obj[key]}</small>
+                  {displayFields[key]} : <small className="text-muted">{obj[key]}</small>
                 </p>
               )
           )}
@@ -109,8 +113,8 @@ export function ObjCard({
 }
 
 EditObjCard.propTypes = {
+  objType: PropTypes.string,
   idField: PropTypes.string,
-  objName: PropTypes.string,
   refresh: PropTypes.func,
   deleteUrl: PropTypes.func,
   deleteConfirmMsg: PropTypes.func,
@@ -124,6 +128,7 @@ EditObjCard.propTypes = {
  * @return {ReactNode}
  */
 export function EditObjCard({
+  objType = '',
   idField,
   btnTextAdd,
   btnTextChg,
@@ -173,10 +178,10 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              className="btn btn-secondary"
-              href={appInfo.formUrl}
+              href={getObjFormUrl(appInfo.formUrl, objType)}
               target="_blank"
               rel="noopener noreferrer"
+              className="btn btn-secondary"
             >
               {btnTextAdd} <Plus />
             </a>
@@ -192,7 +197,7 @@ export function EditObjCard({
                 onChange={handleChange}
               />
               <a
-                href={`${appInfo.formUrl}?update=${editID}`}
+                href={getObjFormUrl(appInfo.formUrl, objType, `?update=${editID}`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-warning"

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { nowLocaleFormatted } from '../../utils/utils'
+import { getObjFormUrl, nowLocaleFormatted } from '../../utils/utils'
 import { getBackUrl } from '../../utils/frontOptions'
 import {
   DefaultOkOption,
@@ -154,7 +154,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={`${appInfo.formUrl}?read-only=${metadata.global_id}`}
+              href={getObjFormUrl(appInfo.formUrl, '', `?read-only=${metadata.global_id}`)}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -173,7 +173,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
                 ) : (
                   <a
                     className="btn btn-warning"
-                    href={`${appInfo.formUrl}?update=${metadata.global_id}`}
+                    href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

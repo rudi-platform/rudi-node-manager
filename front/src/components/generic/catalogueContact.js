@@ -17,7 +17,7 @@ export default function CatalogueContact({ editMode }) {
   return (
     <ObjCatalogue
       editMode={isEdit}
-      formUrlObj="contacts"
+      objType="contacts"
       propId="contact_id"
       propName="contact_name"
       propNamesToDisplay={{
