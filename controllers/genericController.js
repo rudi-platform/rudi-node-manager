@@ -1,10 +1,9 @@
+const mod = 'genCtrl'
+
 const axios = require('axios')
 const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
 const { createRudiApiToken } = require('../utils/secu')
-
-// const axiosCurlirize = require('axios-curlirize');
-// axiosCurlirize(axios);
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -26,21 +25,26 @@ const OBJECT_TYPES = {
  * @param {String} id The UUID of the object
  */
 function raiseError(req, res, initialError, errCode, fun, objectType, id) {
-  console.log('req params:', req.params)
-  console.log('req url:', req.originalUrl)
-  console.log('res:' + res)
-  console.log('initialError:', initialError?.response?.data)
-  console.log(
-    `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
-  )
-  console.log('fun: ' + fun)
-  console.log('objectType: ' + objectType)
-  console.log('id: ' + id)
-  const errPayload = {}
-  if (fun) errPayload.opType = fun
-  if (id) errPayload.id = `${objectType}+${id}`
-  const error = errorHandler.error(initialError, req, errPayload)
-  res.status(initialError.statusCode || errCode).json(error.moreInfo || error)
+  try {
+    console.log('req params:', req.params)
+    console.log('req url:', req.originalUrl)
+    console.log('res:' + res)
+    console.log('initialError:', initialError?.response?.data)
+    console.log(
+      `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
+    )
+    console.log('fun: ' + fun)
+    console.log('objectType: ' + objectType)
+    console.log('id: ' + id)
+    const errPayload = {}
+    if (fun) errPayload.opType = fun
+    if (id) errPayload.id = `${objectType}+${id}`
+    const error = errorHandler.error(initialError, req, errPayload)
+    res.status(initialError.statusCode || errCode).json(error.moreInfo || error)
+  } catch (err) {
+    console.error(mod, 'raiseError', err)
+    console.error(mod, 'raiseError.initialError', initialError)
+  }
 }
 
 const checkObjectType = (req, res, fun, objectType) => {
@@ -52,14 +56,14 @@ const checkObjectType = (req, res, fun, objectType) => {
 }
 
 exports.getObjectList = (req, res, next) => {
-  const fun = 'get_objects'
+  const opType = 'get_objects'
   const { objectType } = req.params
   // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
 
   // const urlParts = `${req.url}`.split('?');
   // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
 
-  if (!checkObjectType(req, res, fun, objectType) || objectType === 'media') return
+  if (!checkObjectType(req, res, opType, objectType) || objectType === 'media') return
 
   const url = getAdminApi(objectType)
   // console.log('T (getObjectList) url', getRudiApi(url));
@@ -70,16 +74,16 @@ exports.getObjectList = (req, res, next) => {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then((resRudiApi) => res.status(200).json(resRudiApi.data))
-    .catch((error) => {
-      console.log(error)
-      raiseError(req, res, error, 501, fun, objectType)
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType })
+      res.status(error.statusCode).json(error)
     })
 }
 
 exports.getObjectById = (req, res, next) => {
-  const fun = 'get_object_by_id'
+  const opType = 'get_object_by_id'
   const { objectType, id } = req.params
-  if (!checkObjectType(req, res, fun, objectType)) return
+  if (!checkObjectType(req, res, opType, objectType)) return
 
   const url = getAdminApi(`${objectType}/${id}`)
   const token = createRudiApiToken(url, req)
@@ -92,13 +96,16 @@ exports.getObjectById = (req, res, next) => {
       const rudiObj = resRudiApi.data
       res.status(200).json(rudiObj)
     })
-    .catch((error) => raiseError(req, res, error, 501, fun, objectType, id))
+    .catch((err) => {
+      const error = errorHandler.error(err, req, { opType, id })
+      res.status(error.statusCode).json(error)
+    })
 }
 
 exports.postObject = (req, res, next) => {
-  const fun = 'post_object'
+  const opType = 'post_object'
   const { objectType } = req.params
-  if (!checkObjectType(req, res, fun, objectType)) return
+  if (!checkObjectType(req, res, opType, objectType)) return
 
   const url = getAdminApi(objectType)
   const token = createRudiApiToken(url, req)
@@ -112,9 +119,10 @@ exports.postObject = (req, res, next) => {
     .then((resRudiApi) => {
       res.status(200).json(resRudiApi.data)
     })
-    .catch((error) => {
+    .catch((err) => {
       const id = req.body[OBJECT_TYPES[objectType].id]
-      raiseError(req, res, error, 501, fun, objectType, id)
+      const error = errorHandler.error(err, req, { opType, id })
+      res.status(error.statusCode).json(error)
     })
 }
 

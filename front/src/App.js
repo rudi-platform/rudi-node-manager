@@ -109,10 +109,17 @@ const Main = () => {
    * @return {void}
    */
   const logout = () => {
-    axios.get(getBackUrl(getApiFront('logout'))).then((res) => {
-      updateToken()
-      setUserInfo(defaultFrontContext)
-    })
+    axios
+      .get(getBackUrl(getApiFront('logout')))
+      .then((res) => {
+        updateToken()
+        setUserInfo(defaultFrontContext)
+      })
+      .catch((err) => {
+        console.error('T (logout)', err)
+        updateToken()
+        setUserInfo(defaultFrontContext)
+      })
   }
 
   if (!token) {
