@@ -15,6 +15,7 @@ exports.error = (error, req, options) => {
     const statusCode =
       error?.statusCode ||
       error?.status ||
+      error?.code ||
       error?.response?.statusCode ||
       error?.response?.status ||
       501
@@ -45,5 +46,6 @@ exports.error = (error, req, options) => {
     return errorToDisplay
   } catch (err) {
     log.e(mod, fun, err)
+    return { statusCode: 500, message: err, error: err }
   }
 }

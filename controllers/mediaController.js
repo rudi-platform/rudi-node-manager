@@ -6,7 +6,7 @@ const axios = require('axios')
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
-const { ForbiddenError, STATUS_CODE, UnauthorizedError, NotFoundError } = require('../utils/errors')
+const { ForbiddenError, UnauthorizedError, NotFoundError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   createRudiApiToken,
@@ -63,7 +63,7 @@ exports.getMediaToken = async (req, res, next) => {
       '!! Liaison avec le module “Media” incomplète, création de JWT impossible: ' + err
     )
     // throw new Error(errMsg);
-    return res.status(err[STATUS_CODE] || 500).send(err)
+    res.status(err.statusCode || 500).json(err)
   }
 }
 
@@ -77,7 +77,7 @@ exports.getMediaById = (req, res, next) => {
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_media', id: `media+${id}` })
-      res.status(error.statusCode).json(error)
+      res.status(error.statusCode || err.statusCode || 500).json(error)
     })
 }
 
@@ -94,7 +94,7 @@ exports.getDownloadById = (req, res, next) => {
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_download', id: `media+${id}` })
-      res.status(error.statusCode).json(error)
+      res.status(error.statusCode || err.statusCode || 500).json(error)
     })
 }
 
