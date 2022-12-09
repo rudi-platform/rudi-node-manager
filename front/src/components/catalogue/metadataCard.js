@@ -173,7 +173,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
                 ) : (
                   <a
                     className="btn btn-warning"
-                    href={`${appInfo.formUrl}?read-only=${metadata.global_id}`}
+                    href={`${appInfo.formUrl}?update=${metadata.global_id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
