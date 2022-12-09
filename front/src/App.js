@@ -212,13 +212,9 @@ const Main = () => {
 
         <PMFrontContextProvider>
           <Routes>
-            <Route path={getBackUrl()} element={<Catalogue editMode={false} />} />
+            <Route path={getBackUrl()} element={<Catalogue />} />
             <Route
               path={getBackUrl('metadata')}
-              element={<Catalogue editMode={appInfo.isEditor} />}
-            />
-            <Route
-              path={getBackUrl('gestion')}
               element={<Catalogue editMode={appInfo.isEditor} />}
             />
             <Route
@@ -235,7 +231,7 @@ const Main = () => {
             />
             <Route
               path={getBackUrl('licence')}
-              element={<CatalogueLicence display={{ editJDD: false }} editMode={false} />}
+              element={<CatalogueLicence display={{ editJDD: false }} />}
             />
             <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
             <Route path={getBackUrl('show')} element={<Visualisation />} />
@@ -245,6 +241,7 @@ const Main = () => {
               element={<CatalogueUser editMode={appInfo.isAdmin} />}
             />
             <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
+            <Route path="*" element={<Catalogue />} />
           </Routes>
         </PMFrontContextProvider>
       </ModalProvider>
