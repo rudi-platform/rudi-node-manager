@@ -96,10 +96,23 @@ function Visualisation() {
     }
   }
 
+  const [imgUrl, setImgUrl] = useState()
+  const getImg = async (imageUrl) => {
+    const response = await fetch(imageUrl)
+    const imageBlob = await response.blob()
+    const reader = new FileReader()
+    reader.readAsDataURL(imageBlob)
+    reader.onloadend = () => {
+      const base64data = reader.result
+      setImgUrl(base64data)
+    }
+  }
+
   /**
    * get the doc
    */
   function handleOnClick() {
+    // First: let's get the media metadata from the "RUDI API" module
     axios
       .get(getBackUrl(`api/media/${mediaId}`))
       .catch((err) => {
@@ -140,68 +153,69 @@ function Visualisation() {
               break
           }
         }
-        axios
-          .get(mediaUrl)
-          .catch((err) => {
-            // console.error('T (visu) getMediaInfo url:', mediaUrl)
-            if (err.msg === 'media uuid not found') {
-              err.statusCode = 404
-              err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
-            } else if (!err.statusCode) err.statusCode = 500
-            defaultErrorHandler(err)
-          })
-          .then((resMedia) => {
-            const media = resMedia?.data
-            if (!media)
-              return defaultErrorHandler({
-                statusCode: 404,
-                message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
-              })
-
-            switch (mediaMime) {
-              case 'image/jpg':
-              case 'image/jpeg':
-              case 'image/png':
-                try {
-                  setVisuOption({ displayType: 'IMG', data: mediaUrl })
-                } catch (error) {
-                  defaultErrorHandler(error)
-                }
-                break
-              case 'application/geo+json':
-              case 'application/json':
-              case 'text/json':
-                setVisuOption({ displayType: 'JSON', data: media })
-                break
-
-              case 'text/csv':
-              case 'application/vnd.oasis.opendocument.spreadsheet':
-              case 'application/vnd.ms-excel':
-              case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                try {
-                  setVisuOption({ displayType: 'CSV', data: csvToArray(media) })
-                } catch (error) {
-                  defaultErrorHandler(error)
-                }
-                break
-
-              case 'text/plain':
-              case 'text/css':
-                try {
-                  setVisuOption({ displayType: 'TXT', data: media })
-                } catch (error) {
-                  defaultErrorHandler(error)
-                }
-                break
-
-              default:
-                defaultErrorHandler({
-                  message: `le type ${mediaMimeStr} n'est pas supporté`,
+        // Let's then get the media data from the "RUDI Media" module
+        if (mediaMime.startsWith('image')) {
+          try {
+            return getImg(mediaUrl)
+              .catch((err) => defaultErrorHandler(error))
+              .then((res) => setVisuOption({ displayType: 'IMG', data: imgUrl }))
+          } catch (error) {
+            defaultErrorHandler(error)
+          }
+        } else
+          axios
+            .get(mediaUrl)
+            .catch((err) => {
+              // console.error('T (visu) getMediaInfo url:', mediaUrl)
+              if (err.msg === 'media uuid not found') {
+                err.statusCode = 404
+                err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
+              } else if (!err.statusCode) err.statusCode = 500
+              defaultErrorHandler(err)
+            })
+            .then((resMedia) => {
+              const media = resMedia?.data
+              if (!media)
+                return defaultErrorHandler({
+                  statusCode: 404,
+                  message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
                 })
 
-                break
-            }
-          })
+              switch (mediaMime) {
+                case 'application/geo+json':
+                case 'application/json':
+                case 'text/json':
+                  setVisuOption({ displayType: 'JSON', data: media })
+                  break
+
+                case 'text/csv':
+                case 'application/vnd.oasis.opendocument.spreadsheet':
+                case 'application/vnd.ms-excel':
+                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                  try {
+                    setVisuOption({ displayType: 'CSV', data: csvToArray(media) })
+                  } catch (error) {
+                    defaultErrorHandler(error)
+                  }
+                  break
+
+                case 'text/plain':
+                case 'text/css':
+                  try {
+                    setVisuOption({ displayType: 'TXT', data: media })
+                  } catch (error) {
+                    defaultErrorHandler(error)
+                  }
+                  break
+
+                default:
+                  defaultErrorHandler({
+                    message: `le type ${mediaMimeStr} n'est pas supporté`,
+                  })
+
+                  break
+              }
+            })
       })
   }
 
@@ -226,7 +240,7 @@ function Visualisation() {
           CSV: <div ref={wrapper} />,
           JSON: <JsonViewer value={visuOption.data} collapsed={2} />,
           TXT: <div className="body">{visuOption.data}</div>,
-          IMG: <img src={visuOption.data} alt="image" className="image90" />,
+          IMG: <img src={imgUrl} alt="image" className="image90" />,
         }[visuOption.displayType]
       }
     </div>
