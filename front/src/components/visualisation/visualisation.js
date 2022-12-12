@@ -28,12 +28,13 @@ function Visualisation() {
   const [el, setEl] = useState(null)
 
   useEffect(() => {
-    setEl(
-      jspreadsheet(wrapper.current, {
-        data: [[]],
-        minDimensions: [10, 10],
-      })
-    )
+    if (visuOption.displayType === 'CSV')
+      setEl(
+        jspreadsheet(wrapper.current, {
+          data: [[]],
+          minDimensions: [10, 10],
+        })
+      )
     if (mediaId.length) {
       handleOnClick()
     }
@@ -123,9 +124,9 @@ function Visualisation() {
         // console.log(mediaMimeStr);
         const mediaMimeElements = mediaMimeStr.split(';')
         const mediaMime = mediaMimeElements[0].trim().toLowerCase()
-
+        let mediaCharset
         if (mediaMimeElements.length > 1) {
-          const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
+          mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
           switch (mediaCharset) {
             case 'charset=utf-8':
             case 'charset=us-ascii':
