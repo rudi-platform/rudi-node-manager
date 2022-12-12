@@ -162,7 +162,7 @@ function Visualisation() {
           } catch (error) {
             defaultErrorHandler(error)
           }
-        } else
+        } else {
           axios
             .get(mediaUrl)
             .catch((err) => {
@@ -216,6 +216,7 @@ function Visualisation() {
                   break
               }
             })
+        }
       })
   }
 

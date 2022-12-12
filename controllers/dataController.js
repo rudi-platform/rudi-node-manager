@@ -34,8 +34,13 @@ const callApiModule = (req, reply, url, opType) => {
       reply.status(200).send(results)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType })
-      reply.status(error.statusCode).json(error)
+      try {
+        const error = errorHandler.error(err, req, { opType })
+        reply.status(error.statusCode).json(error)
+      } catch (error) {
+        err.statusCode = !err.statusCode || isNaN(err.statusCode) ? 500 : err.statusCode
+        reply.status(err.statusCode).send('An error occurred:' + (error.message || error.msg))
+      }
     })
 }
 
