@@ -43,16 +43,14 @@ export const getFrontOptions = (opt, altValue) => {
   return frontOptions[opt]
 }
 
-export const getBackUrl = (suffix) =>
-  `${getFrontOptions(OPT_FRONT_PATH)}${suffix ? `/${suffix}` : ''}`
+export const getBackUrl = (suffix = '') => `${getFrontOptions(OPT_FRONT_PATH)}${suffix}`
 
-if (!getBackUrl().endsWith('/')) OPTIONS[OPT_FRONT_PATH] += '/'
+if (!getBackUrl().endsWith('/')) frontOptions[OPT_FRONT_PATH] += '/'
 
 // const ensureIsFound = (varName) => {
 //   if (!getFrontOptions(varName))
 //     throw new Error(`This environment variable should be defined: ${varName}`);
 // };
-
 
 export const getApiFront = (suffix) => (!suffix ? 'incorrect' : `api/front/${suffix}`)
 export const getApiOpen = (suffix) => (!suffix ? 'incorrect' : `api/open/${suffix}`)

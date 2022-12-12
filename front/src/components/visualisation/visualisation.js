@@ -11,6 +11,7 @@ import 'jspreadsheet-ce/dist/jspreadsheet.css'
 import { JsonViewer } from '@textea/json-viewer'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { getBackUrl } from '../../utils/frontOptions'
 
 /**
  * Composant : Visualisation
@@ -62,9 +63,10 @@ function Visualisation() {
    * @return {*} array of the CSV
    */
   function csvToArray(str, delimiter = ',') {
+    const csvStr = `${str}`
     // TODO : better option => https://www.papaparse.com/ ? https://www.npmjs.com/package/csv-string ?
-    const titles = str.slice(0, str.indexOf('\n')).split(delimiter)
-    const rows = str.slice(str.indexOf('\n') + 1).split('\n')
+    const titles = csvStr.slice(0, csvStr.indexOf('\n')).split(delimiter)
+    const rows = csvStr.slice(csvStr.indexOf('\n') + 1).split('\n')
     return rows.map((row) => {
       const values = row.split(delimiter)
       return titles.reduce((object, curr, i) => ((object[curr] = values[i]), object), {})
@@ -98,39 +100,77 @@ function Visualisation() {
    */
   function handleOnClick() {
     axios
-      .get(`/api/media/${mediaId}`)
-      .then((res) => {
-        const mediaUrl = res.data?.connector?.url
-        if (!mediaUrl) return
-        axios
-          .get(`${mediaUrl}`)
-          .then((res2) => {
-            // const mediaMimeStr = res2.headers['content-type']; // Ex: 'application/json; charset=utf-8'
-            const mediaMimeStr = res.data?.file_type
-            // console.log(mediaMimeStr);
-            const mediaMimeElements = mediaMimeStr.split(';')
-            const mediaMime = mediaMimeElements[0].trim().toLowerCase()
+      .get(getBackUrl(`api/media/${mediaId}`))
+      .catch((err) => {
+        // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
+        if (err.msg === 'media uuid not found') {
+          err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
+          err.statusCode = 404
+        } else if (!err.statusCode) err.statusCode = 500
+        defaultErrorHandler(err)
+      })
+      .then((resApi) => {
+        const mediaInfo = resApi?.data
+        // console.debug('T (visu) getMediaInfo', mediaInfo)
+        if (!mediaInfo)
+          return defaultErrorHandler({
+            statusCode: 404,
+            message: `Info introuvable pour le media ${id}`,
+          })
+        const mediaUrl = mediaInfo.connector.url
 
-            if (mediaMimeElements.length > 1) {
-              const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
-              switch (mediaCharset) {
-                case 'charset=utf-8':
-                case 'charset=us-ascii':
-                case 'charset=iso-8859-1':
-                case 'charset=iso-8859-15':
-                  break
-                default:
-                  defaultErrorHandler({
-                    message: `l'encodage ${mediaCharset} n'est pas supporté`,
-                  })
-                  break
-              }
-            }
+        const mediaMimeStr = mediaInfo.file_type
+        // console.log(mediaMimeStr);
+        const mediaMimeElements = mediaMimeStr.split(';')
+        const mediaMime = mediaMimeElements[0].trim().toLowerCase()
+
+        if (mediaMimeElements.length > 1) {
+          const mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
+          switch (mediaCharset) {
+            case 'charset=utf-8':
+            case 'charset=us-ascii':
+            case 'charset=iso-8859-1':
+            case 'charset=iso-8859-15':
+              break
+            default:
+              defaultErrorHandler({
+                message: `l'encodage ${mediaCharset} n'est pas supporté`,
+              })
+              break
+          }
+        }
+        axios
+          .get(mediaUrl)
+          .catch((err) => {
+            // console.error('T (visu) getMediaInfo url:', mediaUrl)
+            if (err.msg === 'media uuid not found') {
+              err.statusCode = 404
+              err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
+            } else if (!err.statusCode) err.statusCode = 500
+            defaultErrorHandler(err)
+          })
+          .then((resMedia) => {
+            const media = resMedia?.data
+            if (!media)
+              return defaultErrorHandler({
+                statusCode: 404,
+                message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
+              })
+
             switch (mediaMime) {
+              case 'image/jpg':
+              case 'image/jpeg':
+              case 'image/png':
+                try {
+                  setVisuOption({ displayType: 'IMG', data: mediaUrl })
+                } catch (error) {
+                  defaultErrorHandler(error)
+                }
+                break
               case 'application/geo+json':
               case 'application/json':
               case 'text/json':
-                setVisuOption({ displayType: 'JSON', data: res2.data })
+                setVisuOption({ displayType: 'JSON', data: media })
                 break
 
               case 'text/csv':
@@ -138,8 +178,7 @@ function Visualisation() {
               case 'application/vnd.ms-excel':
               case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 try {
-                  const array = csvToArray(res2.data)
-                  setVisuOption({ displayType: 'CSV', data: array })
+                  setVisuOption({ displayType: 'CSV', data: csvToArray(media) })
                 } catch (error) {
                   defaultErrorHandler(error)
                 }
@@ -148,16 +187,7 @@ function Visualisation() {
               case 'text/plain':
               case 'text/css':
                 try {
-                  setVisuOption({ displayType: 'TXT', data: res2.data })
-                } catch (error) {
-                  defaultErrorHandler(error)
-                }
-                break
-              case 'image/jpg':
-              case 'image/jpeg':
-              case 'image/png':
-                try {
-                  setVisuOption({ displayType: 'IMG', data: mediaUrl })
+                  setVisuOption({ displayType: 'TXT', data: media })
                 } catch (error) {
                   defaultErrorHandler(error)
                 }
@@ -171,9 +201,7 @@ function Visualisation() {
                 break
             }
           })
-          .catch((err) => defaultErrorHandler(err))
       })
-      .catch((err) => defaultErrorHandler(err))
   }
 
   return (
@@ -195,9 +223,9 @@ function Visualisation() {
       {
         {
           CSV: <div ref={wrapper} />,
-          JSON: <JsonViewer ref={wrapper} src={visuOption.data} collapsed={2} />,
+          JSON: <JsonViewer value={visuOption.data} collapsed={2} />,
           TXT: <div className="body">{visuOption.data}</div>,
-          IMG: <img alt="image" ref={wrapper} className="image90" src={visuOption.data} />,
+          IMG: <img src={visuOption.data} alt="image" className="image90" />,
         }[visuOption.displayType]
       }
     </div>

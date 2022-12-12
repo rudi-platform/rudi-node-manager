@@ -46,6 +46,7 @@ function handleError(req, res, initialError, errCode, fun, objectType, id) {
     console.error(mod, 'raiseError.initialError', initialError)
   }
 }
+exports.handleError = handleError
 
 const checkObjectType = (req, res, fun, objectType) => {
   if (!OBJECT_TYPES[objectType]) {

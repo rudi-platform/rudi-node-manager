@@ -12,16 +12,24 @@ exports.error = (error, req, options) => {
     // log.e(mod, fun, error.response?.data);
     // log.e(mod, fun, error.response?.status);
     // log.e(mod, fun, error.response?.headers);
-    const statusCode =
+    let statusCode =
       error?.statusCode ||
       error?.status ||
       error?.code ||
       error?.response?.statusCode ||
       error?.response?.status ||
       501
+    if (statusCode === 'ERR_INVALID_URL') {
+      console.error('T (errorHandler) err', error)
+      statusCode = 404
+    } else {
+      statusCode = parseInt(statusCode)
+      if (isNaN(statusCode)) statusCode = 500
+    }
     options.statusCode = statusCode
     error.statusCode = statusCode
-
+    console.error('T (errHandler) statusCode', statusCode)
+    console.error('T (errHandler) error', error)
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx

@@ -18,6 +18,7 @@ const {
   getTokenFromMediaForUser,
 } = require('../utils/secu')
 const errorHandler = require('./errorHandler')
+const { handleError } = require('./genericController')
 
 // Controllers
 exports.getMediaToken = async (req, res, next) => {
@@ -67,18 +68,25 @@ exports.getMediaToken = async (req, res, next) => {
   }
 }
 
-exports.getMediaById = (req, res, next) => {
+exports.getMediaInfoById = async (req, res, next) => {
+  const opType = 'get_media_info_by_id'
   const { id } = req.params
-  return axios
-    .get(getMediaDwnlUrl(id))
-    .then((resRUDI) => {
-      const results = resRUDI.data
-      res.status(200).json(results)
+  try {
+    // console.log('T (getMediaInfoById) url', getAdminApi(`media/${id}`))
+    const url = getAdminApi(`media/${id}`)
+    const token = createRudiApiToken(url, req)
+
+    const resRudiApi = await axios.get(getRudiApi(url), {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
     })
-    .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_media', id: `media+${id}` })
-      res.status(error.statusCode || err.statusCode || 500).json(error)
-    })
+    const mediaInfo = resRudiApi.data
+    res.status(200).json(mediaInfo)
+  } catch (err) {
+    handleError(req, res, err, 500, opType, 'media')
+    // const error = errorHandler.error(err, req, { opType: 'get_media', id: `media+${id}` })
+    // res.status(error.statusCode || err.statusCode || 500).json(error)
+  }
 }
 
 // Deprecated ? now use direct access
