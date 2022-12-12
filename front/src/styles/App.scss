@@ -178,8 +178,12 @@ a {
   width: 100%;
 }
 .image90 {
-  width: 90%;
   margin: 3%;
+  max-height:500px;
+  max-width:500px;
+  height:auto;
+  width:auto;
+
 }
 .center {
   margin: auto;

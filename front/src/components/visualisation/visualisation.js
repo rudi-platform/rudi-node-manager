@@ -157,7 +157,7 @@ function Visualisation() {
         if (mediaMime.startsWith('image')) {
           try {
             return getImg(mediaUrl)
-              .catch((err) => defaultErrorHandler(error))
+              .catch((err) => defaultErrorHandler(err))
               .then((res) => setVisuOption({ displayType: 'IMG', data: imgUrl }))
           } catch (error) {
             defaultErrorHandler(error)
