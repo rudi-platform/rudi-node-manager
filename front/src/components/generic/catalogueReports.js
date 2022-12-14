@@ -21,6 +21,7 @@ export default function CatalogueReports() {
         comment: 'commentaire',
         integration_errors: 'erreurs',
       }}
+      propSortBy='-submission_date'
       btnTextAdd="Ajouter un rapport"
       btnTextChg="Modifier un rapport :"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression du rapport ${id}?`}

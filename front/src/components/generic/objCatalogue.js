@@ -16,6 +16,7 @@ ObjCatalogue.propTypes = {
   propId: PropTypes.string,
   propName: PropTypes.string,
   propNamesToDisplay: PropTypes.object,
+  propSortBy: PropTypes.string,
   btnTextAdd: PropTypes.string,
   btnTextChg: PropTypes.string,
   deleteConfirmMsg: PropTypes.func,
@@ -32,6 +33,7 @@ export default function ObjCatalogue({
   propId,
   propName,
   propNamesToDisplay,
+  propSortBy,
   btnTextAdd,
   btnTextChg,
   deleteConfirmMsg,
@@ -62,7 +64,9 @@ export default function ObjCatalogue({
   function getInitialData() {
     // const params = new URLSearchParams(`limit=${PAGE_SIZE}&offset=0`);
     // const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
-    const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`)
+    const fetchUrl = getApiUrlObj(
+      `?sort_by=${propSortBy ? propSortBy : '-updateAt'}&limit=${PAGE_SIZE}&offset=0`
+    )
     // console.log('url:', fetchUrl);
     axios
       .get(fetchUrl)
