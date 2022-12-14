@@ -143,6 +143,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
     )
     if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag)
     if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet')
+    if (metadata.integration_error_id) return displaySpan('danger', 'Refus portail')
     if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé')
     if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié')
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
