@@ -233,7 +233,10 @@ const Main = () => {
               path={getBackUrl('pub_key')}
               element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
             />{' '}
-            <Route path={getBackUrl('report')} element={<CatalogueReports />} />
+            <Route
+              path={getBackUrl('report')}
+              element={<CatalogueReports editMode={appInfo.isAdmin} />}
+            />
             <Route path={getBackUrl('licence')} element={<CatalogueLicence />} />
             <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
             <Route path={getBackUrl('show')} element={<Visualisation />} />

@@ -1,13 +1,19 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import ObjCatalogue from './objCatalogue'
+
+CatalogueReports.propTypes = {
+  editMode: PropTypes.bool,
+}
 
 /**
  * Composant : CatalogueReports
  * @return {void}
  */
-export default function CatalogueReports() {
+export default function CatalogueReports({ editMode }) {
   return (
     <ObjCatalogue
+      editMode={editMode}
       objType="reports"
       propId="report_id"
       propName="resource_title"
@@ -20,9 +26,7 @@ export default function CatalogueReports() {
         comment: 'commentaire',
         integration_errors: 'erreurs',
       }}
-      propSortBy='-submission_date'
-      btnTextAdd="Ajouter un rapport"
-      btnTextChg="Modifier un rapport :"
+      propSortBy="-submission_date"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression du rapport ${id}?`}
       deleteMsg={(id) => `Le rapport ${id} a été supprimé`}
     />

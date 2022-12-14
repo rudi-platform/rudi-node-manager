@@ -41,7 +41,7 @@ export default function ObjCatalogue({
 }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [isEdit, setEdit] = useState(!!editMode)
+  const [isEdit, setEdit] = useState(editMode)
   useEffect(() => setEdit(editMode), [editMode])
 
   const [listObj, setListObj] = useState([])
@@ -109,7 +109,7 @@ export default function ObjCatalogue({
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            {isEdit && (
+            {isEdit && !!btnTextAdd && (
               <EditObjCard
                 objType={objType}
                 idField={propId}
@@ -130,6 +130,7 @@ export default function ObjCatalogue({
               {listObj.map((obj, i) => (
                 <ObjCard
                   editMode={isEdit}
+                  hidePencil={true}
                   objType={objType}
                   obj={obj}
                   propId={propId}
