@@ -14,7 +14,6 @@ export default function CatalogueReports() {
       propNamesToDisplay={{
         id: 'report_id',
         resource_id: 'resource_id',
-        resource_title: 'resource_title',
         submission_date: 'soumission',
         treatment_date: 'traitement',
         integration_status: 'statut',
