@@ -25,6 +25,7 @@ import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
 import ModalProvider from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
+import CatalogueReports from './components/generic/catalogueReports'
 
 export const history = createBrowserHistory({ basename: getBackUrl() })
 
@@ -186,6 +187,9 @@ const Main = () => {
                       <Dropdown.Item as={Link} to={getBackUrl('user')}>
                         Utilisateurs
                       </Dropdown.Item>
+                      <Dropdown.Item as={Link} to={getBackUrl('report')}>
+                        Rapports portail
+                      </Dropdown.Item>
                     </DropdownButton>
                   </li>
 
@@ -228,11 +232,9 @@ const Main = () => {
             <Route
               path={getBackUrl('pub_key')}
               element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
-            />
-            <Route
-              path={getBackUrl('licence')}
-              element={<CatalogueLicence display={{ editJDD: false }} />}
-            />
+            />{' '}
+            <Route path={getBackUrl('report')} element={<CatalogueReports />} />
+            <Route path={getBackUrl('licence')} element={<CatalogueLicence />} />
             <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
             <Route path={getBackUrl('show')} element={<Visualisation />} />
             <Route path={getBackUrl('monitoring')} element={<Monitoring />} />

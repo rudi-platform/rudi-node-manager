@@ -10,7 +10,7 @@ CataloguePubKeys.propTypes = {
  * Composant : CataloguePubKeys
  * @return {void}
  */
-export default function CataloguePubKeys({  editMode }) {
+export default function CataloguePubKeys({ editMode }) {
   return (
     <ObjCatalogue
       editMode={editMode}
