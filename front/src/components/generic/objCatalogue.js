@@ -65,7 +65,7 @@ export default function ObjCatalogue({
     // const params = new URLSearchParams(`limit=${PAGE_SIZE}&offset=0`);
     // const fetchUrl = getApiUrlObj(`?sort_by=-updateAt&limit=${PAGE_SIZE}&offset=0`);
     const fetchUrl = getApiUrlObj(
-      `?sort_by=${propSortBy ? propSortBy : '-updateAt'}&limit=${PAGE_SIZE}&offset=0`
+      `?sort_by=${propSortBy || '-updateAt'}&limit=${PAGE_SIZE}&offset=0`
     )
     // console.log('url:', fetchUrl);
     axios
@@ -86,7 +86,9 @@ export default function ObjCatalogue({
     const fetchUrl = getApiUrlObj()
     // console.log(fetchUrl);
     axios
-      .get(fetchUrl, { params: { sort_by: '-updateAt', limit: PAGE_SIZE, offset: currentOffset } })
+      .get(fetchUrl, {
+        params: { sort_by: propSortBy || '-updateAt', limit: PAGE_SIZE, offset: currentOffset },
+      })
       .then((res) => {
         const partialListObj = res.data
         setCurrentOffset(currentOffset + PAGE_SIZE)
@@ -125,7 +127,7 @@ export default function ObjCatalogue({
               dataLength={listObj.length}
               next={fetchMoreData}
               hasMore={hasMore}
-              loader={<h4>Loading...</h4>}
+              loader={hasMore ? <h4>Loading...</h4> : <i>Aucune donnée supplémentaire</i>}
             >
               {listObj.map((obj, i) => (
                 <ObjCard
