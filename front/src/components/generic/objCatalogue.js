@@ -12,6 +12,7 @@ const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
   editMode: PropTypes.bool,
+  hideEdit: PropTypes.bool,
   objType: PropTypes.string,
   propId: PropTypes.string,
   propName: PropTypes.string,
@@ -29,6 +30,7 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   editMode,
+  hideEdit,
   objType,
   propId,
   propName,
@@ -132,7 +134,7 @@ export default function ObjCatalogue({
               {listObj.map((obj, i) => (
                 <ObjCard
                   editMode={isEdit}
-                  hidePencil={true}
+                  hideEdit={hideEdit}
                   objType={objType}
                   obj={obj}
                   propId={propId}

@@ -11,7 +11,7 @@ import { getObjFormUrl } from '../../utils/utils'
 
 ObjCard.propTypes = {
   editMode: PropTypes.bool,
-  hidePencil: PropTypes.bool,
+  hideEdit: PropTypes.bool,
   objType: PropTypes.string,
   obj: PropTypes.object,
   propId: PropTypes.string,
@@ -29,7 +29,7 @@ ObjCard.propTypes = {
  */
 export function ObjCard({
   editMode,
-  hidePencil,
+  hideEdit,
   objType,
   obj,
   propId,
@@ -80,7 +80,7 @@ export function ObjCard({
             <a>{objName}</a>
             {isEdit && (
               <div className="btn-group" role="group">
-                {!hidePencil && (
+                {!hideEdit && (
                   <a
                     href={getObjFormUrl(appInfo.formUrl, objType, `?update=${objId}`)}
                     target="_blank"

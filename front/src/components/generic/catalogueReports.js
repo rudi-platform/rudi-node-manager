@@ -14,6 +14,7 @@ export default function CatalogueReports({ editMode }) {
   return (
     <ObjCatalogue
       editMode={editMode}
+      hideEdit={true}
       objType="reports"
       propId="report_id"
       propName="resource_title"

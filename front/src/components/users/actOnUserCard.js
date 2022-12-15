@@ -103,15 +103,15 @@ export default function ActOnUserCard({ roleList, refresh }) {
           </div>
 
           <div className="inline card-text on-right">
-            Modifier un utilisateur&nbsp;:&nbsp;
-            <div className="btn-group" role="group">
-              <input
+            {/* Modifier un utilisateur&nbsp;:&nbsp; */}
+            {/* <div className="btn-group" role="group"> */}
+              {/* <input
                 type="text"
                 className="form-control"
                 placeholder="nom"
                 value={username}
                 onChange={handleChange}
-              />
+              /> */}
               {/*
               <button type="button" className="btn btn-warning" onClick={() => editUser()}>
                 <Pencil />
@@ -120,7 +120,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
                 <Trash />
               </button>
               */}
-            </div>
+            {/* </div> */}
             <AddUserModal
               roleList={roleList}
               visible={isVisibleAddModal}
