@@ -166,9 +166,14 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
             {displayStatus()}
             {isEdit && (
               <div className="btn-group" role="group">
-                <button type="button" className="btn btn-success">
+                <a
+                  className="btn btn-success"
+                  href={getObjFormUrl(appInfo.formUrl, '', `?read-only=${metadata.global_id}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Check />
-                </button>
+                </a>
                 {isRestricted(metadata) ? (
                   ''
                 ) : (
