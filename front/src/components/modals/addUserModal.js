@@ -11,14 +11,14 @@ import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { VALID_EMAIL, VALID_NOT_EMPTY_WORD } from './validation'
+import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
 
 const urlUser = 'api/secu/users'
 const modalTitle = 'Ajouter un nouvel utilisateur'
 const modalSubmitBtnTxt = 'Sauver'
 
 const validation = {
-  username: [VALID_NOT_EMPTY_WORD],
+  username: [VALID_NOT_EMPTY_USERNAME],
   email: [VALID_EMAIL],
 }
 

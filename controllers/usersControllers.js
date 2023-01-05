@@ -134,13 +134,22 @@ exports.createUser = async (req, res, next) => {
 
 exports.editUser = async (req, res, next) => {
   try {
-    const { id, username, email, roles } = req.body
+    const { id, email, roles } = req.body
+    let username = req.body.username
     if ((id !== 0 && !id) || !username || !email || !roles) {
       return res
         .status(400)
         .json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
     }
     const db = dbOpen()
+    const reqUsername = req?.user?.username
+    if (reqUsername) {
+      const dbReqUser = await dbGetUserByUsername(db, reqUsername)
+      if (dbReqUser.id === id) {
+        // An admin user can't change their own name
+        username = reqUsername
+      }
+    }
     const dbUser = await dbGetUserById(db, id)
     const dbUserSameName = await dbGetUserByUsername(db, username)
     if (dbUserSameName && dbUserSameName.id !== dbUser.id) {

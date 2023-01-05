@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Trash } from 'react-bootstrap-icons'
 
+import { lastMonth } from '../../utils/utils'
 import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ObjCatalogue from './objCatalogue'
@@ -24,17 +25,15 @@ export default function CatalogueReports({ editMode }) {
    * call for confirmation before object deletion
    */
   const deleteOldReports = () => {
-    const now = new Date()
-    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).toISOString()
     axios
-      .delete(getApiUrlReports(`?updatedBefore=${lastMonth}`))
+      .delete(getApiUrlReports(`?updatedBefore=${lastMonth().toISOString()}`))
       .catch((err) => defaultErrorHandler(err))
   }
 
   return (
     <div className="col-12">
       <div className="card-body">
-        <div className="inline">
+        <div className="row">
           <a className="btn btn-danger" onClick={() => deleteOldReports()}>
             Supprimer les rapports des mois précédents <Trash />
           </a>

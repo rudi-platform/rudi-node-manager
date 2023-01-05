@@ -8,7 +8,7 @@ const { dbGetUserRolesByUsername } = require('../database/database')
 exports.checkRolePerm = (expectedRoles) => (req, res, next) => {
   // TODO: retrieve user (in JWT ? passportSetup ?)
   const fun = 'checkRolePerm'
-  if (!req.user) return res.status(400).json(new BadRequestError('User info required'))
+  if (!req?.user) return res.status(400).json(new BadRequestError('User info required'))
   const { username } = req.user
   if (!username) return res.status(400).json(new BadRequestError('Username required'))
   // console.log('T (checkRolePerm) username', username)
@@ -20,8 +20,9 @@ exports.checkRolePerm = (expectedRoles) => (req, res, next) => {
         .json(new ForbiddenError(`Admin validation required for user '${username}'`))
     })
     .then((userRoles) => {
-      if(expectedRoles[0] === ROLE_ALL) return next()
+      if (expectedRoles[0] === ROLE_ALL) return next()
       if (
+        userRoles?.length &&
         userRoles.findIndex(
           (userRole) =>
             userRole === ROLE_SU || expectedRoles.findIndex((role) => userRole === role) > -1

@@ -5,13 +5,18 @@ const twoDigits = (n) => `${n}`.padStart(2, '0')
  * @param {string | number} date A date
  * @return {string} A date in format YYYY.MM.DD hh:mm:ss
  */
-exports.nowLocaleFormatted = (date) => {
+exports.getLocaleFormatted = (date) => {
   const d = new Date(date)
   return (
-    `${twoDigits(d.getDate())}/${twoDigits(d.getMonth()+1)}/${d.getFullYear()} ` +
+    `${twoDigits(d.getDate())}/${twoDigits(d.getMonth() + 1)}/${d.getFullYear()} ` +
     `${twoDigits(d.getHours())}:${twoDigits(d.getMinutes())}:${twoDigits(d.getSeconds())}`
   )
 }
+
+exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
+exports.timeEpochS = (delayS = 0) => Math.floor(new Date().getTime() / 1000) + delayS
+
+exports.lastMonth = () => new Date(new Date().getTime() - 2592000000)
 
 /**
  * Displays a JSON object content
@@ -27,5 +32,4 @@ exports.showObj = (obj, option = 2) => {
   }
 }
 
-exports.getObjFormUrl = (formUrl, objType = '', queryParams = '') =>
-  formUrl + objType + queryParams
+exports.getObjFormUrl = (formUrl, objType = '', queryParams = '') => formUrl + objType + queryParams

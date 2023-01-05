@@ -91,7 +91,7 @@ exports.postLogin = async (req, res, next) => {
       })
       .catch((er) => {
         log.e(mod, fun, er)
-        res.status(501).send(er)
+        return res.status(501).send(er)
       })
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, res, next)

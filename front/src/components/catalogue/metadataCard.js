@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getObjFormUrl, nowLocaleFormatted } from '../../utils/utils'
+import { getObjFormUrl, getLocaleFormatted } from '../../utils/utils'
 import { getBackUrl } from '../../utils/frontOptions'
 import {
   DefaultOkOption,
@@ -200,7 +200,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
           <div>
             {metaDates?.updated && (
               <small className="text-muted">
-                Modifié le : {nowLocaleFormatted(metaDates.updated)}
+                Modifié le : {getLocaleFormatted(metaDates.updated)}
               </small>
             )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
@@ -209,7 +209,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
           {metaDates?.published && (
             <div>
               <small className="text-muted">
-                Publié le : {nowLocaleFormatted(metaDates.published)}
+                Publié le : {getLocaleFormatted(metaDates.published)}
               </small>
             </div>
           )}
