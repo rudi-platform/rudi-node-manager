@@ -47,7 +47,8 @@ exports.dbOpen = dbOpen
 
 const dbClose = (db) => {
   db.close((err) => {
-    if (err) log.e(mod, 'dbClose', err.message)
+    if (err && err.message != 'SQLITE_MISUSE: Database handle is closed')
+      log.e(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
 }
@@ -480,7 +481,7 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
     return roles
   } catch (err) {
     if (!openedDb) dbClose(db)
-    log.e(mod, fun, err)
+    log.e(mod, fun, err.toString())
     if (err[STATUS_CODE] === 400)
       throw new ForbiddenError(`Admin validation required for user '${username}'`)
     throw err
@@ -515,10 +516,6 @@ exports.dbGetUserRolesByUserId = (openedDb, userId) => {
     if (userId !== 0 && !userId) return reject(new BadRequestError(`User id not provided`))
     const db = openedDb || dbOpen()
     this.dbGetUserById(db, userId)
-      .catch((err) => {
-        if (!openedDb) dbClose(db)
-        reject(err)
-      })
       .then((userInfo) => {
         if (!userInfo) {
           if (!openedDb) dbClose(db)
@@ -535,6 +532,10 @@ exports.dbGetUserRolesByUserId = (openedDb, userId) => {
             return resolve(rows.map((row) => row?.role))
           }
         })
+      })
+      .catch((err) => {
+        if (!openedDb) dbClose(db)
+        reject(err)
       })
   })
 }

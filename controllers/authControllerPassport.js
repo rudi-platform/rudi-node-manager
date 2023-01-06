@@ -62,9 +62,14 @@ exports.postLogin = async (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) return res.status(400).send(err)
     if (!user)
-      return res
-        .status(401)
-        .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
+      try {
+        return res
+          .status(401)
+          .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
+      } catch (e) {
+        log.e(mod, fun, e)
+        return
+      }
     const username = user.username
     dbGetUserRolesByUsername(null, username)
       .then((roles) => {
@@ -91,7 +96,13 @@ exports.postLogin = async (req, res, next) => {
       })
       .catch((er) => {
         log.e(mod, fun, er)
-        return res.status(501).send(er)
+        this.logout()
+        try {
+          return res.status(er.statusCode || 501).send(er)
+        } catch (e) {
+          log.e(mod, fun, e)
+          return
+        }
       })
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, res, next)
@@ -108,7 +119,12 @@ exports.postRegister = async (req, res) => {
     res.status(200).send(user)
   } catch (err) {
     log.e(mod, fun, err)
-    res.status(err.code || 400).send(err.message)
+    try {
+      res.status(err.code || 400).send(err.message)
+    } catch (e) {
+      log.e(mod, fun, e)
+      return
+    }
   }
 }
 exports.postForgot = (req, res, next) => {
@@ -168,7 +184,11 @@ exports.resetPassword = async (req, res, next) => {
     res.status(200).send(`Password reiniitalized for user ${id}`)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
-    return res.status(500).json(new RudiError(error.message))
+    try {
+      return res.status(err.statusCode).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -177,4 +197,4 @@ exports.logout = (req, res, next) =>
     .status(200)
     .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
     .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-    .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
+    .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '', message: 'logout' })

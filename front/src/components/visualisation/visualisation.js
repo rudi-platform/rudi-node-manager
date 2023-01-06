@@ -115,14 +115,6 @@ function Visualisation() {
     // First: let's get the media metadata from the "RUDI API" module
     axios
       .get(getBackUrl(`api/media/${mediaId}`))
-      .catch((err) => {
-        // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
-        if (err.msg === 'media uuid not found') {
-          err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
-          err.statusCode = 404
-        } else if (!err.statusCode) err.statusCode = 500
-        defaultErrorHandler(err)
-      })
       .then((resApi) => {
         const mediaInfo = resApi?.data
         // console.debug('T (visu) getMediaInfo', mediaInfo)
@@ -165,14 +157,6 @@ function Visualisation() {
         } else {
           axios
             .get(mediaUrl)
-            .catch((err) => {
-              // console.error('T (visu) getMediaInfo url:', mediaUrl)
-              if (err.msg === 'media uuid not found') {
-                err.statusCode = 404
-                err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
-              } else if (!err.statusCode) err.statusCode = 500
-              defaultErrorHandler(err)
-            })
             .then((resMedia) => {
               const media = resMedia?.data
               if (!media)
@@ -216,7 +200,23 @@ function Visualisation() {
                   break
               }
             })
+            .catch((err) => {
+              // console.error('T (visu) getMediaInfo url:', mediaUrl)
+              if (err.msg === 'media uuid not found') {
+                err.statusCode = 404
+                err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
+              } else if (!err.statusCode) err.statusCode = 500
+              defaultErrorHandler(err)
+            })
         }
+      })
+      .catch((err) => {
+        // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
+        if (err.msg === 'media uuid not found') {
+          err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
+          err.statusCode = 404
+        } else if (!err.statusCode) err.statusCode = 500
+        defaultErrorHandler(err)
       })
   }
 

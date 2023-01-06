@@ -102,7 +102,11 @@ exports.getDownloadById = (req, res, next) => {
     })
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_download', id: `media+${id}` })
-      res.status(error.statusCode || err.statusCode || 500).json(error)
+      try {
+        res.status(error.statusCode || err.statusCode || 500).json(error)
+      } catch (e) {
+        console.error(e)
+      }
     })
 }
 

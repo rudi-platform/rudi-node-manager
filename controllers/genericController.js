@@ -28,7 +28,11 @@ function handleError(req, res, initialError, errCode, fun, objectType, id) {
   try {
     console.log('req params:', req.params)
     console.log('req url:', req.originalUrl)
-    console.log('res:' + res)
+    try {
+      console.log('res:' + JSON.stringify(res))
+    } catch (e) {
+      console.log('res:' + res)
+    }
     console.log('initialError:', initialError?.response?.data)
     console.log(
       `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`

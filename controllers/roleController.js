@@ -24,7 +24,11 @@ exports.getRoleList = async (req, res, next) => {
     )
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_roles' })
-    res.status(error.statusCode).json(error)
+    try {
+      res.status(error.statusCode).json(error)
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -34,7 +38,11 @@ exports.getRoleById = (req, res, next) => {
     .then((row) => res.status(200).json(row))
     .catch((err) => {
       const error = errorHandler.error(err, req, { opType: 'get_role' })
-      res.status(error.statusCode).json(error)
+      try {
+        res.status(error.statusCode).json(error)
+      } catch (e) {
+        console.error(e)
+      }
     })
 }
 
@@ -49,7 +57,11 @@ exports.getUserRolesByUsername = async (req, res, next) => {
     return res.status(200).json(roles)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_userRole' })
-    res.status(error.statusCode).json(error)
+    try {
+      res.status(error.statusCode).json(error)
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -62,7 +74,11 @@ exports.deleteUserRole = async (req, res, next) => {
     res.status(200).json(user)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_userRole' })
-    res.status(error.statusCode).json(error)
+    try {
+      res.status(error.statusCode).json(error)
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 exports.postUserRole = async (req, res, next) => {
@@ -79,6 +95,10 @@ exports.postUserRole = async (req, res, next) => {
   } catch (err) {
     console.error(err)
     const error = errorHandler.error(err, req, { opType: 'post_userRole' })
-    res.status(error?.statusCode).json(error)
+    try {
+      res.status(error?.statusCode).json(error)
+    } catch (e) {
+      console.error(e)
+    }
   }
 }

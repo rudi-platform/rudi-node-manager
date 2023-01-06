@@ -26,7 +26,11 @@ exports.getUsersList = async (req, res, next) => {
     return res.status(200).json(users)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_users' })
-    res.status(error.statusCode).json(new RudiError(error.message))
+    try {
+      res.status(error.statusCode).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -39,7 +43,11 @@ exports.getUserByUsername = async (req, res, next) => {
     return res.status(200).json({ id, username, email, roles })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_user' })
-    return res.status(error.statusCode || 500).json(new RudiError(error.message))
+    try {
+      res.status(error.statusCode || 500).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -52,7 +60,11 @@ exports.getUserInfoByUsername = async (req, res, next) => {
     return res.status(200).json({ id, username, email, roles })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'get_user' })
-    return res.status(error.statusCode || 500).json(new RudiError(error.message))
+    try {
+      res.status(error.statusCode || 500).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -71,7 +83,11 @@ exports.deleteUserWithName = async (req, res, next) => {
     return res.status(200).json({ message: `User deleted: ${username}` })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_user' })
-    return res.status(error.statusCode).json(new RudiError(error.message))
+    try {
+      res.status(error.statusCode).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -86,7 +102,11 @@ exports.deleteUserWithId = async (req, res, next) => {
     return res.status(200).json({ message: `User deleted: ${userInfo?.username}` })
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'delete_user' })
-    res.status(error.statusCode).json(new RudiError(error.message))
+    try {
+      res.status(error.statusCode).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -128,7 +148,11 @@ exports.createUser = async (req, res, next) => {
     return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'add_user' })
-    return res.status(500).json(new RudiError(error.message))
+    try {
+      res.status(500).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -170,17 +194,10 @@ exports.editUser = async (req, res, next) => {
     return res.status(200).json(updatedUser)
   } catch (err) {
     const error = errorHandler.error(err, req, { opType: 'edit_user' })
-    return res.status(500).json(new RudiError(error.message))
+    try {
+      res.status(500).json(new RudiError(error.message))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
-
-// exports.putPassword = (req, res, next) => {
-//   const { username, password } = req.body;
-//   return databaseManager
-//     .updatePassword(username, password)
-//     .then((data) => res.status(200).send(`Password changed for user '${data.username}'`))
-//     .catch((err) => {
-//       const error = errorHandler.error(err, req, { opType: 'put_password' });
-//       res.status(error.statusCode).json(error);
-//     });
-// };
