@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { useParams } from 'react-router-dom'
 import { Check } from 'react-bootstrap-icons'
 // import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types'
 
 import jspreadsheet from 'jspreadsheet-ce'
 import 'jspreadsheet-ce/dist/jspreadsheet.css'
@@ -13,11 +13,14 @@ import { JsonViewer } from '@textea/json-viewer'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getBackUrl } from '../../utils/frontOptions'
 
+Visualisation.propTypes = {
+  logout: PropTypes.func,
+}
 /**
  * Composant : Visualisation
  * @return {ReactNode}
  */
-function Visualisation() {
+function Visualisation({ logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { id } = useParams()
@@ -149,10 +152,11 @@ function Visualisation() {
         if (mediaMime.startsWith('image')) {
           try {
             return getImg(mediaUrl)
-              .catch((err) => defaultErrorHandler(err))
+              .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
               .then((res) => setVisuOption({ displayType: 'IMG', data: imgUrl }))
           } catch (error) {
-            defaultErrorHandler(error)
+            if (error.response?.status == 401) logout()
+            else defaultErrorHandler(error)
           }
         } else {
           axios
@@ -179,7 +183,8 @@ function Visualisation() {
                   try {
                     setVisuOption({ displayType: 'CSV', data: csvToArray(media) })
                   } catch (error) {
-                    defaultErrorHandler(error)
+                    if (error.response?.status == 401) logout()
+                    else defaultErrorHandler(error)
                   }
                   break
 
@@ -188,7 +193,8 @@ function Visualisation() {
                   try {
                     setVisuOption({ displayType: 'TXT', data: media })
                   } catch (error) {
-                    defaultErrorHandler(error)
+                    if (error.response?.status == 401) logout()
+                    else defaultErrorHandler(error)
                   }
                   break
 
@@ -206,7 +212,8 @@ function Visualisation() {
                 err.statusCode = 404
                 err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
               } else if (!err.statusCode) err.statusCode = 500
-              defaultErrorHandler(err)
+              if (err.response?.status == 401) logout()
+              else defaultErrorHandler(err)
             })
         }
       })
@@ -216,7 +223,8 @@ function Visualisation() {
           err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
           err.statusCode = 404
         } else if (!err.statusCode) err.statusCode = 500
-        defaultErrorHandler(err)
+        if (err.response?.status == 401) logout()
+        else defaultErrorHandler(err)
       })
   }
 

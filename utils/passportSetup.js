@@ -32,7 +32,7 @@ passport.use(
     checkPassport(username, password)
       .then(() => done(null, { username }))
       .catch((err) => {
-        log.e(mod, 'LocalStrategy', `Error login: ${err}`)
+        log.sysWarn(mod, 'LocalStrategy', `Error login: ${err}`)
         return done(null, false, err)
       })
   })
@@ -98,6 +98,7 @@ passport.use(
         // console.error('T (JWTstrategy) Error auth:', token);
         return done(null, token.user)
       } catch (error) {
+        log.sysWarn(mod, 'JWTstrategy', error)
         done(error)
       }
     }

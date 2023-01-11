@@ -72,7 +72,8 @@ export default function Login({ setToken, setUserInfo }) {
         else if (resMsg.startsWith('Admin validation required for user')) {
           errMsg = [
             'Ce compte utilisateur requiert une validation : ',
-            'veuillez contacter l‘administrateur de votre nœud Rudi.',
+            'veuillez contacter l‘administrateur de votre nœud Rudi ' +
+              'pour qu‘il assigne un rôle à votre compte utilisateur.',
           ]
         } else errMsg = `Mot de passe incorrect`
 

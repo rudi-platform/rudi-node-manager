@@ -24,13 +24,14 @@ const PAGE_SIZE = 20
 
 Catalogue.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : Catalogue
  * @return {ReactNode}
  */
-export default function Catalogue({ editMode }) {
+export default function Catalogue({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
@@ -211,7 +212,7 @@ export default function Catalogue({ editMode }) {
         })
         setCountBy(countByTemp)
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   /**
@@ -230,7 +231,7 @@ export default function Catalogue({ editMode }) {
         if (data.length === 0) setHasMore(false)
         setMetadatas((metadatas) => metadatas.concat(data))
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   /**
@@ -249,7 +250,8 @@ export default function Catalogue({ editMode }) {
       }
       return result
     } catch (err) {
-      defaultErrorHandler(err)
+      if (err.response?.status == 401) logout()
+      else defaultErrorHandler(err)
     }
   }
 

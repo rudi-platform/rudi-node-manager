@@ -11,6 +11,7 @@ import ObjCatalogue from './objCatalogue'
 
 CatalogueReports.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 const getApiUrlReports = (suffix) => getApiData(`reports${suffix ? `/${suffix}` : ''}`)
@@ -19,7 +20,7 @@ const getApiUrlReports = (suffix) => getApiData(`reports${suffix ? `/${suffix}` 
  * Composant : CatalogueReports
  * @return {void}
  */
-export default function CatalogueReports({ editMode }) {
+export default function CatalogueReports({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
   /**
    * call for confirmation before object deletion
@@ -27,7 +28,7 @@ export default function CatalogueReports({ editMode }) {
   const deleteOldReports = () => {
     axios
       .delete(getApiUrlReports(`?updatedBefore=${lastMonth().toISOString()}`))
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   return (

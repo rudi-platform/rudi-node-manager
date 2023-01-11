@@ -60,7 +60,10 @@ exports.postLogin = async (req, res, next) => {
   const fun = 'postLogin'
   // log.d(mod, 'postLogin', '<--')
   passport.authenticate('local', (err, user, info) => {
-    if (err) return res.status(400).send(err)
+    if (err) {
+      log.sysWarn(mod, fun, err)
+      return res.status(400).send(err)
+    }
     if (!user)
       try {
         return res

@@ -105,6 +105,11 @@ const Main = () => {
     </li>
   )
 
+  const exit = () => {
+    updateToken()
+    setUserInfo(defaultFrontContext)
+  }
+
   /**
    * logout
    * @return {void}
@@ -113,13 +118,12 @@ const Main = () => {
     axios
       .get(getBackUrl(getApiFront('logout')))
       .then((res) => {
-        updateToken()
-        setUserInfo(defaultFrontContext)
+        console.error('T (logout.ok)')
+        exit()
       })
       .catch((err) => {
-        console.error('T (logout)', err)
-        updateToken()
-        setUserInfo(defaultFrontContext)
+        console.error('T (logout.ko)', err)
+        exit()
       })
   }
 
@@ -216,37 +220,37 @@ const Main = () => {
 
         <PMFrontContextProvider>
           <Routes>
-            <Route path={getBackUrl()} element={<Catalogue />} />
+            <Route path={getBackUrl()} element={<Catalogue logout={logout} />} />
             <Route
               path={getBackUrl('metadata')}
-              element={<Catalogue editMode={appInfo.isEditor} />}
+              element={<Catalogue editMode={appInfo.isEditor} logout={logout} />}
             />
             <Route
               path={getBackUrl('producer')}
-              element={<CatalogueProducer editMode={appInfo.isEditor} />}
+              element={<CatalogueProducer editMode={appInfo.isEditor} logout={logout} />}
             />
             <Route
               path={getBackUrl('contact')}
-              element={<CatalogueContact editMode={appInfo.isEditor} />}
+              element={<CatalogueContact editMode={appInfo.isEditor} logout={logout} />}
             />
             <Route
               path={getBackUrl('pub_key')}
-              element={<CataloguePubKeys editMode={appInfo.isAdmin} />}
+              element={<CataloguePubKeys editMode={appInfo.isAdmin} logout={logout} />}
             />{' '}
             <Route
               path={getBackUrl('report')}
-              element={<CatalogueReports editMode={appInfo.isAdmin} />}
+              element={<CatalogueReports editMode={appInfo.isAdmin} logout={logout} />}
             />
-            <Route path={getBackUrl('licence')} element={<CatalogueLicence />} />
-            <Route path={getBackUrl('show/:id')} element={<Visualisation />} />
-            <Route path={getBackUrl('show')} element={<Visualisation />} />
-            <Route path={getBackUrl('monitoring')} element={<Monitoring />} />
+            <Route path={getBackUrl('licence')} element={<CatalogueLicence logout={logout} />} />
+            <Route path={getBackUrl('show/:id')} element={<Visualisation logout={logout} />} />
+            <Route path={getBackUrl('show')} element={<Visualisation logout={logout} />} />
+            <Route path={getBackUrl('monitoring')} element={<Monitoring logout={logout} />} />
             <Route
               path={getBackUrl('user')}
-              element={<CatalogueUser editMode={appInfo.isAdmin} />}
+              element={<CatalogueUser editMode={appInfo.isAdmin} logout={logout} />}
             />
             <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
-            <Route path="*" element={<Catalogue />} />
+            <Route path="*" element={<Catalogue logout={logout} />} />
           </Routes>
         </PMFrontContextProvider>
       </ModalProvider>

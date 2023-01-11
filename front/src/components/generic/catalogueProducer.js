@@ -4,19 +4,21 @@ import ObjCatalogue from './objCatalogue'
 
 CatalogueProducer.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : CatalogueProducer
  * @return {void}
  */
-export default function CatalogueProducer({ editMode }) {
+export default function CatalogueProducer({ editMode, logout }) {
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(editMode), [editMode])
 
   return (
     <ObjCatalogue
       editMode={isEdit}
+      logout={logout}
       objType="organizations"
       propId="organization_id"
       propName="organization_name"

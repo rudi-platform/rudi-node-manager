@@ -21,13 +21,14 @@ MetadataCard.propTypes = {
   editMode: PropTypes.bool,
   metadata: PropTypes.object,
   refresh: PropTypes.func,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : metadataCard
  * @return {ReactNode}
  */
-export default function MetadataCard({ editMode, metadata, refresh }) {
+export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const { appInfo } = usePMFrontContext()
   const { changeOptions, toggle } = useModalContext()
 
@@ -78,7 +79,7 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
         changeOptions(options)
         toggle()
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
   /**
    * call for confirmation before metadata deletion
@@ -174,18 +175,16 @@ export default function MetadataCard({ editMode, metadata, refresh }) {
                 >
                   <Check />
                 </a>
-                {isRestricted(metadata) ? (
-                  ''
-                ) : (
-                  <a
-                    className="btn btn-warning"
-                    href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Pencil />
-                  </a>
-                )}
+                {/* {isRestricted(metadata) ? '' : ( */}
+                <a
+                  className="btn btn-warning"
+                  href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Pencil />
+                </a>
+                {/* )} */}
                 <button
                   type="button"
                   className="btn btn-danger"

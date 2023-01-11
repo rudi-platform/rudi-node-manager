@@ -1,3 +1,5 @@
+const mod = 'server'
+
 // Import dependencies
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -6,6 +8,10 @@ const cors = require('cors')
 const path = require('path')
 const helmet = require('helmet')
 
+// Require Config
+const { getConf } = require('./config/config')
+const log = require('./utils/logger')
+
 // Require Route
 const apiOpen = require('./routes/routesOpen')
 const apiFront = require('./routes/routesFront')
@@ -13,18 +19,9 @@ const apiData = require('./routes/routesData')
 const apiMedia = require('./routes/routesMedia')
 const apiSecu = require('./routes/routesSecu')
 
-// Require Config
-const { getConf } = require('./config/config')
-const log = require('./utils/logger')
-
-const mod = 'server'
 
 const passport = require('./utils/passportSetup')
-const {
-  ROLE_ADMIN,
-  dbInitialize,
-  ROLE_ALL,
-} = require('./database/scripts/initDatabase')
+const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./database/scripts/initDatabase')
 const { isDevEnv } = require('./config/backOptions')
 const { checkRolePerm } = require('./utils/roleCheck')
 
@@ -35,11 +32,26 @@ const port = getConf('server', 'listening_port') || 5000
 
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, res, next) => {
-  log.sysInfo(mod, '', `Request_Endpoint: ${req.method} ${req.url}`, log.getContext(req, {}))
+  log.sysInfo(mod, '', `Request <= ${req.method} ${req.url}`, log.getContext(req, {}))
   // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
   // console.debug(req.cookies?`   cookies: ${req.cookies}`:'   auth:', req.headers?.authorization);
   next()
+
+  res.on('finish', () => {
+    if (res.statusCode < 400) {
+      log.sysInfo(mod, '', `=> OK ${res.statusCode}: ${req.method} ${req.url}`, log.getContext(req, {}))
+    } else {
+      // console.error(res)
+      log.sysWarn(
+        mod,
+        '',
+        `ERR ${res.statusCode} ${res.statusMessage} > ${req.method} ${req.originalUrl}`,
+        log.getContext(req, {})
+      )
+    }
+  })
 })
+
 app.use(
   helmet({
     contentSecurityPolicy: {

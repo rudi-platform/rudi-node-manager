@@ -12,6 +12,7 @@ const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
   hideEdit: PropTypes.bool,
   objType: PropTypes.string,
   propId: PropTypes.string,
@@ -30,6 +31,7 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   editMode,
+  logout,
   hideEdit,
   objType,
   propId,
@@ -77,7 +79,7 @@ export default function ObjCatalogue({
         setListObj(res.data)
         // if (res.data?.length < PAGE_SIZE) setHasMore(false);
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   /**
@@ -105,7 +107,7 @@ export default function ObjCatalogue({
           setListObj(listObj.concat(partialListObj))
         }
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   return (

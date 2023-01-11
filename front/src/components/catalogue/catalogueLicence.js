@@ -9,13 +9,14 @@ import LicenceCard from './licenceCard'
 
 CatalogueLicence.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : CatalogueLicence
  * @return {ReactNode}
  */
-export default function CatalogueLicence({ editMode }) {
+export default function CatalogueLicence({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setEdit] = useState(!!editMode)
@@ -32,7 +33,7 @@ export default function CatalogueLicence({ editMode }) {
     axios
       .get(`api/data/licences`)
       .then((res) => setLicences(res.data))
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   return (
@@ -46,7 +47,13 @@ export default function CatalogueLicence({ editMode }) {
               loader={<h4>Loading...</h4>}
             >
               {licences.map((licence) => {
-                return <LicenceCard obj={licence} editMode={isEdit} key={licence.concept_id}></LicenceCard>
+                return (
+                  <LicenceCard
+                    obj={licence}
+                    editMode={isEdit}
+                    key={licence.concept_id}
+                  ></LicenceCard>
+                )
               })}
             </InfiniteScroll>
           </div>
