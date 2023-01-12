@@ -52,8 +52,8 @@ function handleError(req, res, initialError, errCode, fun, objectType, id) {
     const error = errorHandler.error(initialError, req, errPayload)
     res.status(initialError.statusCode || errCode).json(error.moreInfo || error)
   } catch (err) {
-    console.error(mod, 'raiseError', err)
-    console.error(mod, 'raiseError.initialError', initialError)
+    console.error(mod, 'handleError.initialError', initialError)
+    console.error(mod, 'handleError failed', err)
   }
 }
 exports.handleError = handleError
@@ -66,10 +66,11 @@ const checkObjectType = (req, res, fun, objectType) => {
   return true
 }
 
-exports.getObjectList = (req, res, next) => {
+exports.getObjectList = async (req, res, next) => {
   const opType = 'get_objects'
   const { objectType } = req.params
-  // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
+  try {
+    // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
 
   // const urlParts = `${req.url}`.split('?');
   // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
@@ -79,22 +80,19 @@ exports.getObjectList = (req, res, next) => {
   const url = getAdminApi(objectType)
   // console.log('T (getObjectList) url', getRudiApi(url));
   const token = createRudiApiToken(url, req)
-  return axios
-    .get(getRudiApi(url), {
+    const resRudiApi = await axios.get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then((resRudiApi) => {
-      const { consoleToken, pmFrontToken } = refreshTokens(req)
-      res
-        .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-        .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
-        .json(resRudiApi.data)
-    })
-    .catch((err) => {
-      handleError(req, res, err, 501, opType, objectType)
-    })
+    const { consoleToken, pmFrontToken } = refreshTokens(req)
+    res
+      .status(200)
+      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .json(resRudiApi.data)
+  } catch (err) {
+    handleError(req, res, err, 501, opType, objectType)
+  }
 }
 
 exports.getObjectById = (req, res, next) => {
