@@ -84,7 +84,14 @@ exports.getObjectList = (req, res, next) => {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
     })
-    .then((resRudiApi) => res.status(200).json(resRudiApi.data))
+    .then((resRudiApi) => {
+      const { consoleToken, pmFrontToken } = refreshTokens(req)
+      res
+        .status(200)
+        .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+        .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+        .json(resRudiApi.data)
+    })
     .catch((err) => {
       handleError(req, res, err, 501, opType, objectType)
     })
@@ -132,20 +139,12 @@ exports.postObject = async (req, res, next) => {
       throw e
     }
 
-    const tokens = refreshTokens(req)
-    if (tokens) {
-      res
-        .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, tokens[CONSOLE_TOKEN_NAME].jwt, tokens[CONSOLE_TOKEN_NAME].opts)
-        .cookie(
-          PM_FRONT_TOKEN_NAME,
-          tokens[PM_FRONT_TOKEN_NAME].jwt,
-          tokens[PM_FRONT_TOKEN_NAME].opts
-        )
-        .json(data)
-    } else {
-      res.status(200).json(data)
-    }
+    const { consoleToken, pmFrontToken } = refreshTokens(req)
+    res
+      .status(200)
+      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .json(data)
   } catch (err) {
     const id = req.body[OBJECT_TYPES[objectType].id]
     handleError(req, res, err, 501, opType, objectType, id)
@@ -170,20 +169,12 @@ exports.putObject = async (req, res, next) => {
       throw e
     }
 
-    const tokens = refreshTokens(req)
-    if (tokens) {
-      res
-        .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, tokens[CONSOLE_TOKEN_NAME].jwt, tokens[CONSOLE_TOKEN_NAME].opts)
-        .cookie(
-          PM_FRONT_TOKEN_NAME,
-          tokens[PM_FRONT_TOKEN_NAME].jwt,
-          tokens[PM_FRONT_TOKEN_NAME].opts
-        )
-        .json(data)
-    } else {
-      res.status(200).json(data)
-    }
+    const { consoleToken, pmFrontToken } = refreshTokens(req)
+    res
+      .status(200)
+      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .json(data)
   } catch (error) {
     const id = req.body[OBJECT_TYPES[objectType].id]
     handleError(req, res, error, error.statusCode || 501, opType, objectType, id)
