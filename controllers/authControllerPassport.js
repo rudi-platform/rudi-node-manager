@@ -5,7 +5,6 @@ const passport = require('passport')
 
 // Internal dependencies
 const { decodeBase64 } = require('../utils/utils')
-const { isDevEnv } = require('../config/backOptions')
 const log = require('../utils/logger')
 const { BadRequestError, RudiError, UnauthorizedError } = require('../utils/errors')
 const { getDbConf } = require('../config/config')
@@ -15,8 +14,10 @@ const {
   CONSOLE_TOKEN_NAME,
   createFrontUserTokens,
   hashPassword,
-  PM_FRONT_TOKEN_NAME,
   matchPassword,
+  PM_FRONT_TOKEN_NAME,
+  consoleCookieOpts,
+  pmFrontCookieOpts,
 } = require('../utils/secu')
 const {
   dbGetHashedPassword,
@@ -26,27 +27,6 @@ const {
   dbRegisterUser,
   dbUpdatePasswordWithField,
 } = require('../database/database')
-
-// Constants
-const SHOULD_SECURE = !isDevEnv()
-
-// Helper functions
-const consoleCookieOpts = (exp) => {
-  return {
-    secure: SHOULD_SECURE,
-    httpOnly: SHOULD_SECURE,
-    sameSite: 'Strict',
-    expires: new Date(exp * 1000),
-  }
-}
-const pmFrontCookieOpts = (exp) => {
-  return {
-    secure: SHOULD_SECURE,
-    httpOnly: false,
-    sameSite: 'Strict',
-    expires: new Date(exp * 1000),
-  }
-}
 
 // Controllers
 /**
@@ -87,7 +67,7 @@ exports.postLogin = async (req, res, next) => {
         req.login(user, { session: false }, async (err) => {
           if (err) return res.status(400).json({ errors: err })
           user.roles = roles
-          const { consoleToken, pmFrontToken, exp } = await createFrontUserTokens(user)
+          const { consoleToken, pmFrontToken, exp } =  createFrontUserTokens(user)
 
           // sameSite: 'Lax' ?
           return res

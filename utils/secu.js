@@ -11,6 +11,7 @@ const { timeEpochS, toInt } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
 const { compareSync } = require('bcrypt')
+const { isDevEnv } = require('../config/backOptions')
 
 // ----- Constants
 const mod = 'jwt'
@@ -50,7 +51,29 @@ exports.readJwtBody = (jwt) => {
   return jwtLib.tokenStringToJwtObject(jwt)?.payload
 }
 
-exports.createFrontUserTokens = async (userInfo) => {
+// Constants
+const SHOULD_SECURE = !isDevEnv()
+
+// Helper functions
+exports.consoleCookieOpts = (exp) => {
+  return {
+    secure: SHOULD_SECURE,
+    httpOnly: SHOULD_SECURE,
+    sameSite: 'Strict',
+    expires: new Date(exp * 1000),
+  }
+}
+
+exports.pmFrontCookieOpts = (exp) => {
+  return {
+    secure: SHOULD_SECURE,
+    httpOnly: false,
+    sameSite: 'Strict',
+    expires: new Date(exp * 1000),
+  }
+}
+
+exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   // console.log('T (createFrontUserTokens) exp:', new Date(exp * 1000));
   // console.log('T (createFrontUserTokens) userInfo:', userInfo);
@@ -62,6 +85,23 @@ exports.createFrontUserTokens = async (userInfo) => {
   }
 }
 
+exports.refreshTokens = (req) => {
+  const fun = 'renewTokens'
+  const user = req.user
+  if (!user) {
+    log.sysWarn(mod, fun, 'No user found in req')
+    return
+  }
+  log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)
+
+  const { consoleToken, pmFrontToken, exp } = this.createFrontUserTokens(user)
+  const consoleCookieOpts = Object.assign(this.consoleCookieOpts(exp), { overwrite: true })
+  const pmFrontCookieOpts = Object.assign(this.pmFrontCookieOpts(exp), { overwrite: true })
+  return {
+    [this.CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: consoleCookieOpts },
+    [this.PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: pmFrontCookieOpts },
+  }
+}
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser'
   const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null)

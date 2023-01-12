@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 
   res.on('finish', () => {
     if (res.statusCode < 400) {
-      log.sysInfo(mod, '', `=> OK ${res.statusCode}: ${req.method} ${req.url}`, log.getContext(req, {}))
+      log.sysInfo(mod, '', `=> OK ${res.statusCode}: ${req.method} ${req.originalUrl}`, log.getContext(req, {}))
     } else {
       // console.error(res)
       log.sysWarn(

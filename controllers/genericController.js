@@ -3,7 +3,13 @@ const mod = 'genCtrl'
 const axios = require('axios')
 const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
-const { createRudiApiToken } = require('../utils/secu')
+const {
+  CONSOLE_TOKEN_NAME,
+  createRudiApiToken,
+  PM_FRONT_TOKEN_NAME,
+  refreshTokens,
+} = require('../utils/secu')
+const { sysWarn } = require('../utils/logger')
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -105,45 +111,83 @@ exports.getObjectById = (req, res, next) => {
     })
 }
 
-exports.postObject = (req, res, next) => {
+exports.postObject = async (req, res, next) => {
   const opType = 'post_object'
   const { objectType } = req.params
-  if (!checkObjectType(req, res, opType, objectType)) return
+  try {
+    if (!checkObjectType(req, res, opType, objectType)) return
+    let data
+    try {
+      const url = getAdminApi(objectType)
+      const token = createRudiApiToken(url, req)
+      const resRudiApi = await axios.post(getRudiApi(url), req.body, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      data = resRudiApi.data
+    } catch (e) {
+      sysWarn(mod, opType, `ERR ${e.statusCode} Contacting RUDI API failed:`, e.message)
+      throw e
+    }
 
-  const url = getAdminApi(objectType)
-  const token = createRudiApiToken(url, req)
-  return axios
-    .post(getRudiApi(url), req.body, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((resRudiApi) => {
-      res.status(200).json(resRudiApi.data)
-    })
-    .catch((err) => {
-      const id = req.body[OBJECT_TYPES[objectType].id]
-      handleError(req, res, err, 501, opType, objectType, id)
-    })
+    const tokens = refreshTokens(req)
+    if (tokens) {
+      res
+        .status(200)
+        .cookie(CONSOLE_TOKEN_NAME, tokens[CONSOLE_TOKEN_NAME].jwt, tokens[CONSOLE_TOKEN_NAME].opts)
+        .cookie(
+          PM_FRONT_TOKEN_NAME,
+          tokens[PM_FRONT_TOKEN_NAME].jwt,
+          tokens[PM_FRONT_TOKEN_NAME].opts
+        )
+        .json(data)
+    } else {
+      res.status(200).json(data)
+    }
+  } catch (err) {
+    const id = req.body[OBJECT_TYPES[objectType].id]
+    handleError(req, res, err, 501, opType, objectType, id)
+  }
 }
 
-exports.putObject = (req, res, next) => {
-  const fun = 'put_object'
+exports.putObject = async (req, res, next) => {
+  const opType = 'put_object'
   const { objectType } = req.params
-  if (!checkObjectType(req, res, fun, objectType)) return
+  try {
+    if (!checkObjectType(req, res, opType, objectType)) return
+    let data
+    try {
+      const url = getAdminApi(objectType)
+      const token = createRudiApiToken(url, req)
+      const resRudiApi = await axios.put(getRudiApi(url), req.body, {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      })
+      data = resRudiApi.data
+    } catch (e) {
+      sysWarn(mod, opType, `ERR ${e.statusCode} Contacting RUDI API failed:`, e.message)
+      throw e
+    }
 
-  const url = getAdminApi(objectType)
-  const token = createRudiApiToken(url, req)
-  return axios
-    .put(getRudiApi(url), req.body, {
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    })
-    .then((resRudiApi) => res.status(200).json(resRudiApi.data))
-    .catch((error) => {
-      const id = req.body[OBJECT_TYPES[objectType].id]
-      handleError(req, res, error, 501, fun, objectType, id)
-    })
+    const tokens = refreshTokens(req)
+    if (tokens) {
+      res
+        .status(200)
+        .cookie(CONSOLE_TOKEN_NAME, tokens[CONSOLE_TOKEN_NAME].jwt, tokens[CONSOLE_TOKEN_NAME].opts)
+        .cookie(
+          PM_FRONT_TOKEN_NAME,
+          tokens[PM_FRONT_TOKEN_NAME].jwt,
+          tokens[PM_FRONT_TOKEN_NAME].opts
+        )
+        .json(data)
+    } else {
+      res.status(200).json(data)
+    }
+  } catch (error) {
+    const id = req.body[OBJECT_TYPES[objectType].id]
+    handleError(req, res, error, error.statusCode || 501, opType, objectType, id)
+  }
 }
 
 exports.deleteObject = (req, res, next) => {
