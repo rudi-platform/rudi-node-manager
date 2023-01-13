@@ -94,7 +94,7 @@ const Main = () => {
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
   useEffect(() => setDisplayTags(displayVersion()), [appInfo])
-  useEffect(() => console.log('T (displayAppInfo) appInfo', appInfo), [appInfo])
+  // useEffect(() => console.log('T (displayAppInfo) appInfo', appInfo), [appInfo])
 
   /**
    *
