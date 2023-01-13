@@ -1,7 +1,10 @@
 {
-  "name": "rudi-prodmanager-back",
-  "version": "1.0.0",
   "description": "Application d'administration du noeud RUDI",
+  "name": "rudi-prodmanager-back",
+  "version": "2.3.1",
+  "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
+  "license": "EUPL-1.2",
+  "private": true,
   "main": "server.js",
   "scripts": {
     "prestart": "npm install",
@@ -19,8 +22,6 @@
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
-  "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
-  "license": "EUPL-1.2",
   "dependencies": {
     "@aqmo.org/jwt_lib": "^1.1.9",
     "@aqmo.org/rudi_logger": "^1.1.2",
