@@ -92,7 +92,7 @@ exports.refreshTokens = (req) => {
     log.sysWarn(mod, fun, 'No user found in req')
     return
   }
-  log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)
+  // log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)
 
   const { consoleToken, pmFrontToken, exp } = this.createFrontUserTokens(user)
   const consoleCookieOpts = Object.assign(this.consoleCookieOpts(exp), { overwrite: true })

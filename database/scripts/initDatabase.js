@@ -25,7 +25,7 @@ const {
   TBL_USERS,
   dbGetUsers,
 } = require('../database')
-const { dbInitDefaultFormTable } = require('./initDefaultForm')
+// const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
 const USER_ID_START_VALUE = 6000
 
@@ -363,8 +363,8 @@ exports.dbInitialize = async () => {
     await dbCreateSuperUser(db)
     log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
 
-    await dbInitDefaultFormTable(db)
-    log.d(mod, fun, 'Table initialized: DefaultForm')
+    // await dbInitDefaultFormTable(db)
+    // log.d(mod, fun, 'Table initialized: DefaultForm')
 
     // const user =
     //   (await dbGetUserByUsername(db, 'Oliv')) || (await dbGetUserByUsername(db, 'Olivier'))

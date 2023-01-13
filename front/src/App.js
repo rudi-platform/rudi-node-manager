@@ -2,7 +2,7 @@ import './styles/App.scss'
 
 import axios from 'axios'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -77,16 +77,24 @@ const Main = () => {
     setIsRegisterOpen(true)
   }
 
+  // ---------------- Tags
   /**
    * Returns the code to display the version tag (if defined)
+   * @param {string} appTag the tag for the app (ex: 2.3.1)
+   * @param {string} gitHash the abbreviated git hash
    * @return {ReactNode} the code to display the version tag (if defined)
    */
   const displayVersion = () => (
-    <div>
+    <div id="displayTags">
       <div className="appTag">{appInfo.appTag}</div>
       <div className="gitTag">{appInfo.gitHash}</div>
     </div>
   )
+
+  const [displayTags, setDisplayTags] = useState(displayVersion())
+
+  useEffect(() => setDisplayTags(displayVersion()), [appInfo])
+  useEffect(() => console.log('T (displayAppInfo) appInfo', appInfo), [appInfo])
 
   /**
    *
@@ -118,7 +126,7 @@ const Main = () => {
     axios
       .get(getBackUrl(getApiFront('logout')))
       .then((res) => {
-        console.error('T (logout.ok)')
+        // console.debug('T (logout.ok)')
         exit()
       })
       .catch((err) => {
@@ -144,81 +152,81 @@ const Main = () => {
   return (
     <Router>
       <ModalProvider>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="modal-test"></div>
-        <header>
-          <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
-            <div className="container-fluid">
-              <img
-                className="icon-navbar logo-margin"
-                src={`logo_blanc_orange.png`}
-                alt="Rudi logo"
-              />
-              <button
-                className="navbar-toggler align-right"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarCollapse"
-                aria-controls="navbarCollapse"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div className="collapse navbar-collapse" id="navbarCollapse">
-                <ul className="navbar-nav me-auto mb-2 mb-md-0">
-                  {navItem('', 'Catalogue')}
-                  {navItem('licence', 'Licence')}
-                  {navItem('show', 'Visualisation')}
-                  <li className={appInfo.isEditor ? 'nav-item' : 'nav-item hide-wip'}>
-                    <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                      <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
-                        Métadonnées
-                      </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('producer')}>
-                        Producteurs
-                      </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('contact')}>
-                        Contacts
-                      </Dropdown.Item>
-                    </DropdownButton>
-                  </li>
-                  <li className={appInfo.isAdmin ? 'nav-item' : 'nav-item hide-wip'}>
-                    <DropdownButton id="dropdown-gestion-button" title="Admin">
-                      <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
-                        Clés
-                      </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('user')}>
-                        Utilisateurs
-                      </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('report')}>
-                        Rapports portail
-                      </Dropdown.Item>
-                    </DropdownButton>
-                  </li>
-
-                  {navItem('monitoring', 'Monitoring', false)}
-                  {navItem('conf', 'Configuration', false)}
-
-                  <li className="nav-item center ">
-                    <button
-                      type="button"
-                      className="margin-logout btn btn-secondary"
-                      onClick={() => logout()}
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            {displayVersion()}
-          </nav>
-        </header>
-
-        <div id="root"></div>
-
         <PMFrontContextProvider>
+          <noscript>You need to enable JavaScript to run this app.</noscript>
+          <div id="modal-test"></div>
+          <header>
+            <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
+              <div className="container-fluid">
+                <img
+                  className="icon-navbar logo-margin"
+                  src={`logo_blanc_orange.png`}
+                  alt="Rudi logo"
+                />
+                <button
+                  className="navbar-toggler align-right"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarCollapse"
+                  aria-controls="navbarCollapse"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                >
+                  <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarCollapse">
+                  <ul className="navbar-nav me-auto mb-2 mb-md-0">
+                    {navItem('', 'Catalogue')}
+                    {navItem('licence', 'Licence')}
+                    {navItem('show', 'Visualisation')}
+                    <li className={appInfo.isEditor ? 'nav-item' : 'nav-item hide-wip'}>
+                      <DropdownButton id="dropdown-gestion-button" title="Gestion">
+                        <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
+                          Métadonnées
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to={getBackUrl('producer')}>
+                          Producteurs
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to={getBackUrl('contact')}>
+                          Contacts
+                        </Dropdown.Item>
+                      </DropdownButton>
+                    </li>
+                    <li className={appInfo.isAdmin ? 'nav-item' : 'nav-item hide-wip'}>
+                      <DropdownButton id="dropdown-gestion-button" title="Admin">
+                        <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
+                          Clés
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to={getBackUrl('user')}>
+                          Utilisateurs
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to={getBackUrl('report')}>
+                          Rapports portail
+                        </Dropdown.Item>
+                      </DropdownButton>
+                    </li>
+
+                    {navItem('monitoring', 'Monitoring', false)}
+                    {navItem('conf', 'Configuration', false)}
+
+                    <li className="nav-item center ">
+                      <button
+                        type="button"
+                        className="margin-logout btn btn-secondary"
+                        onClick={() => logout()}
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              {displayTags}
+            </nav>
+          </header>
+
+          <div id="root"></div>
+
           <Routes>
             <Route path={getBackUrl()} element={<Catalogue logout={logout} />} />
             <Route

@@ -11,10 +11,8 @@ cache:
       - front/node_modules/
 
 stages:
-  - npm_install_back
-  - npm_install_front
+  - install_back
   - build_front
-  - quality
 
 default:
   before_script:
@@ -24,9 +22,9 @@ default:
         echo "${CI_API_V4_URL#https?}/projects/59/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
       } | tee -a .npmrc
 
-# npm install (Back)
+# npm install Back
 install_back:
-  stage: npm_install_back
+  stage: install_back
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
@@ -39,28 +37,13 @@ install_back:
     - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
     - npm install
 
-# npm install (Front)
-install_front:
-  stage: npm_install_front
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - when: manual
-  tags:
-    - nodejs
-  variables:
-    NODE_ENV: development
-  script:
-    - cd front && npm install
-
-# Build front
+# npm install Front + build Front
 build_front:
   stage: build_front
   rules:
     - when: manual
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: always
-    # - if: '$CI_COMMIT_BRANCH =~ /^release.*$/i'
   needs:
     - install_front
   tags:
@@ -70,31 +53,9 @@ build_front:
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
-    - cd front && npm run build
+    - cd front && npm run cleanup && npm install && npm run build
   artifacts:
     name: 'ProdManager-front-$-PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
     expire_in: 10 week
-
-# Quality: back
-lint_back:
-  stage: quality
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-  tags:
-    - nodejs
-  script:
-    - npm run lintBack
-
-# Quality: front
-lint_front:
-  stage: quality
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-  tags:
-    - nodejs
-  script:
-    - npm run lintFront

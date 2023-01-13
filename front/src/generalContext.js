@@ -13,9 +13,9 @@ import { getApiData, getApiFront, getApiOpen } from './utils/frontOptions'
  * - the display flags that set if the user sees the Users menu (isAdmin) + the Data management menu (isEditor))
  */
 export const defaultFrontContext = {
-  formUrl: '', // the URL for the console formular
   themeLabels: {}, // the theme labels
   userInfo: {}, // the user info (username + roles)
+  formUrl: '', // the URL for the console formular
   isEditor: false, // set true if the user sees the Data management menu ("Gestion")
   isAdmin: false, // set true if the user sees  the Users menu ("Utilisateurs")
 }
@@ -44,25 +44,35 @@ export function PMFrontContextProvider({ children }) {
 
   useEffect(() => {
     const callBackApi = async () => {
-      if (!token) return defaultFrontContext
       try {
+        if (!token) {
+          const values = await Promise.all([
+            axios.get(getApiOpen('tag')),
+            axios.get(getApiOpen('hash')),
+          ])
+          const backValues = Object.assign(defaultFrontContext, {
+            appTag: `${values[0].data}`,
+            gitHash: `${values[1].data}`,
+          })
+          return backValues
+        }
         const values = await Promise.all([
-          axios.get(getApiFront('formUrl')),
           axios.get(getApiData('enum/themes/fr')),
           axios.get(getApiFront('user-info')),
+          axios.get(getApiFront('formUrl')),
           axios.get(getApiOpen('tag')),
           axios.get(getApiOpen('hash')),
         ])
-        const formUrlReceived = `${values[0].data}`
-        const userInfo = values[2].data
+        const userInfo = values[1].data
+        const formUrlReceived = `${values[2].data}`
         const backValues = {
-          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : formUrlReceived + '/',
-          themeLabels: values[1].data,
-          appTag: `${values[3].data}`,
-          gitHash: `${values[4].data}`,
+          themeLabels: values[0].data,
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
+          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : formUrlReceived + '/',
+          appTag: `${values[3].data}`,
+          gitHash: `${values[4].data}`,
         }
         // console.debug('T (context.useEffect) backValues:', backValues)
 
