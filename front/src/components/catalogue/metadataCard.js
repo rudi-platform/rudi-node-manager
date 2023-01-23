@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Pencil, Trash, Check, CloudDownload, Eye } from 'react-bootstrap-icons'
+import { Pencil, Trash, CloudDownload, Eye, Share } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getObjFormUrl, getLocaleFormatted } from '../../utils/utils'
@@ -169,16 +169,16 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
               <div className="btn-group" role="group">
                 <a
                   className="btn btn-success"
-                  href={getObjFormUrl(appInfo.formUrl, '', `?read-only=${metadata.global_id}`)}
+                  href={`${appInfo.apiV1Url}resources/${metadata.global_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Check />
+                  <Share />
                 </a>
                 {/* {isRestricted(metadata) ? '' : ( */}
                 <a
                   className="btn btn-warning"
-                  href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
+                  href={getObjFormUrl(appInfo.apiV1Url, '', `?update=${metadata.global_id}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

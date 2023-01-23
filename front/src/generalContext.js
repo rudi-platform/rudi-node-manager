@@ -59,20 +59,23 @@ export function PMFrontContextProvider({ children }) {
         const values = await Promise.all([
           axios.get(getApiData('enum/themes/fr')),
           axios.get(getApiFront('user-info')),
-          axios.get(getApiFront('formUrl')),
+          axios.get(getApiFront('form-url')),
+          axios.get(getApiFront('ext-api-url')),
           axios.get(getApiOpen('tag')),
           axios.get(getApiOpen('hash')),
         ])
         const userInfo = values[1].data
         const formUrlReceived = `${values[2].data}`
+        const apiV1UrlReceived = `${values[3].data}`
         const backValues = {
           themeLabels: values[0].data,
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
           formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : formUrlReceived + '/',
-          appTag: `${values[3].data}`,
-          gitHash: `${values[4].data}`,
+          apiV1Url: apiV1UrlReceived.endsWith('/') ? apiV1UrlReceived : apiV1UrlReceived + '/',
+          appTag: `${values[4].data}`,
+          gitHash: `${values[5].data}`,
         }
         // console.debug('T (context.useEffect) backValues:', backValues)
 
