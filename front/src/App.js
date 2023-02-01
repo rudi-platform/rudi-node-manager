@@ -150,9 +150,9 @@ const Main = () => {
     )
   }
   return (
-    <Router>
-      <ModalProvider>
-        <PMFrontContextProvider>
+    <PMFrontContextProvider>
+      <Router>
+        <ModalProvider>
           <noscript>You need to enable JavaScript to run this app.</noscript>
           <div id="modal-test"></div>
           <header>
@@ -260,8 +260,8 @@ const Main = () => {
             <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
             <Route path="*" element={<Catalogue logout={logout} />} />
           </Routes>
-        </PMFrontContextProvider>
-      </ModalProvider>
-    </Router>
+        </ModalProvider>
+      </Router>
+    </PMFrontContextProvider>
   )
 }
