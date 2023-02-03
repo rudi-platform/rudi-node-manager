@@ -178,7 +178,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
                 {/* {isRestricted(metadata) ? '' : ( */}
                 <a
                   className="btn btn-warning"
-                  href={getObjFormUrl(appInfo.apiV1Url, '', `?update=${metadata.global_id}`)}
+                  href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
