@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Pencil, Trash, CloudDownload, Eye, Share } from 'react-bootstrap-icons'
+import { BoxArrowUpRight, Pencil, Trash, CloudDownload, Eye, Share } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getObjFormUrl, getLocaleFormatted } from '../../utils/utils'
@@ -150,6 +150,61 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
   }
 
+  const button = {
+    share: (
+      <a
+        className="btn btn-success"
+        title="Partager la métadonnée"
+        href={`${appInfo.apiV1Url}resources/${metadata.global_id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Share />
+      </a>
+    ),
+    edit: (
+      <a
+        className="btn btn-warning"
+        href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
+        title="Editer"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Pencil />
+      </a>
+    ),
+    delete: (
+      <button
+        type="button"
+        className="btn btn-danger"
+        title="Supprimer"
+        onClick={() => triggerDeleteRessource()}
+      >
+        <Trash />
+      </button>
+    ),
+    download: (url) => (
+      <button type="button" className="btn btn-success button-margin">
+        <a id="downloadMedia" title="Télécharger" href={url}>
+          <CloudDownload />
+        </a>
+      </button>
+    ),
+    external: (url) => (
+      <button type="button" className="btn btn-success margin-right">
+        <a id="downloadMedia" title="Site externe" href={url}>
+          <BoxArrowUpRight />
+        </a>
+      </button>
+    ),
+    visualize: (id) => (
+      <Link to={getBackUrl(`show/${id}`)}>
+        <span className="btn btn-success" title="Aperçu">
+          <Eye />
+        </span>
+      </Link>
+    ),
+  }
   return (
     <div className="col-12" key={metadata.global_id}>
       <div className="card card-margin">
@@ -165,33 +220,15 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
               </span>
             </a>
             {displayStatus()}
-            {isEdit && (
+            {isEdit ? (
               <div className="btn-group" role="group">
-                <a
-                  className="btn btn-success"
-                  href={`${appInfo.apiV1Url}resources/${metadata.global_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Share />
-                </a>
-                {/* {isRestricted(metadata) ? '' : ( */}
-                <a
-                  className="btn btn-warning"
-                  href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Pencil />
-                </a>
-                {/* )} */}
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => triggerDeleteRessource()}
-                >
-                  <Trash />
-                </button>
+                {button.share}
+                {button.edit}
+                {button.delete}
+              </div>
+            ) : (
+              <div className="btn-group" role="group">
+                {button.share}
               </div>
             )}
           </div>
@@ -222,26 +259,25 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
           <span className="card-text">
-            {metadata.available_formats.map((ressource) => {
-              return (
+            {metadata.available_formats.map((ressource) =>
+              ressource.file_size ? (
                 <div key={`${ressource.media_id}`}>
-                  <Link to={getBackUrl(`show/${ressource.media_id}`)}>
-                    <span className="btn btn-success" title="Aperçu">
-                      <Eye />
-                    </span>
-                  </Link>
-                  <button type="button" className="btn btn-success button-margin">
-                    <a id="downloadMedia" title="Télécharger" href={ressource.connector.url}>
-                      <CloudDownload />
-                    </a>
-                  </button>
+                  {button.visualize(ressource.media_id)}
+                  {button.download(ressource.connector.url)}
                   <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
                   <span className="">
                     <a href={ressource.connector.url}>{ressource.media_name}</a>
                   </span>
                 </div>
+              ) : (
+                <div key={`${ressource.media_id}`}>
+                  {button.external(ressource.connector.url)}
+                  <span className="">
+                    <a href={ressource.connector.url}>{ressource.connector.url}</a>
+                  </span>
+                </div>
               )
-            })}
+            )}
           </span>
         </div>
       </div>

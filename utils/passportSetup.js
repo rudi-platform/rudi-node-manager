@@ -1,9 +1,11 @@
 const mod = 'passSetup'
-// const bcrypt = require('bcrypt')
+
+// External dependencies
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
+// Internal dependencies
 const { getConf } = require('../config/config')
 const log = require('./logger')
 const { ForbiddenError, statusOK, UnauthorizedError } = require('./errors')
@@ -17,6 +19,7 @@ const {
 } = require('../database/database')
 const { extractCookieFromReq, CONSOLE_TOKEN_NAME, matchPassword } = require('./secu')
 
+// Passport configuration
 passport.serializeUser((user, done) => done(null, user.id))
 
 passport.deserializeUser((id, done) => {

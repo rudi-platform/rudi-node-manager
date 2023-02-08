@@ -10,7 +10,7 @@ const { getConf } = require('../config/config')
 const { timeEpochS, toInt } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
-const { compareSync } = require('bcrypt')
+// const { compareSync } = require('bcrypt')
 const { isDevEnv } = require('../config/backOptions')
 
 // ----- Constants
@@ -312,6 +312,7 @@ exports.hashPassword = (password) => {
  * @returns {Boolean} True if the password matches the hash
  */
 exports.matchPassword = (password, hash) =>
-  hash.startsWith('$2b$10$')
-    ? compareSync(password, hash)
-    : hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))
+  hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))
+// hash.startsWith('$2b$10$')
+//   ? compareSync(password, hash)
+//   :
