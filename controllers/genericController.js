@@ -197,3 +197,22 @@ exports.deleteObject = (req, res, next) => {
     })
     .catch((error) => handleError(req, res, error, 501, fun, objectType, id))
 }
+
+exports.deleteObjects = (req, res, next) => {
+  const fun = 'del_objects'
+  const { objectType } = req.params
+  if (!checkObjectType(req, res, fun, objectType)) return
+
+  const url = getAdminApi(`${objectType}`)
+  const token = createRudiApiToken(url, req)
+  return axios
+    .delete(getRudiApi(url), {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((resRudiApi) => {
+      const rudiObj = resRudiApi.data
+      res.status(200).json(rudiObj)
+    })
+    .catch((error) => handleError(req, res, error, 501, fun, objectType, id))
+}

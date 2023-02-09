@@ -12,6 +12,7 @@ const PAGE_SIZE = 20
 
 ObjCatalogue.propTypes = {
   editMode: PropTypes.bool,
+  shouldPad: PropTypes.bool,
   logout: PropTypes.func,
   hideEdit: PropTypes.bool,
   objType: PropTypes.string,
@@ -31,6 +32,7 @@ ObjCatalogue.propTypes = {
  */
 export default function ObjCatalogue({
   editMode,
+  shouldPad = true,
   logout,
   hideEdit,
   objType,
@@ -111,7 +113,7 @@ export default function ObjCatalogue({
   }
 
   return (
-    <div className="tempPaddingTop">
+    <div className={shouldPad ? 'tempPaddingTop' : ''}>
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">

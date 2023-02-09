@@ -32,33 +32,47 @@ export default function CatalogueReports({ editMode, logout }) {
   }
 
   return (
-    <div className="col-12">
-      <div className="card-body">
-        <div className="row">
-          <a className="btn btn-danger" onClick={() => deleteOldReports()}>
-            Supprimer les rapports des mois précédents <Trash />
-          </a>
+    <div className="tempPaddingTop">
+      <div className="row catalogue">
+        <div className="col-9">
+          <div className="card edit-card-margin ">
+            <div className="card-body align-right valign-middle inline">
+              <div className="text-button inline-block">
+                {' '}
+                Supprimer les rapports des mois précédents
+              </div>
+              <button
+                type="button"
+                title="Supprimer les rapports des mois précédents"
+                className="btn btn-danger inline-block on-right"
+                onClick={() => deleteOldReports()}
+              >
+                <Trash />
+              </button>
+            </div>
+          </div>
         </div>
+        <ObjCatalogue
+          editMode={editMode}
+          shouldPad={false}
+          hideEdit={true}
+          objType="reports"
+          propId="report_id"
+          propName="resource_title"
+          propNamesToDisplay={{
+            id: 'report_id',
+            resource_id: 'resource_id',
+            submission_date: 'soumission',
+            treatment_date: 'traitement',
+            integration_status: 'statut',
+            comment: 'commentaire',
+            integration_errors: 'erreurs',
+          }}
+          propSortBy="-submission_date"
+          deleteConfirmMsg={(id) => `Confirmez vous la suppression du rapport ${id}?`}
+          deleteMsg={(id) => `Le rapport ${id} a été supprimé`}
+        />
       </div>
-      <ObjCatalogue
-        editMode={editMode}
-        hideEdit={true}
-        objType="reports"
-        propId="report_id"
-        propName="resource_title"
-        propNamesToDisplay={{
-          id: 'report_id',
-          resource_id: 'resource_id',
-          submission_date: 'soumission',
-          treatment_date: 'traitement',
-          integration_status: 'statut',
-          comment: 'commentaire',
-          integration_errors: 'erreurs',
-        }}
-        propSortBy="-submission_date"
-        deleteConfirmMsg={(id) => `Confirmez vous la suppression du rapport ${id}?`}
-        deleteMsg={(id) => `Le rapport ${id} a été supprimé`}
-      />
     </div>
   )
 }

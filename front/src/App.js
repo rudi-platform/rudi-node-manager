@@ -16,7 +16,7 @@ import Login, { showPill as showPillLogin } from './components/login/login'
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
 import Register, { showPill as showPillRegister } from './components/login/register'
 
-import Catalogue from './components/catalogue/catalogue'
+import CatalogueMetadata from './components/catalogue/catalogueMetadata'
 import CatalogueLicence from './components/catalogue/catalogueLicence'
 import CatalogueProducer from './components/generic/catalogueProducer'
 import CatalogueContact from './components/generic/catalogueContact'
@@ -228,10 +228,10 @@ const Main = () => {
           <div id="root"></div>
 
           <Routes>
-            <Route path={getBackUrl()} element={<Catalogue logout={logout} />} />
+            <Route path={getBackUrl()} element={<CatalogueMetadata logout={logout} />} />
             <Route
               path={getBackUrl('metadata')}
-              element={<Catalogue editMode={appInfo.isEditor} logout={logout} />}
+              element={<CatalogueMetadata editMode={appInfo.isEditor} logout={logout} />}
             />
             <Route
               path={getBackUrl('producer')}
@@ -258,7 +258,7 @@ const Main = () => {
               element={<CatalogueUser editMode={appInfo.isAdmin} logout={logout} />}
             />
             <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
-            <Route path="*" element={<Catalogue logout={logout} />} />
+            <Route path="*" element={<CatalogueMetadata logout={logout} />} />
           </Routes>
         </ModalProvider>
       </Router>

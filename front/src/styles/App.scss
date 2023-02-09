@@ -96,9 +96,8 @@ a {
   margin-left: $marginSides;
   margin-right: $marginSides;
 }
-.margin-right{
-  margin-right: .8em;
-
+.margin-right {
+  margin-right: 0.8em;
 }
 .bg-navbar {
   background-color: $navbar;
@@ -120,6 +119,11 @@ a {
 .align-right {
   margin-right: 0px;
   margin-left: auto;
+}
+
+.valign-middle {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .temp-align {
@@ -163,6 +167,10 @@ a {
 
 .inline {
   display: inline;
+}
+
+.inline-block {
+  display: inline-block;
 }
 
 .spaced {
@@ -288,4 +296,8 @@ a {
 }
 .catalogue {
   padding-top: 10px;
+}
+.text-button {
+  height: 100%;
+  margin: .5em 1em .5em auto;
 }

@@ -179,6 +179,23 @@ export function EditObjCard({
     toggle()
   }
 
+  const button = {
+    edit: (
+      <a
+        href={getObjFormUrl(appInfo.formUrl, objType, `?update=${editID}`)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn btn-warning"
+      >
+        <Pencil />
+      </a>
+    ),
+    delete: (
+      <button type="button" className="btn btn-danger" onClick={() => triggerDeleteObj(editID)}>
+        <Trash />
+      </button>
+    ),
+  }
   return (
     <div className="col-12">
       <div className="card edit-card-margin">
@@ -203,21 +220,9 @@ export function EditObjCard({
                 value={editID}
                 onChange={handleChange}
               />
-              <a
-                href={getObjFormUrl(appInfo.formUrl, objType, `?update=${editID}`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-warning"
-              >
-                <Pencil />
-              </a>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => triggerDeleteObj(editID)}
-              >
-                <Trash />
-              </button>
+
+              {button.edit}
+              {button.delete}
             </div>
           </div>
         </div>

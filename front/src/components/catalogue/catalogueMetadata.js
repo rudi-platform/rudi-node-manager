@@ -22,7 +22,7 @@ const btnTextAdd = 'Ajouter un jeu de données'
 const btnTextChg = 'Modifier un jeu de données :'
 const PAGE_SIZE = 20
 
-Catalogue.propTypes = {
+CatalogueMetadata.propTypes = {
   editMode: PropTypes.bool,
   logout: PropTypes.func,
 }
@@ -31,7 +31,7 @@ Catalogue.propTypes = {
  * Composant : Catalogue
  * @return {ReactNode}
  */
-export default function Catalogue({ editMode, logout }) {
+export default function CatalogueMetadata({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
