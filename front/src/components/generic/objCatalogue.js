@@ -13,6 +13,7 @@ const PAGE_SIZE = 20
 ObjCatalogue.propTypes = {
   editMode: PropTypes.bool,
   shouldPad: PropTypes.bool,
+  shouldRefresh: PropTypes.bool,
   logout: PropTypes.func,
   hideEdit: PropTypes.bool,
   objType: PropTypes.string,
@@ -33,6 +34,7 @@ ObjCatalogue.propTypes = {
 export default function ObjCatalogue({
   editMode,
   shouldPad = true,
+  shouldRefresh,
   logout,
   hideEdit,
   objType,
@@ -50,13 +52,15 @@ export default function ObjCatalogue({
   const [isEdit, setEdit] = useState(editMode)
   useEffect(() => setEdit(editMode), [editMode])
 
+  useEffect(() => getInitialData(), [shouldRefresh])
+
   const [listObj, setListObj] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(0)
 
   const getApiUrlObj = (suffix) => getApiData(`${objType}${suffix ? `/${suffix}` : ''}`)
 
-  useEffect(() => getInitialData(), [])
+  // useEffect(() => getInitialData(), [])
 
   const deleteUrl = (id) => getApiUrlObj(id)
   const refresh = () => {
@@ -79,7 +83,7 @@ export default function ObjCatalogue({
       .then((res) => {
         setCurrentOffset(PAGE_SIZE)
         setListObj(res.data)
-        // if (res.data?.length < PAGE_SIZE) setHasMore(false);
+        if (listObj.length < PAGE_SIZE) setHasMore(false)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
@@ -98,7 +102,7 @@ export default function ObjCatalogue({
       .then((res) => {
         const partialListObj = res.data
         setCurrentOffset(currentOffset + PAGE_SIZE)
-        if (partialListObj.length === 0) {
+        if (partialListObj.length < PAGE_SIZE) {
           setHasMore(false)
           // console.log('(fetchMoreData 0) partialListObj.length=', partialListObj.length)
           // console.log('(fetchMoreData 0) hasMore=', hasMore)
@@ -133,7 +137,7 @@ export default function ObjCatalogue({
               dataLength={listObj.length}
               next={fetchMoreData}
               hasMore={hasMore}
-              loader={hasMore ? <h4>Loading...</h4> : <i>Aucune donnée supplémentaire</i>}
+              loader={<h4>Loading...</h4>}
             >
               {listObj.map((obj, i) => (
                 <ObjCard

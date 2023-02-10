@@ -62,7 +62,7 @@ export default function CatalogueUser({ editMode }) {
       .then((res) => {
         const partialObjList = res.data
         setCurrentOffset(currentOffset + PAGE_SIZE)
-        if (partialObjList.length === 0) setHasMore(false)
+        if (partialObjList.length < PAGE_SIZE) setHasMore(false)
         setUserList(userList.concat(partialObjList))
       })
       .catch((err) => defaultErrorHandler(err))
@@ -74,21 +74,25 @@ export default function CatalogueUser({ editMode }) {
         <div className="col-9">
           <div className="row">
             {isEdit && <ActOnUserCard refresh={refresh} roleList={roleList}></ActOnUserCard>}
-            <InfiniteScroll
-              dataLength={userList.length}
-              next={fetchMoreData}
-              hasMore={hasMore}
-              loader={<h4>Loading...</h4>}
-            >
-              {userList.map((user) => (
-                <UserCard
-                  roleList={roleList}
-                  user={user}
-                  key={user[propId]}
-                  refresh={refresh}
-                ></UserCard>
-              ))}
-            </InfiniteScroll>
+            {userList.length ? (
+              <InfiniteScroll
+                dataLength={userList.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                loader={<h4>Loading...</h4>}
+              >
+                {userList.map((user) => (
+                  <UserCard
+                    roleList={roleList}
+                    user={user}
+                    key={user[propId]}
+                    refresh={refresh}
+                  ></UserCard>
+                ))}
+              </InfiniteScroll>
+            ) : (
+              'Aucune donnée trouvée'
+            )}
           </div>
         </div>
       </div>

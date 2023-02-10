@@ -214,5 +214,5 @@ exports.deleteObjects = (req, res, next) => {
       const rudiObj = resRudiApi.data
       res.status(200).json(rudiObj)
     })
-    .catch((error) => handleError(req, res, error, 501, fun, objectType, id))
+    .catch((error) => handleError(req, res, error, 501, fun, objectType))
 }

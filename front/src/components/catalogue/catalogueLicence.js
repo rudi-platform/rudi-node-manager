@@ -41,21 +41,25 @@ export default function CatalogueLicence({ editMode, logout }) {
       <div className="row catalogue">
         <div className="col-9">
           <div className="row">
-            <InfiniteScroll
-              dataLength={licences.length}
-              hasMore={hasMore}
-              loader={<h4>Loading...</h4>}
-            >
-              {licences.map((licence) => {
-                return (
-                  <LicenceCard
-                    obj={licence}
-                    editMode={isEdit}
-                    key={licence.concept_id}
-                  ></LicenceCard>
-                )
-              })}
-            </InfiniteScroll>
+            {licences.length ? (
+              <InfiniteScroll
+                dataLength={licences.length}
+                hasMore={hasMore}
+                loader={<h4>Loading...</h4>}
+              >
+                {licences.map((licence) => {
+                  return (
+                    <LicenceCard
+                      obj={licence}
+                      editMode={isEdit}
+                      key={licence.concept_id}
+                    ></LicenceCard>
+                  )
+                })}
+              </InfiniteScroll>
+            ) : (
+              'Aucune donnée trouvée'
+            )}
           </div>
         </div>
       </div>

@@ -228,7 +228,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
         if (isSearchMode()) data = res.data.items
         else data = res.data
 
-        if (data.length === 0) setHasMore(false)
+        if (data.length < PAGE_SIZE) setHasMore(false)
         setMetadatas((metadatas) => metadatas.concat(data))
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
@@ -407,6 +407,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
               }}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
+              endMessage={<i>Aucune donnée supplémentaire</i>}
             >
               {metadatas.map((metadata) => {
                 return (
