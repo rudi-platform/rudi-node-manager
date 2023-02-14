@@ -13,11 +13,12 @@ exports.error = (error, req, options) => {
     // log.e(mod, fun, error.response?.status);
     // log.e(mod, fun, error.response?.headers);
     let statusCode =
+      error?.response?.data?.statusCode ||
+      error?.response?.status ||
+      error?.response?.statusCode ||
       error?.statusCode ||
       error?.status ||
       error?.code ||
-      error?.response?.statusCode ||
-      error?.response?.status ||
       501
     if (statusCode === 'ERR_INVALID_URL') {
       console.error('T (errorHandler) err', error)

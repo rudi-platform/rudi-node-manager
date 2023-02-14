@@ -165,7 +165,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     edit: (
       <a
         className="btn btn-warning"
-        href={getObjFormUrl(appInfo.formUrl, '', `?update=${metadata.global_id}`)}
+        href={`${appInfo.formUrl}?update=${metadata.global_id}`}
         title="Editer"
         target="_blank"
         rel="noopener noreferrer"

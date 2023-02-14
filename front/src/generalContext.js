@@ -72,12 +72,12 @@ export function PMFrontContextProvider({ children }) {
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
-          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : formUrlReceived + '/',
-          apiV1Url: apiV1UrlReceived.endsWith('/') ? apiV1UrlReceived : apiV1UrlReceived + '/',
+          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : `${formUrlReceived}/`,
+          apiV1Url: apiV1UrlReceived.endsWith('/') ? apiV1UrlReceived : `${apiV1UrlReceived}/`,
           appTag: `${values[4].data}`,
           gitHash: `${values[5].data}`,
         }
-        // console.debug('T (context.useEffect) backValues:', backValues)
+        console.debug('T (context.useEffect) backValues:', backValues)
 
         return backValues
       } catch (err) {
