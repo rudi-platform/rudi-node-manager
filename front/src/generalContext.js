@@ -77,11 +77,11 @@ export function PMFrontContextProvider({ children }) {
           appTag: `${values[4].data}`,
           gitHash: `${values[5].data}`,
         }
-        console.debug('T (context.useEffect) backValues:', backValues)
+        // console.debug('T (context.useEffect) backValues:', backValues)
 
         return backValues
       } catch (err) {
-        console.error('T (callBackApi) ERR:', err)
+        console.error('E (callBackApi)', err)
         return defaultFrontContext
       }
     }

@@ -25,7 +25,7 @@ function Visualisation({ logout }) {
 
   const { id } = useParams()
   const [mediaId, setMediaId] = useState(id ? id : '')
-  const [visuOption, setVisuOption] = useState({ displayType: 'CSV', data: null })
+  const [visuOption, setVisuOption] = useState({ displayType: 'TXT', data: '- Aucune donnée -' })
 
   const wrapper = React.useRef()
   const [el, setEl] = useState(null)
@@ -91,9 +91,11 @@ function Visualisation({ logout }) {
         tableOverflow: true,
         lazyLoading: true,
         loadingSpin: true,
-        includeHeadersOnDownload: true,
+        // includeHeadersOnDownload: true,
         parseTableAutoCellType: true,
         parseTableFirstRowAsHeader: true,
+        minSpareRows: 10,
+        minSpareCols: 10,
       }
       setEl(jspreadsheet(wrapper.current, options))
     }
@@ -181,7 +183,11 @@ function Visualisation({ logout }) {
                 case 'application/vnd.ms-excel':
                 case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                   try {
-                    setVisuOption({ displayType: 'CSV', data: csvToArray(media) })
+                    setVisuOption({
+                      displayType: 'CSV',
+                      data: csvToArray(media),
+                      opts: { url: mediaUrl },
+                    })
                   } catch (error) {
                     if (error.response?.status == 401) logout()
                     else defaultErrorHandler(error)
