@@ -393,7 +393,7 @@
 							"response": []
 						},
 						{
-							"name": "Get API external URL",
+							"name": "Get API external URL (directly)",
 							"event": [
 								{
 									"listen": "test",
@@ -401,8 +401,56 @@
 										"exec": [
 											"pm.test(\"Check version\", () => {",
 											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const url = pm.response.stream.toString('utf8');",
-											"    pm.expect(url.startsWith('http')).to.be.true",
+											"    const apiUrl = pm.response.stream.toString('utf8');",
+											"    pm.expect(apiUrl.startsWith('http')).to.be.true",
+											"    pm.collectionVariables.set('apiUrl', apiUrl)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{apiTokenName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{apiUrl}}/api/admin/check/node/url",
+									"host": [
+										"{{apiUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"check",
+										"node",
+										"url"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get API external URL (from PM)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Check version\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const apiUrl = pm.response.stream.toString('utf8');",
+											"    pm.expect(apiUrl.startsWith('http')).to.be.true",
+											"    pm.expect(apiUrl).to.eq(pm.collectionVariables.get('apiUrl'))",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2890,6 +2938,86 @@
 		},
 		{
 			"key": "portalJwt",
+			"value": ""
+		},
+		{
+			"key": "mediaToken",
+			"value": ""
+		},
+		{
+			"key": "org1Id",
+			"value": ""
+		},
+		{
+			"key": "org1Name",
+			"value": ""
+		},
+		{
+			"key": "org1Addr",
+			"value": ""
+		},
+		{
+			"key": "cont1Id",
+			"value": ""
+		},
+		{
+			"key": "cont1Name",
+			"value": ""
+		},
+		{
+			"key": "cont1Mail",
+			"value": ""
+		},
+		{
+			"key": "metaId1",
+			"value": ""
+		},
+		{
+			"key": "now",
+			"value": ""
+		},
+		{
+			"key": "metaTest",
+			"value": ""
+		},
+		{
+			"key": "org1",
+			"value": ""
+		},
+		{
+			"key": "orgId",
+			"value": ""
+		},
+		{
+			"key": "cont1",
+			"value": ""
+		},
+		{
+			"key": "contId",
+			"value": ""
+		},
+		{
+			"key": "pubKey1",
+			"value": ""
+		},
+		{
+			"key": "softUser1username",
+			"value": ""
+		},
+		{
+			"key": "softUser1email",
+			"value": ""
+		},
+		{
+			"key": "softUser1password",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "apiUrl",
 			"value": ""
 		}
 	]

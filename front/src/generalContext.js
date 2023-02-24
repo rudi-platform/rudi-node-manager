@@ -66,14 +66,14 @@ export function PMFrontContextProvider({ children }) {
         ])
         const userInfo = values[1].data
         const formUrlReceived = `${values[2].data}`
-        const apiV1UrlReceived = `${values[3].data}`
+        const apiExtUrlReceived = `${values[3].data}`
         const backValues = {
           themeLabels: values[0].data,
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),
           formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : `${formUrlReceived}/`,
-          apiV1Url: apiV1UrlReceived.endsWith('/') ? apiV1UrlReceived : `${apiV1UrlReceived}/`,
+          apiExtUrl: apiExtUrlReceived.endsWith('/') ? apiExtUrlReceived : `${apiExtUrlReceived}/`,
           appTag: `${values[4].data}`,
           gitHash: `${values[5].data}`,
         }

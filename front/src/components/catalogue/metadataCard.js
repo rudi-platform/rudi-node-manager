@@ -155,7 +155,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       <a
         className="btn btn-success"
         title="Partager la métadonnée"
-        href={`${appInfo.apiV1Url}resources/${metadata.global_id}`}
+        href={`${appInfo.apiExtUrl}api/v1/resources/${metadata.global_id}`}
         target="_blank"
         rel="noopener noreferrer"
       >
