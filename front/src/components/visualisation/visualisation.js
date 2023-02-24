@@ -254,7 +254,13 @@ function Visualisation({ logout }) {
         {
           CSV: <div ref={wrapper} />,
           JSON: <JsonViewer value={visuOption.data} collapsed={2} />,
-          TXT: <div className="body">{visuOption.data}</div>,
+          TXT: (
+            <div className="body">
+              <div className="text-visu">
+                <pre>{visuOption.data}</pre>
+              </div>
+            </div>
+          ),
           IMG: <img src={imgUrl} alt="image" className="image90" />,
         }[visuOption.displayType]
       }
