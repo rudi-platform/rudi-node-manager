@@ -24,6 +24,7 @@ const {
   TBL_USER_ROLES,
   TBL_USERS,
   dbGetUsers,
+  dbGetUserById,
 } = require('../database')
 // const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
@@ -278,13 +279,15 @@ const dbNormalizeUserTableName = (openedDb, oldTblName) => {
 const dbNormalizeUserTableId = async (db) => {
   try {
     const dummyUserName = 'dummy'
-    await dbRegisterUser(db, {
-      username: dummyUserName,
-      email: 'x',
-      password: 'x',
-      id: USER_ID_START_VALUE,
-    })
-    await dbDeleteUserWithId(db, USER_ID_START_VALUE)
+    let dummyUsr = await dbGetUserById(db, USER_ID_START_VALUE)
+    if (!dummyUsr)
+      dummyUsr = await dbRegisterUser(db, {
+        username: dummyUserName,
+        email: 'x',
+        password: 'x',
+        id: USER_ID_START_VALUE,
+      })
+    if (dummyUsr?.username === dummyUserName) await dbDeleteUserWithId(db, USER_ID_START_VALUE)
     return statusOK(`Users table IDs normalized`)
   } catch (err) {
     log.e(mod, 'dbNormalizeUsersTableId', err)
