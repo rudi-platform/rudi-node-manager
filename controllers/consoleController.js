@@ -1,25 +1,17 @@
 const mod = 'consoleCtrl'
 
-const { getConsoleFormUrl, getRudiApi } = require('../config/config')
+// Internal dependecies
+const { getConsoleFormUrl } = require('../config/config')
 const log = require('../utils/logger')
-const {  UnauthorizedError } = require('../utils/errors')
+const { UnauthorizedError } = require('../utils/errors')
 
+// Controllers
 exports.getFormUrl = (req, res) => {
   try {
     res.status(200).send(getConsoleFormUrl())
   } catch (err) {
     log.e('', '', err)
     log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_formUrl' }))
-    throw err
-  }
-}
-
-exports.getRudiApiV1Url = (req, res) => {
-  try {
-    res.status(200).send(getRudiApi('api/v1'))
-  } catch (err) {
-    log.e('', '', err)
-    log.sysError(mod, 'getRudiApiV1Url', err, log.getContext(req, { opType: 'get_apiV1Url' }))
     throw err
   }
 }

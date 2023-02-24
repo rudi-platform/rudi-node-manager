@@ -151,9 +151,9 @@ exports.getContext = (req, options = {}) => {
   }
 
   ctx.operation = {
-    opType: options.opType ? options.opType : 'other',
-    statusCode: options.statusCode ? options.statusCode : '',
-    id: options.id ? options.id : '',
+    opType: options.opType || 'other',
+    statusCode: options.statusCode || '',
+    id: options.id || '',
   }
   return ctx
 }

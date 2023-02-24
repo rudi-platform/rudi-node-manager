@@ -50,6 +50,7 @@ exports.getConf = (section, subSection) => {
   return sect[subSection]
 }
 
+// Shortcuts to access popular conf values
 exports.getRudiApi = (suffix) => getCompletedUrl(config.rudi_api.rudi_api_url, suffix)
 exports.getAdminApi = (suffix) => getCompletedUrl(config.rudi_api.admin_api, suffix)
 

@@ -182,7 +182,7 @@
 											"pm.test(\"Store token\", () => {",
 											"    pm.expect(pm.response.code).to.eql(200);",
 											"    const res = pm.response.json()",
-											"    pm.expect(res.username).to.eq(pm.variables.get('adminusername'))",
+											"    pm.expect(res.username).to.eq(pm.variables.get('pmAdminUsr'))",
 											"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
 											"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
 											"    //const expirationTime = new Date(res.expires).getTime()",
@@ -202,7 +202,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"username\":\"{{adminusername}}\",\n    \"password\":\"{{adminpassword}}\"\n}",
+									"raw": "{\n    \"username\":\"{{pmAdminUsr}}\",\n    \"password\":\"{{pmAdminPwd}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -233,7 +233,7 @@
 											"pm.test(\"Store token\", () => {",
 											"    pm.expect(pm.response.code).to.eql(200);",
 											"    const res = pm.response.json()",
-											"    pm.expect(res.username).to.eq(pm.variables.get('adminusername'))",
+											"    pm.expect(res.username).to.eq(pm.variables.get('pmAdminUsr'))",
 											"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
 											"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
 											"    //const expirationTime = new Date(res.expires).getTime()",
@@ -387,6 +387,40 @@
 										"api",
 										"data",
 										"version"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get API external URL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Check version\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const url = pm.response.stream.toString('utf8');",
+											"    pm.expect(url.startsWith('http')).to.be.true",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{pmBackUrl}}/api/front/ext-api-url",
+									"host": [
+										"{{pmBackUrl}}"
+									],
+									"path": [
+										"api",
+										"front",
+										"ext-api-url"
 									]
 								}
 							},
@@ -1996,7 +2030,7 @@
 					"name": "05. Check API front",
 					"item": [
 						{
-							"name": "GET formUrl",
+							"name": "GET console url",
 							"event": [
 								{
 									"listen": "test",
@@ -2023,14 +2057,14 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{pmBackUrl}}/api/front/formUrl",
+									"raw": "{{pmBackUrl}}/api/front/form-url",
 									"host": [
 										"{{pmBackUrl}}"
 									],
 									"path": [
 										"api",
 										"front",
-										"formUrl"
+										"form-url"
 									]
 								}
 							},
@@ -2040,7 +2074,27 @@
 				},
 				{
 					"name": "06. Check API Media",
-					"item": []
+					"item": [
+						{
+							"name": "GET media",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{pmBackUrl}}/api/media/663a8083-88a5-4820-b1db-05bbfe54e634",
+									"host": [
+										"{{pmBackUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"663a8083-88a5-4820-b1db-05bbfe54e634"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				},
 				{
 					"name": "07. Add/get user",
@@ -2321,7 +2375,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{pmBackUrl}}/api/secu/users/{{adminusername}}",
+									"raw": "{{pmBackUrl}}/api/secu/users/{{pmAdminUsr}}",
 									"host": [
 										"{{pmBackUrl}}"
 									],
@@ -2329,7 +2383,7 @@
 										"api",
 										"secu",
 										"users",
-										"{{adminusername}}"
+										"{{pmAdminUsr}}"
 									]
 								}
 							},
@@ -2449,6 +2503,63 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "99. Logout",
+					"item": [
+						{
+							"name": "Logout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Logout\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.consoleToken).to.eq(\"\")",
+											"    pm.expect(res.pmFrontToken).to.eq(\"\")",
+											"    pm.expect(res.message).to.eq(\"logout\")",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\":\"{{pmAdminUsr}}\",\n    \"password\":\"{{pmAdminPwd}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{pmBackUrl}}/api/front/logout",
+									"host": [
+										"{{pmBackUrl}}"
+									],
+									"path": [
+										"api",
+										"front",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
@@ -2459,22 +2570,26 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"const TRACE = false",
-					"const DEBUG = false",
+					"const DEBUG_LVL = 1",
+					"const TRACE = DEBUG_LVL > 3",
+					"const DEBUG = DEBUG_LVL > 2",
+					"const ERROR = DEBUG_LVL > 1",
 					"",
 					"const WAIT_TIME = 50",
 					"const TOKEN_DURATION_S = 1200",
 					"",
 					"",
 					"log = {",
-					"    d: (msg) => { if (DEBUG || TRACE) console.log(msg) },",
-					"    t: (msg) => { if (TRACE) console.log(msg) }",
+					"    e: (fun, msg = '', arg = '') => { if (ERROR) console.error(`E (${fun}) ERROR: ${msg} ${arg}`) },",
+					"    d: (fun, msg = '', arg = '') => { if (DEBUG) console.log(`D (${fun}) ${msg} ${arg}`) },",
+					"    t: (fun, msg = '<', arg = '') => { if (TRACE) console.log(`T (${fun}) ${msg} ${arg}`) },",
 					"}",
 					"",
 					"const initStoredVar = (name, defaultVal) => {",
+					"    const fun = 'initStoredVar'",
 					"    const storedVal = pm.variables.get(name)",
 					"    if (!storedVal) {",
-					"        log.t('[initStoredVar] no value stored for ' + name)",
+					"        log.t(fun, 'No value stored for', name)",
 					"        pm.variables.set(name, defaultVal)",
 					"    }",
 					"    // log.t('[initStoredVar] val for ' + name + ' is: ' + storedVal || defaultVal)",
@@ -2487,14 +2602,9 @@
 					"const ADMIN_URL = pm.variables.get('apiUrl') + '/api/admin'",
 					"",
 					"",
-					"log.t('API_TOKEN_NAME: ' + API_TOKEN_NAME)",
-					"log.t('PORTAL_TOKEN_NAME: ' + PORTAL_TOKEN_NAME)",
-					"log.t('ADMIN_URL: ' + ADMIN_URL)",
-					"",
-					"",
-					"error = {",
-					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
-					"}",
+					"log.t('const', 'API_TOKEN_NAME:', API_TOKEN_NAME)",
+					"log.t('const', 'PORTAL_TOKEN_NAME:', PORTAL_TOKEN_NAME)",
+					"log.t('const', 'ADMIN_URL:', ADMIN_URL)",
 					"",
 					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
 					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
@@ -2511,14 +2621,18 @@
 					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
 					"}",
 					"",
+					"error = {",
+					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
+					"}",
+					"",
 					"time = {",
 					"    now: () => new Date().toISOString(),",
 					"    nowEpochMS: () => new Date().getTime(),",
 					"    nowEpochS: () => _.floor(new Date().getTime() / 1000),",
 					"    timezone: () => new Date().getTimezoneOffset(),",
 					"    wait: (delayMs, doSomething) => {",
-					"        log.d(`Waiting ${delayMs / 1000}s...`)",
-					"        setTimeout(doSomething ? doSomething : () => { log.d(`Waited ${delayMs / 1000}s`) }, delayMs)",
+					"        log.t('wait', `Waiting ${delayMs / 1000}s...`)",
+					"        setTimeout(doSomething ? doSomething : () => { log.t('wait', `Waited ${delayMs / 1000}s`) }, delayMs)",
 					"    },",
 					"}",
 					"codec = {",
@@ -2527,7 +2641,8 @@
 					"    fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),",
 					"",
 					"    fromBase64Url: (base64UrlStr) => {",
-					"        log.t('-- base64UrlStr --')",
+					"        const fun = 'fromBase64Url'",
+					"        log.t(fun)",
 					"        if (!base64UrlStr) return ''",
 					"        //        log.d('base64UrlStr: ' + base64UrlStr)",
 					"        //        log.d('base64UrlStr.length: ' + base64UrlStr.length)",
@@ -2577,11 +2692,12 @@
 					"",
 					"secu = {",
 					"    isTokenValid: (tokenName) => {",
-					"        log.t('-- is ' + tokenName + ' Valid --')",
+					"        const fun = 'isTokenValid'",
+					"        log.t(fun, tokenName)",
 					"        const token = pm.collectionVariables.get(tokenName)",
 					"        // console.log('typeof token: ' + typeof token)",
 					"        if (!token || typeof token !== 'string') {",
-					"            log.d('Token ' + tokenName + ' is invalid: ' + JSON.stringify(token))",
+					"            log.d(fun, 'Token ' + tokenName + ' is invalid: ', JSON.stringify(token))",
 					"            return false",
 					"        }",
 					"        // log.d('splitting token: ' + token)",
@@ -2591,17 +2707,18 @@
 					"        const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
 					"        // log.d('decoded body: ' + jwtBody)",
 					"        if (!jwtBody.exp) {",
-					"            log.d('No expiration time was found')",
+					"            log.d(fun, 'No expiration time was found')",
 					"            return false",
 					"        }",
 					"        // log.d('is token valid?')",
 					"        const isValid = jwtBody.exp > time.nowEpochS()",
-					"        log.d(tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
+					"        log.d(fun, tokenName + ' is ' + (isValid ? '' : 'not ') + 'valid')",
 					"        return isValid",
 					"    },",
 					"",
 					"    renewApiToken: (tokenName, next) => {",
-					"        log.t('-- renewApiToken --')",
+					"        const fun = 'renewApiToken'",
+					"        log.t(fun)",
 					"        const reqUrl = pm.variables.get('cryptoJwtUrl') + '/forge'",
 					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const reqNewToken = {",
@@ -2623,7 +2740,7 @@
 					"        return new Promise((resolve, reject) => {",
 					"            pm.sendRequest(reqNewToken, (err, res) => {",
 					"                if (err || res.code > 399 || res.statusCode > 399) {",
-					"                    log.d(`[renewApiToken] Error: 'Crypto' module unreachable on ${reqUrl}`)",
+					"                    log.e(fun, `'Crypto' module unreachable on ${reqUrl}`)",
 					"                    return reject(`Crypto module unreachable on ${reqUrl}`)",
 					"                    // error.throwNotFound(`Crypto module unreachable on ${reqUrl}`)",
 					"                }",
@@ -2638,7 +2755,7 @@
 					"                    // throw new Error('[renewApiToken]: ' + err)",
 					"                }",
 					"                pm.collectionVariables.set(tokenName, token)",
-					"                log.d('API token stored')",
+					"                log.d(fun, 'API token stored')",
 					"",
 					"                if (next) return resolve(next(token))",
 					"                return resolve(token)",
@@ -2647,7 +2764,8 @@
 					"    },",
 					"",
 					"    renewPortalToken: (tokenName, rudiProdToken) => {",
-					"        log.t('-- renewPortalToken --')",
+					"        const fun = 'renewPortalToken'",
+					"        log.t(fun)",
 					"        const reqUrl = ADMIN_URL + '/portal/token'",
 					"        // log.d('reqUrl: ' + reqUrl)",
 					"        const reqNewToken = {",
@@ -2661,32 +2779,32 @@
 					"        return new Promise((resolve, reject) => {",
 					"            pm.sendRequest(reqNewToken, (err, res) => {",
 					"                if (err) {",
-					"                    log.d(`[renewPortalToken] Error: RUDI API unreachable on ${reqUrl}`)",
+					"                    log.e(fun, 'RUDI API unreachable on', reqUrl)",
 					"                    // error.throwNotFound(`RUDI API unreachable on ${reqUrl}`)",
 					"                    return reject(`RUDI API unreachable on ${reqUrl}`)",
 					"                }",
 					"                try {",
 					"                    pm.expect(res).to.have.property('code', 200);",
 					"                } catch (error) {",
-					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    log.e(fun, codec.streamToString(res), error)",
 					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
 					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
 					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
 					"                }",
 					"                //log.d('renewPortalToken res: ' + JSON.stringify(res))",
 					"                const token = JSON.parse(codec.streamToString(res))?.access_token",
-					"                log.d('Portal token: ' + token)",
+					"                log.d(fun, 'Portal token:', token)",
 					"                try {",
 					"                    pm.expect(token).to.match(/^\\w+\\.\\w+\\.[\\w\\-=]+$/)",
 					"                } catch (error) {",
-					"                    log.d('[renewPortalToken] Error: ' + codec.streamToString(res))",
+					"                    log.e(fun, codec.streamToString(res), error)",
 					"                    //log.d('[renewPortalToken] Response to Postman req: ' + codec.streamToString(res))",
 					"                    return reject('[renewPortalToken]: ' + codec.streamToString(res))",
 					"                    // throw new Error('[renewPortalToken]: ' + codec.streamToString(res))",
 					"                }",
 					"",
 					"                pm.collectionVariables.set(tokenName, token)",
-					"                log.d('Portal token stored')",
+					"                log.d(fun, 'Portal token stored')",
 					"                return resolve(token)",
 					"            })",
 					"        })",
@@ -2711,8 +2829,30 @@
 					"",
 					"}",
 					"",
-					"secu.getRudiProdToken(secu.getPortalToken).then(res => log.d('[End] Received ' + res))",
-					"time.wait(WAIT_TIME, () => { if (TRACE) console.info('Pre-request Scripts loaded') })",
+					"const fun = 'init'",
+					"const init = async () => {",
+					"    let rudiProdToken",
+					"    try {",
+					"        rudiProdToken = await secu.getRudiProdToken()",
+					"        log.t(fun, 'rudiProd token Received')",
+					"    } catch (e) {",
+					"        log.e(fun, 'Failed to get rudiProd token', `${e}`)",
+					"",
+					"    }",
+					"    const skipPortalConnection = pm.variables.get('skipPortalConnection')",
+					"    if (rudiProdToken && !skipPortalConnection) {",
+					"        let portalToken",
+					"        try {",
+					"            portalToken = await secu.getPortalToken(rudiProdToken)",
+					"            log.d(fun, 'Portal token Received')",
+					"        } catch (e) {",
+					"            log.e(fun, 'Failed to get portal token', `${e}`)",
+					"        }",
+					"    }",
+					"}",
+					"",
+					"init()",
+					"time.wait(WAIT_TIME, () => log.t(fun, 'Pre-request Scripts loaded'))",
 					""
 				]
 			}
@@ -2741,11 +2881,7 @@
 			"value": ""
 		},
 		{
-			"key": "portalJwt",
-			"value": ""
-		},
-		{
-			"key": "mediaToken",
+			"key": "readMetaId",
 			"value": ""
 		},
 		{
@@ -2753,79 +2889,7 @@
 			"value": ""
 		},
 		{
-			"key": "readMetaId",
-			"value": ""
-		},
-		{
-			"key": "org1Id",
-			"value": ""
-		},
-		{
-			"key": "org1Name",
-			"value": ""
-		},
-		{
-			"key": "org1Addr",
-			"value": ""
-		},
-		{
-			"key": "cont1Id",
-			"value": ""
-		},
-		{
-			"key": "cont1Name",
-			"value": ""
-		},
-		{
-			"key": "cont1Mail",
-			"value": ""
-		},
-		{
-			"key": "metaId1",
-			"value": ""
-		},
-		{
-			"key": "now",
-			"value": ""
-		},
-		{
-			"key": "metaTest",
-			"value": ""
-		},
-		{
-			"key": "org1",
-			"value": ""
-		},
-		{
-			"key": "orgId",
-			"value": ""
-		},
-		{
-			"key": "cont1",
-			"value": ""
-		},
-		{
-			"key": "contId",
-			"value": ""
-		},
-		{
-			"key": "pubKey1",
-			"value": ""
-		},
-		{
-			"key": "softUser1username",
-			"value": ""
-		},
-		{
-			"key": "softUser1email",
-			"value": ""
-		},
-		{
-			"key": "softUser1password",
-			"value": ""
-		},
-		{
-			"key": "userId",
+			"key": "portalJwt",
 			"value": ""
 		}
 	]

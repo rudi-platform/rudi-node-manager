@@ -72,14 +72,14 @@ exports.getObjectList = async (req, res, next) => {
   try {
     // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
 
-  // const urlParts = `${req.url}`.split('?');
-  // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
+    // const urlParts = `${req.url}`.split('?');
+    // const urlSuffix = urlParts.length > 1 ? `?${urlParts[1]}` : '';
 
-  if (!checkObjectType(req, res, opType, objectType) || objectType === 'media') return
+    if (!checkObjectType(req, res, opType, objectType) || objectType === 'media') return
 
-  const url = getAdminApi(objectType)
-  // console.log('T (getObjectList) url', getRudiApi(url));
-  const token = createRudiApiToken(url, req)
+    const url = getAdminApi(objectType)
+    // console.log('T (getObjectList) url', getRudiApi(url));
+    const token = createRudiApiToken(url, req)
     const resRudiApi = await axios.get(getRudiApi(url), {
       params: req.query,
       headers: { Authorization: `Bearer ${token}` },
