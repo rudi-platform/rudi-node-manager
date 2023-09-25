@@ -344,7 +344,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
                 {countBy.map((filter) => {
-                  console.log(filter)
+                  // console.log(filter)
                   return !filter.values ? (
                     'No values'
                   ) : (

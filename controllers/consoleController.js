@@ -1,9 +1,10 @@
 const mod = 'consoleCtrl'
 
-// Internal dependecies
+// Internal dependencies
 const { getConsoleFormUrl } = require('../config/config')
 const log = require('../utils/logger')
 const { UnauthorizedError } = require('../utils/errors')
+const { getPortalUrl } = require('./dataController')
 
 // Controllers
 exports.getFormUrl = (req, reply) => {
@@ -11,7 +12,18 @@ exports.getFormUrl = (req, reply) => {
     reply.status(200).send(getConsoleFormUrl())
   } catch (err) {
     log.e('', '', err)
-    log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_formUrl' }))
+    log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_form_url' }))
+    throw err
+  }
+}
+
+// Controllers
+exports.getPortalConnection = (req, reply) => {
+  try {
+    reply.status(200).send(getPortalUrl())
+  } catch (err) {
+    log.e('', '', err)
+    log.sysError(mod, 'getPortalConnection', err, log.getContext(req, { opType: 'get_portal_url' }))
     throw err
   }
 }

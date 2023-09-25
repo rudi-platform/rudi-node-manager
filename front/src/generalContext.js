@@ -61,6 +61,7 @@ export function PMFrontContextProvider({ children }) {
           axios.get(getApiFront('user-info')),
           axios.get(getApiFront('form-url')),
           axios.get(getApiFront('ext-api-url')),
+          axios.get(getApiFront('portal-url')),
           axios.get(getApiOpen('tag')),
           axios.get(getApiOpen('hash')),
         ])
@@ -74,8 +75,9 @@ export function PMFrontContextProvider({ children }) {
           isAdmin: !!isAdmin(userInfo?.roles || []),
           formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : `${formUrlReceived}/`,
           apiExtUrl: apiExtUrlReceived.endsWith('/') ? apiExtUrlReceived : `${apiExtUrlReceived}/`,
-          appTag: `${values[4].data}`,
-          gitHash: `${values[5].data}`,
+          portalConnected: `${values[4].data}` != 'No portal connected',
+          appTag: `${values[5].data}`,
+          gitHash: `${values[6].data}`,
         }
         // console.debug('T (context.useEffect) backValues:', backValues)
 

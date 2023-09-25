@@ -46,10 +46,11 @@ const callApiModule = (req, reply, url, opType) => {
 exports.getVersion = (req, reply) => callApiModule(req, reply, '/api/version', 'get_version')
 exports.getEnum = (req, reply) => callApiModule(req, reply, getAdminApi('enum'), 'get_enum')
 exports.getLicences = (req, reply) =>
-  callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
+callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 
 exports.getThemeByLang = (req, reply) =>
-  callApiModule(req, reply, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lg')
+callApiModule(req, reply, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lg')
 
 exports.getApiExternalUrl = (req, reply) =>
-  callApiModule(req, reply, getAdminApi('check/node/url'), 'get_api_url')
+callApiModule(req, reply, getAdminApi('check/node/url'), 'get_api_url')
+exports.getPortalUrl = (req, reply) => callApiModule(req, reply, getAdminApi('check/portal/url'), 'get_portal_url')

@@ -130,7 +130,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    */
   const isRestricted = (metadata) =>
     !!metadata?.access_condition?.confidentiality?.restricted_access
-  console.log(metadata)
+  // console.log(metadata)
   const metaDates = metadata.metadata_info?.metadata_dates
   /**
    * Display the metadata status
@@ -139,14 +139,15 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   function displayStatus() {
     const displaySpan = (level, text) => (
       <span className={'status-pill text-bg-' + level} id="status-pill">
-        {text}
+        {text}≥
       </span>
     )
     if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag)
     if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet')
     if (metadata.integration_error_id) return displaySpan('danger', 'Refus portail')
+    if (!appInfo.portalConnected) return displaySpan('success', 'Publié (local)')
     if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé')
-    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié')
+    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié (portail)')
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
   }
 
