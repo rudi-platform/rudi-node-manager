@@ -38,7 +38,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
 
-  const [metadatas, setMetadatas] = useState([])
+  const [metadataList, setMetadataList] = useState([])
   const [countBy, setCountBy] = useState([])
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => refresh(), [currentFilters])
@@ -53,7 +53,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
 
   const refresh = () => {
     setHasMore(true)
-    setMetadatas([])
+    setMetadataList([])
     getInitialData()
     // console.log('-- gotInitialData')
 
@@ -65,12 +65,9 @@ export default function CatalogueMetadata({ editMode, logout }) {
   }
 
   useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = false
-    } else {
-      if (currentOffset < 0) setCurrentOffset(0)
-      else fetchMoreData()
-    }
+    if (initialRender.current) initialRender.current = false
+    else if (currentOffset < 0) setCurrentOffset(0)
+    else fetchMoreData()
   }, [currentOffset])
 
   /**
@@ -224,12 +221,9 @@ export default function CatalogueMetadata({ editMode, logout }) {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {
-        let data
-        if (isSearchMode()) data = res.data.items
-        else data = res.data
-
+        const data = isSearchMode() ? res.data.items : res.data
         if (data.length < PAGE_SIZE) setHasMore(false)
-        setMetadatas((metadatas) => metadatas.concat(data))
+        setMetadataList((metadatas) => metadatas.concat(data))
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
@@ -350,7 +344,10 @@ export default function CatalogueMetadata({ editMode, logout }) {
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
                 {countBy.map((filter) => {
-                  return (
+                  console.log(filter)
+                  return !filter.values ? (
+                    'No values'
+                  ) : (
                     <div className="col border rounded" key={filter.name}>
                       <div className="label-lv2">{filter.text}</div>
                       <ul className="list-group">
@@ -401,15 +398,13 @@ export default function CatalogueMetadata({ editMode, logout }) {
               ></EditObjCard>
             )}
             <InfiniteScroll
-              dataLength={metadatas.length}
-              next={() => {
-                setCurrentOffset(currentOffset + PAGE_SIZE)
-              }}
+              dataLength={metadataList.length}
+              next={() => setCurrentOffset(currentOffset + PAGE_SIZE)}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
               endMessage={<i>Aucune donnée supplémentaire</i>}
             >
-              {metadatas.map((metadata) => {
+              {metadataList.map((metadata) => {
                 return (
                   <MetadataCard
                     editMode={isEdit}

@@ -1,37 +1,40 @@
-// External dependecies
+// External dependencies
 const axios = require('axios')
 
-// Internal dependecies
+// Internal dependencies
 const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
-const { createRudiApiToken } = require('../utils/secu')
+const { getRudiApiToken } = require('../utils/secu')
 
 // Helper functions
 const callApiModule = (req, reply, url, opType) => {
-  const token = createRudiApiToken(url, req)
+  const token = getRudiApiToken(url, req)
   const completeUrl = new URL(url, getRudiApi())
   if (req.query) completeUrl.search = new URLSearchParams(req.query)
 
-  // console.log(
-  //   'T (callApiModule) completeUrl',
-  //   { baseUrl: API_MODULE_URL, url, params: req.query },
-  //   '->',
-  //   `${completeUrl}`
-  // )
   return axios
     .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${token}` } })
-    .then((res) => {
-      const results = res.data
-      reply.status(200).send(results)
-    })
+    .then((res) => reply.status(200).send(res.data))
     .catch((err) => {
       try {
+        if (err.code == 'ECONNREFUSED') {
+          console.error(
+            'Connection from “RUDI Prod Manager” to “RUDI API” module failed: “RUDI API” module is apparently down'
+          )
+          return reply.status(500).json({
+            statusCode: 500,
+            message: '“RUDI API” module is apparently down, contact the RUDI node admin',
+            error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
+          })
+        }
         const error = errorHandler.error(err, req, { opType })
-        reply.status(error.statusCode).json(error)
+        return reply.status(error.statusCode).json(error)
       } catch (error) {
         err.statusCode = !err.statusCode || isNaN(err.statusCode) ? 500 : err.statusCode
         try {
-          reply.status(err.statusCode).send('An error occurred:' + (error.message || error.msg))
+          return reply
+            .status(err.statusCode)
+            .send('An error occurred:' + (error.message || error.msg))
         } catch (e) {
           console.error(e)
         }
@@ -40,13 +43,13 @@ const callApiModule = (req, reply, url, opType) => {
 }
 
 // Controllers
+exports.getVersion = (req, reply) => callApiModule(req, reply, '/api/version', 'get_version')
+exports.getEnum = (req, reply) => callApiModule(req, reply, getAdminApi('enum'), 'get_enum')
+exports.getLicences = (req, reply) =>
+  callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 
-exports.getVersion = (req, res) => callApiModule(req, res, '/api/version', 'get_version')
-exports.getEnum = (req, res) => callApiModule(req, res, getAdminApi('enum'), 'get_enum')
-exports.getLicences = (req, res) => callApiModule(req, res, getAdminApi('licences'), 'get_licences')
+exports.getThemeByLang = (req, reply) =>
+  callApiModule(req, reply, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lg')
 
-exports.getThemeByLang = (req, res) =>
-  callApiModule(req, res, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lang')
-
-exports.getApiExternalUrl = (req, res) =>
-  callApiModule(req, res, getAdminApi('check/node/url'), 'get_api_url')
+exports.getApiExternalUrl = (req, reply) =>
+  callApiModule(req, reply, getAdminApi('check/node/url'), 'get_api_url')

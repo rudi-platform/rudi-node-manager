@@ -10,7 +10,6 @@ const { getConf } = require('../config/config')
 const { timeEpochS, toInt } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
-// const { compareSync } = require('bcrypt')
 const { isDevEnv } = require('../config/backOptions')
 
 // ----- Constants
@@ -27,6 +26,12 @@ exports.CONSOLE_TOKEN_NAME = 'consoleToken'
 exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken'
 
 // ----- Functions
+function isJwtValid(jwt) {
+  if (!jwt) return false
+  const jwtParts = jwtLib.tokenStringToJwtObject(jwt)
+  return jwtParts?.payload?.exp > timeEpochS()
+}
+
 exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
   req?.cookies ? req.cookies[cookieName] : null
 
@@ -75,8 +80,6 @@ exports.pmFrontCookieOpts = (exp) => {
 
 exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
-  // console.log('T (createFrontUserTokens) exp:', new Date(exp * 1000));
-  // console.log('T (createFrontUserTokens) userInfo:', userInfo);
   delete userInfo?.password
   return {
     [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
@@ -105,11 +108,10 @@ exports.refreshTokens = (req) => {
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser'
   const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null)
-  // console.log('T (getTokenFromMediaForUser) pmHeadersJwt', pmHeadersJwt);
 
   const delegationBody = {
     user_id: user.id,
-    user_name: user.username || 'rudiconsole',
+    user_name: user.username || 'rudi_console',
     group_name: getConf('rudi_console', 'default_client_group'),
   }
   // Let's offset the user id to not mess with Media ids
@@ -117,8 +119,6 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
-  // console.log('T (getTokenFromMediaForUser) mediaForgeJwtUrl', mediaForgeJwtUrl);
-  // console.log('T (getTokenFromMediaForUser) opts', opts);
   try {
     const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
     if (!mediaRes) throw Error(`No answer received from Media module`)
@@ -172,34 +172,26 @@ exports.createPmJwtForMedia = (body) =>
     }
   )
 
-/**
- *
- * @param {Object} jwtPayload optional options to create the JWT payload
- *  - exp: Epoch date in seconds until which the JWt is valid
- *  - exp_time: time in seconds during which the JWT is valid
- *              (not taken into account if 'exp' is given)
- *  - user_name: name of the user
- *  - user_id: id of the user
- *    (shifted here with an offset of 5000 to ensure compatibility with media)
- * @return {String} a JWT
- */
-exports.createRudiMediaToken = (jwtPayload) =>
-  jwtLib.forgeToken(
-    getPrvKey('media'),
+let cachedApiJwt = {}
+
+exports.getRudiApiToken = (url, req) => {
+  if (isJwtValid(cachedApiJwt?.[url])) return cachedApiJwt[url]
+  cachedApiJwt[url] = jwtLib.forgeToken(
+    getPrvKey('api'),
     {},
     {
-      jti: uuidv4(),
-      iat: timeEpochS(),
-      exp:
-        jwtPayload?.exp || timeEpochS(jwtPayload?.exp_time || MEDIA_AUTH.exp_time_s || DEFAULT_EXP),
-      sub: jwtPayload?.sub || 'auth',
-      client_id: jwtPayload.client_id || MEDIA_AUTH.pm_media_id,
+      exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
+      sub: getConf('rudi_api', 'pm_api_id'),
+      req_mtd: 'all',
+      req_url: 'all',
     }
   )
+  return cachedApiJwt[url]
+}
 
-exports.createRudiApiToken = (url, req) => {
-  // console.log('T (createRudiApiToken) url JWT', axios.getUri({ url, params: req.query }))
-  const jwt = jwtLib.forgeToken(
+exports.getRudiApiTokenPrecise = (url, req) => {
+  if (isJwtValid(cachedApiJwt?.[url])) return cachedApiJwt[url]
+  cachedApiJwt[url] = jwtLib.forgeToken(
     getPrvKey('api'),
     {},
     {
@@ -209,8 +201,7 @@ exports.createRudiApiToken = (url, req) => {
       req_url: axios.getUri({ url, params: req.query }),
     }
   )
-  // console.log('T (createRudiApiToken) JWT', jwt)
-  return jwt
+  return cachedApiJwt[url]
 }
 
 /**
@@ -264,7 +255,7 @@ const SALT_ROUNDS = 10
  * Hash and salt a password before storing it into a DB
  * @param {String} password A password
  * @param {Boolean} isNotBase64 True of the password is not base64 encoded
- * @return {String} The salted passwrod
+ * @return {String} The salted password
  *\/
 exports.hashPasswordBcrypt = (password) => {
   const fun = 'hashPassword'

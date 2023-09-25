@@ -8,10 +8,6 @@ exports.error = (error, req, options) => {
   try {
     let errorToDisplay
     if (!error) return new RudiError(`Error was unidentified: ${error}`)
-    // log.e(mod, fun, error);
-    // log.e(mod, fun, error.response?.data);
-    // log.e(mod, fun, error.response?.status);
-    // log.e(mod, fun, error.response?.headers);
     let statusCode =
       error?.response?.data?.statusCode ||
       error?.response?.status ||
@@ -31,6 +27,7 @@ exports.error = (error, req, options) => {
     error.statusCode = statusCode
     console.error('T (errHandler) statusCode', statusCode)
     console.error('T (errHandler) error', error)
+
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -50,7 +47,7 @@ exports.error = (error, req, options) => {
     }
     log.e(mod, fun, error?.message || error)
     log.sysError(mod, fun, error?.message || error, log.getContext(req, options))
-    if( error?.config) log.e(mod, fun, error.config)
+    if (error?.config) log.e(mod, fun, error.config)
 
     return errorToDisplay
   } catch (err) {

@@ -68,7 +68,7 @@ export function PMFrontContextProvider({ children }) {
         const formUrlReceived = `${values[2].data}`
         const apiExtUrlReceived = `${values[3].data}`
         const backValues = {
-          themeLabels: values[0].data,
+          themeLabels: values[0],
           userInfo,
           isEditor: !!isEditor(userInfo?.roles || []),
           isAdmin: !!isAdmin(userInfo?.roles || []),

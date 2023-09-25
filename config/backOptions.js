@@ -107,24 +107,22 @@ console.log('--------------------------------------------------------------')
 exports.getBackOptions = (opt, altValue) =>
   opt ? backOptionsValues[opt] || altValue : backOptionsValues
 
-exports.getHashFun = (req, res, next) => {
+exports.getHashFun = (req, reply, next) => {
   try {
     const hashId = this.getBackOptions(this.OPT_GIT_HASH)
-    res
-      .status(200)
-      .send(hashId || require('child_process').execSync('git rev-parse --short HEAD'))
+    reply.status(200).send(hashId || require('child_process').execSync('git rev-parse --short HEAD'))
   } catch (err) {
     console.error('WARNING: no --hash option provided + giv rev parse does not work')
-    res.status(200).send('v0_0;')
+    reply.status(200).send('v0_0;')
   }
 }
 
-exports.getAppTag = (req, res, next) => {
+exports.getAppTag = (req, reply, next) => {
   try {
     const appTag = this.getBackOptions(this.OPT_APP_TAG)
-    res.status(200).send(appTag || '')
+    reply.status(200).send(appTag || '')
   } catch (err) {
-    res.status(200).send('')
+    reply.status(200).send('')
   }
 }
 

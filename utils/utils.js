@@ -1,4 +1,5 @@
 const { floor } = require('lodash')
+const { inspect } = require('util')
 
 // ---- Dates
 exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
@@ -33,4 +34,21 @@ exports.getCompletedUrl = (baseUrl, subUrl) => {
   if (!subUrl) return baseUrl
   if (`${subUrl}`.startsWith('/')) subUrl = `${subUrl}`.substring(1)
   return `${baseUrl}`.endsWith('/') ? `${baseUrl}${subUrl}` : `${baseUrl}/${subUrl}`
+}
+
+/**
+ * Custom JSON beautifying function
+ * @param {JSON} jsonObject: a JSON object
+ * @param {String or number} options: JSON.stringify options. 4 or '\t' make it possible
+ *                                    to display the JSON on several lines
+ * @returns {String} JSON.stringify options
+ */
+exports.beautify = (jsonObject, option) => {
+  try {
+    return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${
+      option != null ? '\n' : ''
+    }`
+  } catch (err) {
+    return `${inspect(jsonObject)}`
+  }
 }

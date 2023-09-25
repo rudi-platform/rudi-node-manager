@@ -130,8 +130,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    */
   const isRestricted = (metadata) =>
     !!metadata?.access_condition?.confidentiality?.restricted_access
-
-  const metaDates = metadata.metadata_info.metadata_dates
+  console.log(metadata)
+  const metaDates = metadata.metadata_info?.metadata_dates
   /**
    * Display the metadata status
    * @return {html} A round pill that shows the status
