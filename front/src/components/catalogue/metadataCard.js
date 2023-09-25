@@ -139,7 +139,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   function displayStatus() {
     const displaySpan = (level, text) => (
       <span className={'status-pill text-bg-' + level} id="status-pill">
-        {text}≥
+        {text}
       </span>
     )
     if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag)
