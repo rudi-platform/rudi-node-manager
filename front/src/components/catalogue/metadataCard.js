@@ -17,6 +17,62 @@ import ThemeDisplay from '../other/themeDisplay'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import { usePMFrontContext } from '../../generalContext'
 
+const downloadButton = (url) => (
+  <button type="button" className="btn btn-success button-margin">
+    <a id="downloadMedia" title="Télécharger" href={url}>
+      <CloudDownload />
+    </a>
+  </button>
+)
+
+const externalUrlButton = (url) => (
+  <button type="button" className="btn btn-success margin-right">
+    <a id="downloadMedia" title="Site externe" href={url}>
+      <BoxArrowUpRight />
+    </a>
+  </button>
+)
+
+const eyeButton = (id) => (
+  <Link to={getBackUrl(`show/${id}`)}>
+    <span className="btn btn-success" title="Aperçu">
+      <Eye />
+    </span>
+  </Link>
+)
+const shareButton = (url) => (
+  <a
+    className="btn btn-success"
+    title="Partager la métadonnée"
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Share />
+  </a>
+)
+const editButton = (url) => (
+  <a
+    className="btn btn-warning"
+    href={url}
+    title="Editer"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Pencil />
+  </a>
+)
+const deleteButton = (triggerDelete) => (
+  <button
+    type="button"
+    className="btn btn-danger"
+    title="Supprimer"
+    onClick={() => triggerDelete()}
+  >
+    <Trash />
+  </button>
+)
+
 MetadataCard.propTypes = {
   editMode: PropTypes.bool,
   metadata: PropTypes.object,
@@ -36,30 +92,6 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
-  /**
-   * download le fichier via media_id
-   * @param {*} ressource connector du fichier
-   */
-  /*
-  function downloadFile(ressource) {
-    axios
-      .get(`${ressource.connector.url}`, {
-        responseType: 'blob',
-        headers: { 'media-access-method': 'Direct' },
-      })
-      .then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${ressource.media_name}`);
-        document.body.appendChild(link);
-        link.click();
-      })
-      .catch((err) => {
-        defaultErrorHandler(err);
-      });
-  }
-   */
 
   /**
    * call for metadata deletion
@@ -147,64 +179,18 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     if (metadata.integration_error_id) return displaySpan('danger', 'Refus portail')
     if (!appInfo.portalConnected) return displaySpan('success', 'Publié (local)')
     if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé')
-    if (metaDates?.published && !metaDates?.deleted) return displaySpan('success', 'Publié (portail)')
+    if (metaDates?.published && !metaDates?.deleted)
+      return displaySpan('success', 'Publié (portail)')
     if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
   }
 
   const button = {
-    share: (
-      <a
-        className="btn btn-success"
-        title="Partager la métadonnée"
-        href={`${appInfo.apiExtUrl}api/v1/resources/${metadata.global_id}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Share />
-      </a>
-    ),
-    edit: (
-      <a
-        className="btn btn-warning"
-        href={`${appInfo.formUrl}?update=${metadata.global_id}`}
-        title="Editer"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Pencil />
-      </a>
-    ),
-    delete: (
-      <button
-        type="button"
-        className="btn btn-danger"
-        title="Supprimer"
-        onClick={() => triggerDeleteRessource()}
-      >
-        <Trash />
-      </button>
-    ),
-    download: (url) => (
-      <button type="button" className="btn btn-success button-margin">
-        <a id="downloadMedia" title="Télécharger" href={url}>
-          <CloudDownload />
-        </a>
-      </button>
-    ),
-    external: (url) => (
-      <button type="button" className="btn btn-success margin-right">
-        <a id="downloadMedia" title="Site externe" href={url}>
-          <BoxArrowUpRight />
-        </a>
-      </button>
-    ),
-    visualize: (id) => (
-      <Link to={getBackUrl(`show/${id}`)}>
-        <span className="btn btn-success" title="Aperçu">
-          <Eye />
-        </span>
-      </Link>
-    ),
+    share: shareButton(`${appInfo.apiExtUrl}api/v1/resources/${metadata.global_id}`),
+    edit: editButton(`${appInfo.formUrl}?update=${metadata.global_id}`),
+    delete: deleteButton(triggerDeleteRessource),
+    download: (url) => downloadButton(url),
+    external: (url) => externalUrlButton(url),
+    visualize: (id) => eyeButton(id),
   }
   return (
     <div className="col-12" key={metadata.global_id}>

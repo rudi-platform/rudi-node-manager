@@ -306,13 +306,10 @@ const dbCreateSuperUser = async (db) => {
     return
   }
 
-  if (await dbExistsUser(db, SU_NAME)) {
-    // log.d(mod, fun, `Super user '${suName}' already exists`);
-    return
-  }
+  if (await dbExistsUser(db, SU_NAME)) return
+
   const suId = getDbConf('db_su_id') || 0
 
-  // log.d(mod, fun, `Super user pwd: '${encodedSuPwd}'`);
   const suPwd = decodeBase64(encodedSuPwd)
 
   const superUser = {
@@ -342,7 +339,7 @@ exports.dbInitialize = async () => {
       throw new RudiError(
         `Database folder not found: ${getDbConf('db_directory')}`,
         500,
-        'Confif error'
+        'Config error'
       )
 
     const db = await dbOpenOrCreate()
@@ -355,7 +352,7 @@ exports.dbInitialize = async () => {
     await dbInitTable(db, TBL_USER_ROLES, sqlCreateUserRoleTable)
     log.d(mod, fun, 'Table initialized: UserRoles')
 
-    await dbNormalizeUserTableName(db, 'totox')
+    await dbNormalizeUserTableName(db, 'x')
     await dbNormalizeUserTableName(db, 'users')
     log.d(mod, fun, 'Table normalized: users')
 
@@ -366,17 +363,9 @@ exports.dbInitialize = async () => {
     await dbCreateSuperUser(db)
     log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
 
-    // await dbInitDefaultFormTable(db)
-    // log.d(mod, fun, 'Table initialized: DefaultForm')
-
-    // const user =
-    //   (await dbGetUserByUsername(db, 'Oliv')) || (await dbGetUserByUsername(db, 'Olivier'))
-    // log.d(mod, fun, `Users: ${JSON.stringify(user)?.replace(/\"/g, "'")}`)
-
-    const userList = await dbGetUsers(db)
-    const userRoles = await dbGetUserRoles(db)
-    const roles = await dbGetRoles(db)
-    log.d(mod, fun, { users: userList, userRoles, roles: roles.map((role) => role.role) })
+    await dbGetUsers(db)
+    await dbGetUserRoles(db)
+    await dbGetRoles(db)
     await dbClose(db)
     log.d(mod, fun, 'DB initialized')
   } catch (error) {
