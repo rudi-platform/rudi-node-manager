@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
-const { randomBytes, scryptSync } = require('crypto')
+const { randomBytes, scryptSync, timingSafeEqual } = require('crypto')
 const jwtLib = require(`@aqmo.org/jwt_lib`)
 
 // ----- Internal dependencies
@@ -303,7 +303,4 @@ exports.hashPassword = (password) => {
  * @returns {Boolean} True if the password matches the hash
  */
 exports.matchPassword = (password, hash) =>
-  hash.slice(40) === this.encryptPassword(password, hash.slice(0, 40))
-// hash.startsWith('$2b$10$')
-//   ? compareSync(password, hash)
-//   :
+  timingSafeEqual(hash.slice(40), this.encryptPassword(password, hash.slice(0, 40)))
