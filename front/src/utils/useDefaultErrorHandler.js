@@ -19,7 +19,8 @@ export default function useDefaultErrorHandler() {
         if (err.response.data.moreInfo?.message)
           options.text.push(displayMsg(err.response.data.moreInfo.message))
       } else {
-        if (err.response?.data?.status == 'error') options.text = [displayMsg(err.response.data.msg)]
+        if (err.response?.data?.status == 'error')
+          options.text = [displayMsg(err.response.data.msg)]
         else options.text = [displayMsg(err.response.data)]
       }
     }

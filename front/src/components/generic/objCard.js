@@ -106,7 +106,7 @@ export function ObjCard({
             (key) =>
               obj[key] && (
                 <p className="card-text" key={`${objId}.${key}`}>
-                  {displayFields[key]} :{' '}
+                  {displayFields[key]} :
                   <small className="text-muted">
                     {!Array.isArray(obj[key]) ? obj[key] : JSON.stringify(obj[key])}
                   </small>

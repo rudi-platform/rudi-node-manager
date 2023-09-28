@@ -110,7 +110,9 @@ exports.getBackOptions = (opt, altValue) =>
 exports.getHashFun = (req, reply, next) => {
   try {
     const hashId = this.getBackOptions(this.OPT_GIT_HASH)
-    reply.status(200).send(hashId || require('child_process').execSync('git rev-parse --short HEAD'))
+    reply
+      .status(200)
+      .send(hashId || require('child_process').execSync('git rev-parse --short HEAD'))
   } catch (err) {
     console.error('WARNING: no --hash option provided + giv rev parse does not work')
     reply.status(200).send('v0_0;')
