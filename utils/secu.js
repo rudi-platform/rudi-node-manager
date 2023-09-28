@@ -249,32 +249,6 @@ const getPrvKey = (name) => {
   prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
 }
-/*
-const SALT_ROUNDS = 10
-/**
- * Hash and salt a password before storing it into a DB
- * @param {String} password A password
- * @param {Boolean} isNotBase64 True of the password is not base64 encoded
- * @return {String} The salted password
- *\/
-exports.hashPasswordBcrypt = (password) => {
-  const fun = 'hashPassword'
-  try {
-    const pwdStr = `${password}`
-    if (pwdStr.startsWith('$')) {
-      // console.debug('T (saltPassword) Already hashed pwd:', pwdStr);
-      return pwdStr
-    }
-    const salt = genSaltSync(SALT_ROUNDS)
-    const hashedPwd = hashSync(pwdStr, salt)
-    // console.debug('T (saltPassword) hashed pwd:', hashedPwd);
-    return hashedPwd
-  } catch (e) {
-    log.e(mod, fun, e)
-    throw e
-  }
-}
-*/
 
 /**
  * Solution using crypto native library
@@ -283,7 +257,7 @@ exports.hashPasswordBcrypt = (password) => {
  * @param {String} salt
  * @returns {String} A base64 encoded salted & hashed password
  */
-exports.encryptPassword = (password, salt) => scryptSync(password, salt, 64).toString('base64url')
+const encryptPassword = (password, salt) => scryptSync(password, salt, 64).toString('base64url')
 
 /**
  * Hash the password with randomly generated salt
@@ -293,7 +267,7 @@ exports.encryptPassword = (password, salt) => scryptSync(password, salt, 64).toS
 exports.hashPassword = (password) => {
   // Any random string here (ideally should be atleast 16 bytes)
   const salt = randomBytes(30).toString('base64url')
-  return `${salt}${this.encryptPassword(password, salt)}`
+  return `${salt}${encryptPassword(password, salt)}`
 }
 
 /**
@@ -303,4 +277,7 @@ exports.hashPassword = (password) => {
  * @returns {Boolean} True if the password matches the hash
  */
 exports.matchPassword = (password, hash) =>
-  timingSafeEqual(hash.slice(40), this.encryptPassword(password, hash.slice(0, 40)))
+  timingSafeEqual(
+    Buffer.from(hash.slice(40)),
+    Buffer.from(encryptPassword(password, hash.slice(0, 40)))
+  )
