@@ -35,12 +35,18 @@ function handleError(req, reply, initialError, errCode, fun, objectType, id) {
   try {
     console.log('req params:', req.params)
     console.log('req url:', req.originalUrl)
-    try {
-      console.log('res:' + JSON.stringify(reply))
-    } catch (e) {
-      console.log('res:' + beautify(reply))
-    }
     console.log('initialError:', initialError?.response?.data)
+    if (
+      initialError?.response?.data.statusCode &&
+      initialError?.response?.data?.message &&
+      initialError?.response?.data?.error
+    )
+      return reply.status(initialError.response.data.statusCode).json({
+        statusCode: initialError.response.data.statusCode,
+        error: initialError.response.data.error,
+        message: initialError.response.data.message,
+      })
+
     console.log(
       `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
     )

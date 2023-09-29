@@ -244,7 +244,7 @@ const Main = () => {
             <Route
               path={getBackUrl('pub_key')}
               element={<CataloguePubKeys editMode={appInfo.isAdmin} logout={logout} />}
-            />{' '}
+            />
             <Route
               path={getBackUrl('report')}
               element={<CatalogueReports editMode={appInfo.isAdmin} logout={logout} />}

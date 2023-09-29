@@ -1,9 +1,10 @@
 const mod = 'authController'
 
-// External dependencies
+// ---- External dependencies -----
 const passport = require('passport')
+const { hashPassword, matchPassword } = require('@aqmo.org/jwt-lib')
 
-// Internal dependencies
+// ---- Internal dependencies -----
 const { decodeBase64 } = require('../utils/utils')
 const log = require('../utils/logger')
 const { BadRequestError, RudiError, UnauthorizedError } = require('../utils/errors')
@@ -13,8 +14,6 @@ const errorHandler = require('./errorHandler')
 const {
   CONSOLE_TOKEN_NAME,
   createFrontUserTokens,
-  hashPassword,
-  matchPassword,
   PM_FRONT_TOKEN_NAME,
   consoleCookieOpts,
   pmFrontCookieOpts,
@@ -28,7 +27,7 @@ const {
   dbUpdatePasswordWithField,
 } = require('../database/database')
 
-// Controllers
+// ---- Controllers ----
 /**
  * Used for a user to login
  * @param {*} req

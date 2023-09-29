@@ -67,7 +67,6 @@ exports.getMediaInfoById = async (req, reply, next) => {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    // console.log('T (getMediaInfoById) url', getAdminApi(`media/${id}`))
     const url = getAdminApi(`media/${id}`)
     const token = getRudiApiToken(url, req)
 

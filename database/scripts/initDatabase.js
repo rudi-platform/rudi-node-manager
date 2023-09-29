@@ -73,15 +73,12 @@ const sqlCreateUserRoleTable =
 const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
   const fun = 'initTable'
   const db = openedDb || dbOpen()
-  // console.log('T (initTable) db:', tableName);
   return new Promise((resolve, reject) => {
     db.get(sqlGet, [tableName], (err, row) => {
       if (err) {
         if (!openedDb) dbClose(db)
         return reject(err)
-        // log.e(mod, `${fun}.${tableName}.get`, err.message);
       }
-      // log.i(mod, `${fun}.${tableName}.get`, row);
       if (row) {
         if (!openedDb) dbClose(db)
         return resolve(statusOK(`Table exists: '${tableName}'`))
@@ -366,7 +363,7 @@ exports.dbInitialize = async () => {
     await dbGetUsers(db)
     await dbGetUserRoles(db)
     await dbGetRoles(db)
-    await dbClose(db)
+    dbClose(db)
     log.d(mod, fun, 'DB initialized')
   } catch (error) {
     log.e(mod, fun, error)

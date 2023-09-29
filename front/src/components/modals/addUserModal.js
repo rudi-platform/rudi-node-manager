@@ -209,7 +209,7 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
                   {errors.roles}
                 </Form.Control.Feedback>
               </InputGroup>
-            </Form.Group>{' '}
+            </Form.Group>
           </Row>
         </Modal.Body>
         <Modal.Footer>

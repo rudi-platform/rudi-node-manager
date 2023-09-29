@@ -211,7 +211,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
                   {errors.roles}
                 </Form.Control.Feedback>
               </InputGroup>
-            </Form.Group>{' '}
+            </Form.Group>
           </Row>
           <Row>
             <Form.Group as={Col}>

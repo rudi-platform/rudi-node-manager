@@ -3,7 +3,15 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { BoxArrowUpRight, Pencil, Trash, CloudDownload, Eye, Share } from 'react-bootstrap-icons'
+import {
+  BoxArrowUpRight,
+  Pencil,
+  Trash,
+  CloudDownload,
+  Eye,
+  Share,
+  CloudSlash,
+} from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getObjFormUrl, getLocaleFormatted } from '../../utils/utils'
@@ -18,7 +26,7 @@ import FileSizeDisplay from '../other/fileSizeDisplay'
 import { usePMFrontContext } from '../../generalContext'
 
 const downloadButton = (url) => (
-  <button type="button" className="btn btn-success button-margin">
+  <button type="button" className="btn btn-green button-margin">
     <a id="downloadMedia" title="Télécharger" href={url}>
       <CloudDownload />
     </a>
@@ -26,7 +34,7 @@ const downloadButton = (url) => (
 )
 
 const externalUrlButton = (url) => (
-  <button type="button" className="btn btn-success margin-right">
+  <button type="button" className="btn btn-green margin-right">
     <a id="downloadMedia" title="Site externe" href={url}>
       <BoxArrowUpRight />
     </a>
@@ -35,7 +43,7 @@ const externalUrlButton = (url) => (
 
 const eyeButton = (id) => (
   <Link to={getBackUrl(`show/${id}`)}>
-    <span className="btn btn-success" title="Aperçu">
+    <span className="btn btn-green" title="Aperçu">
       <Eye />
     </span>
   </Link>
@@ -72,7 +80,14 @@ const deleteButton = (triggerDelete) => (
     <Trash />
   </button>
 )
-
+const missButton = () => (
+  <button type="button" className="btn btn-missing" title="Fichier manquant, à retransmettre">
+    {/* <CloudSlashFill /> */}
+    <CloudSlash />
+    {/* <FileEarmarkExcel /> */}
+    {/* <XLg /> */}
+  </button>
+)
 MetadataCard.propTypes = {
   editMode: PropTypes.bool,
   metadata: PropTypes.object,
@@ -247,7 +262,12 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
           </a>
           <span className="card-text">
             {metadata.available_formats.map((ressource) =>
-              ressource.file_size ? (
+              ressource.file_storage_status === 'missing' ? (
+                <div key={`${ressource.media_id}`}>
+                  {missButton()}
+                  <span className="text-muted"> {ressource.media_name} </span>
+                </div>
+              ) : ressource.file_size ? (
                 <div key={`${ressource.media_id}`}>
                   {button.visualize(ressource.media_id)}
                   {button.download(ressource.connector.url)}

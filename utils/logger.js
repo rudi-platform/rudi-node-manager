@@ -10,7 +10,6 @@ const { nowFormatted } = require('./utils')
 const APP_NAME = getConf('logging', 'app_name')
 
 // Helper functions
-
 /**
  * build ips array from the request
  * @param {*} req Request

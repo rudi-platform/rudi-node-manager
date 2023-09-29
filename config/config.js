@@ -29,12 +29,10 @@ const config = ini.parse(defaultConfFileContent)
 
 // eslint-disable-next-line guard-for-in
 for (const section in customConfig) {
-  // console.log('CONF', section);
   const customParams = customConfig[section]
   if (customParams) {
     if (!config[section]) config[section] = {}
     for (const param in customParams) {
-      // console.log('CONF', param);
       if (customParams[param]) config[section][param] = customParams[param]
     }
   }

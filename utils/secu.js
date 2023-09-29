@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
 const { randomBytes, scryptSync, timingSafeEqual } = require('crypto')
-const jwtLib = require(`@aqmo.org/jwt_lib`)
+const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies
 const { getConf } = require('../config/config')
@@ -249,35 +249,3 @@ const getPrvKey = (name) => {
   prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
 }
-
-/**
- * Solution using crypto native library
- * Reworked from Malik-Bagwala & Shivam @ https://stackoverflow.com/a/70631147/1563072
- * @param {String} password
- * @param {String} salt
- * @returns {String} A base64 encoded salted & hashed password
- */
-const encryptPassword = (password, salt) => scryptSync(password, salt, 64).toString('base64url')
-
-/**
- * Hash the password with randomly generated salt
- * @param {String} password
- * @returns {String} A base64 encoded hash of the salt+password
- */
-exports.hashPassword = (password) => {
-  // Any random string here (ideally should be atleast 16 bytes)
-  const salt = randomBytes(30).toString('base64url')
-  return `${salt}${encryptPassword(password, salt)}`
-}
-
-/**
- * Compares a clear password to a hashed one.
- * @param {String} password
- * @param {String} hash
- * @returns {Boolean} True if the password matches the hash
- */
-exports.matchPassword = (password, hash) =>
-  timingSafeEqual(
-    Buffer.from(hash.slice(40)),
-    Buffer.from(encryptPassword(password, hash.slice(0, 40)))
-  )

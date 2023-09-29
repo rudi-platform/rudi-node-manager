@@ -2,6 +2,7 @@ const mod = 'db'
 
 // ---- External dependencies -----
 const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
+const { hashPassword } = require('@aqmo.org/jwt-lib')
 
 // ---- Internal dependencies -----
 const { getDbConf, SU_NAME } = require('../config/config')
@@ -14,7 +15,6 @@ const {
   statusOK,
   UnauthorizedError,
 } = require('../utils/errors')
-const { hashPassword } = require('../utils/secu')
 const log = require('../utils/logger')
 
 // ---- Constants -----
@@ -47,7 +47,7 @@ exports.dbOpen = dbOpen
 
 const dbClose = (db) => {
   db.close((err) => {
-    if (err?.message != 'SQLITE_MISUSE: Database handle is closed')
+    if (err && err?.message != 'SQLITE_MISUSE: Database handle is closed')
       log.e(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
@@ -331,7 +331,7 @@ exports.dbUpdateUser = (openedDb, userInfo) => {
 }
 
 exports.dbHashAndUpdatePassword = async (openedDb, username, password) => {
-  const hashedPwd = await hashPassword(password)
+  const hashedPwd = hashPassword(password)
   return await this.dbUpdatePasswordWithField(openedDb, 'username', username, hashedPwd)
 }
 
