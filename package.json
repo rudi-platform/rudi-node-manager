@@ -25,7 +25,6 @@
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.10",
     "@aqmo.org/rudi_logger": "^1.1.4",
-    "@babel/preset-react": "^7.22.15",
     "axios": "^1.5.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -38,7 +37,6 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.6",
-    "sshpk": "^1.17.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
