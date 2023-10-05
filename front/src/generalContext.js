@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import useToken from './useToken'
 import { getApiData, getApiFront, getApiOpen } from './utils/frontOptions'
+import { ensureEndsWithSlash } from './utils/utils'
 
 /**
  * We use this context to memorize
@@ -42,59 +43,62 @@ export function PMFrontContextProvider({ children }) {
   const isEditor = (roles = []) =>
     roles.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1
 
-  useEffect(() => {
-    const callBackApi = async () => {
-      try {
-        if (!token) {
-          const values = await Promise.all([
-            axios.get(getApiOpen('tag')),
-            axios.get(getApiOpen('hash')),
-          ])
-          const backValues = Object.assign(defaultFrontContext, {
-            appTag: `${values[0].data}`,
-            gitHash: `${values[1].data}`,
-          })
-          return backValues
-        }
+  const callBackApi = async () => {
+    try {
+      if (!token) {
         const values = await Promise.all([
-          axios.get(getApiData('enum/themes/fr')),
-          axios.get(getApiFront('user-info')),
-          axios.get(getApiFront('form-url')),
-          axios.get(getApiFront('ext-api-url')),
-          axios.get(getApiFront('portal-url')),
           axios.get(getApiOpen('tag')),
           axios.get(getApiOpen('hash')),
         ])
-        const userInfo = values[1].data
-        const formUrlReceived = `${values[2].data}`
-        const apiExtUrlReceived = `${values[3].data}`
-        const backValues = {
-          themeLabels: values[0],
-          userInfo,
-          isEditor: !!isEditor(userInfo?.roles || []),
-          isAdmin: !!isAdmin(userInfo?.roles || []),
-          formUrl: formUrlReceived.endsWith('/') ? formUrlReceived : `${formUrlReceived}/`,
-          apiExtUrl: apiExtUrlReceived.endsWith('/') ? apiExtUrlReceived : `${apiExtUrlReceived}/`,
-          portalConnected: `${values[4].data}` != 'No portal connected',
-          appTag: `${values[5].data}`,
-          gitHash: `${values[6].data}`,
-        }
-        // console.debug('T (context.useEffect) backValues:', backValues)
-
+        const backValues = Object.assign(defaultFrontContext, {
+          appTag: `${values[0].data}`,
+          gitHash: `${values[1].data}`,
+        })
         return backValues
-      } catch (err) {
-        console.error('E (callBackApi)', err)
-        return defaultFrontContext
       }
-    }
+      const values = await Promise.all([
+        axios.get(getApiData('enum/themes/fr')),
+        axios.get(getApiFront('user-info')),
+        axios.get(getApiFront('node-urls')),
+        axios.get(getApiOpen('tags')),
+      ])
+      const userInfo = values[1].data
 
+      const nodeUrls = `${values[2].data}`
+      const formUrl = ensureEndsWithSlash(nodeUrls?.console_url)
+      const apiExtUrl = ensureEndsWithSlash(nodeUrls?.api_url)
+      const portalConnected = !!nodeUrls.portal_url
+
+      const pmTags = values[3].data
+      const appTag = pmTags?.tag
+      const gitHash = pmTags?.hash
+
+      const backValues = {
+        themeLabels: values[0],
+        userInfo,
+        isEditor: !!isEditor(userInfo?.roles || []),
+        isAdmin: !!isAdmin(userInfo?.roles || []),
+        formUrl,
+        apiExtUrl,
+        portalConnected,
+        appTag,
+        gitHash,
+      }
+      // console.debug('T (context.useEffect) backValues:', backValues)
+      setAppInfo(backValues)
+    } catch (err) {
+      console.error('E (callBackApi)', err)
+      return defaultFrontContext
+    }
+  }
+
+  useEffect(() => {
     const getBackData = async () => {
       setIsLoaded(false)
-      const newData = await callBackApi()
-      setAppInfo(newData)
+      await callBackApi()
       setIsLoaded(true)
     }
-
+    
     getBackData()
   }, [token])
 

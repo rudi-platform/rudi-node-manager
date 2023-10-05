@@ -10,11 +10,11 @@ const { getRudiApiToken } = require('../utils/secu')
 const callApiModule = (req, reply, url, opType) => {
   const token = getRudiApiToken(url, req)
   const completeUrl = new URL(url, getRudiApi())
-  if (req.query) completeUrl.search = new URLSearchParams(req.query)
+  if (req?.query) completeUrl.search = new URLSearchParams(req.query)
 
   return axios
     .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${token}` } })
-    .then((res) => reply.status(200).send(res.data))
+    .then((res) => (req ? reply.status(200).send(res.data) : res.data))
     .catch((err) => {
       try {
         if (err.code == 'ECONNREFUSED') {
@@ -52,6 +52,6 @@ exports.getThemeByLang = (req, reply) =>
   callApiModule(req, reply, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lg')
 
 exports.getApiExternalUrl = (req, reply) =>
-  callApiModule(req, reply, getAdminApi('check/node/url'), 'get_api_url')
+  callApiModule(null, reply, getAdminApi('check/node/url'), 'get_api_url')
 exports.getPortalUrl = (req, reply) =>
-  callApiModule(req, reply, getAdminApi('check/portal/url'), 'get_portal_url')
+  callApiModule(null, reply, getAdminApi('check/portal/url'), 'get_portal_url')

@@ -33,3 +33,5 @@ exports.showObj = (obj, option = 2) => {
 }
 
 exports.getObjFormUrl = (formUrl, objType = '', queryParams = '') => formUrl + objType + queryParams
+
+exports.ensureEndsWithSlash = (url) => `${url}`.endsWith('/')?url:`${url}/`

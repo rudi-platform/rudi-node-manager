@@ -6,8 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { Search } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import MetadataCard from './metadataCard'
-import { filterConf } from './conf'
+import MetadataCard, { displayStatus } from './metadataCard'
 import ThemeDisplay from '../other/themeDisplay'
 import { EditObjCard } from '../generic/objCard'
 import { getApiData } from '../../utils/frontOptions'
@@ -39,7 +38,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   useEffect(() => setEdit(!!editMode), [editMode])
 
   const [metadataList, setMetadataList] = useState([])
-  const [countBy, setCountBy] = useState([])
+  const [allCountByFilters, setCountByFilters] = useState([])
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => refresh(), [currentFilters])
 
@@ -70,6 +69,55 @@ export default function CatalogueMetadata({ editMode, logout }) {
     else fetchMoreData()
   }, [currentOffset])
 
+  const filterConf = [
+    {
+      name: 'metadata_status',
+      text: 'Statut :',
+      values: [],
+      toFilterParam: (elem) => {
+        return { metadata_status: `"${elem?.metadata_status}"` }
+      },
+      display: (filterValue, filter) => (
+        <span className="align-pill-left">{displayStatus(filter)}</span>
+      ),
+    },
+    {
+      name: 'theme',
+      text: 'Thème :',
+      values: [],
+      toFilterParam: (elem) => {
+        return { theme: `"${elem?.theme}"` }
+      },
+      display: (filterValue, filter) => (
+        <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
+      ),
+    },
+    {
+      name: 'keywords',
+      text: 'Mots-clés :',
+      values: [],
+      toFilterParam: (elem) => {
+        return { keywords: `"${elem?.keywords}"` }
+      },
+    },
+    {
+      name: 'producer',
+      displayName: 'organization_name',
+      text: 'Source :',
+      values: [],
+      toFilterParam: (elem) => {
+        return { 'producer.organization_name': `"${elem.producer?.organization_name}"` }
+      },
+    },
+    // {
+    //   name: 'resource_languages',
+    //   text: 'Langage :',
+    //   values: [],
+    //   toFilterParam: (elem) => {
+    //     return { resource_languages: `"${elem?.resource_languages}"` };
+    //   },
+    // },
+  ]
   /**
    * crée l'object params pour la requete
    * @param {*} baseParams base des params
@@ -193,8 +241,6 @@ export default function CatalogueMetadata({ editMode, logout }) {
    * recup la 1er page des métadonnéees et les countBy
    */
   function getInitialData() {
-    // console.log('-- getInitialData');
-
     Promise.all(
       filterConf.map((count) =>
         axios.get(getApiData(`resources${searchMode()}`), {
@@ -203,11 +249,11 @@ export default function CatalogueMetadata({ editMode, logout }) {
       )
     )
       .then((values) => {
-        const countByTemp = filterConf.map((count, i) => {
-          count.values = values[i].data
-          return count
+        const updatedFilter = filterConf.map((filter, i) => {
+          filter.values = values[i].data
+          return filter
         })
-        setCountBy(countByTemp)
+        setCountByFilters(updatedFilter)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
@@ -229,16 +275,16 @@ export default function CatalogueMetadata({ editMode, logout }) {
   }
 
   /**
-   * récupere le label pour un element d'un countBy
-   * @param {*} filterElement element d'un countBy
-   * @param {*} filterConfig configuration du countBy
+   * récupere le label pour un element d'un countByFilter
+   * @param {*} filterType element d'un countByFilter
+   * @param {*} filterConfig configuration du countByFilter
    * @return {String} label de l'élément
    */
-  function getFilterLabel(filterElement, filterConfig) {
+  function getFilterLabel(filterType, filterConfig) {
     try {
-      // console.log(filterElement)
+      // console.log(filterType)
       // console.log(filterConfig)
-      let result = filterElement[filterConfig?.name] || 'ERR: "name" not found'
+      let result = filterType[filterConfig?.name] || 'ERR: "name" not found'
       if (filterConfig?.displayName && result[filterConfig?.displayName]) {
         result = result[filterConfig.displayName]
       }
@@ -343,30 +389,28 @@ export default function CatalogueMetadata({ editMode, logout }) {
             <div className="left-hand-blocks">
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
-                {countBy.map((filter) => {
+                {allCountByFilters.map((filterConf) => {
                   // console.log(filter)
-                  return !filter.values ? (
+                  return !filterConf.values ? (
                     'No values'
                   ) : (
-                    <div className="col border rounded" key={filter.name}>
-                      <div className="label-lv2">{filter.text}</div>
+                    <div className="col border rounded" key={filterConf.name}>
+                      <div className="label-lv2">{filterConf.text}</div>
                       <ul className="list-group">
-                        {filter.values.map((filterValue, i) => {
+                        {filterConf.values.map((filterValue, i) => {
+                          const key = getFilterLabel(filterValue, filterConf) + i
                           return (
                             <li
                               className="filter-items"
-                              key={getFilterLabel(filterValue, filter) + i}
-                              onClick={() => addToFilter(filter.toFilterParam(filterValue))}
+                              key={key}
+                              onClick={() => addToFilter(filterConf.toFilterParam(filterValue))}
                             >
-                              {filter.name === 'theme' && (
-                                <ThemeDisplay
-                                  value={getFilterLabel(filterValue, filter)}
-                                ></ThemeDisplay>
-                              )}
-                              {filter.name !== 'theme' && getFilterLabel(filterValue, filter)}
+                              {filterConf.display
+                                ? filterConf.display(filterValue, filterConf)
+                                : getFilterLabel(filterValue, filterConf)}
                               <span
                                 className={`badge rounded-pill text-bg-${
-                                  isSelectedFilter(filter.toFilterParam(filterValue))
+                                  isSelectedFilter(filterConf.toFilterParam(filterValue))
                                     ? 'success'
                                     : 'primary'
                                 }`}

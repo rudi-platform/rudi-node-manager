@@ -251,8 +251,14 @@ a {
 .status-pill {
   @extend .badge;
   @extend .rounded-pill;
+}
+.align-pill-right {
   margin-right: 10px;
   margin-left: auto;
+}
+.align-pill-left {
+  margin-right: auto;
+  margin-left: 0px;
 }
 
 .file-size-pill {

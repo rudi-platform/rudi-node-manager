@@ -16,8 +16,7 @@ export default function ThemeDisplay({ value }) {
    * get Theme Label
    * @return {String} text to display
    */
-  const getLabel = () =>
-    appInfo.themeLabels && appInfo.themeLabels[value] ? appInfo.themeLabels[value] : value
+  const getLabel = () => (appInfo.themeLabels?.[value] ? appInfo.themeLabels[value] : value)
 
   return <span>{getLabel()}</span>
 }

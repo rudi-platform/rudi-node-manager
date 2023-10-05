@@ -95,6 +95,45 @@ MetadataCard.propTypes = {
   logout: PropTypes.func,
 }
 
+export const displaySpan = (level, text) => (
+  <span className={'status-pill text-bg-' + level} id="status-pill">
+    {text}
+  </span>
+)
+
+/**
+ * Display a metadata status
+ * @param {string} metadataStatus a metadata status
+ * @return {html} A round pill that shows the status
+ */
+export const displayStatus = (metadataStatus) => {
+  switch (metadataStatus) {
+    case 'incomplete':
+      return displaySpan('danger', 'Incomplet')
+    case 'refused':
+      return displaySpan('danger', 'Refus portail')
+    case 'deleted':
+      return displaySpan('muted', 'Supprimé')
+    case 'local':
+      return displaySpan('success', 'Publié (local)')
+    case 'published':
+      return displaySpan('success', 'Publié (portail)')
+    case 'sent':
+      return displaySpan('warning', 'Envoyé')
+    default:
+      return displaySpan('dark', 'Local')
+  }
+}
+/**
+ * Display the status for the metadata
+ * @param {JSON} metadata a RUDI metadata
+ * @return {html} A round pill that shows the status
+ */
+export const displayMetadataStatus = (metadata) =>
+  metadata.metadataStatus == 'local' && metadata.collection_tag
+    ? displaySpan('dark', metadata.collection_tag)
+    : displayStatus(metadata.metadata_status)
+
 /**
  * Composant : metadataCard
  * @return {ReactNode}
@@ -179,25 +218,39 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     !!metadata?.access_condition?.confidentiality?.restricted_access
   // console.log(metadata)
   const metaDates = metadata.metadata_info?.metadata_dates
-  /**
-   * Display the metadata status
-   * @return {html} A round pill that shows the status
-   */
-  function displayStatus() {
-    const displaySpan = (level, text) => (
-      <span className={'status-pill text-bg-' + level} id="status-pill">
-        {text}
+
+  const displayMediaFile = (mediaFile) => (
+    <div key={`${mediaFile.media_id}`}>
+      {button.visualize(mediaFile.media_id)}
+      {button.download(mediaFile.connector.url)}
+      <FileSizeDisplay number={mediaFile.file_size}></FileSizeDisplay>
+      <span className="">
+        <a href={mediaFile.connector.url}>{mediaFile.media_name}</a>
       </span>
-    )
-    if (metadata.collection_tag) return displaySpan('dark', metadata.collection_tag)
-    if (metadata.storage_status === 'pending') return displaySpan('danger', 'Incomplet')
-    if (metadata.integration_error_id) return displaySpan('danger', 'Refus portail')
-    if (!appInfo.portalConnected) return displaySpan('success', 'Publié (local)')
-    if (!metaDates?.published && !metaDates?.deleted) return displaySpan('warning', 'Envoyé')
-    if (metaDates?.published && !metaDates?.deleted)
-      return displaySpan('success', 'Publié (portail)')
-    if (metaDates?.deleted) return displaySpan('danger', 'Supprimé')
-  }
+    </div>
+  )
+
+  const displayMediaService = (mediaService) => (
+    <div key={`${mediaService.media_id}`}>
+      {button.external(mediaService.connector.url)}
+      <span className="">
+        <a href={mediaService.connector.url}>{mediaService.connector.url}</a>
+      </span>
+    </div>
+  )
+  const displayMissingMedia = (media) => (
+    <div key={`${media.media_id}`}>
+      {missButton()}
+      <span className="text-muted"> {media.media_name} </span>
+    </div>
+  )
+  const displayAvailableMedia = (media) =>
+    media.file_size ? displayMediaFile(media) : displayMediaService(media)
+
+  const displayMedia = (media) =>
+    media.file_storage_status === 'missing'
+      ? displayMissingMedia(media)
+      : displayAvailableMedia(media)
 
   const button = {
     share: shareButton(`${appInfo.apiExtUrl}api/v1/resources/${metadata.global_id}`),
@@ -221,7 +274,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
                 {metadata.resource_title}
               </span>
             </a>
-            {displayStatus()}
+            <span className="align-pill-right">{displayMetadataStatus(metadata)}</span>
             {isEdit ? (
               <div className="btn-group" role="group">
                 {button.share}
@@ -261,30 +314,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
           <span className="card-text">
-            {metadata.available_formats.map((ressource) =>
-              ressource.file_storage_status === 'missing' ? (
-                <div key={`${ressource.media_id}`}>
-                  {missButton()}
-                  <span className="text-muted"> {ressource.media_name} </span>
-                </div>
-              ) : ressource.file_size ? (
-                <div key={`${ressource.media_id}`}>
-                  {button.visualize(ressource.media_id)}
-                  {button.download(ressource.connector.url)}
-                  <FileSizeDisplay number={ressource.file_size}></FileSizeDisplay>
-                  <span className="">
-                    <a href={ressource.connector.url}>{ressource.media_name}</a>
-                  </span>
-                </div>
-              ) : (
-                <div key={`${ressource.media_id}`}>
-                  {button.external(ressource.connector.url)}
-                  <span className="">
-                    <a href={ressource.connector.url}>{ressource.connector.url}</a>
-                  </span>
-                </div>
-              )
-            )}
+            {metadata.available_formats.map((media) => displayMedia(media))}
           </span>
         </div>
       </div>

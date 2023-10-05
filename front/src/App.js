@@ -150,7 +150,6 @@ const Main = () => {
     )
   }
   return (
-    <PMFrontContextProvider>
       <Router>
         <ModalProvider>
           <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -262,6 +261,5 @@ const Main = () => {
           </Routes>
         </ModalProvider>
       </Router>
-    </PMFrontContextProvider>
   )
 }
