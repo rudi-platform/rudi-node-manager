@@ -6,15 +6,20 @@ const { getRudiApi, getAdminApi } = require('../config/config')
 const errorHandler = require('./errorHandler')
 const { getRudiApiToken } = require('../utils/secu')
 
+let cache = {}
 // Helper functions
 const callApiModule = (req, reply, url, opType) => {
+  if (cache[opType]) return req ? reply.status(200).send(cache[opType]) : cache[opType]
   const token = getRudiApiToken(url, req)
   const completeUrl = new URL(url, getRudiApi())
   if (req?.query) completeUrl.search = new URLSearchParams(req.query)
 
   return axios
     .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${token}` } })
-    .then((res) => (req ? reply.status(200).send(res.data) : res.data))
+    .then((res) => {
+      cache[opType] = res.data
+      return req ? reply.status(200).send(res.data) : res.data
+    })
     .catch((err) => {
       try {
         if (err.code == 'ECONNREFUSED') {
