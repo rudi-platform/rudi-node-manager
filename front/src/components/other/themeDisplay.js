@@ -12,11 +12,13 @@ ThemeDisplay.propTypes = {
  */
 export default function ThemeDisplay({ value }) {
   const { appInfo } = usePMFrontContext()
+  // console.log('T ThemeDisplay.value:',value)
+  // console.log('T ThemeDisplay.themeLabels:',appInfo.themeLabels)
   /**
    * get Theme Label
    * @return {String} text to display
    */
-  const getLabel = () => (appInfo.themeLabels?.[value] ? appInfo.themeLabels[value] : value)
+  const getLabel = () => (appInfo.themeLabels?.[value] || value)
 
   return <span>{getLabel()}</span>
 }

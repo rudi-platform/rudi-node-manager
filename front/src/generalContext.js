@@ -74,7 +74,7 @@ export function PMFrontContextProvider({ children }) {
       const gitHash = pmTags?.hash
 
       const backValues = {
-        themeLabels: values[0],
+        themeLabels: values[0].data,
         userInfo,
         isEditor: !!isEditor(userInfo?.roles || []),
         isAdmin: !!isAdmin(userInfo?.roles || []),
@@ -98,7 +98,7 @@ export function PMFrontContextProvider({ children }) {
       await callBackApi()
       setIsLoaded(true)
     }
-    
+
     getBackData()
   }, [token])
 

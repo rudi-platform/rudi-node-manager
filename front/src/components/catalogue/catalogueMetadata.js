@@ -77,8 +77,8 @@ export default function CatalogueMetadata({ editMode, logout }) {
       toFilterParam: (elem) => {
         return { metadata_status: `"${elem?.metadata_status}"` }
       },
-      display: (filterValue, filter) => (
-        <span className="align-pill-left">{displayStatus(filter)}</span>
+      display: (filterValue) => (
+        <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
       ),
     },
     {
@@ -276,17 +276,17 @@ export default function CatalogueMetadata({ editMode, logout }) {
 
   /**
    * récupere le label pour un element d'un countByFilter
-   * @param {*} filterType element d'un countByFilter
-   * @param {*} filterConfig configuration du countByFilter
+   * @param {*} filterValue element d'un countByFilter
+   * @param {*} filterObject configuration du countByFilter
    * @return {String} label de l'élément
    */
-  function getFilterLabel(filterType, filterConfig) {
+  function getFilterLabel(filterValue, filterObject) {
     try {
-      // console.log(filterType)
-      // console.log(filterConfig)
-      let result = filterType[filterConfig?.name] || 'ERR: "name" not found'
-      if (filterConfig?.displayName && result[filterConfig?.displayName]) {
-        result = result[filterConfig.displayName]
+      // console.log('T getFilterLabel.filterValue:', filterValue)
+      // console.log('T getFilterLabel.filterObject:', filterObject)
+      let result = filterValue[filterObject?.name] || 'ERR: "name" not found'
+      if (filterObject?.displayName && result[filterObject?.displayName]) {
+        result = result[filterObject.displayName]
       }
       return result
     } catch (err) {
@@ -389,28 +389,29 @@ export default function CatalogueMetadata({ editMode, logout }) {
             <div className="left-hand-blocks">
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
-                {allCountByFilters.map((filterConf) => {
+                {allCountByFilters.map((filterObject, i) => {
                   // console.log(filter)
-                  return !filterConf.values ? (
+                  return !filterObject.values ? (
                     'No values'
                   ) : (
-                    <div className="col border rounded" key={filterConf.name}>
-                      <div className="label-lv2">{filterConf.text}</div>
+                    <div className={i?"col border rounded":"border rounded"} key={filterObject.name}>
+                      <div className="label-lv2">{filterObject.text}</div>
                       <ul className="list-group">
-                        {filterConf.values.map((filterValue, i) => {
-                          const key = getFilterLabel(filterValue, filterConf) + i
+                        {filterObject.values.map((filterValue, i) => {
+                          const filterLabel = getFilterLabel(filterValue, filterObject)
+                          const key = filterLabel + i
                           return (
                             <li
                               className="filter-items"
                               key={key}
-                              onClick={() => addToFilter(filterConf.toFilterParam(filterValue))}
+                              onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
                             >
-                              {filterConf.display
-                                ? filterConf.display(filterValue, filterConf)
-                                : getFilterLabel(filterValue, filterConf)}
+                              {filterObject.display
+                                ? filterObject.display(filterValue, filterObject)
+                                : filterLabel}
                               <span
                                 className={`badge rounded-pill text-bg-${
-                                  isSelectedFilter(filterConf.toFilterParam(filterValue))
+                                  isSelectedFilter(filterObject.toFilterParam(filterValue))
                                     ? 'success'
                                     : 'primary'
                                 }`}
