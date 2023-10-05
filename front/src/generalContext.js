@@ -64,7 +64,7 @@ export function PMFrontContextProvider({ children }) {
       ])
       const userInfo = values[1].data
 
-      const nodeUrls = `${values[2].data}`
+      const nodeUrls = values[2].data
       const formUrl = ensureEndsWithSlash(nodeUrls?.console_url)
       const apiExtUrl = ensureEndsWithSlash(nodeUrls?.api_url)
       const portalConnected = !!nodeUrls.portal_url
