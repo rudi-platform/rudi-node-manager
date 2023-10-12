@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.10",
-    "@aqmo.org/rudi_logger": "^1.1.4",
+    "@aqmo.org/rudi_logger": "^1.1.5",
     "axios": "^1.5.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -40,14 +40,14 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.0",
+    "@babel/core": "^7.23.2",
     "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-env": "^7.22.20",
-    "eslint": "^8.50.0",
+    "@babel/preset-env": "^7.23.2",
+    "eslint": "^8.51.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-only-warn": "^1.1.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-unused-imports": "^3.0.0",
     "jest": "^29.7.0",
     "jest-express": "^1.12.0",

@@ -32,8 +32,6 @@ const port = getConf('server', 'listening_port') || 5000
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 app.use((req, reply, next) => {
   log.sysInfo(mod, '', `Request <= ${req.method} ${req.url}`, log.getContext(req, {}))
-  // console.log('url:', req.url, ' | params:', req.params, ' | query:', req.query);
-  // console.debug(req.cookies?`   cookies: ${req.cookies}`:'   auth:', req.headers?.authorization);
   next()
 
   reply.on('finish', () => {
