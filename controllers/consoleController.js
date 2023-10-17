@@ -5,18 +5,20 @@ const { getConsoleFormUrl } = require('../config/config')
 const log = require('../utils/logger')
 const { UnauthorizedError } = require('../utils/errors')
 const { getPortalUrl, getApiExternalUrl } = require('./dataController')
+const { beautify } = require('../utils/utils')
+const { handleError } = require('./errorHandler')
 
 exports.getNodeUrls = async (req, reply) => {
+  const fun =  'getNodeUrls'
   try {
     const urls = await Promise.all([getConsoleFormUrl(), getApiExternalUrl(), getPortalUrl()])
     const nodeUrls = { console_url: urls[0], api_url: urls[1] }
-    if (urls[2] != 'No portal connected') nodeUrls[' portal_url'] = urls[2]
+    if (urls[2] != 'No portal connected') nodeUrls['portal_url'] = urls[2]
 
     return reply.status(200).send(nodeUrls)
   } catch (err) {
-    log.e('', '', err)
-    log.sysError(mod, 'getNodeUrls', err, log.getContext(req, { opType: 'get_node_urls' }))
-    throw err
+    log.sysError(mod, fun, err, log.getContext(req, { opType: 'get_node_urls' }))
+    handleError(req, reply, err, 404, fun)
   }
 }
 

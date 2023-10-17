@@ -1,5 +1,6 @@
 // External dependencies
 const rudiLogger = require('@aqmo.org/rudi_logger')
+const { Transport } = rudiLogger
 
 // Internal dependencies
 const { getConf } = require('../config/config')
@@ -37,17 +38,17 @@ function getRudiLoggerOptions() {
   if (getConf('syslog', 'syslog_facility').substr(0, 5) == 'local') {
     facility = 16 + Number(getConf('syslog', 'syslog_facility').substr(5, 1))
   }
-  let transports = 2
+  let transports
   let path = getConf('syslog', 'syslog_host')
   switch (getConf('syslog', 'syslog_protocol')) {
     case 'tcp':
-      transports = 1
+      transports = Transport.Tcp
       break
     case 'udp':
-      transports = 2
+      transports = Transport.Udp
       break
     case 'unix':
-      transports = 4
+      transports = Transport.Unix
       path = getConf('syslog', 'syslog_socket')
       break
   }

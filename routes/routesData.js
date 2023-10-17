@@ -15,6 +15,7 @@ const {
   getObjectById,
   deleteObject,
   deleteObjects,
+  getCounts,
 } = require('../controllers/genericController')
 const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
@@ -26,6 +27,7 @@ router.get('/enum/themes/:lang', getThemeByLang)
 router.get('/licences', getLicences)
 
 // TODO : propagate res.status
+router.get(`/counts`, getCounts)
 router.get(`/:objectType`, getObjectList)
 router.post(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), postObject)
 router.put(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), putObject)

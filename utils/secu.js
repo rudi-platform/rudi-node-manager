@@ -172,11 +172,10 @@ exports.createPmJwtForMedia = (body) =>
     }
   )
 
-let cachedApiJwt = {}
-
-exports.getRudiApiToken = (url, req) => {
-  if (isJwtValid(cachedApiJwt?.[url])) return cachedApiJwt[url]
-  cachedApiJwt[url] = jwtLib.forgeToken(
+let cachedApiJwt
+exports.getRudiApiToken = () => {
+  if (isJwtValid(cachedApiJwt)) return cachedApiJwt
+  cachedApiJwt = jwtLib.forgeToken(
     getPrvKey('api'),
     {},
     {
@@ -186,12 +185,13 @@ exports.getRudiApiToken = (url, req) => {
       req_url: 'all',
     }
   )
-  return cachedApiJwt[url]
+  return cachedApiJwt
 }
 
+let cachedUrlJwt = {}
 exports.getRudiApiTokenPrecise = (url, req) => {
-  if (isJwtValid(cachedApiJwt?.[url])) return cachedApiJwt[url]
-  cachedApiJwt[url] = jwtLib.forgeToken(
+  if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]
+  cachedUrlJwt[url] = jwtLib.forgeToken(
     getPrvKey('api'),
     {},
     {
@@ -201,7 +201,7 @@ exports.getRudiApiTokenPrecise = (url, req) => {
       req_url: axios.getUri({ url, params: req.query }),
     }
   )
-  return cachedApiJwt[url]
+  return cachedUrlJwt[url]
 }
 
 /**

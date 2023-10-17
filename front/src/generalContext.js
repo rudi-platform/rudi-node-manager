@@ -1,6 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import axios from 'axios'
+import PropTypes from 'prop-types'
+import React, { createContext, useEffect, useState } from 'react'
 
 import useToken from './useToken'
 import { getApiData, getApiFront, getApiOpen } from './utils/frontOptions'
@@ -46,13 +46,10 @@ export function PMFrontContextProvider({ children }) {
   const callBackApi = async () => {
     try {
       if (!token) {
-        const values = await Promise.all([
-          axios.get(getApiOpen('tag')),
-          axios.get(getApiOpen('hash')),
-        ])
+        const tags = await axios.get(getApiOpen('tags'))
         const backValues = Object.assign(defaultFrontContext, {
-          appTag: `${values[0].data}`,
-          gitHash: `${values[1].data}`,
+          appTag: `${tags?.data?.tag}`,
+          gitHash: `${tags?.data?.hash}`,
         })
         return backValues
       }

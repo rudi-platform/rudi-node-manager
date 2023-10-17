@@ -11,7 +11,7 @@ const {
   putPassword,
 } = require('../controllers/authControllerPassport')
 
-router.get('/node-urls', passport.authenticate('jwt', { session: false }),getNodeUrls)
+router.get('/node-urls', passport.authenticate('jwt', { session: false }), getNodeUrls)
 
 router.get('/form-url', passport.authenticate('jwt', { session: false }), getFormUrl)
 router.get('/ext-api-url', passport.authenticate('jwt', { session: false }), getApiExternalUrl)

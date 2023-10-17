@@ -17,8 +17,7 @@ const {
   readJwtBody,
   getTokenFromMediaForUser,
 } = require('../utils/secu')
-const errorHandler = require('./errorHandler')
-const { handleError } = require('./genericController')
+const { handleError } = require('./errorHandler')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
@@ -93,12 +92,7 @@ exports.getDownloadById = (req, reply, next) => {
       reply.status(200).contentType(resRUDI.headers['content-type']).json(results)
     })
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_download', id: `media+${id}` })
-      try {
-        reply.status(error.statusCode || err.statusCode || 500).json(error)
-      } catch (e) {
-        console.error(e)
-      }
+      hanleError(req, reply, err, 500, 'get_download', 'media', `media+${id}`)
     })
 }
 
@@ -149,6 +143,7 @@ exports.commitMedia = async (req, reply, next) => {
       `T (commitMedia) ERR${err.response?.status} Api commit:`,
       err.response?.data || err.response?.statusText || err.response
     )
+
     return reply
       .status(err.response?.status || 500)
       .send('ERR Api commit: ' + err.response?.data || err.response?.statusText || err.response)

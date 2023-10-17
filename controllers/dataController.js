@@ -1,49 +1,46 @@
+const mod = 'apiSmplCalls'
+
 // External dependencies
 const axios = require('axios')
 
 // Internal dependencies
 const { getRudiApi, getAdminApi } = require('../config/config')
-const errorHandler = require('./errorHandler')
 const { getRudiApiToken } = require('../utils/secu')
+const { beautify } = require('../utils/utils')
+const { handleError } = require('./errorHandler')
+const log = require('../utils/logger')
 
 let cache = {}
 // Helper functions
 const callApiModule = (req, reply, url, opType) => {
+  const fun = 'callApiModule'
   if (cache[opType]) return req ? reply.status(200).send(cache[opType]) : cache[opType]
-  const token = getRudiApiToken(url, req)
   const completeUrl = new URL(url, getRudiApi())
   if (req?.query) completeUrl.search = new URLSearchParams(req.query)
 
   return axios
-    .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${token}` } })
+    .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${getRudiApiToken()}` } })
     .then((res) => {
       cache[opType] = res.data
-      return req ? reply.status(200).send(res.data) : res.data
+      return req ? reply.status(200).send(res.data) : cache[opType]
     })
-    .catch((err) => {
-      try {
-        if (err.code == 'ECONNREFUSED') {
-          console.error(
-            'Connection from “RUDI Prod Manager” to “RUDI API” module failed: “RUDI API” module is apparently down'
-          )
-          return reply.status(500).json({
-            statusCode: 500,
-            message: '“RUDI API” module is apparently down, contact the RUDI node admin',
-            error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
-          })
+    .catch((error) => {
+      if (error.code == 'ECONNREFUSED') {
+        log.e(
+          mod,
+          fun,
+          'Connection from “RUDI Prod Manager” to “RUDI API” module failed: “RUDI API” module is apparently down'
+        )
+        const statusCode = 500
+        const connError = {
+          statusCode,
+          error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
+          message: '“RUDI API” module is apparently down, contact the RUDI node admin',
         }
-        const error = errorHandler.error(err, req, { opType })
-        return reply.status(error.statusCode).json(error)
-      } catch (error) {
-        err.statusCode = !err.statusCode || isNaN(err.statusCode) ? 500 : err.statusCode
-        try {
-          return reply
-            .status(err.statusCode)
-            .send('An error occurred:' + (error.message || error.msg))
-        } catch (e) {
-          console.error(e)
-        }
+        if (req) return reply.status(500).json(connError)
+        else throw new Error(connError)
       }
+      if (req) return handleError(req, reply, error, 501, opType)
     })
 }
 

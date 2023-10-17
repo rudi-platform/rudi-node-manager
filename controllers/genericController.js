@@ -2,7 +2,6 @@ const mod = 'genCtrl'
 
 const axios = require('axios')
 const { getRudiApi, getAdminApi } = require('../config/config')
-const errorHandler = require('./errorHandler')
 const {
   CONSOLE_TOKEN_NAME,
   getRudiApiToken,
@@ -10,7 +9,7 @@ const {
   refreshTokens,
 } = require('../utils/secu')
 const { sysWarn } = require('../utils/logger')
-const { beautify } = require('../utils/utils')
+const { handleError } = require('./errorHandler')
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -21,50 +20,6 @@ const OBJECT_TYPES = {
   reports: { url: 'reports', id: 'report_id' },
 }
 
-/**
- *
- * @param {String} req The initial request
- * @param {String} reply The response for the request
- * @param {String} initialError The initial error
- * @param {Number} errCode The error code
- * @param {String} fun Describes operation type
- * @param {String} objectType The type of the object
- * @param {String} id The UUID of the object
- */
-function handleError(req, reply, initialError, errCode, fun, objectType, id) {
-  try {
-    console.log('req params:', req.params)
-    console.log('req url:', req.originalUrl)
-    console.log('initialError:', initialError?.response?.data)
-    if (
-      initialError?.response?.data.statusCode &&
-      initialError?.response?.data?.message &&
-      initialError?.response?.data?.error
-    )
-      return reply.status(initialError.response.data.statusCode).json({
-        statusCode: initialError.response.data.statusCode,
-        error: initialError.response.data.error,
-        message: initialError.response.data.message,
-      })
-
-    console.log(
-      `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
-    )
-    console.log('fun: ' + fun)
-    console.log('objectType: ' + objectType)
-    console.log('id: ' + id)
-    const errPayload = {}
-    if (fun) errPayload.opType = fun
-    if (id) errPayload.id = `${objectType}+${id}`
-    const error = errorHandler.error(initialError, req, errPayload)
-    reply.status(initialError.statusCode || errCode).json(error.moreInfo || error)
-  } catch (err) {
-    console.error(mod, 'handleError.initialError', initialError)
-    console.error(mod, 'handleError failed', err)
-  }
-}
-exports.handleError = handleError
-
 const checkObjectType = (req, reply, fun, objectType) => {
   if (!OBJECT_TYPES[objectType]) {
     handleError(req, reply, new Error('Object type unknown: ' + objectType), 400, fun, objectType)
@@ -73,45 +28,35 @@ const checkObjectType = (req, reply, fun, objectType) => {
   return true
 }
 
-const callApiModule = (req, reply, url, opType) => {
-  const fun = `${mod}.callApiModule`
+const callApiModule = (req, url) => {
+  // const fun = `${mod}.callApiModule`
   const completeUrl = new URL(url, getRudiApi())
   if (req.query) completeUrl.search = new URLSearchParams(req.query)
 
   return axios
-    .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${getRudiApiToken(url, req)}` } })
+    .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${getRudiApiToken()}` } })
     .then((res) => res.data)
     .catch((err) => {
-      try {
-        if (err.code == 'ECONNREFUSED') {
-          const errObj = {
-            statusCode: 500,
-            message: '“RUDI API” module is apparently down, contact the RUDI node admin',
-            error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
-          }
-          return handleError(req, reply, new Error(errObj), 500, fun, opType)
-        }
-        const error = errorHandler.error(err, req, { opType })
-        return reply.status(error.statusCode).json(error)
-      } catch (error) {
-        err.statusCode = !err.statusCode || isNaN(err.statusCode) ? 500 : err.statusCode
-        try {
-          return reply
-            .status(err.statusCode)
-            .send('An error occurred:' + (error.message || error.msg))
-        } catch (e) {
-          console.error(e)
-        }
-      }
+      if (err.code == 'ECONNREFUSED') {
+        // const error = {
+        //   statusCode: 404,
+        //   message: '“RUDI API” module is apparently down, contact the RUDI node admin',
+        //   error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
+        // }
+        throw new Error(
+          'Connection from “RUDI Prod Manager” to “RUDI API” module failed: ' +
+            '“RUDI API” module is apparently down, contact the RUDI node admin'
+        )
+      } else throw err
     })
 }
 
-exports.getObjectList = (req, reply, next) => {
+exports.getObjectList = (req, reply) => {
   const opType = 'get_objects'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType) || objectType === 'media') return
 
-  callApiModule(req, reply, getAdminApi(objectType), opType)
+  callApiModule(req, getAdminApi(objectType), opType)
     .then((res) => {
       const { consoleToken, pmFrontToken } = refreshTokens(req)
       return reply
@@ -128,7 +73,7 @@ exports.getObjectById = (req, reply, next) => {
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
 
-  return callApiModule(req, reply, getAdminApi(`${objectType}/${id}`), opType)
+  return callApiModule(req, getAdminApi(`${objectType}/${id}`), opType)
     .then((rudiObj) => reply.status(200).json(rudiObj))
     .catch((err) => handleError(req, reply, err, 501, opType, objectType, id))
 }
@@ -141,11 +86,10 @@ exports.postObject = async (req, reply, next) => {
     let data
     try {
       const url = getAdminApi(objectType)
-      const token = getRudiApiToken(url, req)
       const resRudiApi = await axios.post(getRudiApi(url), req.body, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${getRudiApiToken()}`,
         },
       })
       data = resRudiApi.data
@@ -166,7 +110,7 @@ exports.postObject = async (req, reply, next) => {
   }
 }
 
-exports.putObject = async (req, reply, next) => {
+exports.putObject = async (req, reply) => {
   const opType = 'put_object'
   const { objectType } = req.params
   try {
@@ -174,9 +118,11 @@ exports.putObject = async (req, reply, next) => {
     let data
     try {
       const url = getAdminApi(objectType)
-      const token = getRudiApiToken(url, req)
       const resRudiApi = await axios.put(getRudiApi(url), req.body, {
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getRudiApiToken()}`,
+        },
       })
       data = resRudiApi.data
     } catch (e) {
@@ -202,11 +148,10 @@ exports.deleteObject = (req, reply, next) => {
   if (!checkObjectType(req, reply, fun, objectType)) return
 
   const url = getAdminApi(`${objectType}/${id}`)
-  const token = getRudiApiToken(url, req)
   return axios
     .delete(getRudiApi(url), {
       params: req.query,
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getRudiApiToken()}` },
     })
     .then((resRudiApi) => {
       const rudiObj = resRudiApi.data
@@ -215,21 +160,41 @@ exports.deleteObject = (req, reply, next) => {
     .catch((error) => handleError(req, reply, error, 501, fun, objectType, id))
 }
 
-exports.deleteObjects = (req, reply, next) => {
+exports.deleteObjects = (req, reply) => {
   const fun = 'del_objects'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, fun, objectType)) return
 
   const url = getAdminApi(`${objectType}`)
-  const token = getRudiApiToken(url, req)
   return axios
     .delete(getRudiApi(url), {
       params: req.query,
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${getRudiApiToken()}` },
     })
     .then((resRudiApi) => {
       const rudiObj = resRudiApi.data
       reply.status(200).json(rudiObj)
     })
     .catch((error) => handleError(req, reply, error, 501, fun, objectType))
+}
+
+const COUNT_BY_LABELS = ['metadata_status', 'theme', 'keywords', 'producer']
+exports.getCounts = async (req, reply) => {
+  const fun = `${mod}.getCounts`
+  const res = await Promise.all(
+    COUNT_BY_LABELS.map((label) =>
+      axios
+        .get(getRudiApi(getAdminApi(`resources?count_by=${label}`)), {
+          headers: { Authorization: `Bearer ${getRudiApiToken()}` },
+        })
+        .then((res) => res.data)
+        .catch((error) => handleError(req, reply, error, 501, fun, 'resources'))
+    )
+  )
+
+  const counts = {}
+  COUNT_BY_LABELS.forEach((label, i) => {
+    counts[label] = res[i]
+  })
+  reply.status(200).json(counts)
 }

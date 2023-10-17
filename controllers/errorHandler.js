@@ -1,13 +1,14 @@
 const { RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
+const { beautify } = require('../utils/utils')
 
 const mod = 'errHandler'
-const fun = ''
 
 exports.error = (error, req, options) => {
+  const fun = 'error'
   try {
     let errorToDisplay
-    if (!error) return new RudiError(`Error was unidentified: ${error}`)
+    if (!error) return new RudiError(`Error was unidentified`)
     let statusCode =
       error?.response?.data?.statusCode ||
       error?.response?.status ||
@@ -26,14 +27,14 @@ exports.error = (error, req, options) => {
     options.statusCode = statusCode
     error.statusCode = statusCode
     console.error('T (errHandler) statusCode', statusCode)
-    console.error('T (errHandler) error', error)
+    console.error('T (errHandler) error', beautify(error))
 
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
       log.sysError(mod, fun, error.response?.data || error.response, log.getContext(req, options))
 
-      errorToDisplay = error.toJSON()
+      errorToDisplay = Object.keys(error) > 0 ? error : error.toJSON()
       errorToDisplay.moreInfo = error.response?.data || error.response
     } else if (error.request) {
       errorToDisplay = error
@@ -53,5 +54,49 @@ exports.error = (error, req, options) => {
   } catch (err) {
     log.e(mod, fun, err)
     return { statusCode: 500, message: err, error: err }
+  }
+}
+
+/**
+ *
+ * @param {String} req The initial request
+ * @param {String} reply The response for the request
+ * @param {String} initialError The initial error
+ * @param {Number} errCode The error code
+ * @param {String} fun Describes operation type
+ * @param {String} objectType The type of the object
+ * @param {String} id The UUID of the object
+ */
+exports.handleError = (req, reply, initialError, errCode, fun, objectType, id) => {
+  log.e(mod, fun, initialError)
+  try {
+    console.log('req params:', req.params)
+    console.log('req url:', req.originalUrl)
+    console.log('initialError:', initialError?.response?.data)
+    if (
+      initialError?.response?.data.statusCode &&
+      initialError?.response?.data?.message &&
+      initialError?.response?.data?.error
+    )
+      return reply.status(initialError.response.data.statusCode).json({
+        statusCode: initialError.response.data.statusCode,
+        error: initialError.response.data.error,
+        message: initialError.response.data.message,
+      })
+
+    console.log(
+      `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
+    )
+    console.log('fun: ' + fun)
+    console.log('objectType: ' + objectType)
+    console.log('id: ' + id)
+    const errPayload = {}
+    if (fun) errPayload.opType = fun
+    if (id) errPayload.id = `${objectType}+${id}`
+    const error = this.error(initialError, req, errPayload)
+    reply.status(error.statusCode || errCode).json(error.moreInfo || error)
+  } catch (err) {
+    console.error(mod, 'handleError.initialError', initialError)
+    console.error(mod, 'handleError failed', err)
   }
 }
