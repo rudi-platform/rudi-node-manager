@@ -19,12 +19,17 @@ const {
 } = require('../controllers/genericController')
 const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
+const { getRudiApiToken } = require('../utils/secu')
 
 router.get('/uuid', (req, reply) => reply.status(200).send(uuidv4()))
 router.get('/version', getVersion)
 router.get('/enum', getEnum)
 router.get('/enum/themes/:lang', getThemeByLang)
 router.get('/licences', getLicences)
+
+router.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), (req, reply) =>
+  reply.json({token: getRudiApiToken()})
+)
 
 // TODO : propagate res.status
 router.get(`/counts`, getCounts)

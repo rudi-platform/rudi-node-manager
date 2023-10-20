@@ -38,11 +38,6 @@ const callApiModule = (req, url) => {
     .then((res) => res.data)
     .catch((err) => {
       if (err.code == 'ECONNREFUSED') {
-        // const error = {
-        //   statusCode: 404,
-        //   message: '“RUDI API” module is apparently down, contact the RUDI node admin',
-        //   error: 'Connection from “RUDI Prod Manager” to “RUDI API” module failed',
-        // }
         throw new Error(
           'Connection from “RUDI Prod Manager” to “RUDI API” module failed: ' +
             '“RUDI API” module is apparently down, contact the RUDI node admin'
@@ -56,7 +51,7 @@ exports.getObjectList = (req, reply) => {
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType) || objectType === 'media') return
 
-  callApiModule(req, getAdminApi(objectType), opType)
+  callApiModule(req, getAdminApi(objectType))
     .then((res) => {
       const { consoleToken, pmFrontToken } = refreshTokens(req)
       return reply
@@ -73,7 +68,7 @@ exports.getObjectById = (req, reply, next) => {
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
 
-  return callApiModule(req, getAdminApi(`${objectType}/${id}`), opType)
+  return callApiModule(req, getAdminApi(`${objectType}/${id}`))
     .then((rudiObj) => reply.status(200).json(rudiObj))
     .catch((err) => handleError(req, reply, err, 501, opType, objectType, id))
 }

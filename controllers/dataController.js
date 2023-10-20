@@ -6,7 +6,6 @@ const axios = require('axios')
 // Internal dependencies
 const { getRudiApi, getAdminApi } = require('../config/config')
 const { getRudiApiToken } = require('../utils/secu')
-const { beautify } = require('../utils/utils')
 const { handleError } = require('./errorHandler')
 const log = require('../utils/logger')
 

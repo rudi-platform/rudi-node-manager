@@ -5,7 +5,6 @@ const { getConsoleFormUrl } = require('../config/config')
 const log = require('../utils/logger')
 const { UnauthorizedError } = require('../utils/errors')
 const { getPortalUrl, getApiExternalUrl } = require('./dataController')
-const { beautify } = require('../utils/utils')
 const { handleError } = require('./errorHandler')
 
 exports.getNodeUrls = async (req, reply) => {

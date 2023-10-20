@@ -2,7 +2,6 @@
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
-const { randomBytes, scryptSync, timingSafeEqual } = require('crypto')
 const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies

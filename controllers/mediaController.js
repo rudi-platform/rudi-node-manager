@@ -92,7 +92,7 @@ exports.getDownloadById = (req, reply, next) => {
       reply.status(200).contentType(resRUDI.headers['content-type']).json(results)
     })
     .catch((err) => {
-      hanleError(req, reply, err, 500, 'get_download', 'media', `media+${id}`)
+      handleError(req, reply, err, 500, 'get_download', 'media', `media+${id}`)
     })
 }
 

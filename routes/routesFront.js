@@ -11,12 +11,14 @@ const {
   putPassword,
 } = require('../controllers/authControllerPassport')
 
-router.get('/node-urls', passport.authenticate('jwt', { session: false }), getNodeUrls)
+const authenticate = passport.authenticate('jwt', { session: false })
 
-router.get('/form-url', passport.authenticate('jwt', { session: false }), getFormUrl)
-router.get('/ext-api-url', passport.authenticate('jwt', { session: false }), getApiExternalUrl)
-router.get('/portal-url', passport.authenticate('jwt', { session: false }), getPortalUrl)
-router.get('/user-info', passport.authenticate('jwt', { session: false }), getUserInfo)
+router.get('/node-urls', authenticate, getNodeUrls)
+
+router.get('/form-url', authenticate, getFormUrl)
+router.get('/ext-api-url', authenticate, getApiExternalUrl)
+router.get('/portal-url', authenticate, getPortalUrl)
+router.get('/user-info', authenticate, getUserInfo)
 
 router.post('/register', postRegister)
 router.put('/change-password', putPassword) // Delayed auth
