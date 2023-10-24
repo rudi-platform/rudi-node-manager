@@ -1,6 +1,5 @@
 const { RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
-const { beautify } = require('../utils/utils')
 
 const mod = 'errHandler'
 
@@ -18,7 +17,7 @@ exports.error = (error, req, options) => {
       error?.code ||
       501
     if (statusCode === 'ERR_INVALID_URL') {
-      console.error('T (errorHandler) err', error)
+      // console.error('T (errorHandler) err', error)
       statusCode = 404
     } else {
       statusCode = parseInt(statusCode)
@@ -26,8 +25,8 @@ exports.error = (error, req, options) => {
     }
     options.statusCode = statusCode
     error.statusCode = statusCode
-    console.error('T (errHandler) statusCode', statusCode)
-    console.error('T (errHandler) error', beautify(error))
+    // console.error('T (errHandler) statusCode', statusCode)
+    // console.error('T (errHandler) error', beautify(error))
 
     if (error.response) {
       // The request was made and the server responded with a status code
@@ -46,7 +45,7 @@ exports.error = (error, req, options) => {
       // Something happened in setting up the request that triggered an Error
       errorToDisplay = { message: error?.message || error, statusCode }
     }
-    log.e(mod, fun, error?.message || error)
+    // log.e(mod, fun, error?.message || error)
     log.sysError(mod, fun, error?.message || error, log.getContext(req, options))
     if (error?.config) log.e(mod, fun, error.config)
 
@@ -70,9 +69,9 @@ exports.error = (error, req, options) => {
 exports.handleError = (req, reply, initialError, errCode, fun, objectType, id) => {
   log.e(mod, fun, initialError)
   try {
-    console.log('req params:', req.params)
-    console.log('req url:', req.originalUrl)
-    console.log('initialError:', initialError?.response?.data)
+    // console.log('req params:', req.params)
+    // console.log('req url:', req.originalUrl)
+    // console.log('initialError:', initialError?.response?.data)
     if (
       initialError?.response?.data.statusCode &&
       initialError?.response?.data?.message &&
