@@ -83,13 +83,7 @@ exports.handleError = (req, reply, initialError, errCode, fun, objectType, id) =
         error: initialError.response.data.error,
         message: initialError.response.data.message,
       })
-
-    console.log(
-      `errCode: ${initialError.statusCode || initialError.response?.data?.statusCode || errCode}`
-    )
-    console.log('fun: ' + fun)
-    console.log('objectType: ' + objectType)
-    console.log('id: ' + id)
+    initialError.statusCode = initialError.statusCode || initialError.response?.data?.statusCode || errCode
     const errPayload = {}
     if (fun) errPayload.opType = fun
     if (id) errPayload.id = `${objectType}+${id}`
