@@ -87,7 +87,6 @@ app.use(`/api/data/`, authenticate, checkRolePerm([ROLE_ALL]), apiData)
 app.use(`/api/media/`, authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
 app.use(`/api/secu/`, authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
-
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {

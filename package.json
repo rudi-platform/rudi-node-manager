@@ -23,7 +23,7 @@
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.10",
+    "@aqmo.org/jwt-lib": "^1.1.11",
     "@aqmo.org/rudi_logger": "^1.1.5",
     "axios": "^1.5.1",
     "cookie-parser": "^1.4.6",
@@ -43,7 +43,7 @@
     "@babel/core": "^7.23.2",
     "@babel/eslint-parser": "^7.22.15",
     "@babel/preset-env": "^7.23.2",
-    "eslint": "^8.51.0",
+    "eslint": "^8.52.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-only-warn": "^1.1.0",

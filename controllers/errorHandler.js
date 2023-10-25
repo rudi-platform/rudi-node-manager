@@ -69,9 +69,6 @@ exports.error = (error, req, options) => {
 exports.handleError = (req, reply, initialError, errCode, fun, objectType, id) => {
   log.e(mod, fun, initialError)
   try {
-    // console.log('req params:', req.params)
-    // console.log('req url:', req.originalUrl)
-    // console.log('initialError:', initialError?.response?.data)
     if (
       initialError?.response?.data.statusCode &&
       initialError?.response?.data?.message &&
