@@ -169,7 +169,7 @@ exports.resetPassword = async (req, reply, next) => {
     try {
       return reply.status(err.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.e(mod, 'resetPassword', e)
     }
   }
 }

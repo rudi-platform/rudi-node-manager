@@ -52,3 +52,30 @@ exports.beautify = (jsonObject, option) => {
     return `${inspect(jsonObject)}`
   }
 }
+
+/**
+ * Cleans a headers string from the "Autorization: <whatever>" information
+ */
+exports.cleanErrMsg = (str) => (str ? this.cleanHeadersAuth(str) : '')
+exports.cleanHeadersAuth = (str) =>
+  typeof str == 'string'
+    ? str.replace(/["'](Bearer|Basic) [\w-/\.]+["']/g, '<auth>')
+    : this.cleanHeadersAuth(this.beautify(str))
+
+exports.makeRequestable = (func) => async (req, reply) => {
+  try {
+    return await func(req, reply)
+  } catch (err) {
+    // console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
+    // console.log('makeRequestable', 'ERR', err.statusCode, err.error, err.message)
+    if (typeof err == 'object' && err.message && err.statusCode && err.error)
+      return reply
+        .status(err.statusCode || 500)
+        .json({ statusCode: err.statusCode, error: err.error, message: err.message })
+    if (typeof err.message == 'string')
+      return reply
+        .status(err.statusCode || 500)
+        .json({ statusCode: err.statusCode || 500, message: err.message })
+    reply.status(500).json({ statusCode: 500, message: this.cleanErrMsg(err) })
+  }
+}

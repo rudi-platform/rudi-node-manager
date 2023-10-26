@@ -6,7 +6,7 @@ const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies
 const { getConf } = require('../config/config')
-const { timeEpochS, toInt } = require('./utils')
+const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
 const { isDevEnv } = require('../config/backOptions')
@@ -100,7 +100,7 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
-  console.log('T (getTokenFromMediaForUser) delegationBody', delegationBody)
+  console.log(`T (${fun})`, 'delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
   try {
@@ -110,19 +110,16 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`)
     else return mediaRes.data.token
   } catch (err) {
-    console.error(
-      'T (getTokenFromMediaForUser) mediaError.msg/data',
-      err.message,
-      err.response?.data
-    )
+    if (err.code == 'ECONNREFUSED')
+      throw RudiError.createRudiHttpError(500,
+        'Connection from “RUDI Prod Manager” to “RUDI Media” module failed: ' +
+          '“RUDI Media” module is apparently down, contact the RUDI node admin'
+      )
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
-      `Could not forge a token for user '${user.username}' on Media: ${
-        err.response?.data?.message ||
-        err.response?.data?.msg ||
-        JSON.stringify(err.response?.data) ||
-        err.message
-      }`,
+      `Could not forge a token for user '${user.username}' on Media: ${cleanErrMsg(
+        err.response?.data?.message || err.response?.data?.msg || err.message || err.response?.data
+      )}`,
       mod,
       fun
     )
