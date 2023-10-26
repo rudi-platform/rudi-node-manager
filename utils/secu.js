@@ -34,21 +34,6 @@ function isJwtValid(jwt) {
 exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
   req?.cookies ? req.cookies[cookieName] : null
 
-exports.extractJwtFromReq = (req) => {
-  const fun = 'extractJwtFromReq'
-  const headers = req?.headers || req?.Headers
-  const auth = headers?.Authorization || headers?.authorization
-  if (!auth) {
-    log.d(mod, fun, `headers: ${headers}`)
-    throw new ForbiddenError('No Authorization found in request headers')
-  }
-  if (!auth.startsWith('Bearer ')) return new ForbiddenError('Request should use a JWT')
-
-  const token = auth.substring(7)
-  if (token.length === 0) return new ForbiddenError('Request provided an empty JWT')
-  return token
-}
-
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
   if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`)

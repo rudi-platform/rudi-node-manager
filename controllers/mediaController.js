@@ -13,18 +13,18 @@ const {
   createPmHeadersForMedia,
   extractCookieFromReq,
   CONSOLE_TOKEN_NAME,
-  extractJwtFromReq,
   readJwtBody,
   getTokenFromMediaForUser,
 } = require('../utils/secu')
 const { handleError } = require('./errorHandler')
+const { extractJwt } = require('@aqmo.org/jwt-lib')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
   const fun = 'getMediaToken'
   try {
     // We extract
-    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwtFromReq(req)
+    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwt(req)
     if (!jwt) {
       console.error('T (getMediaToken) req:', req)
       throw new UnauthorizedError('No JWT was found in the request')
