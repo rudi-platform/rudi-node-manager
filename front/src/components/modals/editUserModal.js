@@ -1,14 +1,15 @@
 import axios from 'axios'
 
 import React, { useState } from 'react'
+
 import PropTypes from 'prop-types'
 
 import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
-import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
+import Modal from 'react-bootstrap/Modal'
+import Row from 'react-bootstrap/Row'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
@@ -63,7 +64,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     roles: hasErrors('roles'),
   })
   const isValid = (prop) =>
-    !!prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
+    prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
 
   const editUserInfo = (prop, val) => {
     setErrors((errors) => {

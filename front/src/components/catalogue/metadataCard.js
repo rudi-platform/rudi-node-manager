@@ -1,29 +1,29 @@
 import axios from 'axios'
 
-import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   BoxArrowUpRight,
-  Pencil,
-  Trash,
   CloudDownload,
-  Eye,
-  Share,
   CloudSlash,
+  Eye,
+  Pencil,
+  Share,
+  Trash,
 } from 'react-bootstrap-icons'
+import { Link } from 'react-router-dom'
 
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getObjFormUrl, getLocaleFormatted } from '../../utils/utils'
+import { BackDataContext, BackDataContextProvider } from '../../context/backDataContext'
 import { getBackUrl } from '../../utils/frontOptions'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { getLocaleFormatted, getObjFormUrl } from '../../utils/utils'
 import {
-  DefaultOkOption,
   DefaultConfirmOption,
+  DefaultOkOption,
   useModalContext,
 } from '../modals/genericModalContext'
-import ThemeDisplay from '../other/themeDisplay'
 import FileSizeDisplay from '../other/fileSizeDisplay'
-import { usePMFrontContext } from '../../generalContext'
+import ThemeDisplay from '../other/themeDisplay'
 
 const downloadButton = (url) => (
   <button type="button" className="btn btn-green button-margin">
@@ -139,7 +139,7 @@ export const displayMetadataStatus = (metadata) =>
  * @return {ReactNode}
  */
 export default function MetadataCard({ editMode, metadata, refresh, logout }) {
-  const { appInfo } = usePMFrontContext()
+  const { appInfo } = useContext(BackDataContext)
   const { changeOptions, toggle } = useModalContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
@@ -311,7 +311,9 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
             Producteur : <span className="text-muted">{metadata.producer?.organization_name}</span>
           </p>
           <a href="#" className="btn btn-secondary card-margin">
-            <ThemeDisplay value={metadata.theme}></ThemeDisplay>
+            <BackDataContextProvider>
+              <ThemeDisplay value={metadata.theme}></ThemeDisplay>
+            </BackDataContextProvider>
           </a>
           <span className="card-text">
             {metadata.available_formats.map((media) => displayMedia(media))}

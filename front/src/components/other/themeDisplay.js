@@ -1,6 +1,6 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import { usePMFrontContext } from '../../generalContext'
+import React, { useContext, useEffect, useState } from 'react'
+import { BackDataContext } from '../../context/backDataContext'
 
 ThemeDisplay.propTypes = {
   value: PropTypes.string,
@@ -11,14 +11,14 @@ ThemeDisplay.propTypes = {
  * @return {ReactNode}
  */
 export default function ThemeDisplay({ value }) {
-  const { appInfo } = usePMFrontContext()
-  // console.log('T ThemeDisplay.value:',value)
-  // console.log('T ThemeDisplay.themeLabels:',appInfo.themeLabels)
-  /**
-   * get Theme Label
-   * @return {String} text to display
-   */
-  const getLabel = () => (appInfo.themeLabels?.[value] || value)
+  const { appInfo } = useContext(BackDataContext)
+  const [themeLabel, setThemeLabel] = useState(value)
+  useEffect(
+    () => setThemeLabel(appInfo.themeLabels?.[value] || value),
+    [appInfo?.themeLabels]
+  )
+  // console.log('T ThemeDisplay.value:', value)
+  // console.log('T ThemeDisplay.themeLabel:', themeLabel)
 
-  return <span>{getLabel()}</span>
+  return <span>{themeLabel}</span>
 }

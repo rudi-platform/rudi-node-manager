@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { Search } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { BackDataContextProvider } from '../../context/backDataContext'
 import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard } from '../generic/objCard'
@@ -51,6 +52,14 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const isSearchMode = () => searchText?.current?.value?.length > 0
   const searchMode = () => (isSearchMode() ? `/search` : '')
 
+  const metadataDisplay = (filterValue) => (
+    <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
+  )
+  const themeDisplay = (filterValue, filter) => (
+    <BackDataContextProvider>
+      <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
+    </BackDataContextProvider>
+  )
   const refresh = () => {
     setHasMore(true)
     setMetadataList([])
@@ -78,33 +87,25 @@ export default function CatalogueMetadata({ editMode, logout }) {
       toFilterParam: (elem) => {
         return { metadata_status: `"${elem?.metadata_status}"` }
       },
-      display: (filterValue) => (
-        <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
-      ),
+      display: metadataDisplay,
     },
     {
       name: 'theme',
-      text: 'Thème :',
+      text: 'Thèmes :',
       values: [],
-      toFilterParam: (elem) => {
-        return { theme: `"${elem?.theme}"` }
-      },
-      display: (filterValue, filter) => (
-        <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
-      ),
+      toFilterParam: (elem) => ({ theme: `"${elem?.theme}"` }),
+      display: themeDisplay,
     },
     {
       name: 'keywords',
       text: 'Mots-clés :',
       values: [],
-      toFilterParam: (elem) => {
-        return { keywords: `"${elem?.keywords}"` }
-      },
+      toFilterParam: (elem) => ({ keywords: `"${elem?.keywords}"` }),
     },
     {
       name: 'producer',
       displayName: 'organization_name',
-      text: 'Source :',
+      text: 'Sources :',
       values: [],
       toFilterParam: (elem) => {
         return { 'producer.organization_name': `"${elem.producer?.organization_name}"` }
@@ -189,15 +190,13 @@ export default function CatalogueMetadata({ editMode, logout }) {
     // should add
     if (indexType === -1) {
       setCurrentFilters(filterList.concat(filterParam))
-    } else {
+    } else if (index > -1) {
       // should replace/remove
-      if (index > -1) {
-        filterList.splice(index, 1)
-        setCurrentFilters(filterList)
-      } else {
-        filterList.splice(indexType, 1)
-        setCurrentFilters(filterList.concat(filterParam))
-      }
+      filterList.splice(index, 1)
+      setCurrentFilters(filterList)
+    } else {
+      filterList.splice(indexType, 1)
+      setCurrentFilters(filterList.concat(filterParam))
     }
   }
 
@@ -233,7 +232,6 @@ export default function CatalogueMetadata({ editMode, logout }) {
         // Simple toggle of the actual reference value for this filter type
         filterList[existingFilterIndex] = { [filterKey]: toggleFilterVal(existingFilterVal) }
       }
-      // console.log('T (toggleFilter) filterList[0]', filterList[0]);
       setCurrentFilters(filterList)
     }
   }
@@ -395,7 +393,10 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   return !filterObject.values ? (
                     'No values'
                   ) : (
-                    <div className={i?"col border rounded":"border rounded"} key={filterObject.name}>
+                    <div
+                      className={i ? 'col border rounded' : 'border rounded'}
+                      key={filterObject.name}
+                    >
                       <div className="label-lv2">{filterObject.text}</div>
                       <ul className="list-group">
                         {filterObject.values.map((filterValue, i) => {

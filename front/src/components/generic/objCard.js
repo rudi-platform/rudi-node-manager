@@ -1,13 +1,13 @@
 import axios from 'axios'
 
-import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
+import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
-import { usePMFrontContext } from '../../generalContext'
 import { getObjFormUrl } from '../../utils/utils'
+import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
   editMode: PropTypes.bool,
@@ -40,7 +40,7 @@ export function ObjCard({
   deleteMsg,
   refresh,
 }) {
-  const { appInfo } = usePMFrontContext()
+  const { appInfo } = useContext(BackDataContext)
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
@@ -144,7 +144,7 @@ export function EditObjCard({
   deleteMsg,
   refresh,
 }) {
-  const { appInfo } = usePMFrontContext()
+  const { appInfo } = useContext(BackDataContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [editID, setEditID] = useState('')

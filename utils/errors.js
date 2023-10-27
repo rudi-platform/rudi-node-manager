@@ -138,6 +138,20 @@ class NotImplementedError extends RudiError {
   }
 }
 
+exports.s
+class ConnectionError extends RudiError {
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(
+      errMessage,
+      503,
+      'Connection Failed',
+      'Connection failed, target server is unreachable. Contact the RUDI admin ',
+      ctxMod,
+      ctxFun
+    )
+  }
+}
+
 exports.statusOK = (message) => {
   return { status: 'OK', message }
 }
@@ -149,5 +163,6 @@ exports.NotFoundError = NotFoundError
 exports.MethodNotAllowedError = MethodNotAllowedError
 exports.NotAcceptableError = NotAcceptableError
 exports.InternalServerError = InternalServerError
+exports.ConnectionError = ConnectionError
 exports.RudiError = RudiError
 exports.STATUS_CODE = STATUS_CODE

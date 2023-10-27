@@ -2,13 +2,13 @@ import './login.css'
 
 import axios from 'axios'
 
-import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useState } from 'react'
 
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/esm/Button'
-import InputGroup from 'react-bootstrap/InputGroup'
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
+import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Button from 'react-bootstrap/esm/Button'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
@@ -37,7 +37,7 @@ Login.propTypes = {
  */
 export default function Login({ setToken, setUserInfo }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
-  // console.log('-- Login');
+
   const [username, setUserName] = useState('')
   const [password, setPassword] = useState('')
 

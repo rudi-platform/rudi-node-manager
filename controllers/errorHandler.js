@@ -1,6 +1,6 @@
-const { RudiError } = require('../utils/errors')
+const { RudiError, BadRequestError, ConnectionError } = require('../utils/errors')
 const log = require('../utils/logger')
-const { cleanErrMsg, beautify } = require('../utils/utils')
+const { cleanErrMsg } = require('../utils/utils')
 
 const mod = 'errHandler'
 
@@ -51,7 +51,7 @@ exports.error = (error, req, options) => {
     }
     // log.e(mod, fun, error?.message || error)
     log.sysError(mod, fun, cleanErrMsg(errorToDisplay), log.getContext(req, options))
-    if (error?.config) log.e(mod, fun, error.config)
+    if (error?.config) log.e(mod, fun, cleanErrMsg(error.config))
 
     return errorToDisplay
   } catch (err) {
@@ -94,5 +94,39 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
   } catch (err) {
     console.error(mod, 'handleError.initialError', cleanErrMsg(initialError))
     console.error(mod, 'handleError failed', cleanErrMsg(err))
+  }
+}
+
+exports.treatAxiosError = (err, reply) => {
+  const fun = 'treatAxiosError'
+  let finalError
+  if (err.response) {
+    const { data, status, headers } = err.response
+    log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
+    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+  } else if (err.request) {
+    const { message, status, code, headers, request } = err
+    log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
+    log.e(mod, fun, `ERR for request: ${cleanErrMsg(request)}`)
+    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+  } else {
+    // err.message
+    const { message, status, code, headers } = err
+    log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
+    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+  }
+  if (err.name == 'AxiosError') {
+    let statusCode, error, errorMsg
+    if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+      statusCode = 503
+      error = {
+        statusCode,
+        message:
+          'La connection de “RUDI Prod Manager” vers le module “RUDI API” a échoué: “RUDI API” est injoignable, contactez l‘admin du noeud RUDI',
+      }
+      // log.e(mod,fun,err. )
+      if (reply) return reply.status(statusCode).json(error)
+      else throw new ConnectionError(error.message)
+    }
   }
 }
