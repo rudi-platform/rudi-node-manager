@@ -79,8 +79,8 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
   try {
     if (initialError?.response?.data) {
       const statusCode = initialError.response.data.statusCode
-      const message = initialError.response.data.message
-      const error = initialError.response.data.error
+      const message = cleanErrMsg(initialError.response.data.message)
+      const error = cleanErrMsg(initialError.response.data.error)
       if (statusCode && message && error)
         return reply.status(statusCode).json({ statusCode, error, message })
     }
