@@ -7,7 +7,7 @@ const mod = 'errHandler'
 exports.error = (error, req, options) => {
   const fun = 'error'
   try {
-    log.sysError(mod, fun, beautify(error), log.getContext(req, options))
+    log.sysError(mod, fun, cleanErrMsg(error), log.getContext(req, options))
     let errorToDisplay
     if (!error) return new RudiError(`Error was unidentified`)
     let statusCode =
@@ -50,12 +50,12 @@ exports.error = (error, req, options) => {
       errorToDisplay = { message: cleanErrMsg(error?.message || error, statusCode) }
     }
     // log.e(mod, fun, error?.message || error)
-    log.sysError(mod, fun, beautify(errorToDisplay), log.getContext(req, options))
+    log.sysError(mod, fun, cleanErrMsg(errorToDisplay), log.getContext(req, options))
     if (error?.config) log.e(mod, fun, error.config)
 
     return errorToDisplay
   } catch (err) {
-    log.e(mod, fun, `Error in errHandler: ${beautify(err)}`)
+    log.e(mod, fun, `Error in errHandler: ${cleanErrMsg(err)}`)
     return {
       statusCode: 500,
       message: cleanErrMsg(err),
@@ -75,7 +75,7 @@ exports.error = (error, req, options) => {
  * @param {String} id The UUID of the object
  */
 exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id) => {
-  log.e(mod, srcFun, beautify(initialError))
+  log.e(mod, srcFun, cleanErrMsg(initialError))
   try {
     if (initialError?.response?.data) {
       const statusCode = initialError.response.data.statusCode
