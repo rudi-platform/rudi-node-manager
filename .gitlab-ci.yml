@@ -26,7 +26,8 @@ install_back:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
-    - when: manual
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+      when: manual
   tags:
     - nodejs
   variables:
@@ -42,7 +43,8 @@ build_front:
   rules:
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: always
-    - when: manual
+    - if: '$CI_COMMIT_BRANCH != "release"'
+      when: manual  
   tags:
     - nodejs
   variables:
