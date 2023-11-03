@@ -44,7 +44,7 @@ build_front:
       when: always
     - when: manual
   tags:
-    - nodejs--20
+    - nodejs-20
   variables:
     # NODE_ENV: development
     NODE_ENV: production
