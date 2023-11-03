@@ -28,7 +28,7 @@ install_back:
       when: always
     - when: manual
   tags:
-    - nodejs-20
+    - nodejs
   variables:
     # NODE_ENV: development
     NODE_ENV: production
@@ -44,7 +44,7 @@ build_front:
       when: always
     - when: manual
   tags:
-    - nodejs-20
+    - nodejs
   variables:
     # NODE_ENV: development
     NODE_ENV: production
