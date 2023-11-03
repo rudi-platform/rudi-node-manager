@@ -144,7 +144,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
   const [appData, setAppData] = useState({})
-  useEffect(() => setAppData(appInfo),[appInfo])
+  useEffect(() => setAppData(appInfo), [appInfo])
 
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])

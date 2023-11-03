@@ -62,7 +62,12 @@ exports.getPortalUrl = () =>
 exports.getInitData = async (req, reply) => {
   try {
     const data = await Promise.all([
-      callApiModule(null, null, getAdminApi(`enum/themes/${req.query?.lang || 'fr'}`), 'get_theme_by_lg'),
+      callApiModule(
+        null,
+        null,
+        getAdminApi(`enum/themes/${req.query?.lang || 'fr'}`),
+        'get_theme_by_lg'
+      ),
       getConsoleFormUrl(),
       this.getApiExternalUrl(),
       this.getPortalUrl(),

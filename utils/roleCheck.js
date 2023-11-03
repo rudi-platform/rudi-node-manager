@@ -29,7 +29,7 @@ exports.checkRolePerm = (expectedRoles) => (req, reply, next) => {
         log.sysWarn(
           mod,
           fun,
-          `Forbidden access by ${username} at ${req.method} ${req.url}`,
+          `Access forbidden for '${username}' to ${req.method} ${req.url}`,
           log.getContext(req, { opType: 'get_hash', statusCode: 403 })
         )
         try {

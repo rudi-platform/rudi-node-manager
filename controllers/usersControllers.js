@@ -111,7 +111,7 @@ exports.deleteUserWithId = async (req, reply, next) => {
   }
 }
 
-exports.createUser = async (req, reply, next) => {
+exports.createUser = async (req, reply) => {
   try {
     const userInfo = req.body
     // console.log('T (addUser) userInfo', userInfo)
@@ -124,6 +124,10 @@ exports.createUser = async (req, reply, next) => {
       return reply
         .status(400)
         .json(new BadRequestError('La requête doit comporter un email non null'))
+    if (!roles || !Array.isArray(roles) || roles.length == 0)
+      return reply
+        .status(400)
+        .json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
 
     const hashedPassword = hashPassword(password || INIT_PWD)
 

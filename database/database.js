@@ -48,7 +48,7 @@ exports.dbOpen = dbOpen
 
 const dbClose = (db) => {
   db.close((err) => {
-    if (err && err?.message != 'SQLITE_MISUSE: Database handle is closed')
+    if (err && err.message != 'SQLITE_MISUSE: Database handle is closed')
       log.e(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
@@ -207,34 +207,33 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
         log.e(mod, fun + ' userExists', errMsg)
         return reject(new ForbiddenError(errMsg))
       } else {
-        db.run(
-          `INSERT INTO ${TBL_USERS}(username,password,email${id && ',id'})` +
-            ` VALUES(?,?,?${id && ',?'})`,
-          [username, password, email, id],
-          (err) => {
-            if (err) {
-              if (!openedDb) dbClose(db)
-              log.e(mod, fun + ' cannotCreateUser', err.message)
-              return reject(err)
-            }
-            log.i(
-              mod,
-              fun,
-              `${TBL_USERS} : user created: '${username}'`,
-              log.getContext(null, { opType: 'post_user' })
-            )
-            db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, userInfo) => {
-              if (!openedDb) dbClose(db)
-              if (err) {
-                log.e(mod, fun + ' retrieveUserInfo', err.message)
-                reject(err)
-              } else {
-                const { id, username } = userInfo
-                resolve({ id, username })
-              }
-            })
+        const sqlReq =
+          `INSERT INTO ${TBL_USERS}(username,password,email${id ? ',id' : ''})` +
+          ` VALUES(?,?,?${id ? ',?' : ''})`
+        db.run(sqlReq, [username, password, email, id], (err) => {
+          if (err) {
+            if (!openedDb) dbClose(db)
+            log.e(mod, fun + ' cannotCreateUser', err.message)
+            log.e(mod, fun + ' sqlReq', sqlReq)
+            return reject(err)
           }
-        )
+          log.i(
+            mod,
+            fun,
+            `${TBL_USERS} : user created: '${username}'`,
+            log.getContext(null, { opType: 'post_user' })
+          )
+          db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, userInfo) => {
+            if (!openedDb) dbClose(db)
+            if (err) {
+              log.e(mod, fun + ' retrieveUserInfo', err.message)
+              reject(err)
+            } else {
+              const { id, username } = userInfo
+              resolve({ id, username })
+            }
+          })
+        })
       }
     })
   })
@@ -646,10 +645,11 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
               .catch((err) => reject(new InternalServerError(`(dbUpdateUserRoles.addNew) ${err}`)))
           } else {
             origRoles.splice(i, 1)
-            console.log(
-              `T (dbUpdateUserRoles) Role kept for user '${username || userId}': ${newRole}`
-            )
-            console.log(`T (dbUpdateUserRoles) Roles left:`, origRoles)
+            console
+              .log
+              // `T (dbUpdateUserRoles) Role kept for user '${username || userId}': ${newRole}`
+              ()
+            // console.log(`T (dbUpdateUserRoles) Roles left:`, origRoles)
             resolve(`Role kept for user '${username || userId}': ${newRole}`)
           }
         })

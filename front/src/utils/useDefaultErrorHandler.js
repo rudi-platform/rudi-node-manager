@@ -13,17 +13,15 @@ export default function useDefaultErrorHandler() {
     const options = DefaultErrorOption
     if (!err.response) {
       options.text = [displayMsg(err.message)]
+    } else if (err.response.data?.message) {
+      options.text = [displayMsg(err.response.data.message)]
+      if (err.response.data.moreInfo?.message)
+        options.text.push(displayMsg(err.response.data.moreInfo.message))
     } else {
-      if (err.response.data?.message) {
-        options.text = [displayMsg(err.response.data.message)]
-        if (err.response.data.moreInfo?.message)
-          options.text.push(displayMsg(err.response.data.moreInfo.message))
-      } else {
-        options.text =
-          err.response?.data?.status == 'error'
-            ? [displayMsg(err.response.data.msg)]
-            : [displayMsg(err.response.data)]
-      }
+      options.text =
+        err.response?.data?.status == 'error'
+          ? [displayMsg(err.response.data.msg)]
+          : [displayMsg(err.response.data)]
     }
     changeOptions(options)
     toggle()

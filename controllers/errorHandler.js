@@ -1,4 +1,4 @@
-const { RudiError, BadRequestError, ConnectionError } = require('../utils/errors')
+const { RudiError, ConnectionError } = require('../utils/errors')
 const log = require('../utils/logger')
 const { cleanErrMsg } = require('../utils/utils')
 
@@ -99,7 +99,6 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
 
 exports.treatAxiosError = (err, reply) => {
   const fun = 'treatAxiosError'
-  let finalError
   if (err.response) {
     const { data, status, headers } = err.response
     log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)

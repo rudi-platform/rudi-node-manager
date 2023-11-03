@@ -32,10 +32,10 @@ export const showObj = (obj, option = 2) => {
   }
 }
 
-export const getObjFormUrl = (formUrl, objType = '', queryParams = '') => formUrl + objType + queryParams
+export const getObjFormUrl = (formUrl, objType = '', queryParams = '') =>
+  formUrl + objType + queryParams
 
-export const ensureEndsWithSlash = (url) => `${url}`.endsWith('/')?url:`${url}/`
-
+export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
 
 export const getCookie = (name) =>
   document.cookie

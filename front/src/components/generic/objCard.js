@@ -45,7 +45,7 @@ export function ObjCard({
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''),[appInfo])
+  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
 
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
@@ -151,7 +151,7 @@ export function EditObjCard({
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''),[appInfo])
+  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
 
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)

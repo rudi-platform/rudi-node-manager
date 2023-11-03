@@ -6,7 +6,7 @@ const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies
 const { getConf } = require('../config/config')
-const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
+const { timeEpochS, toInt, cleanErrMsg, beautify } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
 const { isDevEnv } = require('../config/backOptions')
@@ -100,9 +100,12 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
-  console.log(`T (${fun})`, 'delegationBody', delegationBody)
+  // console.log(`T (${fun})`, 'delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
+  // log.d(mod, fun, `mediaForgeJwtUrl: ${mediaForgeJwtUrl}`)
+  // log.d(mod, fun, `delegationBody: ${beautify(delegationBody)}`)
+  // log.d(mod, fun, `pmHeaders: ${cleanErrMsg(pmHeaders)}`)
   try {
     const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
     if (!mediaRes) throw Error(`No answer received from Media module`)
@@ -111,7 +114,8 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
     else return mediaRes.data.token
   } catch (err) {
     if (err.code == 'ECONNREFUSED')
-      throw RudiError.createRudiHttpError(500,
+      throw RudiError.createRudiHttpError(
+        500,
         'Connection from “RUDI Prod Manager” to “RUDI Media” module failed: ' +
           '“RUDI Media” module is apparently down, contact the RUDI node admin'
       )
