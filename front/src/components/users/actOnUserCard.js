@@ -26,7 +26,7 @@ export default function ActOnUserCard({ roleList, refresh }) {
       <div className="card edit-card-margin">
         <div className="card-body">
           <div className="inline">
-            <a className="btn btn-secondary" onClick={() => createNewUser()}>
+            <a className="btn btn-secondary" onClick={createNewUser} onKeyDown={createNewUser}>
               Ajouter un utilisateur <Plus />
             </a>
           </div>

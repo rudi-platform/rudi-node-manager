@@ -65,10 +65,12 @@
     "@testing-library/user-event": "^14.5.1",
     "eslint": "^8.52.0",
     "eslint-plugin-only-warn": "^1.1.0",
-    "eslint-plugin-react": "^7.33.2"
+    "eslint-plugin-react": "^7.33.2",
+    "postcss": "^8.4.31"
   },
   "overrides": {
     "@svgr/webpack": "$@svgr/webpack",
-    "nth-check": "$nth-check"
+    "nth-check": "$nth-check",
+    "postcss": "$postcss"
   }
 }

@@ -146,8 +146,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const [appData, setAppData] = useState({})
   useEffect(() => setAppData(appInfo), [appInfo])
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   /**
    * call for metadata deletion

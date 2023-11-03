@@ -91,10 +91,7 @@ app.use(`/api/secu/`, authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
   app.use(express.static(path.join(__dirname, 'front/build')))
-
-  app.get('/*', function (req, reply) {
-    reply.sendFile(path.join(__dirname, 'front/build', 'index.html'))
-  })
+  app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build', 'index.html')))
 }
 
 // Init database on startup

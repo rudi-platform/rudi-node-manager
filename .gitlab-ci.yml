@@ -1,61 +1,59 @@
 cache:
   - key:
       files:
-        - package-lock.json
+        - ./package-lock.json
     paths:
-      - node_modules/
+      - ./node_modules/
   - key:
       files:
-        - front/package-lock.json
+        - ./front/package-lock.json
     paths:
-      - front/node_modules/
+      - ./front/node_modules/
 
 stages:
   - install_back
   - build_front
 
-default:
-  before_script:
-    - |
-      {
-        echo "@aqmo.org:registry=${CI_API_V4_URL}/projects/59/packages/npm/"
-        echo "${CI_API_V4_URL#https?}/projects/59/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
-      } | tee -a .npmrc
-
 # npm install Back
 install_back:
   stage: install_back
+  cache:
+    - key:
+        files:
+          - ./package-lock.json
+      paths:
+        - ./node_modules/
   rules:
-    - when: manual
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
+    - when: manual
   tags:
-    - nodejs
+    - nodejs--20
   variables:
     # NODE_ENV: development
     NODE_ENV: production
   script:
-    - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
+    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
     - npm install
 
 # npm install Front + build Front
 build_front:
   stage: build_front
   rules:
-    - when: manual
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: always
+    - when: manual
   tags:
-    - nodejs
+    - nodejs--20
   variables:
     # NODE_ENV: development
     NODE_ENV: production
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
-    - cd front && npm run cleanup && npm install && npm run build
+    - cd front && npm install && npm run build
   artifacts:
-    name: 'ProdManager-front-$-PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
+    name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
     expire_in: 10 week

@@ -6,7 +6,7 @@ const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies
 const { getConf } = require('../config/config')
-const { timeEpochS, toInt, cleanErrMsg, beautify } = require('./utils')
+const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
 const { isDevEnv } = require('../config/backOptions')

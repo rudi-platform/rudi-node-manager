@@ -137,7 +137,6 @@ class NotImplementedError extends RudiError {
   }
 }
 
-exports.s
 class ConnectionError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
@@ -151,9 +150,7 @@ class ConnectionError extends RudiError {
   }
 }
 
-exports.statusOK = (message) => {
-  return { status: 'OK', message }
-}
+exports.statusOK = (message) => ({ status: 'OK', message })
 
 exports.BadRequestError = BadRequestError
 exports.UnauthorizedError = UnauthorizedError
