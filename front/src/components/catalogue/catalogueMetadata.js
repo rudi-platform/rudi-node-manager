@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 import { Search } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { BackDataContextProvider } from '../../context/backDataContext'
 import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard } from '../generic/objCard'
@@ -36,11 +35,11 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const [metadataList, setMetadataList] = useState([])
-  const [allCountByFilters, setCountByFilters] = useState([])
+  const [allCountByFilters, setAllCountByFilters] = useState([])
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => refresh(), [currentFilters])
 
@@ -56,9 +55,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
     <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
   )
   const themeDisplay = (filterValue, filter) => (
-    <BackDataContextProvider>
-      <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
-    </BackDataContextProvider>
+    <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
   )
   const refresh = () => {
     setHasMore(true)
@@ -252,7 +249,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
           filter.values = values[i].data
           return filter
         })
-        setCountByFilters(updatedFilter)
+        setAllCountByFilters(updatedFilter)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }

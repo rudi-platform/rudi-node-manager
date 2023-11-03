@@ -8,8 +8,8 @@ import DropdownButton from 'react-bootstrap/DropdownButton'
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import { createBrowserHistory } from 'history'
+import { UserContext, UserContextProvider } from './context/authContext'
 import { BackDataContext, BackDataContextProvider } from './context/backDataContext'
-import useToken from './useToken'
 import { getApiFront, getBackUrl } from './utils/frontOptions'
 
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
@@ -26,7 +26,7 @@ import ModalProvider from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
 import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
-import { UserContext, UserContextProvider } from './context/authContext'
+import { JwtContext, JwtContextProvider } from './context/jwtContext'
 
 export const history = createBrowserHistory({ basename: getBackUrl() })
 
@@ -44,19 +44,20 @@ TODO :
  */
 export default function App() {
   return (
-    <UserContextProvider>
-      <BackDataContextProvider>
-        <Main />
-      </BackDataContextProvider>
-    </UserContextProvider>
+    <JwtContextProvider>
+      <UserContextProvider>
+        <BackDataContextProvider>
+          <Main />
+        </BackDataContextProvider>
+      </UserContextProvider>
+    </JwtContextProvider>
   )
 }
 const Main = () => {
-  const { token, updateToken } = useToken()
-
   // ---------------- Loading context
-  const { isEditor, isAdmin, setUserInfo } = useContext(UserContext)
-  const { appInfo, isLoading } = useContext(BackDataContext)
+  const { token, updateToken } = useContext(JwtContext)
+  const { isEditor, isAdmin } = useContext(UserContext)
+  const { appInfo } = useContext(BackDataContext)
 
   // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
@@ -97,7 +98,7 @@ const Main = () => {
 
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
-  useEffect(() => setDisplayTags(displayVersion()), [appInfo?.appTag, appInfo?.gitHash, isLoading])
+  useEffect(() => setDisplayTags(displayVersion()), [appInfo?.appTag, appInfo?.gitHash])
   // useEffect(() => console.log('T (displayAppInfo) appInfo', appInfo), [appInfo])
 
   /**
@@ -117,10 +118,7 @@ const Main = () => {
     </li>
   )
 
-  const exit = () => {
-    updateToken()
-    setUserInfo({})
-  }
+  const exit = () => updateToken({})
 
   /**
    * logout
@@ -141,7 +139,7 @@ const Main = () => {
 
   return !token ? (
     <div>
-      {isLoginOpen && <Login setToken={updateToken} setUserInfo={setUserInfo} />}
+      {isLoginOpen && <Login updateToken={updateToken} />}
       {isChgPwdOpen && <ChangePwd backToLogin={showLoginBox} />}
       {isRegisterOpen && <Register backToLogin={showLoginBox} />}
       <div className="login-switch">

@@ -67,12 +67,8 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
 
   const editUserInfo = (prop, val) => {
-    setErrors((errors) => {
-      return { ...errors, [prop]: hasErrors(prop, val) }
-    })
-    setUserInfo((userInfo) => {
-      return { ...userInfo, [prop]: val }
-    })
+    setErrors((errors) => ({ ...errors, [prop]: hasErrors(prop, val) }))
+    setUserInfo((userInfo) => ({ ...userInfo, [prop]: val }))
   }
 
   const isInUserRole = (userRoles, role) =>

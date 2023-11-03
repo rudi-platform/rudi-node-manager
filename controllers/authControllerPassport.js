@@ -38,54 +38,44 @@ const {
 exports.postLogin = async (req, reply, next) => {
   const fun = 'postLogin'
   // log.d(mod, 'postLogin', '<--')
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', async (err, user, info) => {
     if (err) {
       log.sysWarn(mod, fun, err)
       return reply.status(400).send(err)
     }
     if (!user)
-      try {
+      return reply
+        .status(401)
+        .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
+    try {
+      const username = user.username
+      const roles = await dbGetUserRolesByUsername(null, username)
+
+      if (!roles?.length)
         return reply
           .status(401)
-          .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
-      } catch (e) {
-        log.e(mod, fun, e)
-        return
-      }
-    const username = user.username
-    dbGetUserRolesByUsername(null, username)
-      .then((roles) => {
-        if (!roles?.length)
-          return reply
-            .status(401)
-            .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
-            .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-            .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
-            .send(`Admin validation is required for this user: '${user.username}'`)
+          .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
+          .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
+          .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
+          .send(`Admin validation is required for this user: '${user.username}'`)
 
-        req.login(user, { session: false }, async (err) => {
-          if (err) return reply.status(400).json({ errors: err })
-          user.roles = roles
-          const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
+      req.login(user, { session: false }, async (err) => {
+        if (err) return reply.status(400).json({ errors: err })
+        user.roles = roles
+        const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
 
-          // sameSite: 'Lax' ?
-          return reply
-            .status(200)
-            .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
-            .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
-            .json({ username, roles })
-        })
+        // sameSite: 'Lax' ?
+        return reply
+          .status(200)
+          .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
+          .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
+          .json({ username, roles })
       })
-      .catch((er) => {
-        log.e(mod, fun, er)
-        this.logout()
-        try {
-          return reply.status(er.statusCode || 501).send(er)
-        } catch (e) {
-          log.e(mod, fun, e)
-          return
-        }
-      })
+    } catch (er) {
+      log.e(mod, fun, er)
+      this.logout()
+      return reply.status(er?.statusCode || 501).send(er)
+    }
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, reply, next)
 }

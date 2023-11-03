@@ -1,14 +1,14 @@
 import axios from 'axios'
 
-import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useState } from 'react'
 
 import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
-import Row from 'react-bootstrap/Row'
 import InputGroup from 'react-bootstrap/InputGroup'
+import Modal from 'react-bootstrap/Modal'
+import Row from 'react-bootstrap/Row'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
@@ -72,12 +72,8 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
     !!prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
 
   const editUserInfo = (prop, val) => {
-    setErrors((errors) => {
-      return { ...errors, [prop]: hasErrors(prop, val) }
-    })
-    setUserInfo((userInfo) => {
-      return { ...userInfo, [prop]: val }
-    })
+    setErrors((errors) => ({ ...errors, [prop]: hasErrors(prop, val) }))
+    setUserInfo((userInfo) => ({ ...userInfo, [prop]: val }))
   }
 
   const isInUserRole = (role, rolesList) =>
@@ -111,11 +107,7 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
     // console.log('(handleRoleChange) usrRoles:', userRoles, '=>', nextUserRoles)
     editUserInfo('roles', nextUserRoles)
   }
-  const resetState = () => {
-    setUserInfo(() => {
-      return {}
-    })
-  }
+  const resetState = () => setUserInfo(() => ({}))
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -229,11 +221,4 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
 }
 
 export const useAddUserModal = () => {
-  const [isVisibleAddModal, setVisible] = useState(false)
-  /**
-   * toggle l'affichage de la modal
-   * @return {void}
-   */
-  const toggleAddModal = () => setVisible(!isVisibleAddModal)
-  return { isVisibleAddModal, toggleAddModal }
 }

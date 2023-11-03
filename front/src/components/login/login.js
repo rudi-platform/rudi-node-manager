@@ -25,17 +25,14 @@ export const showPill = (condition, showState) =>
     ''
   )
 
-Login.propTypes = {
-  setToken: PropTypes.func.isRequired,
-  setUserInfo: PropTypes.func.isRequired,
-}
+Login.propTypes = { updateToken: PropTypes.func.isRequired }
 
 /**
  * Login component
  * @param {*} param0 (token hooks)
  * @return {ReactNode} Login html component
  */
-export default function Login({ setToken, setUserInfo }) {
+export default function Login({ updateToken }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [username, setUserName] = useState('')
@@ -81,12 +78,7 @@ export default function Login({ setToken, setUserInfo }) {
           text: [errMsg],
           title: 'Une erreur est survenue',
           type: 'error',
-          buttons: [
-            {
-              text: 'Ok',
-              action: () => {},
-            },
-          ],
+          buttons: [{ text: 'Ok', action: () => {} }],
         })
         toggle()
       })
@@ -97,16 +89,8 @@ export default function Login({ setToken, setUserInfo }) {
    */
   function handleSubmit(event) {
     event.preventDefault()
-    loginUser({
-      username,
-      password,
-    })
-      .then((res) => {
-        setToken()
-        const userInfo = res?.data
-        // console.debug('T (Login) user', userInfo)
-        setUserInfo(userInfo)
-      })
+    loginUser({ username, password })
+      .then(() => updateToken())
       .catch((err) => {
         console.error('T (handleSubmit) handleSubmit ERR', err)
         defaultErrorHandler(err)

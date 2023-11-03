@@ -5,7 +5,7 @@ const twoDigits = (n) => `${n}`.padStart(2, '0')
  * @param {string | number} date A date
  * @return {string} A date in format YYYY.MM.DD hh:mm:ss
  */
-exports.getLocaleFormatted = (date) => {
+export const getLocaleFormatted = (date) => {
   const d = new Date(date)
   return (
     `${twoDigits(d.getDate())}/${twoDigits(d.getMonth() + 1)}/${d.getFullYear()} ` +
@@ -13,10 +13,10 @@ exports.getLocaleFormatted = (date) => {
   )
 }
 
-exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
-exports.timeEpochS = (delayS = 0) => Math.floor(new Date().getTime() / 1000) + delayS
+export const timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
+export const timeEpochS = (delayS = 0) => Math.floor(new Date().getTime() / 1000) + delayS
 
-exports.lastMonth = () => new Date(new Date().getTime() - 2592000000)
+export const lastMonth = () => new Date(new Date().getTime() - 2592000000)
 
 /**
  * Displays a JSON object content
@@ -24,7 +24,7 @@ exports.lastMonth = () => new Date(new Date().getTime() - 2592000000)
  * @param {BigInt} option adds indentation
  * @return {string} The JSON object as a string
  */
-exports.showObj = (obj, option = 2) => {
+export const showObj = (obj, option = 2) => {
   try {
     return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch (err) {
@@ -32,6 +32,13 @@ exports.showObj = (obj, option = 2) => {
   }
 }
 
-exports.getObjFormUrl = (formUrl, objType = '', queryParams = '') => formUrl + objType + queryParams
+export const getObjFormUrl = (formUrl, objType = '', queryParams = '') => formUrl + objType + queryParams
 
-exports.ensureEndsWithSlash = (url) => `${url}`.endsWith('/')?url:`${url}/`
+export const ensureEndsWithSlash = (url) => `${url}`.endsWith('/')?url:`${url}/`
+
+
+export const getCookie = (name) =>
+  document.cookie
+    ?.split('; ')
+    ?.find((row) => row.startsWith(`${name}`))
+    ?.split('=')[1]

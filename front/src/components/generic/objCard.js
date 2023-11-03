@@ -44,6 +44,9 @@ export function ObjCard({
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.formUrl || ''),[appInfo])
+
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
 
@@ -57,7 +60,7 @@ export function ObjCard({
   const deleteObj = (id) => {
     axios
       .delete(deleteUrl(id))
-      .then((res) => {
+      .then(() => {
         changeOptions(getOptOk(deleteMsg(id), () => refresh()))
         toggle()
       })
@@ -82,7 +85,7 @@ export function ObjCard({
               <div className="btn-group" role="group">
                 {!hideEdit && (
                   <a
-                    href={getObjFormUrl(appInfo.formUrl, objType, `?update=${objId}`)}
+                    href={getObjFormUrl(formUrl, objType, `?update=${objId}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-warning"
@@ -147,6 +150,9 @@ export function EditObjCard({
   const { appInfo } = useContext(BackDataContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.formUrl || ''),[appInfo])
+
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)
 
@@ -164,7 +170,7 @@ export function EditObjCard({
   const deleteObj = (id) => {
     axios
       .delete(deleteUrl(id))
-      .then((res) => {
+      .then(() => {
         changeOptions(getOptOk(deleteMsg(id), () => refresh()))
         toggle()
       })
@@ -182,7 +188,7 @@ export function EditObjCard({
   const button = {
     edit: (
       <a
-        href={getObjFormUrl(appInfo.formUrl, objType, `?update=${editID}`)}
+        href={getObjFormUrl(formUrl, objType, `?update=${editID}`)}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-warning"
@@ -202,7 +208,7 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              href={getObjFormUrl(appInfo.formUrl, objType)}
+              href={getObjFormUrl(formUrl, objType)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"

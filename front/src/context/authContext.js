@@ -1,9 +1,9 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
-import useToken from '../useToken'
 import { getApiFront } from '../utils/frontOptions'
+import { JwtContext } from './jwtContext'
 
 const hasRoleAdmin = (userInfo) =>
   userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1 || false
@@ -17,30 +17,33 @@ const callAuthBackend = async (token) => {
   try {
     return !token ? {} : (await axios.get(getApiFront('user-info')))?.data
   } catch (err) {
-    console.error('E (auth.callBackend)', err)
+    console.error('E (callAuthBackend)', err)
     return {}
   }
 }
-
+/**
+ * We use this context to memorize
+ * - the user info (username + roles)
+ * - the function to update the user info
+ * - the display flags that set if the user sees the Users menu (isAdmin) + the Data management menu (isEditor))
+ */
 const defaultUserProfile = {
   userInfo: {}, // the user info (username + roles)
-  setUserInfo: () => {},
   isEditor: false, // set true if the user sees the Data management menu ("Gestion")
   isAdmin: false, // set true if the user sees  the Users menu ("Utilisateurs")
 }
 
 export const UserContext = createContext(defaultUserProfile)
 
-UserContextProvider.propTypes = {
-  children: PropTypes.object,
-}
+UserContextProvider.propTypes = { children: PropTypes.object }
 /**
  * Returns the user information as a context
  * @param {Object} children
  * @return {React.Context.Provider}
  */
 export function UserContextProvider({ children }) {
-  const { token } = useToken()
+  const { token } = useContext(JwtContext)
+
   const [userInfo, setUserInfo] = useState({})
   const [isAdmin, setIsAdmin] = useState(false)
   const [isEditor, setIsEditor] = useState(false)
@@ -51,13 +54,11 @@ export function UserContextProvider({ children }) {
   }, [userInfo])
 
   useEffect(() => {
-    const getBackUserInfo = async () => setUserInfo(await callAuthBackend(token))
-    getBackUserInfo()
+    const updateUserInfo = async () => setUserInfo(await callAuthBackend(token))
+    updateUserInfo()
   }, [token])
 
   return (
-    <UserContext.Provider value={{ userInfo, isAdmin, isEditor, setUserInfo }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={{ userInfo, isAdmin, isEditor }}>{children}</UserContext.Provider>
   )
 }

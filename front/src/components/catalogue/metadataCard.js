@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
-import { BackDataContext, BackDataContextProvider } from '../../context/backDataContext'
+import { BackDataContext } from '../../context/backDataContext'
 import { getBackUrl } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getLocaleFormatted, getObjFormUrl } from '../../utils/utils'
@@ -143,6 +143,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const { changeOptions, toggle } = useModalContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
+  const [appData, setAppData] = useState({})
+  useEffect(() => setAppData(appInfo),[appInfo])
 
   const [isEdit, setEdit] = useState(!!editMode)
   useEffect(() => setEdit(!!editMode), [editMode])
@@ -253,8 +255,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(`${appInfo.apiExtUrl}api/v1/resources/${metadata.global_id}`),
-    edit: editButton(`${appInfo.formUrl}?update=${metadata.global_id}`),
+    share: shareButton(`${appData.apiExtUrl}api/v1/resources/${metadata.global_id}`),
+    edit: editButton(`${appData.formUrl}?update=${metadata.global_id}`),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
     external: (url) => externalUrlButton(url),
@@ -266,7 +268,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={getObjFormUrl(appInfo.formUrl, '', `?read-only=${metadata.global_id}`)}
+              href={getObjFormUrl(appData.formUrl, '', `?read-only=${metadata.global_id}`)}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -311,9 +313,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
             Producteur : <span className="text-muted">{metadata.producer?.organization_name}</span>
           </p>
           <a href="#" className="btn btn-secondary card-margin">
-            <BackDataContextProvider>
-              <ThemeDisplay value={metadata.theme}></ThemeDisplay>
-            </BackDataContextProvider>
+            <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
           <span className="card-text">
             {metadata.available_formats.map((media) => displayMedia(media))}

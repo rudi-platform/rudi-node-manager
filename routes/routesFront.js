@@ -3,7 +3,7 @@ const router = new express.Router()
 
 const passport = require('../utils/passportSetup')
 const { getFormUrl, getUserInfo, getNodeUrls } = require('../controllers/consoleController')
-const { getApiExternalUrl, getPortalUrl } = require('../controllers/dataController')
+const { getApiExternalUrl, getPortalUrl, getInitData } = require('../controllers/dataController')
 const {
   logout,
   postLogin,
@@ -15,6 +15,7 @@ const { makeRequestable } = require('../utils/utils')
 const authenticate = passport.authenticate('jwt', { session: false })
 
 router.get('/node-urls', authenticate, getNodeUrls)
+router.get('/init-data', authenticate, getInitData)
 
 router.get('/form-url', authenticate, getFormUrl)
 router.get('/ext-api-url', authenticate, makeRequestable(getApiExternalUrl))

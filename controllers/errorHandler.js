@@ -116,7 +116,7 @@ exports.treatAxiosError = (err, reply) => {
     log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   }
   if (err.name == 'AxiosError') {
-    let statusCode, error, errorMsg
+    let statusCode, error
     if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
       statusCode = 503
       error = {

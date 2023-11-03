@@ -16,6 +16,7 @@ const {
   UnauthorizedError,
 } = require('../utils/errors')
 const log = require('../utils/logger')
+const { beautify } = require('../utils/utils')
 
 // ---- Constants -----
 const DB_NAME = getDbConf('db_filename')
@@ -294,39 +295,47 @@ exports.dbCreateUser = (openedDb, userInfo) => {
 exports.dbUpdateUser = (openedDb, userInfo) => {
   const fun = 'dbUpdateUser'
   const { id, username, password, email } = userInfo
-  const db = openedDb || dbOpen()
-  return new Promise((resolve, reject) => {
-    db.run(
+  log.d(mod, fun, `userInfo: ${beautify(userInfo)}`)
+  log.d(
+    mod,
+    fun,
+    `req: ${
       `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
-        (password && `, password = '${password}'`) +
-        ` WHERE id = ?`,
-      [username, email, id],
-      (err) => {
+      (password ? `, password = '${password}'` : '') +
+      ` WHERE id = ?`
+    }`
+  )
+  const db = openedDb || dbOpen()
+  const sqlReq =
+    `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
+    (password ? `, password = '${password}'` : '') +
+    ` WHERE id = ?`
+  return new Promise((resolve, reject) => {
+    db.run(sqlReq, [username, email, id], (err) => {
+      if (err) {
+        if (!openedDb) dbClose(db)
+        log.e(mod, fun + ' insert', err.message)
+        return reject(err)
+      }
+      log.i(
+        mod,
+        fun,
+        `(${TBL_USERS}) user updated: '${username}'`,
+        log.getContext(null, { opType: 'post_user' })
+      )
+      db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
+        if (!openedDb) dbClose(db)
         if (err) {
-          if (!openedDb) dbClose(db)
-          log.e(mod, fun + ' insert', err.message)
+          log.e(mod, fun + '.select', err.message)
           return reject(err)
         }
-        log.i(
-          mod,
-          fun,
-          `(${TBL_USERS}) user updated: '${username}'`,
-          log.getContext(null, { opType: 'post_user' })
-        )
-        db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            log.e(mod, fun + '.select', err.message)
-            return reject(err)
-          }
-          if (!row) {
-            log.e(mod, fun + '.select', `User doesn't exist: ${username}`)
-            return reject(new BadRequestError(`User doesn't exist: ${username}`))
-          }
-          resolve({ id: row.id, username: row.username })
-        })
-      }
-    )
+        if (!row) {
+          log.e(mod, fun + '.select', `User doesn't exist: ${username}`)
+          return reject(new BadRequestError(`User doesn't exist: ${username}`))
+        }
+        resolve({ id: row.id, username: row.username })
+      })
+    })
   })
 }
 
