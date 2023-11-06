@@ -64,9 +64,9 @@ exports.cleanHeadersAuth = (str) =>
 
 exports.makeRequestable = (func) => async (req, reply) => {
   try {
-    return await func(req, reply)
+    reply.status(200).send(await func(req, reply))
   } catch (err) {
-    // console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
+    console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
     // console.log('makeRequestable', 'ERR', err.statusCode, err.error, err.message)
     if (typeof err == 'object' && err.message && err.statusCode && err.error)
       return reply
