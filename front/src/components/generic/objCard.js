@@ -47,8 +47,8 @@ export function ObjCard({
   const [formUrl, setFormUrl] = useState('')
   useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const objId = obj[propId]
   const objName = obj[propName]

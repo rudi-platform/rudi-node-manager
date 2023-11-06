@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom'
 import { BackDataContext } from '../../context/backDataContext'
 import { getBackUrl } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getLocaleFormatted, getObjFormUrl } from '../../utils/utils'
+import { getLocaleFormatted, getObjFormUrl, pathJoin } from '../../utils/utils'
 import {
   DefaultConfirmOption,
   DefaultOkOption,
@@ -255,8 +255,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(`${appData.apiExtUrl}api/v1/resources/${metadata.global_id}`),
-    edit: editButton(`${appData.formUrl}?update=${metadata.global_id}`),
+    share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
+    edit: editButton('?'.merge(appData.formUrl, `update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
     external: (url) => externalUrlButton(url),

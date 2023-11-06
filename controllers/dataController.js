@@ -52,7 +52,7 @@ exports.getLicences = (req, reply) =>
   callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 
 exports.getThemeByLang = (req, reply) =>
-  callApiModule(req, reply, getAdminApi(`enum/themes/${req.params?.lang}`), 'get_theme_by_lg')
+  callApiModule(req, reply, getAdminApi('enum/themes/', req.params?.lang || 'fr'), 'get_theme_by_lg')
 
 exports.getApiExternalUrl = () =>
   callApiModule(null, null, getAdminApi('check/node/url'), 'get_api_url')
@@ -65,7 +65,7 @@ exports.getInitData = async (req, reply) => {
       callApiModule(
         null,
         null,
-        getAdminApi(`enum/themes/${req.query?.lang || 'fr'}`),
+        getAdminApi('enum/themes/', req.query?.lang || 'fr'),
         'get_theme_by_lg'
       ),
       getConsoleFormUrl(),

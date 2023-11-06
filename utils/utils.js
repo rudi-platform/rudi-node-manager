@@ -8,6 +8,28 @@ exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 
 // ---- Strings
+/**
+ * Joins several string arguments with the character on which the function is called.
+ * This is basically the reverse of the String split function, with the difference that we make sure
+ * the merging character is not duplicated
+ * @param {...string} args strings to be joined
+ * @return {string}
+ */
+/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
+String.prototype.merge = function (...args) {
+  const argNb = args.length
+  if (argNb == 0) return ''
+  let finalString = `${args[0]}`
+  for (let i = 1; i < argNb; i++) {
+    const str = `${args[i]}`
+    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
+    finalString = !finalString.endsWith(this)
+      ? finalString + mergableStr
+      : finalString.substring(0, finalString.length - 1) + mergableStr
+  }
+  return finalString
+}
+
 exports.toBase64 = (data) => this.convertEncoding(data, 'utf-8', 'base64')
 exports.toBase64url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
 exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
@@ -30,11 +52,7 @@ exports.toInt = (str) => {
 }
 
 // ---- URL
-exports.getCompletedUrl = (baseUrl, subUrl) => {
-  if (!subUrl) return baseUrl
-  if (`${subUrl}`.startsWith('/')) subUrl = `${subUrl}`.substring(1)
-  return `${baseUrl}`.endsWith('/') ? `${baseUrl}${subUrl}` : `${baseUrl}/${subUrl}`
-}
+exports.pathJoin = (...args) => '/'.merge(...args)
 
 /**
  * Custom JSON beautifying function

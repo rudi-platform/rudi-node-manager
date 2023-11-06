@@ -66,7 +66,7 @@ exports.getMediaInfoById = async (req, reply, next) => {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    const url = getAdminApi(`media/${id}`)
+    const url = getAdminApi('media', id)
     const token = getRudiApiToken(url, req)
 
     const resRudiApi = await axios.get(getRudiApi(url), {
@@ -126,7 +126,7 @@ exports.commitMedia = async (req, reply, next) => {
       .status(err.response?.status || 500)
       .send('ERR Media commit: ' + err.response?.data || err.response?.statusText)
   }
-  const url = getAdminApi(`media/${mediaId}/commit`)
+  const url = getAdminApi('media', mediaId, 'commit')
   const token = getRudiApiToken(url, { method: 'POST' })
   const apiHeaders = {
     headers: {

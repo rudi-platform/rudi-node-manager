@@ -3,7 +3,8 @@ const fs = require('fs')
 const ini = require('ini')
 
 // Internal dependencies
-const { getCompletedUrl } = require('../utils/utils')
+const { pathJoin } = require('../utils/utils')
+
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
 
 // Load default conf
@@ -49,11 +50,11 @@ exports.getConf = (section, subSection) => {
 }
 
 // Shortcuts to access popular conf values
-exports.getRudiApi = (suffix) => getCompletedUrl(config.rudi_api.rudi_api_url, suffix)
-exports.getAdminApi = (suffix) => getCompletedUrl(config.rudi_api.admin_api, suffix)
+exports.getRudiApi = (...args) => pathJoin(config.rudi_api.rudi_api_url, ...args)
+exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
 
-exports.getRudiMediaUrl = (suffix) => getCompletedUrl(config.rudi_media.rudi_media_url, suffix)
-exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl(`/download/${id}`)
+exports.getRudiMediaUrl = (...args) => pathJoin(config.rudi_media.rudi_media_url, ...args)
+exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 
 exports.getConsoleFormUrl = () => config.rudi_console.console_form_url
 
