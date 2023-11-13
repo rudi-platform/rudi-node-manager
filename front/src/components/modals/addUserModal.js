@@ -45,8 +45,6 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
     }
     if (!val) val = userInfo[prop]
     if (prop === 'roles') {
-      // if (!userInfo.roles) console.error('T (hasErrors) No roles')
-      // else if (userInfo.roles.length === 0) console.error('T (hasErrors) No role')
       return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
     }
 
