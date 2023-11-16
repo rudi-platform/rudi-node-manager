@@ -105,3 +105,22 @@ app.get('*', (req, reply) => reply.status(404).send(`Route '${req.method} ${req.
 
 // Configure our server to listen on the port defiend by our port variable
 app.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
+
+app.use((err, req, reply, next) => _errorHandler(err, req, reply, next))
+
+const _errorHandler = (err, req, reply, next) => {
+  const now = new Date()
+  // console.error(now, `[Express default error handler]`, err)
+  log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
+  console.error('[Local dump]', err)
+
+  if (reply.headersSent) return
+
+  // res.status(500)
+  // res.render('error', { time: now.getTime(), error: err })
+  reply.status(500).json({
+    error: `An error was thrown, please contact the Admin with the information bellow`,
+    message: err.message,
+    time: now.getTime(),
+  })
+}
