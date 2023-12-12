@@ -35,11 +35,11 @@ Login.propTypes = { updateToken: PropTypes.func.isRequired }
 export default function Login({ updateToken }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [username, setUserName] = useState('')
+  const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
 
-  const [isPwdShown, setPasswordShown] = useState(false)
-  const togglePwdVisibility = () => setPasswordShown(!isPwdShown)
+  const [isPwdShown, setIsPwdShown] = useState(false)
+  const togglePwdVisibility = () => setIsPwdShown(!isPwdShown)
   const stateType = () => (isPwdShown ? 'text' : 'password')
 
   const { toggle, visible } = useGenericModal()
@@ -49,7 +49,7 @@ export default function Login({ updateToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const isFormValid = () => username.length > 0 && password.length > 0
+  const isFormValid = () => userName.length > 0 && password.length > 0
 
   /**
    * call server to log user
@@ -89,7 +89,7 @@ export default function Login({ updateToken }) {
    */
   function handleSubmit(event) {
     event.preventDefault()
-    loginUser({ username, password })
+    loginUser({ username: userName, password })
       .then(() => updateToken())
       .catch((err) => {
         console.error('T (handleSubmit) handleSubmit ERR', err)
@@ -133,7 +133,7 @@ export default function Login({ updateToken }) {
             <Form.Control
               autoFocus={true}
               type="text"
-              value={username}
+              value={userName}
               autoComplete="username"
               onChange={(e) => setUserName(e.target.value)}
             />
