@@ -61,7 +61,7 @@ app.use(
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
-        'connect-src': ["'self'", ...getConf('security').trusted_domain],
+        'connect-src': ["'self'", ...getConf('security', 'trusted_domain')],
       },
     },
   })
@@ -81,11 +81,11 @@ app.use(passport.initialize())
 const authenticate = passport.authenticate('jwt', { session: false })
 
 // Configure app to use routes
-app.use(`/api/open/`, apiOpen)
-app.use(`/api/front/`, apiFront)
-app.use(`/api/data/`, authenticate, checkRolePerm([ROLE_ALL]), apiData)
-app.use(`/api/media/`, authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
-app.use(`/api/secu/`, authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+app.use(`/api/open`, apiOpen)
+app.use('/api/front', apiFront)
+app.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
+app.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+app.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
