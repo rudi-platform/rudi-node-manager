@@ -29,7 +29,7 @@ install_back:
     - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
       when: manual
   tags:
-    - nodejs
+    - nodejs-20
   variables:
     # NODE_ENV: development
     NODE_ENV: production
@@ -46,7 +46,7 @@ build_front:
     - if: '$CI_COMMIT_BRANCH != "release"'
       when: manual  
   tags:
-    - nodejs
+    - nodejs-20
   variables:
     # NODE_ENV: development
     NODE_ENV: production
