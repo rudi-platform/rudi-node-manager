@@ -8,6 +8,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false react-scripts build",
+    "buildProd": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=production react-scripts build",
     "buildWindow": "Set DISABLE_ESLINT_PLUGIN=true & Set INLINE_RUNTIME_CHUNK=false & react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
