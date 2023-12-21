@@ -38,16 +38,14 @@ build_front:
         files: [ ./front/package-lock.json ]
       paths: [ ./front/node_modules/ ]
   variables:
-    # NODE_ENV: development
-    NODE_ENV: production
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
     - cd front
     - tar -xf ~/rudi-console-proxy_front.cache.tar.xz
-    - npm install
+    - export NODE_ENV=development; npm install
     - ls -la node_modules
-    - npm run build
+    - npm run buildProd
   artifacts:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
