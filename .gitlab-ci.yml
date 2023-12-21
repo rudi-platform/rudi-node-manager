@@ -43,6 +43,7 @@ build_front:
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
+    - ls -la front
     - cd front
     - tar -xf ~/rudi-console-proxy_front.cache.tar.xz
     - npm install
@@ -51,5 +52,4 @@ build_front:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
-      - front/node_modules/
     expire_in: 1 weeks
