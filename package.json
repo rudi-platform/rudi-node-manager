@@ -14,7 +14,7 @@
     "startProd": "Set NODE_ENV=production&node server",
     "serverWindow": "nodemon server.js --ignore './front/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
-    "front-build": "cd front && npm run build",
+    "front-build": "cd front && npm run build:prod",
     "lintBack": "eslint \"**/*.js\"",
     "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc --no-ignore",
     "prettier": "npx prettier --write .",
