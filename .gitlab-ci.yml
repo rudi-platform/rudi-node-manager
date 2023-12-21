@@ -2,34 +2,13 @@ stages:
   - build_front
   - install_back
 
-# npm install Back
-install_back:
-  stage: install_back
-  cache:
-    - key:
-        files: [ ./package-lock.json ]
-      paths:   [ ./node_modules/ ]
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
-      when: manual
-  tags:
-    - nodejs-20
-  variables:
-    # NODE_ENV: development
-    NODE_ENV: production
-  script:
-    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
-    - npm install
-
 # npm install Front + build Front
 build_front:
   stage: build_front
   rules:
-    - if: '$CI_COMMIT_BRANCH == "release"'
+    - if: $CI_COMMIT_BRANCH == "release"
       when: always
-    - if: '$CI_COMMIT_BRANCH != "release"'
+    - if: $CI_COMMIT_BRANCH != "release"
       when: manual  
   tags:
     - nodejs-20
@@ -42,12 +21,34 @@ build_front:
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
     - cd front
-    - tar -xf ~/rudi-console-proxy_front.cache.tar.xz
+    # - tar -xf ~/rudi-console-proxy_front.cache.tar.xz
     - export NODE_ENV=development; npm i
-    - ls -la node_modules
-    - npm run buildProd
+    # - ls -la node_modules
+    - npm run build:prod
   artifacts:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
     expire_in: 1 weeks
+
+# npm install Back
+install_back:
+  stage: install_back
+  cache:
+    - key:
+        files: [ ./package-lock.json ]
+      paths:   [ ./node_modules/ ]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "release"
+      when: always
+    - if: $CI_COMMIT_BRANCH != "release"
+      when: manual
+  needs: [build_front]
+  tags:
+    - nodejs-20
+  variables:
+    # NODE_ENV: development
+    NODE_ENV: production
+  script:
+    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
+    - npm i
