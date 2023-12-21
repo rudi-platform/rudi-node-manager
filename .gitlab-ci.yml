@@ -29,7 +29,7 @@ build_front:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
-    expire_in: 1 weeks
+    expire_in: 10 weeks
 
 # npm install Back
 install_back:
