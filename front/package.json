@@ -35,10 +35,10 @@
     ]
   },
   "dependencies": {
-    "@babel/core": "^7.23.6",
+    "@babel/core": "^7.23.7",
     "@svgr/webpack": "^8.1.0",
-    "@textea/json-viewer": "^3.2.3",
-    "axios": "^1.6.2",
+    "@textea/json-viewer": "^3.3.0",
+    "axios": "^1.6.5",
     "bootstrap": "^5.3.2",
     "history": "^5.3.0",
     "http-proxy-middleware": "^2.0.6",
@@ -47,28 +47,28 @@
     "nth-check": "^2.1.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.9.1",
+    "react-bootstrap": "^2.9.2",
     "react-bootstrap-icons": "^1.10.3",
     "react-dom": "^18.2.0",
     "react-infinite-scroll-component": "^6.1.0",
-    "react-router": "^6.21.0",
-    "react-router-dom": "^6.21.0",
+    "react-router": "^6.21.2",
+    "react-router-dom": "^6.21.2",
     "react-scripts": "^5.0.1",
-    "sass": "^1.69.5",
-    "web-vitals": "^3.5.0"
+    "sass": "^1.69.7",
+    "web-vitals": "^3.5.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-env": "^7.23.8",
     "@babel/preset-react": "^7.23.3",
-    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.1.2",
-    "@testing-library/user-event": "^14.5.1",
+    "@testing-library/user-event": "^14.5.2",
     "eslint": "^8.56.0",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-react": "^7.33.2",
-    "postcss": "^8.4.32"
+    "postcss": "^8.4.33"
   },
   "overrides": {
     "@svgr/webpack": "$@svgr/webpack",
