@@ -1,4 +1,3 @@
-
 /**
  * Joins several string argument with the character on which the function is called
  * This is basically the reverse of the String split function, with the difference that we make sure

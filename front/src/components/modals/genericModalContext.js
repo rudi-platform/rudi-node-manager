@@ -49,7 +49,7 @@ export const DefaultConfirmOption = {
   buttons: [{ text: 'Oui', action: () => {} }],
 }
 
-export const getOptOk = (label, action = () => {}, caption=null) => {
+export const getOptOk = (label, action = () => {}, caption = null) => {
   const opt = DefaultOkOption
   opt.text = [label]
   opt.buttons = [{ text: 'Ok', action: () => action() }]

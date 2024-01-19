@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 
-import { pathJoin } from "../utils/utils"
+import { pathJoin } from '../utils/utils'
 
 // ------------------------------------------------------------------------------------------------
 export const OPT_FRONT_PATH = 'PUBLIC_URL'
@@ -49,6 +49,6 @@ export const getBackUrl = (suffix = '') => '/'.merge(getFrontOptions(OPT_FRONT_P
 
 if (!getBackUrl().endsWith('/')) frontOptions[OPT_FRONT_PATH] += '/'
 
-export const getApiFront = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/front',suffix))
-export const getApiOpen = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/open',suffix))
-export const getApiData = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/data',suffix))
+export const getApiFront = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/front', suffix))
+export const getApiOpen = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/open', suffix))
+export const getApiData = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/data', suffix))

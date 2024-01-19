@@ -15,7 +15,7 @@ stages:
   - build_front
 
 # npm install Back
-install_back:
+install:back:
   stage: install_back
   cache:
     - key:
@@ -38,13 +38,13 @@ install_back:
     - npm install
 
 # npm install Front + build Front
-build_front:
+build:front:
   stage: build_front
   rules:
     - if: '$CI_COMMIT_BRANCH == "release"'
       when: always
     - if: '$CI_COMMIT_BRANCH != "release"'
-      when: manual  
+      when: manual
   tags:
     - nodejs-20
   variables:

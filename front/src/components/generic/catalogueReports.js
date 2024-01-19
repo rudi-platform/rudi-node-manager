@@ -36,8 +36,8 @@ export default function CatalogueReports({ editMode, logout }) {
         const msg = !deletedCount
           ? `Aucun rapport d'intégration n'a été supprimé`
           : deletedCount == 1
-          ? `Un ancien rapport d'intégration a été supprimé`
-          : `${deletedCount} anciens rapports d'intégration ont été supprimés`
+            ? `Un ancien rapport d'intégration a été supprimé`
+            : `${deletedCount} anciens rapports d'intégration ont été supprimés`
         changeOptions(getOptOk(msg, () => {}))
         toggle()
         setRefreshState(!refreshState)
