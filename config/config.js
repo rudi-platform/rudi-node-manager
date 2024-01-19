@@ -8,7 +8,7 @@ const { pathJoin } = require('../utils/utils')
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
 
 // Load default conf
-const defaultConfigFile = './rudi_console_proxy.ini'
+const defaultConfigFile = './prodmanager-conf-default.ini'
 let defaultConfFileContent
 try {
   defaultConfFileContent = fs.readFileSync(defaultConfigFile, 'utf-8')
@@ -17,7 +17,7 @@ try {
 }
 
 // Load custom conf
-const customConfigFile = getBackOptions(OPT_USER_CONF, './rudi_console_proxy_custom.ini')
+const customConfigFile = getBackOptions(OPT_USER_CONF, './prodmanager-conf-custom.ini')
 let customConfFileContent
 try {
   customConfFileContent = fs.readFileSync(customConfigFile, 'utf-8')
