@@ -17,8 +17,8 @@ install_front:
     - nodejs-20
   cache:
     - key:
-        files: [ ./front/package-lock.json ]
-      paths:   [ ./front/node_modules/ ]
+        files: [./front/package-lock.json]
+      paths: [./front/node_modules/]
   variables:
     NODE_ENV: development
   script:
@@ -35,13 +35,13 @@ build_front:
     - if: $CI_COMMIT_BRANCH == "release"
       when: always
     - if: $CI_COMMIT_BRANCH != "release"
-      when: manual  
+      when: manual
   tags:
     - nodejs-20
   cache:
     - key:
-        files: [ ./front/package-lock.json ]
-      paths: [ ./front/node_modules/ ]
+        files: [./front/package-lock.json]
+      paths: [./front/node_modules/]
   variables:
     NODE_ENV: production
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
@@ -70,8 +70,8 @@ install_back:
     - nodejs-20
   cache:
     - key:
-        files: [ ./package-lock.json ]
-      paths:   [ ./node_modules/ ]
+        files: [./package-lock.json]
+      paths: [./node_modules/]
   variables:
     NODE_ENV: production
   script:
