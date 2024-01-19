@@ -1,3 +1,9 @@
+# --------------------------------------------------------------------------------------------------
+# Notes:
+# - jobs are executed in the order indicated at root "stages" property
+# - "needs" property needs an array of job names (not stages names)
+# - linter needs install:dev as eslint and prettier are dev dependencies
+# --------------------------------------------------------------------------------------------------
 stages:
   - install_front
   - build_front
@@ -6,7 +12,7 @@ stages:
 #---------------------------------------------------------------------------------------------------
 # FRONT: INSTALL
 #---------------------------------------------------------------------------------------------------
-install_front:
+install:front:
   stage: install_front
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
@@ -28,9 +34,9 @@ install_front:
 #---------------------------------------------------------------------------------------------------
 # FRONT: BUILD
 #---------------------------------------------------------------------------------------------------
-build_front:
+build:front:
   stage: build_front
-  needs: [install_front]
+  needs: [install:front]
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
       when: always
@@ -58,9 +64,8 @@ build_front:
 #---------------------------------------------------------------------------------------------------
 # BACK: INSTALL
 #---------------------------------------------------------------------------------------------------
-install_back:
+install:back:
   stage: install_back
-  needs: [build_front]
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
       when: always
