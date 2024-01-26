@@ -68,7 +68,7 @@ exports.getObjectById = (req, reply, next) => {
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
 
-  return callApiModule(req, getAdminApi(objectType,id))
+  return callApiModule(req, getAdminApi(objectType, id))
     .then((rudiObj) => reply.status(200).json(rudiObj))
     .catch((err) => handleError(req, reply, err, 501, opType, objectType, id))
 }
@@ -89,7 +89,7 @@ exports.postObject = async (req, reply, next) => {
       })
       data = resRudiApi.data
     } catch (e) {
-      sysWarn(mod, opType, `ERR ${e.statusCode} Contacting RUDI API failed:`, e.message)
+      sysWarn(mod, opType, `ERR ${e.statusCode || ''} Contacting RUDI API failed:`, e.message)
       throw e
     }
 
@@ -142,7 +142,7 @@ exports.deleteObject = (req, reply, next) => {
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, fun, objectType)) return
 
-  const url = getAdminApi(objectType,id)
+  const url = getAdminApi(objectType, id)
   return axios
     .delete(getRudiApi(url), {
       params: req.query,
