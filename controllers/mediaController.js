@@ -35,7 +35,9 @@ exports.getMediaToken = async (req, reply, next) => {
     const payloadUser = jwtPayload.user
     const exp = jwtPayload.exp
     if (!payloadUser)
-      throw new UnauthorizedError(`JWT body token should contain an identified user: ${jwtPayload}`)
+      throw new UnauthorizedError(
+        `JWT body token should contain an identified user: ${beautify(jwtPayload)}`
+      )
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
