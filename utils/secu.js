@@ -36,7 +36,7 @@ exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
 
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
-  if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
+  if (!RegExp(REGEX_JWT).exec(`${jwt}`)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
   return jwtLib.tokenStringToJwtObject(jwt)?.payload
 }
 

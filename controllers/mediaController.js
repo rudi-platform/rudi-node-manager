@@ -18,6 +18,7 @@ const {
 } = require('../utils/secu')
 const { handleError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
+const { beautify } = require('../utils/utils.js')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
@@ -109,7 +110,7 @@ exports.commitMedia = async (req, reply, next) => {
 
   try {
     const commitMediaRes = await axios.post(
-      getRudiMediaUrl(`commit/?zone_name=${zoneName}&commit_uuid=${commitId}`),
+      getRudiMediaUrl('commit/'),
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
       pmMediaHeaders
     )
@@ -124,7 +125,7 @@ exports.commitMedia = async (req, reply, next) => {
     )
     return reply
       .status(err.response?.status || 500)
-      .send('ERR Media commit: ' + err.response?.data || err.response?.statusText)
+      .send(`ERR Media commit: ${beautify(err.response?.data || err.response?.statusText)}`)
   }
   const url = getAdminApi('media', mediaId, 'commit')
   const token = getRudiApiToken(url, { method: 'POST' })
@@ -146,6 +147,8 @@ exports.commitMedia = async (req, reply, next) => {
 
     return reply
       .status(err.response?.status || 500)
-      .send('ERR Api commit: ' + err.response?.data || err.response?.statusText || err.response)
+      .send(
+        `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
+      )
   }
 }
