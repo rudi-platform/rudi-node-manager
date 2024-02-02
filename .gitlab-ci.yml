@@ -27,11 +27,11 @@ build_front:
     - cd front
     - NODE_ENV=development && npm i
     - NODE_ENV=production && npm run build:prod
-artifacts:
-  name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
-  paths:
-    - front/build/
-  expire_in: 10 weeks
+  artifacts:
+    name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
+    paths:
+      - front/build/
+    expire_in: 10 weeks
 
 #---------------------------------------------------------------------------------------------------
 # BACK: INSTALL
