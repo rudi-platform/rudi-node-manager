@@ -25,8 +25,8 @@ build_front:
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
     - cd front
-    - NODE_ENV=development && npm i
-    - NODE_ENV=production && npm run build:prod
+    - npm run prestart
+    - npm run build:prod
   artifacts:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
@@ -38,10 +38,9 @@ build_front:
 #---------------------------------------------------------------------------------------------------
 install_back:
   stage: install_back
-  needs: []
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
-      when: always
+      when: on_success
     - if: $CI_COMMIT_BRANCH != "release"
       when: manual
   tags:

@@ -6,7 +6,8 @@
   "license": "EUPL-1.2",
   "private": true,
   "scripts": {
-    "prestart": "NODE_ENV=development && npm i",
+    "prestart": "npm run install:dev",
+    "install:dev": "NODE_ENV=development npm i --loglevel=error",
     "start": "react-scripts start",
     "build": "npm run build:prod",
     "build:dev": "export DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=development react-scripts build",
