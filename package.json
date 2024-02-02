@@ -11,6 +11,7 @@
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
+    "start": "npx nodemon server.js --hash=$(git rev-parse --short HEAD) --tag=dev0 --node_env=development --conf=.env/prodmanager-conf-custom.ini --ignore \"**/front/\"",
     "startProd": "Set NODE_ENV=production&node server",
     "serverWindow": "nodemon server.js --ignore './front/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
@@ -41,7 +42,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
-    "@babel/eslint-parser": "^7.23.9",
+    "@babel/eslint-parser": "^7.23.10",
     "@babel/preset-env": "^7.23.9",
     "eslint": "^8.56.0",
     "eslint-config-google": "^0.14.0",

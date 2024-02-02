@@ -9,6 +9,8 @@ const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
 
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
+const defaultCustomConfigFile = './prodmanager-conf-custom.ini' // if not set
+
 let defaultConfFileContent
 try {
   defaultConfFileContent = fs.readFileSync(defaultConfigFile, 'utf-8')
@@ -17,7 +19,7 @@ try {
 }
 
 // Load custom conf
-const customConfigFile = getBackOptions(OPT_USER_CONF, './prodmanager-conf-custom.ini')
+const customConfigFile = getBackOptions(OPT_USER_CONF, defaultCustomConfigFile)
 let customConfFileContent
 try {
   customConfFileContent = fs.readFileSync(customConfigFile, 'utf-8')
