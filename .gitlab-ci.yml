@@ -38,9 +38,10 @@ build_front:
 #---------------------------------------------------------------------------------------------------
 install_back:
   stage: install_back
+  needs: []
   rules:
     - if: $CI_COMMIT_BRANCH == "release"
-      when: on_success
+      when: always
     - if: $CI_COMMIT_BRANCH != "release"
       when: manual
   tags:
