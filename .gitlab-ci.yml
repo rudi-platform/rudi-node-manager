@@ -27,6 +27,7 @@ install_front:
           - ./front/package-lock.json
       paths:
         - ./front/node_modules/
+      policy: push
   variables:
     NODE_ENV: development
   script:
