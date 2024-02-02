@@ -6,10 +6,11 @@
   "license": "EUPL-1.2",
   "private": true,
   "scripts": {
+    "prestart": "NODE_ENV=development && npm i",
     "start": "react-scripts start",
     "build": "echo \"Please use build:dev or build:prod \" && exit 1",
-    "build:dev": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=development react-scripts build",
-    "build:prod": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=production react-scripts build",
+    "build:dev": "export DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=development && react-scripts build",
+    "build:prod": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=production && react-scripts build",
     "build:windows": "Set DISABLE_ESLINT_PLUGIN=true & Set INLINE_RUNTIME_CHUNK=false & react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
