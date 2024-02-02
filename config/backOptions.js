@@ -46,7 +46,7 @@ exports.OPTIONS = {
 console.log('--------------------------------------------------------------')
 
 console.log('Options to run this app: ')
-Object.keys(this.OPTIONS).map((opt) =>
+Object.keys(this.OPTIONS).forEach((opt) =>
   console.log(
     '    cli: ' +
       this.OPTIONS[opt].cli +
@@ -63,9 +63,9 @@ console.log('--------------------------------------------------------------')
 // console.log('= Extract command line arguments =');
 // console.log(process.argv);
 const cliOptionsValues = {}
-process.argv.map((cliArg) => {
+process.argv.forEach((cliArg) => {
   // console.log('• cliArg: ' + cliArg);
-  Object.keys(this.OPTIONS).map((appOpt) => {
+  Object.keys(this.OPTIONS).forEach((appOpt) => {
     if (this.OPTIONS[appOpt].cli) {
       const appOptForCli = this.OPTIONS[appOpt].cli + '='
       // console.log('• appOptForCli: ' + appOptForCli);
@@ -83,7 +83,7 @@ process.argv.map((cliArg) => {
 // ------------------------------------------------------------------------------------------------
 console.log('Extracted conf values:')
 const backOptionsValues = {}
-Object.keys(this.OPTIONS).map((opt) => {
+Object.keys(this.OPTIONS).forEach((opt) => {
   if (cliOptionsValues[opt]) {
     backOptionsValues[opt] = cliOptionsValues[opt]
     console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt])
