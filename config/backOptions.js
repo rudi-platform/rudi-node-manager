@@ -67,10 +67,10 @@ process.argv.forEach((cliArg) => {
   // console.log('• cliArg: ' + cliArg);
   Object.keys(this.OPTIONS).forEach((appOpt) => {
     if (this.OPTIONS[appOpt].cli) {
-      const appOptForCli = this.OPTIONS[appOpt].cli + '='
+      const appOptForCli = this.OPTIONS[appOpt].cli
       // console.log('• appOptForCli: ' + appOptForCli);
-      if (cliArg.startsWith(appOptForCli)) {
-        cliOptionsValues[appOpt] = cliArg.substring(appOptForCli.length)
+      if (cliArg.startsWith(`${appOptForCli}=`) || cliArg.startsWith(`${appOptForCli} `)) {
+        cliOptionsValues[appOpt] = cliArg.substring(appOptForCli.length + 1)
         // console.log('    (cli) ' + appOpt + ': ' + cliOptionsValues[appOpt]);
       }
     }
