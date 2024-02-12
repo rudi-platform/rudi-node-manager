@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 
 import PropTypes from 'prop-types'
-import { Search } from 'react-bootstrap-icons'
+import { Search, XCircle } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { getApiData } from '../../utils/frontOptions'
@@ -297,7 +297,10 @@ export default function CatalogueMetadata({ editMode, logout }) {
     event.preventDefault()
     refresh()
   }
-  // const clearSearch = () => (searchText = '')
+  const clearSearch = () => {
+    searchText.current.value = ''
+    refresh()
+  }
   const toggleExtSearch = () => setIsExtSearch(!isExtSearch)
 
   // TODO :  sticky-top ?
@@ -366,7 +369,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
             </div>
             <div className="left-hand-blocks">
               <div className="label-lv1">Rechercher</div>
-              <form className="input-group flex-nowrap" onSubmit={onSubmit}>
+              <form className="input-group flex-nowrap has-feedback" onSubmit={onSubmit}>
                 <input
                   type="text"
                   className="form-control"
@@ -375,12 +378,15 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   aria-label="Recherche"
                   aria-describedby="addon-wrapping"
                 />
+                <a className={'clear-btn'} onClick={clearSearch}>
+                  <XCircle />
+                </a>
                 <button type="button" className="btn btn-success" onClick={refresh}>
                   <Search />
                 </button>
               </form>
               <div>
-                <div className="on-right">
+                <div className="on-right-box">
                   <label htmlFor="ext_search_on">Étendre la recherche</label>
                   <input
                     type="checkbox"

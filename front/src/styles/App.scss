@@ -153,6 +153,11 @@ a {
   float: right;
 }
 
+.on-right-box {
+  float: right;
+  margin-right: 53px;
+}
+
 .checkbox {
   margin: 0 0 0 20px;
 }
@@ -344,4 +349,25 @@ a {
   font-size: 14px;
   cursor: pointer;
   color: #ccc;
+}
+
+.clear-btn {
+  position: absolute;
+  width: 10px;
+  font-weight: 550;
+  border: none;
+  background-color: transparent;
+  line-height: 35px;
+  left: calc(100% - 65px);
+  z-index: 99999;
+  color: #aaaaaa;
+}
+.clear-btn:hover {
+  color: black;
+}
+.clear-btn-hidden {
+  visibility: hidden;
+}
+.clear-btn-visible {
+  visibility: visible;
 }
