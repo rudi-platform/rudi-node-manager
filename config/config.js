@@ -3,9 +3,8 @@ const fs = require('fs')
 const ini = require('ini')
 
 // Internal dependencies
-const { pathJoin } = require('../utils/utils')
-
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
+const { pathJoin, jsonToString } = require('../utils/utils')
 
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
@@ -41,7 +40,7 @@ for (const section in customConfig) {
   }
 }
 
-if (config.logging.displayConf) console.log(config)
+if (config.logging.displayConf) jsonToString(config)
 
 // Access conf values
 exports.getConf = (section, subSection) => {

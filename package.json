@@ -11,7 +11,7 @@
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
-    "start": "npx nodemon server.js --hash=$(git rev-parse --short HEAD) --tag=dev0 --node_env=development --conf=.env/prodmanager-conf-custom.ini --ignore \"**/front/\"",
+    "start": "npx nodemon server.js --hash $(git rev-parse --short HEAD) --tag dev0 --node_env=development --conf .env/prodmanager-conf-custom.ini --ignore \"**/front/\"",
     "startProd": "Set NODE_ENV=production&node server",
     "serverWindow": "nodemon server.js --ignore './front/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "serverLinux": "nodemon server.js --ignore './front/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
@@ -34,6 +34,7 @@
     "ini": "^4.1.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -54,7 +55,7 @@
     "jest-express": "^1.12.0",
     "jest-junit": "^16.0.0",
     "nodemon": "^3.0.3",
-    "postcss": "^8.4.33",
-    "prettier": "^3.2.4"
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5"
   }
 }

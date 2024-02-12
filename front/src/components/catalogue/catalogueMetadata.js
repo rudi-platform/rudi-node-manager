@@ -47,9 +47,12 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const [currentOffset, setCurrentOffset] = useState(-1)
 
   const initialRender = useRef(true)
+
   const searchText = useRef(null)
   const isSearchMode = () => searchText?.current?.value?.length > 0
-  const searchMode = () => (isSearchMode() ? `/search` : '')
+  const searchMode = () => (isSearchMode() ? `/${isExtSearch ? 'ext_' : ''}search` : '')
+
+  const [isExtSearch, setIsExtSearch] = useState(false)
 
   const metadataDisplay = (filterValue) => (
     <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
@@ -123,7 +126,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
    * @return {*} params enrichis pour la requete
    */
   function createParams(baseParams) {
-    if (searchText.current.value) baseParams[searchText.current.value] = ''
+    if (searchText?.current?.value) baseParams[searchText.current.value] = ''
     currentFilters.forEach((filter) => Object.assign(baseParams, filter))
     return baseParams
   }
@@ -290,6 +293,12 @@ export default function CatalogueMetadata({ editMode, logout }) {
       else defaultErrorHandler(err)
     }
   }
+  const onSubmit = (event) => {
+    event.preventDefault()
+    refresh()
+  }
+  // const clearSearch = () => (searchText = '')
+  const toggleExtSearch = () => setIsExtSearch(!isExtSearch)
 
   // TODO :  sticky-top ?
   return (
@@ -357,7 +366,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
             </div>
             <div className="left-hand-blocks">
               <div className="label-lv1">Rechercher</div>
-              <div className="input-group flex-nowrap">
+              <form className="input-group flex-nowrap" onSubmit={onSubmit}>
                 <input
                   type="text"
                   className="form-control"
@@ -366,10 +375,10 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   aria-label="Recherche"
                   aria-describedby="addon-wrapping"
                 />
-                <button type="button" className="btn btn-success" onClick={() => refresh()}>
+                <button type="button" className="btn btn-success" onClick={refresh}>
                   <Search />
                 </button>
-              </div>
+              </form>
               <div>
                 <div className="on-right">
                   <label htmlFor="ext_search_on">Étendre la recherche</label>
@@ -378,6 +387,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
                     className="checkbox"
                     id="ext_search_on"
                     name="ext_search_on"
+                    onChange={toggleExtSearch}
                   />
                 </div>
               </div>

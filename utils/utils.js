@@ -71,6 +71,8 @@ exports.beautify = (jsonObject, option) => {
   }
 }
 
+exports.jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
+
 /**
  * Cleans a headers string from the "Autorization: <whatever>" information
  */
