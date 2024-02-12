@@ -153,11 +153,6 @@ a {
   float: right;
 }
 
-.on-right-box {
-  float: right;
-  margin-right: 53px;
-}
-
 .checkbox {
   margin: 0 0 0 20px;
 }
@@ -370,4 +365,8 @@ a {
 }
 .clear-btn-visible {
   visibility: visible;
+}
+.on-right-box {
+  float: right;
+  padding: 0.5em 0.2em 0 0;
 }

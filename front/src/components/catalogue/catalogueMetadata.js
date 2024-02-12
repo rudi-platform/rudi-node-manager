@@ -368,7 +368,19 @@ export default function CatalogueMetadata({ editMode, logout }) {
               </div>
             </div>
             <div className="left-hand-blocks">
-              <div className="label-lv1">Rechercher</div>
+              <div>
+                <span className="label-lv1">Rechercher</span>
+                <div className="on-right-box">
+                  <label htmlFor="ext_search_on">Étendre la recherche</label>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    id="ext_search_on"
+                    name="ext_search_on"
+                    onChange={toggleExtSearch}
+                  />
+                </div>
+              </div>{' '}
               <form className="input-group flex-nowrap has-feedback" onSubmit={onSubmit}>
                 <input
                   type="text"
@@ -385,18 +397,6 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   <Search />
                 </button>
               </form>
-              <div>
-                <div className="on-right-box">
-                  <label htmlFor="ext_search_on">Étendre la recherche</label>
-                  <input
-                    type="checkbox"
-                    className="checkbox"
-                    id="ext_search_on"
-                    name="ext_search_on"
-                    onChange={toggleExtSearch}
-                  />
-                </div>
-              </div>
             </div>
             <div className="left-hand-blocks">
               <div className="label-lv1">Filtrer</div>
