@@ -16,7 +16,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src/**.js",
-    "cleanup": "rm -fR ./node_modules ./package-lock.json ./yarn.lock"
+    "cleanup": "rm -fR ./node_modules; rm -fR ./package-lock.json; rm -fR ./yarn.lock"
   },
   "eslintConfig": {
     "extends": [
