@@ -1,5 +1,5 @@
 // ----- External dependencies
-const jwt = require('jsonwebtoken')
+const jwtAA = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
 const jwtLib = require(`@aqmo.org/jwt-lib`)
@@ -17,7 +17,6 @@ const mod = 'jwt'
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
 const OFFSET_USR_ID = 5000
-const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt')
 const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
 const MEDIA_AUTH = getConf('rudi_media')
 
@@ -62,12 +61,15 @@ exports.pmFrontCookieOpts = (exp) => {
   }
 }
 
+const SECRET_KEY_JWT = `${uuidv4()}${uuidv4()}`
+exports.jwtSecretKey = () => SECRET_KEY_JWT
+
 exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   delete userInfo?.password
   return {
-    [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
-    [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ roles: userInfo.roles, exp }, SECRET_KEY_JWT),
+    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
+    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ roles: userInfo.roles, exp }, SECRET_KEY_JWT),
     exp,
   }
 }
