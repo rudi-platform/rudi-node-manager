@@ -31,7 +31,7 @@ function isJwtValid(jwt) {
 }
 
 exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
-  req?.cookies ? req.cookies[cookieName] : null
+  req?.cookies?.[cookieName]
 
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
@@ -67,9 +67,10 @@ exports.jwtSecretKey = () => SECRET_KEY_JWT
 exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   delete userInfo?.password
+  const { username, roles } = { ...userInfo }
   return {
-    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
-    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ roles: userInfo.roles, exp }, SECRET_KEY_JWT),
+    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, roles, exp }, SECRET_KEY_JWT),
+    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ username, roles, exp }, SECRET_KEY_JWT),
     exp,
   }
 }

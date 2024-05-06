@@ -16,7 +16,12 @@ const {
   dbClose,
   dbOpen,
 } = require('../database/database')
-const { extractCookieFromReq, CONSOLE_TOKEN_NAME, jwtSecretKey } = require('./secu')
+const {
+  extractCookieFromReq,
+  CONSOLE_TOKEN_NAME,
+  jwtSecretKey,
+  PM_FRONT_TOKEN_NAME,
+} = require('./secu')
 const { matchPassword } = require('@aqmo.org/jwt-lib')
 
 // Passport configuration
@@ -91,6 +96,7 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN_NAME),
+        (req) => extractCookieFromReq(req, PM_FRONT_TOKEN_NAME),
         // Take jwt from http header
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),

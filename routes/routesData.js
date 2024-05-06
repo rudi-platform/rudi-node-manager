@@ -24,6 +24,7 @@ router.get('/uuid', (_, reply) => reply.status(200).send(uuidv4()))
 router.get('/version', getVersion)
 router.get('/enum', getEnum)
 router.get('/enum/themes/:lang', getThemeByLang)
+router.get('/enum/themes', getThemeByLang)
 router.get('/licences', getLicences)
 
 // TODO : propagate res.status
