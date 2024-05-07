@@ -51,14 +51,17 @@ exports.getEnum = (req, reply) => callApiModule(req, reply, getAdminApi('enum'),
 exports.getLicences = (req, reply) =>
   callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 
-exports.getThemeByLang = (req, reply) =>
-  callApiModule(
-    req,
+const getThemes = (req, reply) => {
+  const lang = req.params?.lang || req.query?.lang || 'fr'
+  return callApiModule(
+    reply ? req : null,
     reply,
-    getAdminApi('enum/themes', req.params?.lang || req.query?.lang || 'fr'),
-    `get_theme_by_lg_${req.params?.lang || req.query?.lang || 'fr'}`
+    getAdminApi('enum/themes', lang),
+    `get_theme_by_lg_${lang}`
   )
+}
 
+exports.getThemeByLang = (req, reply) => getThemes(req, reply)
 exports.getApiExternalUrl = () =>
   callApiModule(null, null, getAdminApi('check/node/url'), 'get_api_url')
 exports.getPortalUrl = () =>
@@ -67,12 +70,7 @@ exports.getPortalUrl = () =>
 exports.getInitData = async (req, reply) => {
   try {
     const data = await Promise.all([
-      callApiModule(
-        null,
-        null,
-        getAdminApi('enum/themes', req.params?.lang || req.query?.lang || 'fr'),
-        'get_theme_by_lg'
-      ),
+      getThemes(req),
       getConsoleFormUrl(),
       this.getApiExternalUrl(),
       this.getPortalUrl(),
