@@ -47,7 +47,10 @@ const callApiModule = async (req, reply, url, opType) => {
 
 // Controllers
 exports.getVersion = (req, reply) => callApiModule(req, reply, '/api/version', 'get_version')
-exports.getEnum = (req, reply) => callApiModule(req, reply, getAdminApi('enum'), 'get_enum')
+exports.getEnum = (req, reply) => {
+  const lang = req.params?.lang || req.query?.lang || 'fr'
+  return callApiModule(req, reply, getAdminApi(`enum?lang=${lang}`), `get_enum_${lang}`)
+}
 exports.getLicences = (req, reply) =>
   callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 

@@ -49,7 +49,7 @@ const callApiModule = (req, url) => {
 exports.getObjectList = (req, reply) => {
   const opType = 'get_objects'
   const { objectType } = req.params
-  if (!checkObjectType(req, reply, opType, objectType) || objectType === 'media') return
+  if (!checkObjectType(req, reply, opType, objectType)) return reply.status(404).json('Not found')
 
   callApiModule(req, getAdminApi(objectType))
     .then((res) => {
