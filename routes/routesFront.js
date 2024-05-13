@@ -11,6 +11,7 @@ const {
   putPassword,
 } = require('../controllers/authControllerPassport')
 const { makeRequestable } = require('../utils/utils')
+const { getRudiMediaUrl } = require('../config/config.js')
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
@@ -18,6 +19,7 @@ router.get('/node-urls', authenticate, getNodeUrls)
 router.get('/init-data', authenticate, getInitData)
 
 router.get('/form-url', authenticate, getFormUrl)
+router.get('/media-url', authenticate, makeRequestable(getRudiMediaUrl))
 router.get('/ext-api-url', authenticate, makeRequestable(getApiExternalUrl))
 router.get('/portal-url', authenticate, makeRequestable(getPortalUrl))
 router.get('/user-info', authenticate, getUserInfo)

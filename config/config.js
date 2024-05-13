@@ -42,6 +42,9 @@ for (const section in customConfig) {
 
 if (config.logging.displayConf) jsonToString(config)
 
+console.debug('[CONF] rudi_media_url:', config.rudi_media.rudi_media_url)
+console.debug()
+
 // Access conf values
 exports.getConf = (section, subSection) => {
   if (!section) return config

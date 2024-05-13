@@ -82,9 +82,9 @@ exports.cleanHeadersAuth = (str) =>
     ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '<auth>')
     : this.cleanHeadersAuth(this.beautify(str))
 
-exports.makeRequestable = (func) => async (req, reply) => {
+exports.makeRequestable = (func) => async (req, reply, next) => {
   try {
-    reply.status(200).send(await func(req, reply))
+    reply.status(200).send(await func())
   } catch (err) {
     console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
     // console.log('makeRequestable', 'ERR', err.statusCode, err.error, err.message)
