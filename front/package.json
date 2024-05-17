@@ -8,10 +8,10 @@
   "scripts": {
     "prestart": "npm run install:dev",
     "install:dev": "NODE_ENV=development npm i --loglevel=error",
-    "start": "react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "npm run build:prod",
-    "build:dev": "export DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=development react-scripts build",
-    "build:prod": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false NODE_ENV=production react-scripts build",
+    "build:dev": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false  NODE_ENV=development react-scripts build",
+    "build:prod": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build",
     "build:windows": "Set DISABLE_ESLINT_PLUGIN=true & Set INLINE_RUNTIME_CHUNK=false & react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

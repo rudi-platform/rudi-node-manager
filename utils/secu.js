@@ -176,6 +176,13 @@ exports.getRudiApiToken = () => {
   return cachedApiJwt
 }
 
+exports.getRudiApiHeaders = () => ({
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${this.getRudiApiToken()}`,
+  },
+})
+
 let cachedUrlJwt = {}
 exports.getRudiApiTokenPrecise = (url, req) => {
   if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]

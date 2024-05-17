@@ -19,6 +19,7 @@ const {
 } = require('../controllers/genericController')
 const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
+const { commitFileOnRudiApi } = require('../controllers/mediaController.js')
 
 router.get('/uuid', (_, reply) => reply.status(200).send(uuidv4()))
 router.get('/version', getVersion)
