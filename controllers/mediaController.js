@@ -121,6 +121,7 @@ exports.commitFileOnRudiApi = async (req, reply) => {
 }
 
 exports.commitMediaFile = async (req, reply, next) => {
+  const fun = 'commitMediaFile'
   const {
     media_id: mediaId,
     global_id: metadataId,
@@ -138,11 +139,9 @@ exports.commitMediaFile = async (req, reply, next) => {
     await commitOnRudiApi(mediaId, metadataId, commitId)
     return reply.status(200).send({ status: 'OK' })
   } catch (err) {
-    return reply
-      .status(err.response?.status || 500)
-      .send(
-        `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
-      )
+    const errMsg = `ERR${err.response?.status || ''} API metadata commit: ${beautify(err.response?.data) || err.response?.statusText || beautify(err.response)}`
+    log.e(mod, fun, errMsg)
+    return reply.status(err.response?.status || 500).send(errMsg)
   }
 }
 
@@ -158,15 +157,9 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
     log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
     return { place: 'rudi-media', mediaId, commitId, status: 'OK' }
   } catch (err) {
-    log.e(
-      mod,
-      fun,
-      `ERR${err.response?.status} Media commit:`,
-      err.response?.data || err.response?.statusText
-    )
-    throw new InternalServerError(
-      `ERR${err.response?.status} Media commit: ${err.response?.data || err.response?.statusText}`
-    )
+    const errMsg = `ERR${err.response?.status || ''} Media commit: ${beautify(err.response?.data) || err.response?.statusText}`
+    log.e(mod, fun, errMsg)
+    throw new InternalServerError(errMsg)
   }
 }
 

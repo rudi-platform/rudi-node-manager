@@ -5,7 +5,7 @@ const { Transport } = rudiLogger
 // Internal dependencies
 const { getConf } = require('../config/config')
 const { getBackOptions, OPT_GIT_HASH } = require('../config/backOptions')
-const { nowFormatted } = require('./utils')
+const { nowFormatted, beautify } = require('./utils')
 
 // Constants
 const APP_NAME = getConf('logging', 'app_name')
@@ -160,7 +160,7 @@ exports.getContext = (req, options = {}) => {
 
 exports.e = (srcMod, srcFun, ...msg) => {
   console.error(createLogLine('error', srcMod, srcFun, ...msg))
-  this.sysWarn(srcMod, srcFun, `${msg}`)
+  this.sysWarn(srcMod, srcFun, beautify(msg))
 }
 
 exports.w = (srcMod, srcFun, ...msg) => {
@@ -169,7 +169,7 @@ exports.w = (srcMod, srcFun, ...msg) => {
 
 exports.i = (srcMod, srcFun, ...msg) => {
   console.info(createLogLine('info', srcMod, srcFun, ...msg))
-  this.sysInfo(srcMod, srcFun, `${msg}`)
+  this.sysInfo(srcMod, srcFun, beautify(msg))
 }
 
 exports.v = (srcMod, srcFun, ...msg) => {
