@@ -163,7 +163,7 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
   }
 }
 
-const commitOnRudiApi = async (mediaId, commitId, metadataId) => {
+const commitOnRudiApi = async (mediaId, metadataId, commitId) => {
   const fun = 'commitOnRudiApi'
   const url = getAdminApi('media', mediaId, 'commit')
   try {
