@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "./node_modules/*", "./build/*"],
+  "ignorePatterns": ["**/*.spec.js", "**/*.test.js", "**/node_modules/**", "build/**"],
   "extends": ["google", "prettier", "plugin:react/recommended", "../.eslintrc"],
   "parserOptions": {
     "sourceType": "module"
@@ -12,7 +12,7 @@
       "warn",
       {
         "vars": "all",
-        "varsIgnorePattern": "^(_|req|res|reply|next)$",
+        "varsIgnorePattern": "^(_|mod|fun)$",
         "args": "after-used",
         "argsIgnorePattern": "^(_|req|res|reply|next)$"
       }

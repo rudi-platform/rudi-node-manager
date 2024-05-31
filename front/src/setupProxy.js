@@ -1,8 +1,8 @@
 const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const backPath = `${process.env.PUBLIC_URL}/api`
-const rewriteBackPathKey = `^${backPath}`
-const here = '[proxy]'
+// const rewriteBackPathKey = `^${backPath}`
+const mod = '[proxy]'
 module.exports = (app) => {
   app.use(
     backPath,
