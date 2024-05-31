@@ -4,7 +4,7 @@ const mod = 'callApiSimple'
 const axios = require('axios')
 
 // Internal dependencies
-const { getRudiApi, getAdminApi, getConsoleFormUrl } = require('../config/config')
+const { getRudiApi, getAdminApi, getConsoleFormUrl, getRudiMediaUrl } = require('../config/config')
 const { getRudiApiToken } = require('../utils/secu')
 const { handleError } = require('./errorHandler')
 const log = require('../utils/logger')
@@ -47,7 +47,10 @@ const callApiModule = async (req, reply, url, opType) => {
 
 // Controllers
 exports.getVersion = (req, reply) => callApiModule(req, reply, '/api/version', 'get_version')
-exports.getEnum = (req, reply) => callApiModule(req, reply, getAdminApi('enum'), 'get_enum')
+exports.getEnum = (req, reply) => {
+  const lang = req.params?.lang || req.query?.lang || 'fr'
+  return callApiModule(req, reply, getAdminApi(`enum?lang=${lang}`), `get_enum_${lang}`)
+}
 exports.getLicences = (req, reply) =>
   callApiModule(req, reply, getAdminApi('licences'), 'get_licences')
 
@@ -59,6 +62,17 @@ exports.getThemeByLang = (req, reply) =>
     'get_theme_by_lg'
   )
 
+const getThemes = (req, reply) => {
+  const lang = req.params?.lang || req.query?.lang || 'fr'
+  return callApiModule(
+    reply ? req : null,
+    reply,
+    getAdminApi('enum/themes', lang),
+    `get_theme_by_lg_${lang}`
+  )
+}
+
+exports.getThemeByLang = (req, reply) => getThemes(req, reply)
 exports.getApiExternalUrl = () =>
   callApiModule(null, null, getAdminApi('check/node/url'), 'get_api_url')
 exports.getPortalUrl = () =>
@@ -66,25 +80,16 @@ exports.getPortalUrl = () =>
 
 exports.getInitData = async (req, reply) => {
   try {
-    const data = await Promise.all([
-      callApiModule(
-        null,
-        null,
-        getAdminApi('enum/themes/', req.query?.lang || 'fr'),
-        'get_theme_by_lg'
-      ),
-      getConsoleFormUrl(),
-      this.getApiExternalUrl(),
-      this.getPortalUrl(),
-    ])
+    const data = await Promise.all([getThemes(req), this.getApiExternalUrl(), this.getPortalUrl()])
     const tags = getTags()
     const initData = {
-      themeLabels: data[0],
-      formUrl: data[1],
-      apiExtUrl: data[2],
-      portalConnected: !!data[3],
       appTag: tags?.tag,
       gitHash: tags?.hash,
+      themeLabels: data[0],
+      apiExtUrl: data[1],
+      mediaExtUrl: getRudiMediaUrl(),
+      formUrl: getConsoleFormUrl(),
+      portalConnected: !!data[2],
     }
     return reply ? reply.status(200).json(initData) : initData
   } catch (e) {

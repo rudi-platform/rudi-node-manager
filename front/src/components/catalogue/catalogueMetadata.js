@@ -3,7 +3,7 @@ import axios from 'axios'
 import React, { useEffect, useRef, useState } from 'react'
 
 import PropTypes from 'prop-types'
-import { Search } from 'react-bootstrap-icons'
+import { Search, XCircle } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { getApiData } from '../../utils/frontOptions'
@@ -47,9 +47,12 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const [currentOffset, setCurrentOffset] = useState(-1)
 
   const initialRender = useRef(true)
+
   const searchText = useRef(null)
   const isSearchMode = () => searchText?.current?.value?.length > 0
-  const searchMode = () => (isSearchMode() ? `/search` : '')
+  const searchMode = () => (isSearchMode() ? `/${isExtSearch ? 'ext_' : ''}search` : '')
+
+  const [isExtSearch, setIsExtSearch] = useState(false)
 
   const metadataDisplay = (filterValue) => (
     <span className="align-pill-left">{displayStatus(filterValue.metadata_status)}</span>
@@ -123,7 +126,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
    * @return {*} params enrichis pour la requete
    */
   function createParams(baseParams) {
-    if (searchText.current.value) baseParams[searchText.current.value] = ''
+    if (searchText?.current?.value) baseParams[searchText.current.value] = ''
     currentFilters.forEach((filter) => Object.assign(baseParams, filter))
     return baseParams
   }
@@ -290,6 +293,15 @@ export default function CatalogueMetadata({ editMode, logout }) {
       else defaultErrorHandler(err)
     }
   }
+  const onSubmit = (event) => {
+    event.preventDefault()
+    refresh()
+  }
+  const clearSearch = () => {
+    searchText.current.value = ''
+    refresh()
+  }
+  const toggleExtSearch = () => setIsExtSearch(!isExtSearch)
 
   // TODO :  sticky-top ?
   return (
@@ -356,8 +368,20 @@ export default function CatalogueMetadata({ editMode, logout }) {
               </div>
             </div>
             <div className="left-hand-blocks">
-              <div className="label-lv1">Rechercher</div>
-              <div className="input-group flex-nowrap">
+              <div>
+                <span className="label-lv1">Rechercher</span>
+                <div className="on-right-box">
+                  <label htmlFor="ext_search_on">Étendre la recherche</label>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    id="ext_search_on"
+                    name="ext_search_on"
+                    onChange={toggleExtSearch}
+                  />
+                </div>
+              </div>{' '}
+              <form className="input-group flex-nowrap has-feedback" onSubmit={onSubmit}>
                 <input
                   type="text"
                   className="form-control"
@@ -366,21 +390,13 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   aria-label="Recherche"
                   aria-describedby="addon-wrapping"
                 />
-                <button type="button" className="btn btn-success" onClick={() => refresh()}>
+                <a className={'clear-btn'} onClick={clearSearch}>
+                  <XCircle />
+                </a>
+                <button type="button" className="btn btn-success" onClick={refresh}>
                   <Search />
                 </button>
-              </div>
-              <div>
-                <div className="on-right">
-                  <label htmlFor="ext_search_on">Étendre la recherche</label>
-                  <input
-                    type="checkbox"
-                    className="checkbox"
-                    id="ext_search_on"
-                    name="ext_search_on"
-                  />
-                </div>
-              </div>
+              </form>
             </div>
             <div className="left-hand-blocks">
               <div className="label-lv1">Filtrer</div>

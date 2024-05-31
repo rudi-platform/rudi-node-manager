@@ -1,5 +1,5 @@
 // ----- External dependencies
-const jwt = require('jsonwebtoken')
+const jwtAA = require('jsonwebtoken')
 const axios = require('axios')
 const { v4: uuidv4 } = require('uuid')
 const jwtLib = require(`@aqmo.org/jwt-lib`)
@@ -17,7 +17,6 @@ const mod = 'jwt'
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
 const OFFSET_USR_ID = 5000
-const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt')
 const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
 const MEDIA_AUTH = getConf('rudi_media')
 
@@ -32,11 +31,11 @@ function isJwtValid(jwt) {
 }
 
 exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
-  req?.cookies ? req.cookies[cookieName] : null
+  req?.cookies?.[cookieName]
 
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
-  if (!`${jwt}`.match(REGEX_JWT)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
+  if (!RegExp(REGEX_JWT).exec(`${jwt}`)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
   return jwtLib.tokenStringToJwtObject(jwt)?.payload
 }
 
@@ -62,12 +61,16 @@ exports.pmFrontCookieOpts = (exp) => {
   }
 }
 
+const SECRET_KEY_JWT = `${uuidv4()}${uuidv4()}`
+exports.jwtSecretKey = () => SECRET_KEY_JWT
+
 exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   delete userInfo?.password
+  const { username, roles } = { ...userInfo }
   return {
-    [this.CONSOLE_TOKEN_NAME]: jwt.sign({ user: userInfo, exp }, SECRET_KEY_JWT),
-    [this.PM_FRONT_TOKEN_NAME]: jwt.sign({ roles: userInfo.roles, exp }, SECRET_KEY_JWT),
+    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, roles, exp }, SECRET_KEY_JWT),
+    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ username, roles, exp }, SECRET_KEY_JWT),
     exp,
   }
 }
@@ -172,6 +175,13 @@ exports.getRudiApiToken = () => {
   )
   return cachedApiJwt
 }
+
+exports.getRudiApiHeaders = () => ({
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${this.getRudiApiToken()}`,
+  },
+})
 
 let cachedUrlJwt = {}
 exports.getRudiApiTokenPrecise = (url, req) => {

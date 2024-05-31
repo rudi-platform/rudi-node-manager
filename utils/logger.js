@@ -5,7 +5,7 @@ const { Transport } = rudiLogger
 // Internal dependencies
 const { getConf } = require('../config/config')
 const { getBackOptions, OPT_GIT_HASH } = require('../config/backOptions')
-const { nowFormatted } = require('./utils')
+const { nowFormatted, beautify } = require('./utils')
 
 // Constants
 const APP_NAME = getConf('logging', 'app_name')
@@ -158,26 +158,26 @@ exports.getContext = (req, options = {}) => {
   return ctx
 }
 
-exports.e = (srcMod, srcFun, msg, context) => {
-  console.error(createLogLine('error', srcMod, srcFun, msg))
-  this.sysWarn(srcMod, srcFun, msg, context)
+exports.e = (srcMod, srcFun, ...msg) => {
+  console.error(createLogLine('error', srcMod, srcFun, ...msg))
+  this.sysWarn(srcMod, srcFun, beautify(msg))
 }
 
-exports.w = (srcMod, srcFun, msg) => {
-  console.warn(createLogLine('warn', srcMod, srcFun, msg))
+exports.w = (srcMod, srcFun, ...msg) => {
+  console.warn(createLogLine('warn', srcMod, srcFun, ...msg))
 }
 
-exports.i = (srcMod, srcFun, msg, context) => {
-  console.info(createLogLine('info', srcMod, srcFun, msg))
-  this.sysInfo(srcMod, srcFun, msg, context)
+exports.i = (srcMod, srcFun, ...msg) => {
+  console.info(createLogLine('info', srcMod, srcFun, ...msg))
+  this.sysInfo(srcMod, srcFun, beautify(msg))
 }
 
-exports.v = (srcMod, srcFun, msg) => {
-  console.log(createLogLine('verbose', srcMod, srcFun, msg))
+exports.v = (srcMod, srcFun, ...msg) => {
+  console.log(createLogLine('verbose', srcMod, srcFun, ...msg))
 }
 
-exports.d = (srcMod, srcFun, msg) => {
-  console.debug(createLogLine('debug', srcMod, srcFun, msg))
+exports.d = (srcMod, srcFun, ...msg) => {
+  console.debug(createLogLine('debug', srcMod, srcFun, ...msg))
 }
 
 // ------------------------------------------------------------------------------------------------

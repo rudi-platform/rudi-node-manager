@@ -1,61 +1,51 @@
-cache:
-  - key:
-      files:
-        - ./package-lock.json
-    paths:
-      - ./node_modules/
-  - key:
-      files:
-        - ./front/package-lock.json
-    paths:
-      - ./front/node_modules/
-
+# --------------------------------------------------------------------------------------------------
+# Notes:
+# - jobs are executed in the order indicated at root "stages" property
+# - "needs" property needs an array of job names (not stages names)
+# - linter needs install:dev as eslint and prettier are dev dependencies
+# --------------------------------------------------------------------------------------------------
 stages:
-  - install_back
   - build_front
-
-# npm install Back
-install:back:
-  stage: install_back
-  cache:
-    - key:
-        files:
-          - ./package-lock.json
-      paths:
-        - ./node_modules/
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
-      when: manual
-  tags:
-    - nodejs-20
-  variables:
-    # NODE_ENV: development
-    NODE_ENV: production
-  script:
-    # - test -r ../node_modules.1.tar.gz && tar -xvf ../node_modules.1.tar.gz
-    - npm install
+  - install_back
 
 # npm install Front + build Front
 build:front:
   stage: build_front
   rules:
-    - if: '$CI_COMMIT_BRANCH == "release"'
+    - if: $CI_COMMIT_BRANCH == "release"
       when: always
     - if: '$CI_COMMIT_BRANCH != "release"'
       when: manual
   tags:
     - nodejs-20
   variables:
-    # NODE_ENV: development
-    NODE_ENV: production
+    NODE_ENV: development
     PUBLIC_URL: 68064ef1-1e5c-4384-8c50-626f52b78c5c
     REACT_APP_TAG: dee007ae-5efd-45d8-b81c-86e440522b55
   script:
-    - cd front && npm install && npm run build
+    - cd front
+    - npm run install:dev || (npm cache clean --force && npm run install:dev)
+    - npm run build:prod
   artifacts:
     name: 'ProdManager-front-$PUBLIC_URL-rev$CI_COMMIT_SHORT_SHA'
     paths:
       - front/build/
     expire_in: 10 weeks
+
+#---------------------------------------------------------------------------------------------------
+# BACK: INSTALL
+#---------------------------------------------------------------------------------------------------
+install_back:
+  stage: install_back
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "release"
+      when: always
+    - if: $CI_COMMIT_BRANCH != "release"
+      when: manual
+  tags:
+    - nodejs-20
+  variables:
+    NODE_ENV: production
+  script:
+    - npm i || (npm cache clean --force && npm i)

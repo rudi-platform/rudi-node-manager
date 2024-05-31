@@ -49,7 +49,7 @@ const callApiModule = (req, url) => {
 exports.getObjectList = (req, reply) => {
   const opType = 'get_objects'
   const { objectType } = req.params
-  if (!checkObjectType(req, reply, opType, objectType) || objectType === 'media') return
+  if (!checkObjectType(req, reply, opType, objectType)) return reply.status(404).json('Not found')
 
   callApiModule(req, getAdminApi(objectType))
     .then((res) => {
@@ -89,7 +89,7 @@ exports.postObject = async (req, reply, next) => {
       })
       data = resRudiApi.data
     } catch (e) {
-      sysWarn(mod, opType, `ERR ${e.statusCode} Contacting RUDI API failed:`, e.message)
+      sysWarn(mod, opType, `ERR ${e.statusCode || ''} Contacting RUDI API failed:`, e.message)
       throw e
     }
 

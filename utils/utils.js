@@ -71,18 +71,20 @@ exports.beautify = (jsonObject, option) => {
   }
 }
 
+exports.jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
+
 /**
  * Cleans a headers string from the "Autorization: <whatever>" information
  */
 exports.cleanErrMsg = (str) => (str ? this.cleanHeadersAuth(str) : '')
 exports.cleanHeadersAuth = (str) =>
   typeof str == 'string'
-    ? str.replace(/["'](Bearer|Basic) [\w-/\.]+["']/g, '<auth>')
+    ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '<auth>')
     : this.cleanHeadersAuth(this.beautify(str))
 
-exports.makeRequestable = (func) => async (req, reply) => {
+exports.makeRequestable = (func) => async (req, reply, next) => {
   try {
-    reply.status(200).send(await func(req, reply))
+    reply.status(200).send(await func())
   } catch (err) {
     console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
     // console.log('makeRequestable', 'ERR', err.statusCode, err.error, err.message)

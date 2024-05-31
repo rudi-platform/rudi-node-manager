@@ -1,3 +1,5 @@
+const minimist = require('minimist')
+
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
@@ -6,6 +8,8 @@ exports.OPT_GIT_HASH = 'hash'
 exports.OPT_APP_TAG = 'tag'
 exports.OPT_NODE_ENV = 'nodeEnv'
 exports.OPT_BACK_PATH = 'backPath'
+
+const _argv = minimist(process.argv.slice(2))
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -18,37 +22,37 @@ exports.OPT_BACK_PATH = 'backPath'
 exports.OPTIONS = {
   [this.OPT_NODE_ENV]: {
     text: 'Node environment: production | development',
-    cli: '--node_env',
+    cli: 'node_env',
     env: 'NODE_ENV',
   },
   [this.OPT_USER_CONF]: {
     text: 'Path for user conf file',
-    cli: '--conf',
+    cli: 'conf',
     env: 'RUDI_PROD_MANAGER_USER_CONF',
   },
   [this.OPT_GIT_HASH]: {
     text: 'Git hash',
-    cli: '--hash',
+    cli: 'hash',
     env: 'RUDI_PROD_MANAGER_GIT_REV',
   },
   [this.OPT_APP_TAG]: {
     text: 'Version tag displayed',
-    cli: '--tag',
+    cli: 'tag',
     env: 'RUDI_PROD_MANAGER_APP_TAG',
   },
   [this.OPT_BACK_PATH]: {
     text: 'Back-end path',
-    cli: '--back_path',
+    cli: 'back_path',
     env: 'RUDI_PROD_MANAGER_BACK_PATH',
   },
 }
 // if (argv.indexOf('--opts') > -1) {
 console.log('--------------------------------------------------------------')
 
-console.log('Options to run this app: ')
-Object.keys(this.OPTIONS).map((opt) =>
+// console.log('Options to run this app: ', _argv)
+Object.keys(this.OPTIONS).forEach((opt) =>
   console.log(
-    '    cli: ' +
+    '    cli: --' +
       this.OPTIONS[opt].cli +
       (this.OPTIONS[opt].cli.length < 8 ? '\t' : '') +
       '\t| env: ' +
@@ -63,27 +67,30 @@ console.log('--------------------------------------------------------------')
 // console.log('= Extract command line arguments =');
 // console.log(process.argv);
 const cliOptionsValues = {}
-process.argv.map((cliArg) => {
-  // console.log('• cliArg: ' + cliArg);
-  Object.keys(this.OPTIONS).map((appOpt) => {
-    if (this.OPTIONS[appOpt].cli) {
-      const appOptForCli = this.OPTIONS[appOpt].cli + '='
-      // console.log('• appOptForCli: ' + appOptForCli);
-      if (cliArg.startsWith(appOptForCli)) {
-        cliOptionsValues[appOpt] = cliArg.substring(appOptForCli.length)
-        // console.log('    (cli) ' + appOpt + ': ' + cliOptionsValues[appOpt]);
-      }
+
+Object.keys(_argv).forEach((cliOption) => {
+  if (cliOption == '_') return
+  let found = false
+  for (const appOpt of Object.keys(this.OPTIONS)) {
+    if (this.OPTIONS[appOpt].cli && this.OPTIONS[appOpt].cli == cliOption) {
+      cliOptionsValues[cliOption] = _argv[cliOption]
+      found = true
+      // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
+      break
     }
-  })
+  }
+  if (!found) {
+    console.error('!!! ERR Command Line option not recognized:', `--${cliOption}`, _argv[cliOption])
+    console.log('--------------------------------------------------------------')
+  }
 })
-// console.log(cliOptionsValues);
 
 // ------------------------------------------------------------------------------------------------
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
 console.log('Extracted conf values:')
 const backOptionsValues = {}
-Object.keys(this.OPTIONS).map((opt) => {
+Object.keys(this.OPTIONS).forEach((opt) => {
   if (cliOptionsValues[opt]) {
     backOptionsValues[opt] = cliOptionsValues[opt]
     console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt])

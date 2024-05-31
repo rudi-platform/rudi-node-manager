@@ -6,7 +6,13 @@ const axios = require('axios')
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
-const { ForbiddenError, UnauthorizedError, NotFoundError } = require('../utils/errors')
+const {
+  ForbiddenError,
+  UnauthorizedError,
+  NotFoundError,
+  RudiError,
+  InternalServerError,
+} = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   getRudiApiToken,
@@ -15,9 +21,11 @@ const {
   CONSOLE_TOKEN_NAME,
   readJwtBody,
   getTokenFromMediaForUser,
+  getRudiApiHeaders,
 } = require('../utils/secu')
 const { handleError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
+const { beautify } = require('../utils/utils.js')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
@@ -34,7 +42,9 @@ exports.getMediaToken = async (req, reply, next) => {
     const payloadUser = jwtPayload.user
     const exp = jwtPayload.exp
     if (!payloadUser)
-      throw new UnauthorizedError(`JWT body token should contain an identified user: ${jwtPayload}`)
+      throw new UnauthorizedError(
+        `JWT body token should contain an identified user: ${beautify(jwtPayload)}`
+      )
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
@@ -96,7 +106,22 @@ exports.getDownloadById = (req, reply, next) => {
     })
 }
 
-exports.commitMedia = async (req, reply, next) => {
+exports.commitFileOnRudiMedia = async (req, reply) => {
+  const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
+  try {
+    return await commitOnRudiMedia(mediaId, commitId, zoneName)
+  } catch (err) {
+    return reply.status(err.response?.status || 500).send(err)
+  }
+}
+
+exports.commitFileOnRudiApi = async (req, reply) => {
+  const { media_id: mediaId, commit_uuid: commitId, metadata_id: metadataId } = req.body
+  return await commitOnRudiApi(mediaId, commitId, metadataId)
+}
+
+exports.commitMediaFile = async (req, reply, next) => {
+  const fun = 'commitMediaFile'
   const {
     media_id: mediaId,
     global_id: metadataId,
@@ -105,39 +130,50 @@ exports.commitMedia = async (req, reply, next) => {
   } = req.body
 
   // Let's commit the media on Media module
-  const pmMediaHeaders = createPmHeadersForMedia()
+  try {
+    await commitOnRudiMedia(mediaId, commitId, zoneName)
+  } catch (err) {
+    return reply.status(err.response?.status || 500).send(err)
+  }
+  try {
+    await commitOnRudiApi(mediaId, metadataId, commitId)
+    return reply.status(200).send({ status: 'OK' })
+  } catch (err) {
+    const errMsg = `ERR${err.response?.status || ''} API metadata commit: ${beautify(err.response?.data) || err.response?.statusText || beautify(err.response)}`
+    log.e(mod, fun, errMsg)
+    return reply.status(err.response?.status || 500).send(errMsg)
+  }
+}
+
+const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
+  const fun = 'commitOnRudiMedia'
 
   try {
     const commitMediaRes = await axios.post(
-      getRudiMediaUrl(`commit/?zone_name=${zoneName}&commit_uuid=${commitId}`),
+      getRudiMediaUrl('commit/'),
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
-      pmMediaHeaders
+      createPmHeadersForMedia()
     )
-    console.log(
-      'T (commitMedia) commitMediaRes',
-      commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes
-    )
+    log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
+    return { place: 'rudi-media', mediaId, commitId, status: 'OK' }
   } catch (err) {
-    console.error(
-      `T (commitMedia) ERR${err.response?.status} Media commit:`,
-      err.response?.data || err.response?.statusText
-    )
-    return reply
-      .status(err.response?.status || 500)
-      .send('ERR Media commit: ' + err.response?.data || err.response?.statusText)
+    const errMsg = `ERR${err.response?.status || ''} Media commit: ${beautify(err.response?.data) || err.response?.statusText}`
+    log.e(mod, fun, errMsg)
+    throw new InternalServerError(errMsg)
   }
+}
+
+const commitOnRudiApi = async (mediaId, commitId, metadataId) => {
+  const fun = 'commitOnRudiApi'
   const url = getAdminApi('media', mediaId, 'commit')
-  const token = getRudiApiToken(url, { method: 'POST' })
-  const apiHeaders = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  }
   try {
-    const mediaInfo = await axios.post(getRudiApi(url), { metadataId, commitId }, apiHeaders)
-    console.log('T (commitMedia) commit API OK:', mediaInfo.data)
-    return reply.status(200).send({ status: 'OK' })
+    const mediaInfo = await axios.post(
+      getRudiApi(url),
+      { metadataId, commitId },
+      getRudiApiHeaders()
+    )
+    log.d(mod, fun, 'T (commitMedia) commit API OK:', mediaInfo.data)
+    return { place: 'rudi-api', mediaId, commitId, status: 'OK' }
   } catch (err) {
     console.error(
       `T (commitMedia) ERR${err.response?.status} Api commit:`,
@@ -146,6 +182,8 @@ exports.commitMedia = async (req, reply, next) => {
 
     return reply
       .status(err.response?.status || 500)
-      .send('ERR Api commit: ' + err.response?.data || err.response?.statusText || err.response)
+      .send(
+        `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
+      )
   }
 }

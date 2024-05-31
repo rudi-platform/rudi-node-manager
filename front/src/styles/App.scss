@@ -333,3 +333,40 @@ a {
   padding: 2em;
   max-width: 80em;
 }
+
+#searchclear {
+  position: absolute;
+  right: 5px;
+  top: 0;
+  bottom: 0;
+  height: 14px;
+  margin: auto;
+  font-size: 14px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.clear-btn {
+  position: absolute;
+  width: 10px;
+  font-weight: 550;
+  border: none;
+  background-color: transparent;
+  line-height: 35px;
+  left: calc(100% - 65px);
+  z-index: 99999;
+  color: #aaaaaa;
+}
+.clear-btn:hover {
+  color: black;
+}
+.clear-btn-hidden {
+  visibility: hidden;
+}
+.clear-btn-visible {
+  visibility: visible;
+}
+.on-right-box {
+  float: right;
+  padding: 0.5em 0.2em 0 0;
+}

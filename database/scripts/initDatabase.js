@@ -300,7 +300,6 @@ const dbCreateSuperUser = async (db) => {
   if (!SU_NAME || !encodedSuPwd) {
     log.e(mod, fun, 'No super user config was found')
     throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
-    return
   }
 
   if (await dbExistsUser(db, SU_NAME)) return

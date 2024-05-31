@@ -6,7 +6,6 @@ const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
 // Internal dependencies
-const { getConf } = require('../config/config')
 const log = require('./logger')
 const { ForbiddenError, statusOK, UnauthorizedError } = require('./errors')
 const {
@@ -17,7 +16,12 @@ const {
   dbClose,
   dbOpen,
 } = require('../database/database')
-const { extractCookieFromReq, CONSOLE_TOKEN_NAME } = require('./secu')
+const {
+  extractCookieFromReq,
+  CONSOLE_TOKEN_NAME,
+  jwtSecretKey,
+  PM_FRONT_TOKEN_NAME,
+} = require('./secu')
 const { matchPassword } = require('@aqmo.org/jwt-lib')
 
 // Passport configuration
@@ -84,7 +88,7 @@ const checkPassport = async (username, password) => {
   }
 }
 
-const SECRET_KEY_JWT = getConf('auth', 'secret_key_jwt')
+const SECRET_KEY_JWT = jwtSecretKey()
 passport.use(
   new JWTstrategy(
     {
@@ -92,6 +96,7 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN_NAME),
+        (req) => extractCookieFromReq(req, PM_FRONT_TOKEN_NAME),
         // Take jwt from http header
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
