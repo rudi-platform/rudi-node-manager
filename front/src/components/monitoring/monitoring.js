@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
  */
 function Monitoring({}) {
   return
-  const [generalMonitoring, setGeneralMonitoring] = useState({})
+  const [generalMonitoring, setGeneralMonitoring] = useState({}) // NOSONAR
 
   useEffect(() => {
     Promise.all([

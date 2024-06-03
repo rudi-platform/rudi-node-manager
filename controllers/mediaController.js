@@ -179,11 +179,8 @@ const commitOnRudiApi = async (mediaId, metadataId, commitId) => {
       `T (commitMedia) ERR${err.response?.status} Api commit:`,
       err.response?.data || err.response?.statusText || err.response
     )
-
-    return reply
-      .status(err.response?.status || 500)
-      .send(
-        `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
-      )
+    throw new RudiError(
+      `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
+    )
   }
 }

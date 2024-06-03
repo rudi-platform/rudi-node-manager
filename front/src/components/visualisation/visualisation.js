@@ -1,16 +1,15 @@
 import axios from 'axios'
 
+import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import { Check } from 'react-bootstrap-icons'
 import { useParams } from 'react-router-dom'
-// import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types'
 
 import { JsonViewer } from '@textea/json-viewer'
 import jspreadsheet from 'jspreadsheet-ce'
 import 'jspreadsheet-ce/dist/jspreadsheet.css'
 
-import { getBackUrl } from '../../utils/frontOptions'
+import { getApiMedia } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 Visualisation.propTypes = {
@@ -101,137 +100,129 @@ function Visualisation({ logout }) {
     }
   }
 
-  const [imgUrl, setImgUrl] = useState()
-  const getImg = async (imageUrl) => {
-    const response = await fetch(imageUrl)
+  const getContent = async (mediaUrl, displayContent) => {
+    const response = await fetch(mediaUrl)
+    if (!response)
+      return defaultErrorHandler({
+        statusCode: 404,
+        message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
+      })
     const imageBlob = await response.blob()
     const reader = new FileReader()
     reader.readAsDataURL(imageBlob)
     reader.onloadend = () => {
-      const base64data = reader.result
-      setImgUrl(base64data)
+      setHtmlSrc(displayContent(reader.result))
     }
   }
 
+  const getMediaInfo = async (mediaId) => {
+    const resApi = await axios.get(getApiMedia(mediaId))
+    const mediaInfo = resApi?.data
+    // console.debug('T (visu) getMediaInfo', mediaInfo)
+    if (!mediaInfo)
+      return defaultErrorHandler({
+        statusCode: 404,
+        message: `Info introuvable pour le media ${id}`,
+      })
+    const mediaUrl = mediaInfo.connector.url
+    const mediaMimeStr = mediaInfo.file_type
+    const mediaMimeElements = mediaMimeStr.split(';')
+    const mediaMime = mediaMimeElements[0].trim().toLowerCase()
+    let mediaCharset
+    if (mediaMimeElements.length > 1) {
+      mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
+      switch (mediaCharset) {
+        case 'charset=utf-8':
+        case 'charset=us-ascii':
+        case 'charset=iso-8859-1':
+        case 'charset=iso-8859-15':
+          break
+        default:
+          defaultErrorHandler({
+            message: `l'encodage ${mediaCharset} n'est pas supporté`,
+          })
+          break
+      }
+    }
+    mediaCharset = mediaMimeStr
+    return { mediaUrl, mediaMime, mediaCharset }
+  }
+  const [htmlSrc, setHtmlSrc] = useState()
+
+  const showContent = async (mediaUrl, mediaMime) => {
+    if (mediaMime.startsWith('image')) {
+      await getContent(mediaUrl, (srcContent) => (
+        <img src={srcContent} className="image90" alt="retrieving media..." />
+      ))
+
+      // setVisuOption({ displayType: 'IMG', data: imgUrl })
+    } else if (mediaMime.startsWith('video')) {
+      await getContent(mediaUrl, (srcContent) => (
+        <video className="image90" controls loop autoPlay>
+          <source src={srcContent} type={mediaMime} />
+        </video>
+      ))
+    } else {
+      const media = await axios.get(mediaUrl)
+      if (!media)
+        return defaultErrorHandler({
+          statusCode: 404,
+          message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
+        })
+      console.log(media)
+      switch (mediaMime) {
+        case 'application/geo+json':
+        case 'application/json':
+        case 'text/json':
+          return setHtmlSrc(<JsonViewer value={media} collapsed={2} />)
+
+        case 'text/csv':
+        case 'application/vnd.oasis.opendocument.spreadsheet':
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+          setVisuOption({ displayType: 'CSV', data: csvToArray(media), opts: { url: mediaUrl } })
+          return setHtmlSrc(<div ref={wrapper} />)
+
+        case 'text/plain':
+        case 'text/css':
+        case 'text/markdown':
+        case 'text/x-markdown':
+          if (!media.data)
+            return defaultErrorHandler({
+              statusCode: 404,
+              message: `Le media n'a pu être récupéré à l'adresse ${mediaUrl}`,
+            })
+          return setHtmlSrc(
+            <div className="body">
+              <div className="text-visu">
+                <pre>{media.data}</pre>
+              </div>
+            </div>
+          )
+
+        default:
+          defaultErrorHandler({ message: `le type ${mediaMime} n'est pas supporté` })
+      }
+    }
+  }
   /**
    * get the doc
    */
-  function handleOnClick() {
+  async function handleOnClick() {
     // First: let's get the media metadata from the "RUDI API" module
-    axios
-      .get(getBackUrl(`api/media/${mediaId}`))
-      .then((resApi) => {
-        const mediaInfo = resApi?.data
-        // console.debug('T (visu) getMediaInfo', mediaInfo)
-        if (!mediaInfo)
-          return defaultErrorHandler({
-            statusCode: 404,
-            message: `Info introuvable pour le media ${id}`,
-          })
-        const mediaUrl = mediaInfo.connector.url
-
-        const mediaMimeStr = mediaInfo.file_type
-        // console.log(mediaMimeStr);
-        const mediaMimeElements = mediaMimeStr.split(';')
-        const mediaMime = mediaMimeElements[0].trim().toLowerCase()
-        let mediaCharset
-        if (mediaMimeElements.length > 1) {
-          mediaCharset = mediaMimeElements[1].trim().toLowerCase() || 'charset=utf-8'
-          switch (mediaCharset) {
-            case 'charset=utf-8':
-            case 'charset=us-ascii':
-            case 'charset=iso-8859-1':
-            case 'charset=iso-8859-15':
-              break
-            default:
-              defaultErrorHandler({
-                message: `l'encodage ${mediaCharset} n'est pas supporté`,
-              })
-              break
-          }
-        }
-        // Let's then get the media data from the "RUDI Media" module
-        if (mediaMime.startsWith('image')) {
-          try {
-            return getImg(mediaUrl)
-              .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
-              .then((res) => setVisuOption({ displayType: 'IMG', data: imgUrl }))
-          } catch (error) {
-            if (error.response?.status == 401) logout()
-            else defaultErrorHandler(error)
-          }
-        } else {
-          axios
-            .get(mediaUrl)
-            .then((resMedia) => {
-              const media = resMedia?.data
-              if (!media)
-                return defaultErrorHandler({
-                  statusCode: 404,
-                  message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
-                })
-
-              switch (mediaMime) {
-                case 'application/geo+json':
-                case 'application/json':
-                case 'text/json':
-                  setVisuOption({ displayType: 'JSON', data: media })
-                  break
-
-                case 'text/csv':
-                case 'application/vnd.oasis.opendocument.spreadsheet':
-                case 'application/vnd.ms-excel':
-                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                  try {
-                    setVisuOption({
-                      displayType: 'CSV',
-                      data: csvToArray(media),
-                      opts: { url: mediaUrl },
-                    })
-                  } catch (error) {
-                    if (error.response?.status == 401) logout()
-                    else defaultErrorHandler(error)
-                  }
-                  break
-
-                case 'text/plain':
-                case 'text/css':
-                  try {
-                    setVisuOption({ displayType: 'TXT', data: media })
-                  } catch (error) {
-                    if (error.response?.status == 401) logout()
-                    else defaultErrorHandler(error)
-                  }
-                  break
-
-                default:
-                  defaultErrorHandler({
-                    message: `le type ${mediaMimeStr} n'est pas supporté`,
-                  })
-
-                  break
-              }
-            })
-            .catch((err) => {
-              // console.error('T (visu) getMediaInfo url:', mediaUrl)
-              if (err.msg === 'media uuid not found') {
-                err.statusCode = 404
-                err.msg = `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`
-              } else if (!err.statusCode) err.statusCode = 500
-              if (err.response?.status == 401) logout()
-              else defaultErrorHandler(err)
-            })
-        }
-      })
-      .catch((err) => {
-        // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
-        if (err.msg === 'media uuid not found') {
-          err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
-          err.statusCode = 404
-        } else if (!err.statusCode) err.statusCode = 500
-        if (err.response?.status == 401) logout()
-        else defaultErrorHandler(err)
-      })
+    const { mediaUrl, mediaMime, mediaCharset } = await getMediaInfo(mediaId)
+    try {
+      // Let's then get the media data from the "RUDI Media" module
+      await showContent(mediaUrl, mediaMime, mediaCharset)
+    } catch (err) {
+      // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
+      if (err.msg === 'media uuid not found') {
+        err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
+        err.statusCode = 404
+      } else if (!err.statusCode) err.statusCode = 500
+      if (err.response?.status == 401) logout()
+      else defaultErrorHandler(err)
+    }
   }
 
   return (
@@ -250,23 +241,9 @@ function Visualisation({ logout }) {
         </button>
       </div>
       <br></br>
-      {
-        {
-          CSV: <div ref={wrapper} />,
-          JSON: <JsonViewer value={visuOption.data} collapsed={2} />,
-          TXT: (
-            <div className="body">
-              <div className="text-visu">
-                <pre>{visuOption.data}</pre>
-              </div>
-            </div>
-          ),
-          IMG: <img src={imgUrl} className="image90" />,
-        }[visuOption.displayType]
-      }
+      {htmlSrc}
     </div>
   )
 }
-Visualisation.propTypes = { match: PropTypes.object }
 
 export default Visualisation
