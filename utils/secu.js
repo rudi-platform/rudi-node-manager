@@ -61,16 +61,19 @@ exports.pmFrontCookieOpts = (exp) => {
   }
 }
 
-const SECRET_KEY_JWT = `${uuidv4()}${uuidv4()}`
-exports.jwtSecretKey = () => SECRET_KEY_JWT
+const JWT_SECRET = `${uuidv4()}${uuidv4()}`
+exports.jwtSecretKey = () => JWT_SECRET
+
+const INIT_PWD_SECRET = `${uuidv4()}${uuidv4()}`
+exports.initPwdSecret = () => INIT_PWD_SECRET
 
 exports.createFrontUserTokens = (userInfo) => {
   const exp = timeEpochS(toInt(DEFAULT_EXP))
   delete userInfo?.password
   const { username, roles } = { ...userInfo }
   return {
-    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, roles, exp }, SECRET_KEY_JWT),
-    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ username, roles, exp }, SECRET_KEY_JWT),
+    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, roles, exp }, JWT_SECRET),
+    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ username, roles, exp }, JWT_SECRET),
     exp,
   }
 }

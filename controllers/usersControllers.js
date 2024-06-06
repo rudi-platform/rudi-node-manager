@@ -2,8 +2,6 @@ const { hashPassword } = require('@aqmo.org/jwt-lib')
 
 const errorHandler = require('./errorHandler')
 const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
-const { decodeBase64 } = require('../utils/utils')
-const { getDbConf } = require('../config/config')
 const {
   dbCreateUser,
   dbDeleteUserWithId,
@@ -18,8 +16,9 @@ const {
   dbClose,
   dbGetUserInfoByUsername,
 } = require('../database/database')
+const { initPwdSecret } = require('../utils/secu.js')
 
-const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
+const INIT_PWD = initPwdSecret()
 
 exports.getUsersList = async (req, reply, next) => {
   try {
@@ -133,13 +132,13 @@ exports.createUser = async (req, reply) => {
 
     const db = dbOpen()
 
-    const dbUserSameName = await dbGetUserByUsername(db, username)
+    const dbUserSameName = await dbGetUserByUsername(db, username) // NOSONAR
     if (dbUserSameName) {
       dbClose(db)
       return reply.status(403).json(new ForbiddenError(`Ce nom est déjà utilisé: '${username}'`))
     }
 
-    const dbUserSameMail = await dbGetUserByEmail(db, email)
+    const dbUserSameMail = await dbGetUserByEmail(db, email) // NOSONAR
     if (dbUserSameMail) {
       dbClose(db)
       return reply.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))

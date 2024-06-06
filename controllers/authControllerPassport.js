@@ -5,11 +5,8 @@ const passport = require('passport')
 const { hashPassword, matchPassword } = require('@aqmo.org/jwt-lib')
 
 // ---- Internal dependencies -----
-const { decodeBase64 } = require('../utils/utils')
-const log = require('../utils/logger')
 const { BadRequestError, RudiError, UnauthorizedError } = require('../utils/errors')
-const { getDbConf } = require('../config/config')
-
+const log = require('../utils/logger')
 const errorHandler = require('./errorHandler')
 const {
   CONSOLE_TOKEN_NAME,
@@ -17,6 +14,7 @@ const {
   PM_FRONT_TOKEN_NAME,
   consoleCookieOpts,
   pmFrontCookieOpts,
+  initPwdSecret,
 } = require('../utils/secu')
 const {
   dbGetHashedPassword,
@@ -109,7 +107,7 @@ exports.postForgot = (req, reply, next) => {
   }
 }
 
-const INIT_PWD = decodeBase64(getDbConf('db_no_pwd'))
+const INIT_PWD = initPwdSecret()
 
 exports.putPassword = async (req, reply, next) => {
   const fun = 'changePwd'
