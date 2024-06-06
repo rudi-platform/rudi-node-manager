@@ -9,6 +9,12 @@ module.exports = (app) => {
     createProxyMiddleware({
       target: 'http://localhost:5005/api',
       changeOrigin: true,
+      // pathRewrite: (path, req) => {
+      //   const pathReplaced = path.replace(new RegExp(rewriteBackPathKey), '/api')
+      //   console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
+      //   // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
+      //   return pathReplaced
+      // },
     })
   )
 }

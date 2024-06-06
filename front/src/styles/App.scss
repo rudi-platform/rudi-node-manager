@@ -1,5 +1,5 @@
 //----- Fonts
-@import './fonts.scss';
+@import 'fonts/Montserrat.css';
 
 //----- Colors
 $primary: #004680;
@@ -32,7 +32,8 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 $marginSides: 20px;
 
 //----- CSS
-body {
+body,
+html {
   font-family: 'Montserrat', $font-family-sans-serif;
   height: 100%;
   font-size: 14px;

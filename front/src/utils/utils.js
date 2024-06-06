@@ -1,24 +1,29 @@
 /**
- * Joins several string argument with the character on which the function is called
+ * Joins several string chunks with the first argument the function is called with.
  * This is basically the reverse of the String split function, with the difference that we make sure
  * the merging character is not duplicated
- * @param {...string} args strings to be joined
+ * @param {string} sep separator we want to merge the string chunks with
+ * @param {...string} args string chunks to be joined
  * @return {string}
  */
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge = function (...args) {
+export const mergeStrings = (sep, ...args) => {
   const argNb = args.length
-  if (argNb == 0) return ''
-  let finalString = `${args[0]}`
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
+  let accumulatedStr = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = !finalString.endsWith(this)
-      ? finalString + mergableStr
-      : finalString.substring(0, finalString.length - 1) + mergableStr
+    if (args[i] === undefined || args[i] === null) break
+    const newChunk = `${args[i]}`
+    const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
+    accumulatedStr = accumulatedStr.endsWith(sep)
+      ? accumulatedStr + cleanChunk
+      : accumulatedStr + sep + cleanChunk
   }
-  return finalString
+  return accumulatedStr
 }
+
+export const pathJoin = (...args) => mergeStrings('/', ...args)
+export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
+export const removeTrailingSlash = (url) => (`${url}`.endsWith('/') ? url.slice(0, -1) : url)
 
 const twoDigits = (n) => `${n}`.padStart(2, '0')
 
@@ -49,17 +54,10 @@ export const lastMonth = () => new Date(new Date().getTime() - 2592000000)
 export const showObj = (obj, option = 2) => {
   try {
     return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
-  } catch (err) {
+  } catch {
     return `${obj}`
   }
 }
-
-export const getObjFormUrl = (formUrl, objType = '', queryParams = '') =>
-  formUrl + objType + queryParams
-
-export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
-
-export const pathJoin = (...args) => '/'.merge(...args)
 
 export const getCookie = (name) =>
   document.cookie

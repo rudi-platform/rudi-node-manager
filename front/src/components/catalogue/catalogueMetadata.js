@@ -14,7 +14,7 @@ import MetadataCard, { displayStatus } from './metadataCard'
 
 const idField = 'global_id'
 
-const deleteUrl = (id) => getApiData(`resources/${id}`)
+const deleteUrl = (id) => getApiData('resources', id)
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`
 const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`
 
@@ -78,6 +78,14 @@ export default function CatalogueMetadata({ editMode, logout }) {
     else if (currentOffset < 0) setCurrentOffset(0)
     else fetchMoreData()
   }, [currentOffset])
+
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  document.addEventListener('visibilitychange', () => {
+    setIsTabVisible(document.visibilityState === 'visible')
+  })
+  useEffect(() => {
+    if (isTabVisible) refresh()
+  }, [isTabVisible])
 
   const filterConf = [
     {
@@ -448,6 +456,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
           <div className="row">
             {isEdit && (
               <EditObjCard
+                objType="metadata"
                 idField={idField}
                 deleteUrl={deleteUrl}
                 deleteConfirmMsg={deleteConfirmMsg}

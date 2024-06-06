@@ -14,9 +14,8 @@ import {
 import { Link } from 'react-router-dom'
 
 import { BackDataContext } from '../../context/backDataContext'
-import { getBackUrl } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getLocaleFormatted, getObjFormUrl, pathJoin } from '../../utils/utils'
+import { getLocaleFormatted, mergeStrings, pathJoin } from '../../utils/utils'
 import {
   DefaultConfirmOption,
   DefaultOkOption,
@@ -24,6 +23,7 @@ import {
 } from '../modals/genericModalContext'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import ThemeDisplay from '../other/themeDisplay'
+import { getPublicUrl } from '../../utils/frontOptions.js'
 
 const downloadButton = (url) => (
   <button type="button" className="btn btn-green button-margin">
@@ -42,7 +42,7 @@ const externalUrlButton = (url) => (
 )
 
 const eyeButton = (id) => (
-  <Link to={getBackUrl(`show/${id}`)}>
+  <Link to={`/show/${id}`}>
     <span className="btn btn-green" title="Aperçu">
       <Eye />
     </span>
@@ -130,7 +130,7 @@ export const displayStatus = (metadataStatus) => {
  * @return {html} A round pill that shows the status
  */
 export const displayMetadataStatus = (metadata) =>
-  metadata.metadataStatus == 'local' && metadata.collection_tag
+  metadata.metadata_status == 'local' && metadata.collection_tag
     ? displaySpan('dark', metadata.collection_tag)
     : displayStatus(metadata.metadata_status)
 
@@ -148,6 +148,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
+
+  const getForm = (query) => mergeStrings('?', getPublicUrl(appData.formUrl, 'metadata'), query)
 
   /**
    * call for metadata deletion
@@ -256,7 +258,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const button = {
     share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
-    edit: editButton('?'.merge(appData.formUrl, `update=${metadata.global_id}`)),
+    edit: editButton(getForm(`update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
     external: (url) => externalUrlButton(url),
@@ -268,7 +270,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={getObjFormUrl(appData.formUrl, '', `?read-only=${metadata.global_id}`)}
+              href={getForm(`read-only=${metadata.global_id}`)}
               target="_blank"
               rel="noopener noreferrer"
             >

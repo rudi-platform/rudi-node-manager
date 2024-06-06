@@ -1,127 +1,133 @@
 const mod = 'server'
 
-// Import dependencies
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 const express = require('express')
-const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const cors = require('cors')
+// const cors = require('cors')
 const path = require('path')
 const helmet = require('helmet')
 
-// Require Config
-const { getConf } = require('./config/config')
-const log = require('./utils/logger')
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies: conf
+// -------------------------------------------------------------------------------------------------
+const { getConf, getConsoleFormUrl, getRudiMediaUrl } = require('./back/config/config')
 
-// Require Route
-const apiOpen = require('./routes/routesOpen')
-const apiFront = require('./routes/routesFront')
-const apiData = require('./routes/routesData')
-const apiMedia = require('./routes/routesMedia')
-const apiSecu = require('./routes/routesSecu')
+const log = require('./back/utils/logger')
+const { isDevEnv } = require('./back/config/backOptions')
+const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
-const passport = require('./utils/passportSetup')
-const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./database/scripts/initDatabase')
-const { isDevEnv } = require('./config/backOptions')
-const { checkRolePerm } = require('./utils/roleCheck')
+// -------------------------------------------------------------------------------------------------
+// External dependencies: routes
+// -------------------------------------------------------------------------------------------------
+const apiOpen = require('./back/routes/routesOpen')
+const apiFront = require('./back/routes/routesFront')
+const apiData = require('./back/routes/routesData')
+const apiMedia = require('./back/routes/routesMedia')
+const apiSecu = require('./back/routes/routesSecu')
 
-// Create a new express application named 'app'
-const app = express()
+// -------------------------------------------------------------------------------------------------
+// External dependencies: security
+// -------------------------------------------------------------------------------------------------
+const passport = require('./back/utils/passportSetup')
+const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
+const { checkRolePerm } = require('./back/utils/roleCheck')
+const consoleRouter = require('./console/router.js')
+
+// -------------------------------------------------------------------------------------------------
+// Launching express app
+// -------------------------------------------------------------------------------------------------
+const backend = express()
 // Set our backend port to be either an environment variable or port 5000
 const port = getConf('server', 'listening_port') || 5000
 
-// This application level middleware prints incoming requests to the servers console, useful to see incoming requests
-app.use((req, reply, next) => {
-  log.sysInfo(mod, '', `Request <= ${req.method} ${req.url}`, log.getContext(req, {}))
-  // console.log('server', 'req:', req)
-  next()
-
-  reply.on('finish', () => {
-    if (reply.statusCode < 400) {
-      log.sysInfo(
-        mod,
-        '',
-        `=> OK ${reply.statusCode}: ${req.method} ${req.originalUrl}`,
-        log.getContext(req, {})
-      )
-      // console.debug(reply)
-    } else {
-      // console.error(reply)
-      log.sysWarn(
-        mod,
-        '',
-        `ERR ${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`,
-        log.getContext(req, {})
-      )
-    }
-  })
-})
-
-app.use(
+backend.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
+        defaultSrc: ["'self'", 'data:'],
         scriptSrc: ["'self'"],
-        'connect-src': ["'self'", ...getConf('security', 'trusted_domain')],
+        connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
+        imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
       },
     },
   })
 )
 
-// Configure the bodyParser middleware
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(cookieParser())
+// This application level middleware prints incoming requests to the servers console, useful to see incoming requests
+backend.use((req, reply, next) => {
+  const logReqMsg = `Request <= ${req.method} ${req.url} (from ${req.ip})`
+  log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
 
+  // console.log('req.headers.cookie:', req.headers.cookie)
+  next()
+
+  reply.on('finish', () => {
+    if (reply.statusCode < 400) {
+      const okReplyMsg = `=> OK ${reply.statusCode}: ${req.method} ${req.originalUrl}`
+      log.sysInfo(mod, '', okReplyMsg, log.getContext(req, {}))
+    } else {
+      const errReplyMsg = `=> ERR ${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`
+      log.sysWarn(mod, '', errReplyMsg, log.getContext(req, {}))
+    }
+  })
+})
+
+// Note: bodyParser middleware has been replace with express bodyParser
+backend.use(express.json())
+backend.use(express.urlencoded({ extended: true }))
+backend.use(cookieParser())
+
+// Access-Control-Allow-Origin
 // Configure the CORs middleware
-app.use(cors())
+// backend.use(
+//   cors({
+//     credentials: true,
+//     origin: WHITE_LIST,
+//     allowedHeaders: ['Content-Type', 'Content-Length', 'Authorization'],
+//     vary: 'Origin',
+//     methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
+//     maxAge: 600,
+//   })
+// )
 
 // Passport middleware
-app.use(passport.initialize())
+backend.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
 // Configure app to use routes
-app.use(`/api/open`, apiOpen)
-app.use('/api/front', apiFront)
-app.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
-app.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
-app.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+backend.use('/api/open', apiOpen)
+backend.use('/api/front', apiFront)
+backend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
+backend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+backend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+
+// Serving the console frontend
+const CONSOLE_PREFIX = '/form'
+backend.use(CONSOLE_PREFIX, consoleRouter)
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
-  app.use(express.static(path.join(__dirname, 'front/build')))
-  app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build', 'index.html')))
+  console.log('Serving the built static page')
+  backend.use(express.static(path.join(__dirname, 'front/build')))
+  backend.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
 }
 
 // Init database on startup
-
 dbInitialize()
   .then((res) => log.d(mod, 'initDatabase', 'SQL DB init OK'))
   .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`))
 
 // Catch any bad requests
-app.get('*', (req, reply) => reply.status(404).send(`Route '${req.method} ${req.url}' not found`))
+backend.get('*', (req, reply) =>
+  reply.status(404).send(`Route '${req.method} ${req.url}' not found`)
+)
 
 // Configure our server to listen on the port defiend by our port variable
-app.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
+backend.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
 
-app.use((err, req, reply, next) => _errorHandler(err, req, reply, next))
-
-const _errorHandler = (err, req, reply, next) => {
-  const now = new Date()
-  // console.error(now, `[Express default error handler]`, err)
-  log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
-  console.error('[Local dump]', err)
-
-  if (reply.headersSent) return
-
-  // res.status(500)
-  // res.render('error', { time: now.getTime(), error: err })
-  reply.status(500).json({
-    error: `An error was thrown, please contact the Admin with the information bellow`,
-    message: err.message,
-    time: now.getTime(),
-  })
-}
+backend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
