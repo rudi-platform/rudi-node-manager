@@ -116,18 +116,13 @@ exports.commitFileOnRudiMedia = async (req, reply) => {
 }
 
 exports.commitFileOnRudiApi = async (req, reply) => {
-  const { media_id: mediaId, commit_uuid: commitId, metadata_id: metadataId } = req.body
-  return await commitOnRudiApi(mediaId, commitId, metadataId)
+  const { media_id: mediaId, commit_uuid: commitId } = req.body
+  return await commitOnRudiApi(mediaId, commitId)
 }
 
 exports.commitMediaFile = async (req, reply, next) => {
   const fun = 'commitMediaFile'
-  const {
-    media_id: mediaId,
-    global_id: metadataId,
-    commit_uuid: commitId,
-    zone_name: zoneName,
-  } = req.body
+  const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
 
   // Let's commit the media on Media module
   try {
@@ -136,10 +131,13 @@ exports.commitMediaFile = async (req, reply, next) => {
     return reply.status(err.response?.status || 500).send(err)
   }
   try {
-    await commitOnRudiApi(mediaId, metadataId, commitId)
-    return reply.status(200).send({ status: 'OK' })
+    const apiCommitReply = await commitOnRudiApi(mediaId, commitId)
+    return reply.status(200).send({ status: 'OK', ...apiCommitReply })
   } catch (err) {
-    const errMsg = `ERR${err.response?.status || ''} API metadata commit: ${beautify(err.response?.data) || err.response?.statusText || beautify(err.response)}`
+    const errMsg =
+      `ERR${err.response?.status || ''} API metadata commit:` + beautify(err.response?.data) ||
+      err.response?.statusText ||
+      beautify(err.response)
     log.e(mod, fun, errMsg)
     return reply.status(err.response?.status || 500).send(errMsg)
   }
@@ -163,15 +161,11 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
   }
 }
 
-const commitOnRudiApi = async (mediaId, metadataId, commitId) => {
+const commitOnRudiApi = async (mediaId, commitId) => {
   const fun = 'commitOnRudiApi'
   const url = getAdminApi('media', mediaId, 'commit')
   try {
-    const mediaInfo = await axios.post(
-      getRudiApi(url),
-      { metadataId, commitId },
-      getRudiApiHeaders()
-    )
+    const mediaInfo = await axios.post(getRudiApi(url), { commitId }, getRudiApiHeaders())
     log.d(mod, fun, 'T (commitMedia) commit API OK:', mediaInfo.data)
     return { place: 'rudi-api', mediaId, commitId, status: 'OK' }
   } catch (err) {
