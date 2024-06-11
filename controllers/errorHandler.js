@@ -104,35 +104,49 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
   }
 }
 
-exports.treatAxiosError = (err, reply) => {
+exports.treatAxiosError = (err, reply, moduleName) => {
   const fun = 'treatAxiosError'
   if (err.response) {
     const { data, status, headers } = err.response
     log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
-    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   } else if (err.request) {
     const { message, status, code, headers, request } = err
     log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
-    log.e(mod, fun, `ERR for request: ${cleanErrMsg(request)}`)
-    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+    // log.e(mod, fun, `ERR for request: ${cleanErrMsg(request)}`)
+    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   } else {
     // err.message
     const { message, status, code, headers } = err
     log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
-    log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
+    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   }
-  if (err.name == 'AxiosError') {
-    let statusCode, error
-    if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
-      statusCode = 503
-      error = {
-        statusCode,
-        message:
-          'La connection de “RUDI Prod Manager” vers le module “RUDI API” a échoué: “RUDI API” est injoignable, contactez l‘admin du noeud RUDI',
-      }
-      // log.e(mod,fun,err. )
-      if (reply) return reply.status(statusCode).json(error)
-      else throw new ConnectionError(error.message)
+  let statusCode, error
+  if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+    statusCode = 503
+    error = {
+      statusCode,
+      message: `La connection de “RUDI Prod Manager” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`,
     }
+    // log.e(mod,fun,err. )
+    if (reply) return reply.status(statusCode).json(error)
+    else throw new ConnectionError(error.message)
   }
+}
+
+exports.expressErrorHandler = (err, req, reply) => {
+  const now = new Date()
+  // console.error(now, `[Express default error handler]`, err)
+  // log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
+  console.error(`An error happened on ${req.method} ${req.url}: ${err}`)
+
+  if (reply.headersSent) return
+
+  // res.status(500)
+  // res.render('error', { time: now.getTime(), error: err })
+  reply.status(500).json({
+    error: `An error was thrown, please contact the Admin with the information bellow`,
+    message: err.message,
+    time: now.getTime(),
+  })
 }

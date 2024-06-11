@@ -23,7 +23,7 @@ const {
   getTokenFromMediaForUser,
   getRudiApiHeaders,
 } = require('../utils/secu')
-const { handleError } = require('./errorHandler')
+const { handleError, treatAxiosError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
 const { beautify } = require('../utils/utils.js')
 
@@ -128,18 +128,22 @@ exports.commitMediaFile = async (req, reply, next) => {
   try {
     await commitOnRudiMedia(mediaId, commitId, zoneName)
   } catch (err) {
-    return reply.status(err.response?.status || 500).send(err)
+    log.e(mod, fun, err)
+    return reply.status(err.code).json(err || err?.message)
   }
   try {
     const apiCommitReply = await commitOnRudiApi(mediaId, commitId)
-    return reply.status(200).send({ status: 'OK', ...apiCommitReply })
+    const res = {
+      status: 'OK',
+      media_id: mediaId,
+      commit_id: commitId,
+      metadata_list: apiCommitReply?.metadata_list,
+    }
+    return reply.status(200).send(res)
   } catch (err) {
-    const errMsg =
-      `ERR${err.response?.status || ''} API metadata commit:` + beautify(err.response?.data) ||
-      err.response?.statusText ||
-      beautify(err.response)
-    log.e(mod, fun, errMsg)
-    return reply.status(err.response?.status || 500).send(errMsg)
+    log.e(mod, fun, err)
+    if (err.response?.data) return reply.send(err.response.code).json(err.response.data)
+    return treatAxiosError(err, reply, 'RudiApi')
   }
 }
 
@@ -153,11 +157,33 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
       createPmHeadersForMedia()
     )
     log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
-    return { place: 'rudi-media', mediaId, commitId, status: 'OK' }
+    return { status: 'OK', place: 'rudi-media', media_id: mediaId, commit_id: commitId }
   } catch (err) {
-    const errMsg = `ERR${err.response?.status || ''} Media commit: ${beautify(err.response?.data) || err.response?.statusText}`
+    log.e(mod, fun + '.origErr', err)
+    const moduleName = 'RUDI Media'
+    if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+      throw RudiError.createRudiHttpError(
+        503,
+        `La connection de “RUDI Prod Manager” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`
+      )
+    }
+
+    const errMsg = `ERR${err.response?.status || ''} Media commit: ${beautify(err.response?.data) || err.response?.statusTex || err}`
     log.e(mod, fun, errMsg)
-    throw new InternalServerError(errMsg)
+    const e = {
+      statusCode: err.response?.status,
+      place: moduleName,
+      message: err.response?.data?.msg,
+    }
+    log.e(mod, fun + '.test', e)
+
+    throw RudiError.createRudiHttpError(err.response?.status, err.response?.data?.msg)
+    // RudiError.createRudiHttpError(
+    //   err.statusCode || err.code || 500,
+    //   `ERR${err.response?.status} Api commit:`,
+    //   err.response?.data || err.response?.statusText || err.response
+    // )
+    // // throw new InternalServerError(errMsg)
   }
 }
 
@@ -165,16 +191,21 @@ const commitOnRudiApi = async (mediaId, commitId) => {
   const fun = 'commitOnRudiApi'
   const url = getAdminApi('media', mediaId, 'commit')
   try {
-    const mediaInfo = await axios.post(getRudiApi(url), { commitId }, getRudiApiHeaders())
-    log.d(mod, fun, 'T (commitMedia) commit API OK:', mediaInfo.data)
-    return { place: 'rudi-api', mediaId, commitId, status: 'OK' }
+    const commitInfo = await axios.post(
+      getRudiApi(url),
+      { commit_id: commitId },
+      getRudiApiHeaders()
+    )
+    log.d(mod, fun, 'T (commitMedia) commit API OK:', commitInfo.data)
+    return {
+      place: 'rudi-api',
+      ...commitInfo,
+    }
   } catch (err) {
     console.error(
-      `T (commitMedia) ERR${err.response?.status} Api commit:`,
+      `T (commitMedia) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
       err.response?.data || err.response?.statusText || err.response
     )
-    throw new RudiError(
-      `ERR API metadata commit: ${beautify(err.response?.data || err.response?.statusText || err.response)}`
-    )
+    throw err
   }
 }
