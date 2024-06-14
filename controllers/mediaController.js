@@ -6,13 +6,7 @@ const axios = require('axios')
 // Internal dependencies
 const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
-const {
-  ForbiddenError,
-  UnauthorizedError,
-  NotFoundError,
-  RudiError,
-  InternalServerError,
-} = require('../utils/errors')
+const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   getRudiApiToken,
