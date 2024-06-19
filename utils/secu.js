@@ -163,19 +163,21 @@ exports.createPmJwtForMedia = (body) =>
     }
   )
 
+const PM_API_ID = getConf('rudi_api', 'pm_api_id')
 let cachedApiJwt
 exports.getRudiApiToken = () => {
-  if (isJwtValid(cachedApiJwt)) return cachedApiJwt
-  cachedApiJwt = jwtLib.forgeToken(
-    getPrvKey('api'),
-    {},
-    {
-      exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-      sub: getConf('rudi_api', 'pm_api_id'),
-      req_mtd: 'all',
-      req_url: 'all',
-    }
-  )
+  if (!isJwtValid(cachedApiJwt)) {
+    cachedApiJwt = jwtLib.forgeToken(
+      getPrvKey('api'),
+      {},
+      {
+        exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
+        sub: PM_API_ID,
+        req_mtd: 'all',
+        req_url: 'all',
+      }
+    )
+  }
   return cachedApiJwt
 }
 
@@ -226,6 +228,7 @@ const prvKeyCache = {}
  * @return {object} the private key
  */
 const getPrvKey = (name) => {
+  const fun = 'getPrvKey'
   // Shortcuts
   switch (name) {
     case 'api':
@@ -244,6 +247,7 @@ const getPrvKey = (name) => {
   // If PEM is cached, let's return it
   if (prvKeyCache[name]) return prvKeyCache[name]
   const keyPath = getKeyPath(name)
+  // log.d(mod, fun, `keyPath (${name}}: ${keyPath}`)
   prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
 }

@@ -12,6 +12,7 @@ const {
 } = require('../controllers/authControllerPassport')
 const { makeRequestable } = require('../utils/utils')
 const { getRudiMediaUrl } = require('../config/config.js')
+const { expressErrorHandler } = require('../controllers/errorHandler.js')
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
@@ -28,5 +29,6 @@ router.post('/register', postRegister)
 router.put('/change-password', putPassword) // Delayed auth
 router.post('/login', postLogin)
 router.get('/logout', logout)
+router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
 
 module.exports = router

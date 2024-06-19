@@ -127,7 +127,7 @@ const logWhere = (srcMod, srcFun) => {
 }
 
 const displayStr = (srcMod, srcFun, msg) => {
-  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== '' ? JSON.stringify(msg, noCycle()) : '<-'}`
+  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== undefined && msg !== '' ? JSON.stringify(msg, noCycle()) : '<-'}`
 }
 const createLogLine = (level, srcMod, srcFun, msg) => {
   return `${nowFormatted()} ${level} ${displayStr(srcMod, srcFun, msg)}`

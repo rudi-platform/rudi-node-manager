@@ -24,6 +24,8 @@ built
 # dev
 env
 .env
+.ssh
 .gitconfig
 bak
 _
+

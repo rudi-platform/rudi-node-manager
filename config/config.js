@@ -64,3 +64,9 @@ exports.getConsoleFormUrl = () => config.rudi_console.console_form_url
 
 exports.getDbConf = (subSection) => config.database[subSection]
 exports.SU_NAME = config?.database?.db_su_usr
+
+exports.getCompleteRudiApiUrl = (url, req) => {
+  const completeUrl = new URL(url, this.getRudiApi())
+  if (req.query) completeUrl.search = new URLSearchParams(req.query)
+  return `${completeUrl}`
+}

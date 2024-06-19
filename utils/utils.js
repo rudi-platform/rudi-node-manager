@@ -79,7 +79,7 @@ exports.jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
 exports.cleanErrMsg = (str) => (str ? this.cleanHeadersAuth(str) : '')
 exports.cleanHeadersAuth = (str) =>
   typeof str == 'string'
-    ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '<auth>')
+    ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '"***"')
     : this.cleanHeadersAuth(this.beautify(str))
 
 exports.makeRequestable = (func) => async (req, reply, next) => {

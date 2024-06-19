@@ -20,6 +20,7 @@ const {
 const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
 const { commitFileOnRudiApi } = require('../controllers/mediaController.js')
+const { expressErrorHandler } = require('../controllers/errorHandler.js')
 
 router.get('/uuid', (_, reply) => reply.status(200).send(uuidv4()))
 router.get('/version', getVersion)
@@ -36,5 +37,6 @@ router.put(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), putObject)
 router.get(`/:objectType/:id`, getObjectById)
 router.delete(`/:objectType/:id`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObject)
 router.delete(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObjects)
+router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
 
 module.exports = router

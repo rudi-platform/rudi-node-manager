@@ -75,8 +75,12 @@ exports.error = (error, req, options) => {
  * @param {String} id The UUID of the object
  */
 exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id) => {
-  log.e(mod, srcFun, cleanErrMsg(initialError))
+  log.e(mod, 'handleError.' + srcFun)
   try {
+    if (initialError instanceof RudiError) {
+      return reply.status(initialError.code).json(initialError)
+    }
+    if (isAxiosError(initialError)) return this.treatAxiosError(initialError, reply, mod)
     if (initialError?.response?.data) {
       const statusCode = initialError.response.data.statusCode
       const message = cleanErrMsg(initialError.response.data.message)
@@ -104,20 +108,17 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
   }
 }
 
-exports.treatAxiosError = (err, reply, moduleName) => {
+const isAxiosError = (err) => err?.name == 'AxiosError'
+
+exports.treatAxiosError = (err, rudiModuleCalled, reply) => {
   const fun = 'treatAxiosError'
   if (err.response) {
-    const { data, status, headers } = err.response
+    const { data, status = '' } = err.response
     log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
-    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
-  } else if (err.request) {
-    const { message, status, code, headers, request } = err
-    log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
-    // log.e(mod, fun, `ERR for request: ${cleanErrMsg(request)}`)
     // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   } else {
     // err.message
-    const { message, status, code, headers } = err
+    const { message, status, code } = err
     log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
     // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
   }
@@ -126,7 +127,7 @@ exports.treatAxiosError = (err, reply, moduleName) => {
     statusCode = 503
     error = {
       statusCode,
-      message: `La connection de “RUDI Prod Manager” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`,
+      message: `La connection de “RUDI Prod Manager” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`,
     }
     // log.e(mod,fun,err. )
     if (reply) return reply.status(statusCode).json(error)
@@ -135,18 +136,22 @@ exports.treatAxiosError = (err, reply, moduleName) => {
 }
 
 exports.expressErrorHandler = (err, req, reply) => {
+  const fun = 'expressErrorHandler'
+  log.d(mod, fun)
   const now = new Date()
   // console.error(now, `[Express default error handler]`, err)
   // log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
-  console.error(`An error happened on ${req.method} ${req.url}: ${err}`)
+  const errMsg = cleanErrMsg(err.message)
+  console.error(`An error happened on ${req.method} ${req.url}: ${errMsg}`)
 
   if (reply.headersSent) return
 
   // res.status(500)
   // res.render('error', { time: now.getTime(), error: err })
-  reply.status(500).json({
+  log.e(mod, fun + '.uncaught', errMsg)
+  reply?.status(500).json({
     error: `An error was thrown, please contact the Admin with the information bellow`,
-    message: err.message,
+    message: errMsg,
     time: now.getTime(),
   })
 }

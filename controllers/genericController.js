@@ -1,15 +1,17 @@
 const mod = 'genCtrl'
 
+const log = require('../utils/logger')
 const axios = require('axios')
-const { getRudiApi, getAdminApi } = require('../config/config')
+const { getRudiApi, getAdminApi, getCompleteRudiApiUrl } = require('../config/config')
 const {
   CONSOLE_TOKEN_NAME,
   getRudiApiToken,
   PM_FRONT_TOKEN_NAME,
   refreshTokens,
 } = require('../utils/secu')
-const { sysWarn } = require('../utils/logger')
-const { handleError } = require('./errorHandler')
+const { sysWarn, d } = require('../utils/logger')
+const { handleError, treatAxiosError } = require('./errorHandler')
+const { rudiApiGet } = require('../utils/connect.js')
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -28,49 +30,33 @@ const checkObjectType = (req, reply, fun, objectType) => {
   return true
 }
 
-const callApiModule = (req, url) => {
-  // const fun = `${mod}.callApiModule`
-  const completeUrl = new URL(url, getRudiApi())
-  if (req.query) completeUrl.search = new URLSearchParams(req.query)
-
-  return axios
-    .get(`${completeUrl}`, { headers: { Authorization: `Bearer ${getRudiApiToken()}` } })
-    .then((res) => res.data)
-    .catch((err) => {
-      if (err.code == 'ECONNREFUSED') {
-        throw new Error(
-          'Connection from “RUDI Prod Manager” to “RUDI API” module failed: ' +
-            '“RUDI API” module is apparently down, contact the RUDI node admin'
-        )
-      } else throw err
-    })
-}
-
-exports.getObjectList = (req, reply) => {
+exports.getObjectList = async (req, reply) => {
   const opType = 'get_objects'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return reply.status(404).json('Not found')
-
-  callApiModule(req, getAdminApi(objectType))
-    .then((res) => {
-      const { consoleToken, pmFrontToken } = refreshTokens(req)
-      return reply
-        .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-        .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
-        .json(res)
-    })
-    .catch((err) => handleError(req, reply, err, 501, opType, objectType))
+  try {
+    const data = await rudiApiGet(getCompleteRudiApiUrl(getAdminApi(objectType), req))
+    const { consoleToken, pmFrontToken } = refreshTokens(req)
+    return reply
+      .status(200)
+      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .json(data)
+  } catch (err) {
+    handleError(req, reply, err, 501, opType, objectType)
+  }
 }
 
-exports.getObjectById = (req, reply, next) => {
+exports.getObjectById = async (req, reply, next) => {
   const opType = 'get_object_by_id'
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-
-  return callApiModule(req, getAdminApi(objectType, id))
-    .then((rudiObj) => reply.status(200).json(rudiObj))
-    .catch((err) => handleError(req, reply, err, 501, opType, objectType, id))
+  try {
+    const rudiObj = await rudiApiGet(getCompleteRudiApiUrl(getAdminApi(objectType, id), req))
+    return reply.status(200).json(rudiObj)
+  } catch (err) {
+    handleError(req, reply, err, 501, opType, objectType, id)
+  }
 }
 
 exports.postObject = async (req, reply, next) => {
@@ -108,6 +94,8 @@ exports.postObject = async (req, reply, next) => {
 exports.putObject = async (req, reply) => {
   const opType = 'put_object'
   const { objectType } = req.params
+  d(opType, 'req.params', req.params)
+  d(opType, 'req', req)
   try {
     if (!checkObjectType(req, reply, opType, objectType)) return
     let data
@@ -176,20 +164,20 @@ exports.deleteObjects = (req, reply) => {
 const COUNT_BY_LABELS = ['metadata_status', 'theme', 'keywords', 'producer']
 exports.getCounts = async (req, reply) => {
   const fun = `${mod}.getCounts`
-  const res = await Promise.all(
-    COUNT_BY_LABELS.map((label) =>
-      axios
-        .get(getRudiApi(getAdminApi(`resources?count_by=${label}`)), {
-          headers: { Authorization: `Bearer ${getRudiApiToken()}` },
-        })
-        .then((res) => res.data)
-        .catch((error) => handleError(req, reply, error, 501, fun, 'resources'))
+  try {
+    const data = await Promise.all(
+      COUNT_BY_LABELS.map((label) =>
+        rudiApiGet(getRudiApi(getAdminApi(`resources?count_by=${label}`)))
+      )
     )
-  )
 
-  const counts = {}
-  COUNT_BY_LABELS.forEach((label, i) => {
-    counts[label] = res[i]
-  })
-  reply.status(200).json(counts)
+    const counts = {}
+    COUNT_BY_LABELS.forEach((label, i) => {
+      counts[label] = data[i]
+    })
+    reply.status(200).json(counts)
+  } catch (err) {
+    log.e(mod, fun, 'Could not get counts')
+    reply.status(500).json({ statusCode: err.statusCode || 500, message: err.message })
+  }
 }

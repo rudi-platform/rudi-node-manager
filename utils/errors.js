@@ -47,6 +47,8 @@ class RudiError extends Error {
           return new NotAcceptableError(message, ctxMod, ctxFun)
         case 501:
           return new NotImplementedError(message, ctxMod, ctxFun)
+        case 503:
+          return new ServiceUnavailableError(message, ctxMod, ctxFun)
         case 500:
         default:
           return new InternalServerError(message, ctxMod, ctxFun)
@@ -134,6 +136,12 @@ class NotImplementedError extends RudiError {
       ctxMod,
       ctxFun
     )
+  }
+}
+
+class ServiceUnavailableError extends RudiError {
+  constructor(errMessage, ctxMod, ctxFun) {
+    super(errMessage, 503, 'Service Unavailable', 'The server is unreachable', ctxMod, ctxFun)
   }
 }
 

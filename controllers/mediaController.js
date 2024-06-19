@@ -9,7 +9,6 @@ const { dbGetUserByUsername } = require('../database/database')
 const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
-  getRudiApiToken,
   createPmHeadersForMedia,
   extractCookieFromReq,
   CONSOLE_TOKEN_NAME,
@@ -20,6 +19,7 @@ const {
 const { handleError, treatAxiosError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
 const { beautify } = require('../utils/utils.js')
+const { rudiApiGet } = require('../utils/connect.js')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
@@ -70,14 +70,7 @@ exports.getMediaInfoById = async (req, reply, next) => {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    const url = getAdminApi('media', id)
-    const token = getRudiApiToken(url, req)
-
-    const resRudiApi = await axios.get(getRudiApi(url), {
-      params: req.query,
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    const mediaInfo = resRudiApi.data
+    const mediaInfo = await rudiApiGet(getRudiApi(getAdminApi('media', id)), { params: req.query })
     reply.status(200).json(mediaInfo)
   } catch (err) {
     handleError(req, reply, err, 500, opType, 'media')
