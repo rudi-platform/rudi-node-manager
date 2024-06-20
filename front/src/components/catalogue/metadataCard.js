@@ -130,7 +130,7 @@ export const displayStatus = (metadataStatus) => {
  * @return {html} A round pill that shows the status
  */
 export const displayMetadataStatus = (metadata) =>
-  metadata.metadataStatus == 'local' && metadata.collection_tag
+  metadata.metadata_status == 'local' && metadata.collection_tag
     ? displaySpan('dark', metadata.collection_tag)
     : displayStatus(metadata.metadata_status)
 
