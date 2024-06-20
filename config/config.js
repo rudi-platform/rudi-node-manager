@@ -66,7 +66,12 @@ exports.getDbConf = (subSection) => config.database[subSection]
 exports.SU_NAME = config?.database?.db_su_usr
 
 exports.getCompleteRudiApiUrl = (url, req) => {
-  const completeUrl = new URL(url, this.getRudiApi())
-  if (req?.query) completeUrl.search = new URLSearchParams(req.query)
-  return `${completeUrl}`
+  const finalUrl = new URL(this.getRudiApi(url))
+  if (req) {
+    const origUrl = new URL(this.getRudiApi(req.url))
+    if (origUrl?.search) {
+      origUrl.searchParams.forEach((val, key) => finalUrl.searchParams.set(key, val))
+    }
+  }
+  return finalUrl.href
 }

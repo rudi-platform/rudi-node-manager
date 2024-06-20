@@ -32,9 +32,6 @@ const callApiModule = async (url, req, reply) => {
   const fun = 'callApiModule'
   try {
     if (cache[url]) return reply ? reply.status(200).send(cache[url]) : cache[url]
-    const completeUrl = new URL(url, getRudiApi())
-    if (req?.query) completeUrl.search = new URLSearchParams(req.query)
-
     const data = await rudiApiGet(getCompleteRudiApiUrl(url, req))
     cache[url] = data
     return reply ? reply.status(200).send(data) : data

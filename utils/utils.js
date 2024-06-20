@@ -18,9 +18,10 @@ exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replac
 /* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
 String.prototype.merge = function (...args) {
   const argNb = args.length
-  if (argNb == 0) return ''
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
   let finalString = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) break
     const str = `${args[i]}`
     const mergableStr = str.startsWith(this) ? str : `${this}${str}`
     finalString = !finalString.endsWith(this)
