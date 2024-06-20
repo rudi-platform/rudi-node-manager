@@ -18,7 +18,7 @@ exports.safeAxiosGet = async (rudiModuleCalled, url, opts) => {
   const fun = 'safeAxiosGet'
   let res
   try {
-    log.d(mod, fun, url)
+    log.d('axios.get', null, url)
     res = await axios.get(url, opts)
     // log.d(mod, `${fun}+(${url})`, res?.data)
   } catch (axiosErr) {
@@ -40,13 +40,15 @@ exports.safeAxiosGet = async (rudiModuleCalled, url, opts) => {
     }
     throw RudiError.createRudiHttpError(status, rudiErrMsg(rudiModuleCalled, message, status))
   }
-  if (res?.data?.error) {
-    const rudiErr = res.data
-    throw RudiError.createRudiHttpError(
-      rudiErr.statusCode,
-      rudiErrMsg(rudiModuleCalled, rudiErr.message, rudiErr.statusCode)
-    )
-  }
+  //   if (res?.data?.error !== undefined) {
+  //     log.e(mod, `${fun} res?.data?.error =`, res?.data?.error)
+  //     log.e(mod, `${fun} res =`, res)
+  //     const rudiErr = res.data
+  //     throw RudiError.createRudiHttpError(
+  //       rudiErr.statusCode,
+  //       rudiErrMsg(rudiModuleCalled, rudiErr.message, rudiErr.statusCode)
+  //     )
+  //   }
   //   log.i(mod, fun + `(${url})=>`, res?.data)
   return res.data
 }
