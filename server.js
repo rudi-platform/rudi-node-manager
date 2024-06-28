@@ -92,6 +92,7 @@ app.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
+  console.log('Serving the built static page')
   app.use(express.static(path.join(__dirname, 'front/build')))
   app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build', 'index.html')))
 }

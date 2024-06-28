@@ -10,6 +10,7 @@ exports.OPT_NODE_ENV = 'nodeEnv'
 exports.OPT_BACK_PATH = 'backPath'
 
 const _argv = minimist(process.argv.slice(2))
+console.log('_argv:', _argv)
 
 // ------------------------------------------------------------------------------------------------
 // App options
@@ -69,11 +70,18 @@ console.log('--------------------------------------------------------------')
 const cliOptionsValues = {}
 
 Object.keys(_argv).forEach((cliOption) => {
-  if (cliOption == '_') return
+  if (cliOption == '_') {
+    if (_argv[cliOption].length > 0)
+      console.error(
+        '!!! ERR Command Line option not recognized. You might have used --opt = "value" with value ',
+        _argv[cliOption]
+      )
+    return
+  }
   let found = false
   for (const appOpt of Object.keys(this.OPTIONS)) {
-    if (this.OPTIONS[appOpt].cli && this.OPTIONS[appOpt].cli == cliOption) {
-      cliOptionsValues[cliOption] = _argv[cliOption]
+    if (this.OPTIONS[appOpt]?.cli == cliOption) {
+      cliOptionsValues[appOpt] = _argv[cliOption]
       found = true
       // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
       break
@@ -91,7 +99,7 @@ Object.keys(_argv).forEach((cliOption) => {
 console.log('Extracted conf values:')
 const backOptionsValues = {}
 Object.keys(this.OPTIONS).forEach((opt) => {
-  if (cliOptionsValues[opt]) {
+  if (cliOptionsValues[opt] !== undefined) {
     backOptionsValues[opt] = cliOptionsValues[opt]
     console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt])
   } else {
