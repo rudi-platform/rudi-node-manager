@@ -83,7 +83,7 @@ app.use(passport.initialize())
 const authenticate = passport.authenticate('jwt', { session: false })
 
 // Configure app to use routes
-app.use(`/api/open`, apiOpen)
+app.use('/api/open', apiOpen)
 app.use('/api/front', apiFront)
 app.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
 app.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
@@ -94,7 +94,7 @@ app.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 if (!isDevEnv()) {
   console.log('Serving the built static page')
   app.use(express.static(path.join(__dirname, 'front/build')))
-  app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build', 'index.html')))
+  app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
 }
 
 // Init database on startup

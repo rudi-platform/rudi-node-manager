@@ -5,7 +5,6 @@
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
-  "homepage": ".",
   "scripts": {
     "prestart": "npm run install:dev",
     "install:dev": "NODE_ENV=development npm i --loglevel=error",

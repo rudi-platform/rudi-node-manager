@@ -9,10 +9,10 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import { createBrowserHistory } from 'history'
 
-import { getApiFront, getBackUrl } from './utils/frontOptions'
+import { PUBLIC_URL, getApiFront, getFrontOptions, getFrontUrl } from './utils/frontOptions'
 
-import { UserContext, UserContextProvider } from './context/authContext'
-import { BackDataContext, BackDataContextProvider } from './context/backDataContext'
+import { UserContext } from './context/authContext'
+import { BackDataContext } from './context/backDataContext'
 
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
 import Login, { showPill as showPillLogin } from './components/login/login'
@@ -28,9 +28,9 @@ import ModalProvider from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
 import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
-import { JwtContext, JwtContextProvider } from './context/jwtContext'
+import { JwtContext } from './context/jwtContext'
 
-export const history = createBrowserHistory({ basename: getBackUrl() })
+export const history = createBrowserHistory({ basename: getFrontUrl() })
 
 /*
 TODO :
@@ -45,17 +45,6 @@ TODO :
  * @return {ReactNode} main html or login component
  */
 export default function App() {
-  return (
-    <JwtContextProvider>
-      <UserContextProvider>
-        <BackDataContextProvider>
-          <Main />
-        </BackDataContextProvider>
-      </UserContextProvider>
-    </JwtContextProvider>
-  )
-}
-const Main = () => {
   // ---------------- Loading context
   const { token, updateToken } = useContext(JwtContext)
   const { isEditor, isAdmin } = useContext(UserContext)
@@ -112,7 +101,7 @@ const Main = () => {
    */
   const navItem = (destUrl, buttonText, show = true) => (
     <li className={show ? 'nav-item' : 'nav-item hide-wip'}>
-      <Link to={getBackUrl(destUrl)}>
+      <Link to={destUrl}>
         <button type="button" className="btn btn-primary">
           {buttonText}
         </button>
@@ -128,7 +117,7 @@ const Main = () => {
    */
   const logout = () => {
     axios
-      .get(getBackUrl(getApiFront('logout')))
+      .get(getApiFront('logout'))
       .then((res) => {
         // console.debug('T (logout.ok)')
         exit()
@@ -151,7 +140,7 @@ const Main = () => {
       </div>
     </div>
   ) : (
-    <Router>
+    <Router basename={getFrontOptions(PUBLIC_URL)}>
       <ModalProvider>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="modal-test"></div>
@@ -181,26 +170,26 @@ const Main = () => {
                   {navItem('show', 'Visualisation')}
                   <li className={isEditor ? 'nav-item' : 'nav-item hide-wip'}>
                     <DropdownButton id="dropdown-gestion-button" title="Gestion">
-                      <Dropdown.Item as={Link} to={getBackUrl('metadata')}>
+                      <Dropdown.Item as={Link} to="metadata">
                         Métadonnées
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('producer')}>
+                      <Dropdown.Item as={Link} to="producer">
                         Producteurs
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('contact')}>
+                      <Dropdown.Item as={Link} to="contact">
                         Contacts
                       </Dropdown.Item>
                     </DropdownButton>
                   </li>
                   <li className={isAdmin ? 'nav-item' : 'nav-item hide-wip'}>
                     <DropdownButton id="dropdown-gestion-button" title="Admin">
-                      <Dropdown.Item as={Link} to={getBackUrl('pub_key')}>
+                      <Dropdown.Item as={Link} to="pub_key">
                         Clés
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('user')}>
+                      <Dropdown.Item as={Link} to="user">
                         Utilisateurs
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to={getBackUrl('report')}>
+                      <Dropdown.Item as={Link} to="report">
                         Rapports portail
                       </Dropdown.Item>
                     </DropdownButton>
@@ -228,36 +217,26 @@ const Main = () => {
         <div id="root"></div>
 
         <Routes>
-          <Route path={getBackUrl()} element={<CatalogueMetadata logout={logout} />} />
           <Route
-            path={getBackUrl('metadata')}
+            path="metadata"
             element={<CatalogueMetadata editMode={isEditor} logout={logout} />}
           />
           <Route
-            path={getBackUrl('producer')}
+            path="producer"
             element={<CatalogueProducer editMode={isEditor} logout={logout} />}
           />
           <Route
-            path={getBackUrl('contact')}
+            path="contact"
             element={<CatalogueContact editMode={isEditor} logout={logout} />}
           />
-          <Route
-            path={getBackUrl('pub_key')}
-            element={<CataloguePubKeys editMode={isAdmin} logout={logout} />}
-          />
-          <Route
-            path={getBackUrl('report')}
-            element={<CatalogueReports editMode={isAdmin} logout={logout} />}
-          />
-          <Route path={getBackUrl('licence')} element={<CatalogueLicence logout={logout} />} />
-          <Route path={getBackUrl('show/:id')} element={<Visualisation logout={logout} />} />
-          <Route path={getBackUrl('show')} element={<Visualisation logout={logout} />} />
-          <Route path={getBackUrl('monitoring')} element={<Monitoring logout={logout} />} />
-          <Route
-            path={getBackUrl('user')}
-            element={<CatalogueUser editMode={isAdmin} logout={logout} />}
-          />
-          <Route path={getBackUrl('conf')} element={<div className="tempPaddingTop">WIP</div>} />
+          <Route path="pub_key" element={<CataloguePubKeys editMode={isAdmin} logout={logout} />} />
+          <Route path="report" element={<CatalogueReports editMode={isAdmin} logout={logout} />} />
+          <Route path="licence" element={<CatalogueLicence logout={logout} />} />
+          <Route path="show/:id" element={<Visualisation logout={logout} />} />
+          <Route path="show" element={<Visualisation logout={logout} />} />
+          <Route path="monitoring" element={<Monitoring logout={logout} />} />
+          <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
+          <Route path="conf" element={<div className="tempPaddingTop">WIP</div>} />
           <Route path="*" element={<CatalogueMetadata logout={logout} />} />
         </Routes>
       </ModalProvider>

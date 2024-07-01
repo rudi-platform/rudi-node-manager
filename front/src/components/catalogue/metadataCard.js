@@ -14,7 +14,6 @@ import {
 import { Link } from 'react-router-dom'
 
 import { BackDataContext } from '../../context/backDataContext'
-import { getBackUrl } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getLocaleFormatted, getObjFormUrl, pathJoin } from '../../utils/utils'
 import {
@@ -42,7 +41,7 @@ const externalUrlButton = (url) => (
 )
 
 const eyeButton = (id) => (
-  <Link to={getBackUrl(`show/${id}`)}>
+  <Link to={`show/${id}`}>
     <span className="btn btn-green" title="Aperçu">
       <Eye />
     </span>

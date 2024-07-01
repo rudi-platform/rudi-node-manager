@@ -10,7 +10,7 @@ const {
   refreshTokens,
 } = require('../utils/secu')
 const { sysWarn, d } = require('../utils/logger')
-const { handleError, treatAxiosError } = require('./errorHandler')
+const { handleError } = require('./errorHandler')
 const { rudiApiGet } = require('../utils/connect.js')
 
 const OBJECT_TYPES = {

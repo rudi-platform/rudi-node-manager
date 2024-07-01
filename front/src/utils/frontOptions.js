@@ -4,7 +4,7 @@
 import { pathJoin } from '../utils/utils'
 
 // ------------------------------------------------------------------------------------------------
-export const OPT_FRONT_PATH = 'PUBLIC_URL'
+export const PUBLIC_URL = 'PUBLIC_URL'
 // export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
 // export const OPT_TAG = 'REACT_APP_TAG'
 
@@ -16,7 +16,7 @@ export const OPT_FRONT_PATH = 'PUBLIC_URL'
 // 'file': option given through the configuration file
 // If found, 'cli' has priority over 'env' that has priority over 'file'
 // ------------------------------------------------------------------------------------------------
-const OPTIONS = [OPT_FRONT_PATH]
+const OPTIONS = [PUBLIC_URL]
 
 const frontOptions = {}
 
@@ -38,18 +38,21 @@ console.log('FRONT_PATH: ' + process.env.FRONT_PATH);
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-export const getFrontOptions = (opt, altValue) => {
+export const getFrontOptions = (opt, altValue = '') => {
   if (!opt) return OPTIONS
-  if (frontOptions[opt]) return frontOptions[opt]
-  frontOptions[opt] = process.env[opt] || altValue
-  console.log('\t- ' + opt + '=' + frontOptions[opt])
+  if (frontOptions[opt] === undefined) {
+    frontOptions[opt] = process.env[opt] !== undefined ? process.env[opt] : altValue
+    if (`${frontOptions[opt]}`.endsWith('/'))
+      frontOptions[opt] = `${frontOptions[opt]}`.slice(0, -1)
+
+    console.log(`\t- ${opt}=${frontOptions[opt]}`)
+  }
   return frontOptions[opt]
 }
-export const getBackUrl = (...suffix) => pathJoin(getFrontOptions(OPT_FRONT_PATH), ...suffix)
+export const getFrontUrl = (...suffix) => pathJoin(getFrontOptions(PUBLIC_URL), ...suffix)
 
-if (!getBackUrl().endsWith('/')) frontOptions[OPT_FRONT_PATH] += '/'
-
-export const getApiFront = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/front', suffix))
-export const getApiOpen = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/open', suffix))
-export const getApiData = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/data', suffix))
-export const getApiMedia = (suffix) => (!suffix ? 'incorrect' : pathJoin('api/media', suffix))
+const getBackApi = (backPath, suffix) => (!suffix ? 'incorrect' : pathJoin('api', backPath, suffix))
+export const getApiFront = (suffix) => getBackApi('front', suffix)
+export const getApiOpen = (suffix) => getBackApi('open', suffix)
+export const getApiData = (suffix) => getBackApi('data', suffix)
+export const getApiMedia = (suffix) => getBackApi('media', suffix)
