@@ -2,7 +2,6 @@ const mod = 'server'
 
 // Import dependencies
 const express = require('express')
-const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const path = require('path')
@@ -69,9 +68,9 @@ app.use(
   })
 )
 
-// Configure the bodyParser middleware
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+// Note: bodyParser middleware has been replace with express bodyParser
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 // Configure the CORs middleware

@@ -296,22 +296,24 @@ const dbCreateSuperUser = async (db) => {
   const fun = 'dbCreateSuperUser'
 
   const encodedSuPwd = getDbConf('db_su_pwd')
+  const isSuPwdHashed = getDbConf('is_su_pwd_hashed')
 
   if (!SU_NAME || !encodedSuPwd) {
     log.e(mod, fun, 'No super user config was found')
     throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
   }
 
-  if (await dbExistsUser(db, SU_NAME)) return
+  if (await dbExistsUser(db, SU_NAME)) return // NOSONAR
 
   const suId = getDbConf('db_su_id') || 0
 
-  const suPwd = decodeBase64(encodedSuPwd)
+  const suPwd = !isSuPwdHashed ? decodeBase64(encodedSuPwd) : encodedSuPwd
 
   const superUser = {
     id: suId,
     username: SU_NAME,
     password: suPwd,
+    isSuPwdHashed: !!isSuPwdHashed,
     email: 'security@rudi-univ-rennes1.fr',
     role: this.ROLE_SU,
   }

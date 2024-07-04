@@ -239,18 +239,18 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
   })
 }
 
-exports.dbRegisterUser = async (db, { username, email, password, id }) => {
+exports.dbRegisterUser = async (db, { username, email, password, isSuPwdHashed, id }) => {
   const fun = 'dbRegisterUser'
   try {
     const userCreds = {
       username,
-      password: hashPassword(password),
+      password: isSuPwdHashed ? password : hashPassword(password),
       email,
     }
     if (id) userCreds.id = id
 
-    const usr = await this.dbCreateUserCheckExists(db, userCreds)
-    return { id: usr.id, username: usr.username }
+    const usrInfo = await this.dbCreateUserCheckExists(db, userCreds)
+    return { id: usrInfo.id, username: usrInfo.username }
   } catch (err) {
     log.e(mod, fun, err)
     throw err

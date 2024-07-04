@@ -49,7 +49,7 @@ export const lastMonth = () => new Date(new Date().getTime() - 2592000000)
 export const showObj = (obj, option = 2) => {
   try {
     return `${JSON.stringify(obj, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
-  } catch (err) {
+  } catch {
     return `${obj}`
   }
 }
