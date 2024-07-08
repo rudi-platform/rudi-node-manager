@@ -6,7 +6,7 @@ import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { pathJoin } from '../../utils/utils.js'
+import { mergeStrings, pathJoin } from '../../utils/utils.js'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
@@ -53,8 +53,7 @@ export function ObjCard({
   const objId = obj[propId]
   const objName = obj[propName]
 
-  const getFormUrl = (suffix, query) =>
-    pathJoin(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
+  const getForm = (obj, query) => mergeStrings('?', pathJoin(formUrl, obj), query)
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -87,7 +86,7 @@ export function ObjCard({
               <div className="btn-group" role="group">
                 {!hideEdit && (
                   <a
-                    href={getFormUrl(objType, `update=${objId}`)}
+                    href={getForm(objType, `update=${objId}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-warning"
@@ -158,8 +157,7 @@ export function EditObjCard({
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)
 
-  const getFormUrl = (suffix, query) =>
-    pathJoin(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
+  const getForm = (suffix, query) => mergeStrings('?', pathJoin(formUrl, suffix), query)
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
@@ -192,7 +190,7 @@ export function EditObjCard({
   const button = {
     edit: (
       <a
-        href={getFormUrl(objType, `update=${editID}`)}
+        href={getForm(objType, `update=${editID}`)}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-warning"
@@ -212,7 +210,7 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              href={getFormUrl(objType)}
+              href={getForm(objType)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"

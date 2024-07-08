@@ -13,7 +13,7 @@ exports.removeTrailingChar = (str, char) =>
 exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
 
 /**
- * Joins several string arguments with the character on which the function is called.
+ * Joins several string chunks with the first argument the function is called with.
  * This is basically the reverse of the String split function, with the difference that we make sure
  * the merging character is not duplicated
  * @param {string} sep separator we want to merge the string chunks with
