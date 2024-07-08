@@ -21,7 +21,24 @@ String.prototype.merge = function (...args) {
   return finalString
 }
 
-export const pathJoin = (...args) => '/'.merge(...args)
+const mergeStr = (...args) => {
+  const c = `${args[0]}`
+  const argNb = args.length
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
+  if (argNb == 1) return args[1]
+
+  let finalString = `${args[1]}`
+  for (let i = 2; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) break
+    const str = `${args[i]}`
+    const mergableStr = str.startsWith(c) ? str.slice(1) : str
+    finalString = finalString.endsWith(c)
+      ? finalString + mergableStr
+      : finalString + c + mergableStr
+  }
+  return finalString
+}
+export const pathJoin = (...args) => mergeStr('/', ...args)
 export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
 export const removeTrailingSlash = (url) => (`${url}`.endsWith('/') ? url.slice(0, -1) : url)
 

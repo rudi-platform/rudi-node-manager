@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { pathJoin } from '../../utils/utils.js'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
@@ -53,7 +54,7 @@ export function ObjCard({
   const objName = obj[propName]
 
   const getFormUrl = (suffix, query) =>
-    '/'.merge(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
+    pathJoin(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -158,7 +159,7 @@ export function EditObjCard({
   const { changeOptions, toggle } = useContext(ModalContext)
 
   const getFormUrl = (suffix, query) =>
-    '/'.merge(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
+    pathJoin(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
