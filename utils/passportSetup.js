@@ -30,7 +30,10 @@ passport.serializeUser((user, done) => done(null, user.id))
 passport.deserializeUser((id, done) => {
   dbGetUserById(null, id)
     .then((user) => done(null, user))
-    .catch((err) => done(err, false, new UnauthorizedError('User not found')))
+    .catch((err) => {
+      log.e(mod, 'passport.deserializeUser', `User ID not found: ${id}`)
+      return done(err, false, new UnauthorizedError('User not found'))
+    })
 })
 
 // Local Strategy
@@ -40,6 +43,7 @@ passport.use(
     checkPassport(username, password)
       .then(() => done(null, { username }))
       .catch((err) => {
+        log.e(mod, 'passport', `ERR LocalStrategy: ${err}`)
         log.sysWarn(mod, 'LocalStrategy', `Error login: ${err}`)
         return done(null, false, err)
       })
@@ -53,6 +57,7 @@ const checkPassport = async (username, password) => {
     const dbUserInfo = await dbGetHashedPassword(db, username)
     const dbUserHash = dbUserInfo.password
     if (!dbUserHash) {
+      log.e(mod, fun, `User not found: ${username}`)
       throw new UnauthorizedError('No user found')
     }
 
@@ -105,8 +110,9 @@ passport.use(
       try {
         return done(null, token.user)
       } catch (error) {
+        log.e(mod, 'JWTstrategy', `ERR: ${error}`)
         log.sysWarn(mod, 'JWTstrategy', error)
-        done(error)
+        return done(error)
       }
     }
   )

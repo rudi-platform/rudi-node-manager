@@ -49,7 +49,11 @@ exports.getPortalConnection = (req, reply) => {
 
 exports.getUserInfo = (req, reply) => {
   const user = req.user
-  if (!user) return reply.status(401).send(new UnauthorizedError('User info not available'))
+  if (!user) {
+    const errMsg = 'User info not available'
+    log.w(mod, fun, errMsg)
+    return reply.status(401).send(new UnauthorizedError(errMsg))
+  }
   const { username, roles } = user
   return reply.status(200).json({ username, roles })
 }

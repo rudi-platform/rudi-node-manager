@@ -2,7 +2,12 @@ const mod = 'genCtrl'
 
 const log = require('../utils/logger')
 const axios = require('axios')
-const { getRudiApi, getAdminApi, getCompleteRudiApiUrl } = require('../config/config')
+const {
+  getRudiApi,
+  getAdminApi,
+  getCompleteRudiApiUrl,
+  getConsoleFormUrl,
+} = require('../config/config')
 const {
   CONSOLE_TOKEN_NAME,
   getRudiApiToken,

@@ -4,7 +4,7 @@ const ini = require('ini')
 
 // Internal dependencies
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
-const { pathJoin, jsonToString } = require('../utils/utils')
+const { pathJoin, jsonToString, removeTrailingSlash } = require('../utils/utils')
 
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
@@ -60,7 +60,8 @@ exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
 exports.getRudiMediaUrl = (...args) => pathJoin(config.rudi_media.rudi_media_url, ...args)
 exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 
-exports.getConsoleFormUrl = () => config.rudi_console.console_form_url
+const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
+exports.getConsoleFormUrl = () => CONSOLE_FORM_URL
 
 exports.getDbConf = (subSection) => config.database[subSection]
 exports.SU_NAME = config?.database?.db_su_usr

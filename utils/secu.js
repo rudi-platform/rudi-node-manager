@@ -47,7 +47,7 @@ exports.consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
-    sameSite: 'Strict',
+    sameSite: 'None',
     expires: new Date(exp * 1000),
   }
 }

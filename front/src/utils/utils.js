@@ -20,6 +20,13 @@ String.prototype.merge = function (...args) {
   return finalString
 }
 
+export const pathJoin = (...args) => {
+  console.log('utils', 'pathJoin', ...args, '=>', '/'.merge(...args))
+  return '/'.merge(...args)
+}
+export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
+export const removeTrailingSlash = (url) => (`${url}`.endsWith('/') ? url.slice(0, -1) : url)
+
 const twoDigits = (n) => `${n}`.padStart(2, '0')
 
 /**
@@ -53,13 +60,6 @@ export const showObj = (obj, option = 2) => {
     return `${obj}`
   }
 }
-
-export const getObjFormUrl = (formUrl, objType = '', queryParams = '') =>
-  formUrl + objType + queryParams
-
-export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
-
-export const pathJoin = (...args) => '/'.merge(...args)
 
 export const getCookie = (name) =>
   document.cookie

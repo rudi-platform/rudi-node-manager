@@ -24,6 +24,7 @@ const {
   dbRegisterUser,
   dbUpdatePasswordWithField,
 } = require('../database/database')
+const { getConsoleFormUrl } = require('../config/config.js')
 
 // ---- Controllers ----
 /**
@@ -41,21 +42,24 @@ exports.postLogin = async (req, reply, next) => {
       log.sysWarn(mod, fun, err)
       return reply.status(400).send(err)
     }
-    if (!user)
-      return reply
-        .status(401)
-        .send(info?.message || `User not found or incorrect password: '${req?.body?.username}'`)
+    if (!user) {
+      const errMsg =
+        info?.message || `User not found or incorrect password: '${req?.body?.username}'`
+      log.w(mod, fun, errMsg)
+      return reply.status(401).send(errMsg)
+    }
     try {
       const username = user.username
       const roles = await dbGetUserRolesByUsername(null, username)
-
-      if (!roles?.length)
+      if (!roles?.length) {
+        const errMsg = `Admin validation is required for this user: '${user.username}'`
+        log.w(mod, fun, errMsg)
         return reply
           .status(401)
           .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
           .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-          .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '' })
-          .send(`Admin validation is required for this user: '${user.username}'`)
+          .send(errMsg)
+      }
 
       req.login(user, { session: false }, async (err) => {
         if (err) return reply.status(400).json({ errors: err })
@@ -119,18 +123,22 @@ exports.putPassword = async (req, reply, next) => {
       !newPassword ||
       newPassword === password ||
       newPassword !== confirmNewPassword
-    )
-      reply.status(401).send('Prerequisites not met')
-
+    ) {
+      const errMsg = 'Prerequisites not met'
+      log.w(mod, fun, errMsg)
+      reply.status(401).send(errMsg)
+    }
     const db = dbOpen()
     const dbUserInfo = await dbGetHashedPassword(db, username)
     const dbUserHash = dbUserInfo?.password
 
     passport.authenticate('local', (err, user, info) => {
       if (err) return reply.status(400).send(err)
-      if (!user && !matchPassword(INIT_PWD, dbUserHash))
-        return reply.status(401).send(info.message || 'User not found')
-
+      if (!user && !matchPassword(INIT_PWD, dbUserHash)) {
+        const errMsg = info.message || 'User not found'
+        log.w(mod, fun, errMsg)
+        return reply.status(401).send(errMsg)
+      }
       return dbHashAndUpdatePassword(db, username, newPassword)
         .then((userInfo) => reply.json(userInfo))
         .catch((err) => {

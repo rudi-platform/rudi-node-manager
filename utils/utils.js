@@ -8,6 +8,8 @@ exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 
 // ---- Strings
+exports.removeTrailingChar = (str, char) => (str.endsWith(char) ? str.slice(0, -1) : str)
+
 /**
  * Joins several string arguments with the character on which the function is called.
  * This is basically the reverse of the String split function, with the difference that we make sure
@@ -26,7 +28,7 @@ String.prototype.merge = function (...args) {
     const mergableStr = str.startsWith(this) ? str : `${this}${str}`
     finalString = !finalString.endsWith(this)
       ? finalString + mergableStr
-      : finalString.substring(0, finalString.length - 1) + mergableStr
+      : finalString.slice(0, -1) + mergableStr
   }
   return finalString
 }
@@ -54,6 +56,7 @@ exports.toInt = (str) => {
 
 // ---- URL
 exports.pathJoin = (...args) => '/'.merge(...args)
+exports.removeTrailingSlash = (path) => (`${path}`.endsWith('/') ? path.slice(0, -1) : path)
 
 /**
  * Custom JSON beautifying function
@@ -87,8 +90,7 @@ exports.makeRequestable = (func) => async (req, reply, next) => {
   try {
     reply.status(200).send(await func())
   } catch (err) {
-    console.log('makeRequestable', 'ERR', this.cleanErrMsg(err))
-    // console.log('makeRequestable', 'ERR', err.statusCode, err.error, err.message)
+    console.warn('makeRequestable', 'ERR', this.cleanErrMsg(err))
     if (typeof err == 'object' && err.message && err.statusCode && err.error)
       return reply
         .status(err.statusCode || 500)

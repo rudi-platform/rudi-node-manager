@@ -139,7 +139,7 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
 
   try {
     const commitMediaRes = await axios.post(
-      getRudiMediaUrl('commit/'),
+      getRudiMediaUrl('commit'),
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
       createPmHeadersForMedia()
     )

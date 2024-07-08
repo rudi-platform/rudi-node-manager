@@ -42,9 +42,6 @@ export const getFrontOptions = (opt, altValue = '') => {
   if (!opt) return OPTIONS
   if (frontOptions[opt] === undefined) {
     frontOptions[opt] = process.env[opt] !== undefined ? process.env[opt] : altValue
-    if (`${frontOptions[opt]}`.endsWith('/'))
-      frontOptions[opt] = `${frontOptions[opt]}`.slice(0, -1)
-
     console.log(`\t- ${opt}=${frontOptions[opt]}`)
   }
   return frontOptions[opt]

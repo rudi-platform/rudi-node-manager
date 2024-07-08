@@ -6,7 +6,7 @@ import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getObjFormUrl } from '../../utils/utils'
+import { pathJoin } from '../../utils/utils'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
@@ -85,7 +85,7 @@ export function ObjCard({
               <div className="btn-group" role="group">
                 {!hideEdit && (
                   <a
-                    href={getObjFormUrl(formUrl, objType, `?update=${objId}`)}
+                    href={`${pathJoin(formUrl, objType)}?update=${objId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-warning"
@@ -188,7 +188,7 @@ export function EditObjCard({
   const button = {
     edit: (
       <a
-        href={getObjFormUrl(formUrl, objType, `?update=${editID}`)}
+        href={`${pathJoin(formUrl, objType)}?update=${editID}`}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-warning"
@@ -208,7 +208,7 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              href={getObjFormUrl(formUrl, objType)}
+              href={pathJoin(formUrl, objType)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"

@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 
 import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getLocaleFormatted, getObjFormUrl, pathJoin } from '../../utils/utils'
+import { getLocaleFormatted, pathJoin } from '../../utils/utils'
 import {
   DefaultConfirmOption,
   DefaultOkOption,
@@ -255,7 +255,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const button = {
     share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
-    edit: editButton('?'.merge(appData.formUrl, `update=${metadata.global_id}`)),
+    edit: editButton(`${appData.formUrl}?update=${metadata.global_id}`),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
     external: (url) => externalUrlButton(url),
@@ -267,7 +267,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={getObjFormUrl(appData.formUrl, '', `?read-only=${metadata.global_id}`)}
+              href={`${appData.formUrl}?read-only=${metadata.global_id}`}
               target="_blank"
               rel="noopener noreferrer"
             >

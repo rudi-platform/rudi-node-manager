@@ -51,7 +51,7 @@ exports.getEnum = (req, reply) => {
 exports.getLicences = (req, reply) => callApiModule(getAdminApi('licences'), req, reply)
 
 exports.getThemeByLang = (req, reply) =>
-  callApiModule(getAdminApi('enum/themes/', req.params?.lang || 'fr'), req, reply)
+  callApiModule(getAdminApi('enum/themes', req.params?.lang || 'fr'), req, reply)
 
 const getThemes = (req, reply) => {
   const lang = req.params?.lang || req.query?.lang || 'fr'
