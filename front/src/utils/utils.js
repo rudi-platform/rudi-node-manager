@@ -8,14 +8,15 @@
 /* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
 String.prototype.merge = function (...args) {
   const argNb = args.length
-  if (argNb == 0) return ''
+  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
   let finalString = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
+    if (args[i] === undefined || args[i] === null) break
     const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = !finalString.endsWith(this)
+    const mergableStr = str.startsWith(this) ? str.slice(1) : str
+    finalString = finalString.endsWith(this)
       ? finalString + mergableStr
-      : finalString.substring(0, finalString.length - 1) + mergableStr
+      : finalString + this + mergableStr
   }
   return finalString
 }

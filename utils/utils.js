@@ -25,10 +25,10 @@ String.prototype.merge = function (...args) {
   for (let i = 1; i < argNb; i++) {
     if (args[i] === undefined || args[i] === null) break
     const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str : `${this}${str}`
-    finalString = !finalString.endsWith(this)
+    const mergableStr = str.startsWith(this) ? str.slice(1) : str
+    finalString = finalString.endsWith(this)
       ? finalString + mergableStr
-      : finalString.slice(0, -1) + mergableStr
+      : finalString + this + mergableStr
   }
   return finalString
 }
