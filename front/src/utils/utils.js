@@ -5,40 +5,22 @@
  * @param {...string} args strings to be joined
  * @return {string}
  */
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge = function (...args) {
+const mergeStrings = (sep, ...args) => {
   const argNb = args.length
   if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
-  let finalString = `${args[0]}`
+  let accumulatedStr = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
     if (args[i] === undefined || args[i] === null) break
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str.slice(1) : str
-    finalString = finalString.endsWith(this)
-      ? finalString + mergableStr
-      : finalString + this + mergableStr
+    const newChunk = `${args[i]}`
+    const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
+    accumulatedStr = accumulatedStr.endsWith(sep)
+      ? accumulatedStr + cleanChunk
+      : accumulatedStr + sep + cleanChunk
   }
-  return finalString
+  return accumulatedStr
 }
 
-const mergeStr = (...args) => {
-  const c = `${args[0]}`
-  const argNb = args.length
-  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
-  if (argNb == 1) return args[1]
-
-  let finalString = `${args[1]}`
-  for (let i = 2; i < argNb; i++) {
-    if (args[i] === undefined || args[i] === null) break
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(c) ? str.slice(1) : str
-    finalString = finalString.endsWith(c)
-      ? finalString + mergableStr
-      : finalString + c + mergableStr
-  }
-  return finalString
-}
-export const pathJoin = (...args) => mergeStr('/', ...args)
+export const pathJoin = (...args) => mergeStrings('/', ...args)
 export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
 export const removeTrailingSlash = (url) => (`${url}`.endsWith('/') ? url.slice(0, -1) : url)
 

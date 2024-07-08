@@ -8,31 +8,36 @@ exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 
 // ---- Strings
-exports.removeTrailingChar = (str, char) => (str.endsWith(char) ? str.slice(0, -1) : str)
+exports.removeTrailingChar = (str, char) =>
+  `${str}`.endsWith(char) ? `${str}`.slice(0, -1) : `${str}`
+exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
 
 /**
  * Joins several string arguments with the character on which the function is called.
  * This is basically the reverse of the String split function, with the difference that we make sure
  * the merging character is not duplicated
+ * @param {string} sep separator we want to merge the string chunks with
  * @param {...string} args strings to be joined
  * @return {string}
  */
-/* eslint no-extend-native: ["error", { "exceptions": ["String"] }] */
-String.prototype.merge = function (...args) {
+const mergeStrings = (sep, ...args) => {
   const argNb = args.length
   if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
-  let finalString = `${args[0]}`
+  let accumulatedStr = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
     if (args[i] === undefined || args[i] === null) break
-    const str = `${args[i]}`
-    const mergableStr = str.startsWith(this) ? str.slice(1) : str
-    finalString = finalString.endsWith(this)
-      ? finalString + mergableStr
-      : finalString + this + mergableStr
+    const newChunk = `${args[i]}`
+    const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
+    accumulatedStr = accumulatedStr.endsWith(sep)
+      ? accumulatedStr + cleanChunk
+      : accumulatedStr + sep + cleanChunk
   }
-  return finalString
+  return accumulatedStr
 }
 
+exports.pathJoin = (...args) => mergeStrings('/', ...args)
+
+// ---- String encodings
 exports.toBase64 = (data) => this.convertEncoding(data, 'utf-8', 'base64')
 exports.toBase64url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
 exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
@@ -53,10 +58,6 @@ exports.toInt = (str) => {
   // console.log('T (toInt)', str, '->', i);
   return Number.isNaN(i) || `${i}` !== str ? str : i
 }
-
-// ---- URL
-exports.pathJoin = (...args) => '/'.merge(...args)
-exports.removeTrailingSlash = (path) => (`${path}`.endsWith('/') ? path.slice(0, -1) : path)
 
 /**
  * Custom JSON beautifying function
