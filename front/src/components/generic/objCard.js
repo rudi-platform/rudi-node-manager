@@ -6,7 +6,6 @@ import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import { BackDataContext } from '../../context/backDataContext'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { pathJoin } from '../../utils/utils'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
@@ -53,6 +52,8 @@ export function ObjCard({
   const objId = obj[propId]
   const objName = obj[propName]
 
+  const getFormUrl = (suffix, query) =>
+    '/'.merge(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -85,7 +86,7 @@ export function ObjCard({
               <div className="btn-group" role="group">
                 {!hideEdit && (
                   <a
-                    href={`${pathJoin(formUrl, objType)}?update=${objId}`}
+                    href={getFormUrl(objType, `update=${objId}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-warning"
@@ -156,6 +157,8 @@ export function EditObjCard({
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)
 
+  const getFormUrl = (suffix, query) =>
+    '/'.merge(formUrl, suffix) + query.startsWith('?') ? query : `?${query}`
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
@@ -188,7 +191,7 @@ export function EditObjCard({
   const button = {
     edit: (
       <a
-        href={`${pathJoin(formUrl, objType)}?update=${editID}`}
+        href={getFormUrl(objType, `update=${editID}`)}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-warning"
@@ -208,7 +211,7 @@ export function EditObjCard({
         <div className="card-body">
           <div className="inline">
             <a
-              href={pathJoin(formUrl, objType)}
+              href={getFormUrl(objType)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"

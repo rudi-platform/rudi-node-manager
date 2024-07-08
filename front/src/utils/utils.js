@@ -20,10 +20,7 @@ String.prototype.merge = function (...args) {
   return finalString
 }
 
-export const pathJoin = (...args) => {
-  console.log('utils', 'pathJoin', ...args, '=>', '/'.merge(...args))
-  return '/'.merge(...args)
-}
+export const pathJoin = (...args) => '/'.merge(...args)
 export const ensureEndsWithSlash = (url) => (`${url}`.endsWith('/') ? url : `${url}/`)
 export const removeTrailingSlash = (url) => (`${url}`.endsWith('/') ? url.slice(0, -1) : url)
 

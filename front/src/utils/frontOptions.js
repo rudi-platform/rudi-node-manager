@@ -46,7 +46,7 @@ export const getFrontOptions = (opt, altValue = '') => {
   }
   return frontOptions[opt]
 }
-export const getFrontUrl = (...suffix) => pathJoin(getFrontOptions(PUBLIC_URL), ...suffix)
+export const getPublicUrl = (...suffix) => pathJoin(getFrontOptions(PUBLIC_URL), ...suffix)
 
 const getBackApi = (backPath, suffix) => (!suffix ? 'incorrect' : pathJoin('api', backPath, suffix))
 export const getApiFront = (suffix) => getBackApi('front', suffix)

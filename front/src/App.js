@@ -9,7 +9,7 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import { createBrowserHistory } from 'history'
 
-import { PUBLIC_URL, getApiFront, getFrontOptions, getFrontUrl } from './utils/frontOptions'
+import { PUBLIC_URL, getApiFront, getFrontOptions, getPublicUrl } from './utils/frontOptions'
 
 import { UserContext } from './context/authContext'
 import { BackDataContext } from './context/backDataContext'
@@ -30,7 +30,7 @@ import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
 import { JwtContext } from './context/jwtContext'
 
-export const history = createBrowserHistory({ basename: getFrontUrl() })
+export const history = createBrowserHistory({ basename: getPublicUrl() })
 
 /*
 TODO :
