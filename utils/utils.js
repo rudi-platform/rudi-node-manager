@@ -17,7 +17,7 @@ exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
  * This is basically the reverse of the String split function, with the difference that we make sure
  * the merging character is not duplicated
  * @param {string} sep separator we want to merge the string chunks with
- * @param {...string} args strings to be joined
+ * @param {...string} args string chunks to be joined
  * @return {string}
  */
 const mergeStrings = (sep, ...args) => {

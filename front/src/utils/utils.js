@@ -1,8 +1,9 @@
 /**
- * Joins several string argument with the character on which the function is called
+ * Joins several string arguments with the character on which the function is called.
  * This is basically the reverse of the String split function, with the difference that we make sure
  * the merging character is not duplicated
- * @param {...string} args strings to be joined
+ * @param {string} sep separator we want to merge the string chunks with
+ * @param {...string} args string chunks to be joined
  * @return {string}
  */
 const mergeStrings = (sep, ...args) => {
