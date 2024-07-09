@@ -47,6 +47,7 @@ backend.use(
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
+        defaultSrc: ["'self'", 'data:'],
         scriptSrc: ["'self'"],
         connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
         imgSrc: ["'self'"],
