@@ -5,14 +5,14 @@ const mod = 'server'
 // -------------------------------------------------------------------------------------------------
 const express = require('express')
 const cookieParser = require('cookie-parser')
-const cors = require('cors')
+// const cors = require('cors')
 const path = require('path')
 const helmet = require('helmet')
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-const { getConf, getConsoleFormUrl } = require('./back/config/config')
+const { getConf, getConsoleFormUrl, getRudiMediaUrl } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
 const { isDevEnv } = require('./back/config/backOptions')
@@ -33,6 +33,7 @@ const apiSecu = require('./back/routes/routesSecu')
 const passport = require('./back/utils/passportSetup')
 const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
 const { checkRolePerm } = require('./back/utils/roleCheck')
+const consoleRouter = require('./console/router.js')
 
 // -------------------------------------------------------------------------------------------------
 // Launching express app
@@ -41,23 +42,14 @@ const backend = express()
 // Set our backend port to be either an environment variable or port 5000
 const port = getConf('server', 'listening_port') || 5000
 
-const WHITE_LIST = [
-  'self',
-  '::ffff:127.0.0.1',
-  /127\.0\.0\.1(:\d+)?/,
-  /localhost(:\d+)?/,
-  'localhost.*',
-  getConsoleFormUrl(),
-  ...getConf('security', 'trusted_domain'),
-]
-const QUOTED_WHITE_LIST = WHITE_LIST.map((whiteListedIp) => `'${whiteListedIp}'`)
 backend.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
-        'connect-src': QUOTED_WHITE_LIST,
+        connectSrc: ["'self'", ...getConf('security', 'trusted_domain')],
+        imgSrc: ["'self'"],
       },
     },
   })
@@ -89,16 +81,16 @@ backend.use(cookieParser())
 
 // Access-Control-Allow-Origin
 // Configure the CORs middleware
-backend.use(
-  cors({
-    credentials: true,
-    origin: WHITE_LIST,
-    allowedHeaders: ['Content-Type', 'Content-Length', 'Authorization'],
-    vary: 'Origin',
-    methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
-    maxAge: 600,
-  })
-)
+// backend.use(
+//   cors({
+//     credentials: true,
+//     origin: WHITE_LIST,
+//     allowedHeaders: ['Content-Type', 'Content-Length', 'Authorization'],
+//     vary: 'Origin',
+//     methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
+//     maxAge: 600,
+//   })
+// )
 
 // Passport middleware
 backend.use(passport.initialize())
@@ -120,8 +112,11 @@ if (!isDevEnv()) {
   backend.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
 }
 
-// Init database on startup
+// Serving the console frontend
+const CONSOLE_PREFIX = '/form'
+backend.use(CONSOLE_PREFIX, consoleRouter)
 
+// Init database on startup
 dbInitialize()
   .then((res) => log.d(mod, 'initDatabase', 'SQL DB init OK'))
   .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`))

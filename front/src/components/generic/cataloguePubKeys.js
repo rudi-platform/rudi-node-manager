@@ -1,5 +1,5 @@
-import React from 'react'
 import PropTypes from 'prop-types'
+import React from 'react'
 import ObjCatalogue from './objCatalogue'
 
 CataloguePubKeys.propTypes = {
@@ -14,7 +14,7 @@ export default function CataloguePubKeys({ editMode }) {
   return (
     <ObjCatalogue
       editMode={editMode}
-      objType="pub_keys"
+      objType="pub_key"
       propId="name"
       propName="name"
       propNamesToDisplay={{

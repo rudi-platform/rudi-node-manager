@@ -1,21 +1,21 @@
 import axios from 'axios'
 
-import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useState } from 'react'
 import { Trash } from 'react-bootstrap-icons'
 
-import { lastMonth } from '../../utils/utils'
 import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import ObjCatalogue from './objCatalogue'
+import { lastMonth } from '../../utils/utils'
 import { getOptConfirm, getOptOk, useModalContext } from '../modals/genericModalContext'
+import ObjCatalogue from './objCatalogue'
 
 CatalogueReports.propTypes = {
   editMode: PropTypes.bool,
   logout: PropTypes.func,
 }
 
-const getApiUrlReports = (suffix) => getApiData(`reports${suffix ? `/${suffix}` : ''}`)
+const getApiUrlReports = (suffix) => getApiData('reports', suffix)
 
 /**
  * Composant : CatalogueReports

@@ -20,7 +20,7 @@ exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
  * @param {...string} args string chunks to be joined
  * @return {string}
  */
-const mergeStrings = (sep, ...args) => {
+exports.mergeStrings = (sep, ...args) => {
   const argNb = args.length
   if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
   let accumulatedStr = `${args[0]}`
@@ -35,7 +35,7 @@ const mergeStrings = (sep, ...args) => {
   return accumulatedStr
 }
 
-exports.pathJoin = (...args) => mergeStrings('/', ...args)
+exports.pathJoin = (...args) => this.mergeStrings('/', ...args)
 
 // ---- String encodings
 exports.toBase64 = (data) => this.convertEncoding(data, 'utf-8', 'base64')

@@ -1,0 +1,22 @@
+# generated
+node_modules
+package-lock.json
+*.lock
+
+# cypress
+cypress/fixtures
+cypress/plugins
+cypress/support
+
+public/keys
+public/test.html
+dev
+.env
+
+# custom config
+custom*.json
+
+# vscode
+.vscode/
+bak
+_

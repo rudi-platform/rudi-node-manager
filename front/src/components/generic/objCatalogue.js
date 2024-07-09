@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-import React, { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
+import React, { useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard, ObjCard } from '../generic/objCard'
-import { getApiData } from '../../utils/frontOptions'
 
 const PAGE_SIZE = 20
 
@@ -57,7 +57,7 @@ export default function ObjCatalogue({
   const [currentOffset, setCurrentOffset] = useState(-1)
   const initialRender = useRef(true)
 
-  const getApiUrlObj = (suffix) => getApiData(`${objType}${suffix ? `/${suffix}` : ''}`)
+  const getApiUrlObj = (suffix) => getApiData(objType, suffix)
   const deleteUrl = (id) => getApiUrlObj(id)
 
   const refresh = () => {
