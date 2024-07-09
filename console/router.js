@@ -4,8 +4,8 @@ const { pathJoin } = require('../back/utils/utils.js')
 
 // Helper functions
 const root = process.cwd()
-const relative = (...path_) => pathJoin(root, 'console', ...path_)
-const staticDependency = (dep) => express.static(relative(pathJoin('/node_modules', dep, 'dist')))
+const relative = (...path) => pathJoin(root, 'console', ...path)
+const staticDependency = (dep) => express.static(pathJoin(root, 'node_modules', dep, 'dist'))
 const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))
 
 // Console router
