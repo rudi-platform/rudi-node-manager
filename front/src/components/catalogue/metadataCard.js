@@ -23,6 +23,7 @@ import {
 } from '../modals/genericModalContext'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import ThemeDisplay from '../other/themeDisplay'
+import { getPublicUrl } from '../../utils/frontOptions.js'
 
 const downloadButton = (url) => (
   <button type="button" className="btn btn-green button-margin">
@@ -148,7 +149,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
 
-  const getForm = (query) => mergeStrings('?', pathJoin(appData.formUrl, 'metadata'), query)
+  const getForm = (query) => mergeStrings('?', getPublicUrl(appData.formUrl, 'metadata'), query)
 
   /**
    * call for metadata deletion
