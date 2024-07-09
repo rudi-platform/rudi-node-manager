@@ -1,11 +1,17 @@
 const mod = 'db'
 
-// ---- External dependencies -----
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
 const { hashPassword } = require('@aqmo.org/jwt-lib')
 
-// ---- Internal dependencies -----
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
 const { getDbConf, SU_NAME } = require('../config/config')
+const { beautify } = require('../utils/utils')
+
 const {
   BadRequestError,
   ForbiddenError,
@@ -16,9 +22,10 @@ const {
   UnauthorizedError,
 } = require('../utils/errors')
 const log = require('../utils/logger')
-const { beautify } = require('../utils/utils')
 
-// ---- Constants -----
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
 const DB_NAME = getDbConf('db_filename')
 const DB_FILE = (`${getDbConf('db_directory')}` + (DB_NAME && `/${DB_NAME}`)).trim()
 
@@ -31,7 +38,9 @@ exports.TBL_ROLES = TBL_ROLES
 const TBL_USER_ROLES = 'User_Roles'
 exports.TBL_USER_ROLES = TBL_USER_ROLES
 
-// ---- Functions -----
+// -------------------------------------------------------------------------------------------------
+// Functions
+// -------------------------------------------------------------------------------------------------
 const dbOpen = () => {
   const fun = 'dbOpen'
   const db = new Database(DB_FILE, OPEN_READWRITE, (err) => {

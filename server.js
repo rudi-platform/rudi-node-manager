@@ -1,32 +1,43 @@
 const mod = 'server'
 
-// Import dependencies
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 const express = require('express')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const path = require('path')
 const helmet = require('helmet')
 
-// Require Config
-const { getConf, getConsoleFormUrl } = require('./config/config')
-const log = require('./utils/logger')
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies: conf
+// -------------------------------------------------------------------------------------------------
+const { getConf, getConsoleFormUrl } = require('./back/config/config')
 
-// Require Route
-const apiOpen = require('./routes/routesOpen')
-const apiFront = require('./routes/routesFront')
-const apiData = require('./routes/routesData')
-const apiMedia = require('./routes/routesMedia')
-const apiSecu = require('./routes/routesSecu')
+const log = require('./back/utils/logger')
+const { isDevEnv } = require('./back/config/backOptions')
+const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
-const passport = require('./utils/passportSetup')
-const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./database/scripts/initDatabase')
-const { isDevEnv } = require('./config/backOptions')
-const { checkRolePerm } = require('./utils/roleCheck')
-const { expressErrorHandler } = require('./controllers/errorHandler.js')
-const { get } = require('lodash')
+// -------------------------------------------------------------------------------------------------
+// External dependencies: routes
+// -------------------------------------------------------------------------------------------------
+const apiOpen = require('./back/routes/routesOpen')
+const apiFront = require('./back/routes/routesFront')
+const apiData = require('./back/routes/routesData')
+const apiMedia = require('./back/routes/routesMedia')
+const apiSecu = require('./back/routes/routesSecu')
 
-// Create a new express application named 'app'
-const app = express()
+// -------------------------------------------------------------------------------------------------
+// External dependencies: security
+// -------------------------------------------------------------------------------------------------
+const passport = require('./back/utils/passportSetup')
+const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
+const { checkRolePerm } = require('./back/utils/roleCheck')
+
+// -------------------------------------------------------------------------------------------------
+// Launching express app
+// -------------------------------------------------------------------------------------------------
+const backend = express()
 // Set our backend port to be either an environment variable or port 5000
 const port = getConf('server', 'listening_port') || 5000
 
@@ -40,7 +51,7 @@ const WHITE_LIST = [
   ...getConf('security', 'trusted_domain'),
 ]
 const QUOTED_WHITE_LIST = WHITE_LIST.map((whiteListedIp) => `'${whiteListedIp}'`)
-app.use(
+backend.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
@@ -53,7 +64,7 @@ app.use(
 )
 
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
-app.use((req, reply, next) => {
+backend.use((req, reply, next) => {
   const logReqMsg = `Request <= ${req.method} ${req.url} (from ${req.ip})`
   log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
 
@@ -72,13 +83,13 @@ app.use((req, reply, next) => {
 })
 
 // Note: bodyParser middleware has been replace with express bodyParser
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
+backend.use(express.json())
+backend.use(express.urlencoded({ extended: true }))
+backend.use(cookieParser())
 
 // Access-Control-Allow-Origin
 // Configure the CORs middleware
-app.use(
+backend.use(
   cors({
     credentials: true,
     origin: WHITE_LIST,
@@ -90,23 +101,23 @@ app.use(
 )
 
 // Passport middleware
-app.use(passport.initialize())
+backend.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
 // Configure app to use routes
-app.use('/api/open', apiOpen)
-app.use('/api/front', apiFront)
-app.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
-app.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
-app.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+backend.use('/api/open', apiOpen)
+backend.use('/api/front', apiFront)
+backend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
+backend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+backend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
   console.log('Serving the built static page')
-  app.use(express.static(path.join(__dirname, 'front/build')))
-  app.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
+  backend.use(express.static(path.join(__dirname, 'front/build')))
+  backend.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
 }
 
 // Init database on startup
@@ -116,9 +127,11 @@ dbInitialize()
   .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`))
 
 // Catch any bad requests
-app.get('*', (req, reply) => reply.status(404).send(`Route '${req.method} ${req.url}' not found`))
+backend.get('*', (req, reply) =>
+  reply.status(404).send(`Route '${req.method} ${req.url}' not found`)
+)
 
 // Configure our server to listen on the port defiend by our port variable
-app.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
+backend.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
 
-app.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+backend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
