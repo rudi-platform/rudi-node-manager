@@ -19,7 +19,7 @@ consoleRouter.use(
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
-        connectSrc: ["'self'", pathJoin(getRudiMediaUrl(), 'post')],
+        connectSrc: ["'self'", getRudiMediaUrl('post')],
         imgSrc: ["'self'", 'https://*.tile.osm.org'],
       },
     },

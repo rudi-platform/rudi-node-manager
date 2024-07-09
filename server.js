@@ -48,7 +48,7 @@ backend.use(
       useDefaults: true,
       directives: {
         scriptSrc: ["'self'"],
-        connectSrc: ["'self'", ...getConf('security', 'trusted_domain')],
+        connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
         imgSrc: ["'self'"],
       },
     },
@@ -104,6 +104,10 @@ backend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
 backend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
 backend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
+// Serving the console frontend
+const CONSOLE_PREFIX = '/form'
+backend.use(CONSOLE_PREFIX, consoleRouter)
+
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 if (!isDevEnv()) {
@@ -111,10 +115,6 @@ if (!isDevEnv()) {
   backend.use(express.static(path.join(__dirname, 'front/build')))
   backend.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
 }
-
-// Serving the console frontend
-const CONSOLE_PREFIX = '/form'
-backend.use(CONSOLE_PREFIX, consoleRouter)
 
 // Init database on startup
 dbInitialize()

@@ -73,6 +73,14 @@ export default function ObjCatalogue({
   }
   useEffect(() => refresh(), [shouldRefresh])
 
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  document.addEventListener('visibilitychange', () => {
+    setIsTabVisible(document.visibilityState === 'visible')
+  })
+  useEffect(() => {
+    if (isTabVisible) refresh()
+  }, [isTabVisible])
+
   useEffect(() => {
     if (initialRender.current) initialRender.current = false
     else if (currentOffset < 0) setCurrentOffset(0)

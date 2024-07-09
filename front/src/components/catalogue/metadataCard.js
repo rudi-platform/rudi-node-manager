@@ -41,7 +41,7 @@ const externalUrlButton = (url) => (
 )
 
 const eyeButton = (id) => (
-  <Link to={`show/${id}`}>
+  <Link to={`/show/${id}`}>
     <span className="btn btn-green" title="Aperçu">
       <Eye />
     </span>

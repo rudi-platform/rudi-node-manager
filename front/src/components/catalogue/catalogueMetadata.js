@@ -79,6 +79,14 @@ export default function CatalogueMetadata({ editMode, logout }) {
     else fetchMoreData()
   }, [currentOffset])
 
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  document.addEventListener('visibilitychange', () => {
+    setIsTabVisible(document.visibilityState === 'visible')
+  })
+  useEffect(() => {
+    if (isTabVisible) refresh()
+  }, [isTabVisible])
+
   const filterConf = [
     {
       name: 'metadata_status',
