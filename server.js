@@ -50,7 +50,7 @@ backend.use(
         defaultSrc: ["'self'", 'data:'],
         scriptSrc: ["'self'"],
         connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
-        imgSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
       },
     },
   })

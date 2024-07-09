@@ -1,34 +1,20 @@
 const express = require('express')
-const helmet = require('helmet')
-const path = require('path')
 
 const { pathJoin } = require('../back/utils/utils.js')
-const { getRudiMediaUrl } = require('../back/config/config.js')
 
-const root = process.cwd()
 // Helper functions
-
+const root = process.cwd()
+const relative = (...path_) => pathJoin(root, 'console', ...path_)
+const staticDependency = (dep) => express.static(relative(pathJoin('/node_modules', dep, 'dist')))
 const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))
-const relative = (...path_) => path.join(root, 'console', ...path_)
 
 // Console router
 const consoleRouter = express.Router()
-consoleRouter.use(
-  helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        scriptSrc: ["'self'"],
-        connectSrc: ["'self'", getRudiMediaUrl('post')],
-        imgSrc: ["'self'", 'https://*.tile.osm.org'],
-      },
-    },
-  })
-)
+
 // Package dependencies
 const dependenciesRouter = express.Router()
-dependenciesRouter.use('/leaflet', express.static(relative('/node_modules/leaflet/dist')))
-dependenciesRouter.use('/leaflet.draw', express.static(relative('/node_modules/leaflet-draw/dist')))
+dependenciesRouter.use('/leaflet', staticDependency('leaflet'))
+dependenciesRouter.use('/leaflet.draw', staticDependency('leaflet-draw'))
 consoleRouter.use('/dependencies', dependenciesRouter)
 
 // Main routes
