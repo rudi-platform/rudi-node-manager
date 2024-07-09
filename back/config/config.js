@@ -60,8 +60,8 @@ exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
 exports.getRudiMediaUrl = (...args) => pathJoin(config.rudi_media.rudi_media_url, ...args)
 exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 
-const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
-exports.getConsoleFormUrl = () => CONSOLE_FORM_URL
+// const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
+exports.getConsoleFormUrl = () => '/form'
 
 exports.getDbConf = (subSection) => config.database[subSection]
 exports.SU_NAME = config?.database?.db_su_usr
