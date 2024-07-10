@@ -45,7 +45,7 @@ install_back:
   rules:
     - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: always
-    - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
+    - if: $CI_COMMIT_BRANCH !~ $BRANCHES_AUTO
       when: manual
   tags:
     - nodejs-20
