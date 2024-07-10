@@ -142,6 +142,7 @@ export class RudiForm {
     } catch {
       console.log(document.baseURI)
       this._pmUrl = document.baseURI.split('/form/')[0] + '/api'
+      console.log(this._pmUrl)
     }
     return this._pmUrl
   }
