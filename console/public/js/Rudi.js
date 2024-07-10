@@ -140,7 +140,8 @@ export class RudiForm {
     try {
       if (!this._pmUrl) this._pmUrl = this.getConf('pm_url')
     } catch {
-      this._pmUrl = document.baseURI.split('form') + '/api'
+      console.log(document.baseURI)
+      this._pmUrl = document.baseURI.split('/form/')[0] + '/api'
     }
     return this._pmUrl
   }
