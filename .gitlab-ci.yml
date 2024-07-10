@@ -8,14 +8,17 @@ stages:
   - install_back
   - build_front
 
+variables:
+  BRANCHES_AUTO: /^(release|shared)$/
+
 # npm install Front + build Front
 build:front:
   stage: build_front
   needs: []
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /(release|shared)/
+    - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: always
-    - if: $CI_COMMIT_BRANCH =~ /(?!(release|shared))/
+    - if: $CI_COMMIT_BRANCH !~ $BRANCHES_AUTO
       when: manual
   tags:
     - nodejs-20
@@ -40,9 +43,9 @@ install_back:
   stage: install_back
   needs: []
   rules:
-    - if: $CI_COMMIT_BRANCH == "release"
+    - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: always
-    - if: $CI_COMMIT_BRANCH != "release"
+    - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: manual
   tags:
     - nodejs-20
