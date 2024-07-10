@@ -108,7 +108,7 @@ export class RudiForm {
       }
       this.ok(
         here,
-        `\n   - consoleUrl: ${this.consoleUrl}`,
+        `\n   - consoleUrl: ${this.formUrl}`,
         `\n   - mediaUrl: ${this.mediaUrl}`,
         `\n   - apiUrl:${this.apiUrl}`
       )
@@ -125,7 +125,7 @@ export class RudiForm {
     if (!this._nodeUrls) this._initNodeUrls()
     return this._nodeUrls
   }
-  get consoleUrl() {
+  get formUrl() {
     return this.nodeUrls?.console_url
   }
   get mediaUrl() {
@@ -135,20 +135,16 @@ export class RudiForm {
     return this.nodeUrls?.api_url
   }
 
-  _pmUrl = ''
-  get pmUrl() {
-    try {
-      if (!this._pmUrl) this._pmUrl = this.getConf('pm_url')
-    } catch {
-      console.log(document.baseURI)
-      this._pmUrl = document.baseURI.split('/form/')[0] + '/api'
-      console.log(this._pmUrl)
-    }
-    return this._pmUrl
+  _baseUrl = ''
+  get baseUrl() {
+    if (!this._baseUrl) this._baseUrl = document.baseURI.split('/form/')[0]
+    return this._baseUrl
   }
+  formUrl = pathJoin(this.baseUrl, 'form')
+  pmUrl = pathJoin(this.baseUrl, 'api')
 
   getUrlPm = (...args) => pathJoin(this.pmUrl, ...args)
-  getUrlLocal = (...args) => pathJoin(this.consoleUrl, ...args)
+  getUrlLocal = (...args) => pathJoin(this.formUrl, ...args)
   getUrlMedia = (...args) => pathJoin(this.mediaUrl, ...args)
 
   async _getPm(isJson, ...urlBits) {
