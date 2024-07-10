@@ -13,9 +13,9 @@ build:front:
   stage: build_front
   needs: []
   rules:
-    - if: $CI_COMMIT_BRANCH == "release"
+    - if: $CI_COMMIT_BRANCH =~ /(release|shared)/
       when: always
-    - if: '$CI_COMMIT_BRANCH != "release"'
+    - if: $CI_COMMIT_BRANCH =~ /(?!(release|shared))/
       when: manual
   tags:
     - nodejs-20
