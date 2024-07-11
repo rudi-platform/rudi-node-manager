@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Trash } from 'react-bootstrap-icons'
 
-import { getApiData } from '../../utils/frontOptions'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { lastMonth } from '../../utils/utils'
 import { getOptConfirm, getOptOk, useModalContext } from '../modals/genericModalContext'
@@ -15,22 +15,27 @@ CatalogueReports.propTypes = {
   logout: PropTypes.func,
 }
 
-const getApiUrlReports = (suffix) => getApiData('reports', suffix)
-
 /**
  * Composant : CatalogueReports
  * @return {void}
  */
 export default function CatalogueReports({ editMode, logout }) {
+  const { backConf } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const { changeOptions, toggle } = useModalContext()
   const [refreshState, setRefreshState] = useState(editMode)
+
   /**
    * call for confirmation before object deletion
    */
-  const deleteOldReports = () => {
+  const deleteOldReports = () =>
+    back?.isLoaded &&
     axios
-      .delete(getApiUrlReports(`?treatedBefore=${lastMonth().toISOString()}`))
+      .delete(back.getBackCatalog('reports', `?submitted_before=${lastMonth().toISOString()}`))
       .then((res) => {
         const deletedCount = res?.data?.deletedCount
         const msg = !deletedCount
@@ -43,7 +48,6 @@ export default function CatalogueReports({ editMode, logout }) {
         setRefreshState(!refreshState)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
-  }
 
   /**
    * call for confirmation before organization deletion
@@ -51,10 +55,7 @@ export default function CatalogueReports({ editMode, logout }) {
    */
   const triggerDeleteOldReports = () => {
     changeOptions(
-      getOptConfirm(
-        "Voulez-vous supprimer les rapports d'intégration d'il y a plus d'un mois ?",
-        deleteOldReports
-      )
+      getOptConfirm("Voulez-vous supprimer les rapports d'intégration d'il y a plus d'un mois ?", deleteOldReports)
     )
     toggle()
   }
@@ -65,9 +66,7 @@ export default function CatalogueReports({ editMode, logout }) {
         <div className="col-9">
           <div className="card edit-card-margin ">
             <div className="card-body align-right valign-middle inline">
-              <div className="text-button inline-block">
-                Supprimer les rapports des mois précédents
-              </div>
+              <div className="text-button inline-block">Supprimer les rapports des mois précédents</div>
               <button
                 type="button"
                 title="Supprimer les rapports des mois précédents"
@@ -84,6 +83,7 @@ export default function CatalogueReports({ editMode, logout }) {
           shouldPad={false}
           shouldRefresh={refreshState}
           hideEdit={true}
+          logout={logout}
           objType="reports"
           propId="report_id"
           propName="resource_title"

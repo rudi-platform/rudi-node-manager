@@ -1,13 +1,27 @@
-const express = require('express')
-const router = new express.Router()
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import express from 'express'
 
-const { getAppTag, getTags, getHash } = require('../config/backOptions')
-const { expressErrorHandler } = require('../controllers/errorHandler.js')
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { getAppTag, getHash, getTags } from '../config/backOptions.js'
+import { hashCredentials } from '../controllers/authControllerPassport.js'
+import { expressErrorHandler } from '../controllers/errorHandler.js'
 
-router.get('/test', (req, reply) => reply.status(200).send('test'))
-router.get('/hash', (req, reply) => reply.status(200).send(getHash()))
-router.get('/tag', (req, reply) => reply.status(200).send(getAppTag()))
-router.get('/tags', (req, reply) => reply.status(200).send(getTags()))
-router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+// -------------------------------------------------------------------------------------------------
+// Routing
+// -------------------------------------------------------------------------------------------------
+export const openApi = new express.Router()
 
-module.exports = router
+openApi.post('/hash-credentials', (req, reply) => {
+  let { usr, pwd, encoding } = req.body
+  return reply.status(200).send(hashCredentials(pwd, usr, encoding))
+})
+
+openApi.get('/test', (req, reply) => reply.status(200).send('test'))
+openApi.get('/hash', (req, reply) => reply.status(200).send(getHash()))
+openApi.get('/tag', (req, reply) => reply.status(200).send(getAppTag()))
+openApi.get('/tags', (req, reply) => reply.status(200).send(getTags()))
+openApi.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))

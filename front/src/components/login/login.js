@@ -3,27 +3,30 @@ import './login.css'
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/esm/Button'
 
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import { BackConfContext } from '../../context/backConfContext.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'success'
 export const btnText = 'Accéder à l‘application'
 
 export const showPill = (condition, showState) =>
-  condition ? (
+  condition && (
     <div className={'login-pill text-bg-' + btnColor} onClick={showState}>
       {btnText}
     </div>
-  ) : (
-    ''
   )
+
+const ACCOUNT_VALIDATION_MSG = [
+  'Ce compte utilisateur requiert une validation : ',
+  'veuillez contacter l‘administrateur de votre nœud Rudi pour qu‘il assigne un rôle à votre compte utilisateur.',
+]
 
 Login.propTypes = { updateToken: PropTypes.func.isRequired }
 
@@ -33,14 +36,19 @@ Login.propTypes = { updateToken: PropTypes.func.isRequired }
  * @return {ReactNode} Login html component
  */
 export default function Login({ updateToken }) {
-  const { defaultErrorHandler } = useDefaultErrorHandler()
+  const { backConf } = useContext(BackConfContext)
 
-  const [userName, setUserName] = useState('')
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  // const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const [isPwdShown, setIsPwdShown] = useState(false)
-  const togglePwdVisibility = () => setIsPwdShown(!isPwdShown)
-  const stateType = () => (isPwdShown ? 'text' : 'password')
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const togglePwdVisibility = () => setIsPasswordShown(!isPasswordShown)
+  const stateType = () => (isPasswordShown ? 'text' : 'password')
 
   const { toggle, visible } = useGenericModal()
   const { options, changeOptions } = useGenericModalOptions()
@@ -49,51 +57,39 @@ export default function Login({ updateToken }) {
    * is form valid?
    * @return {Boolean} return true is the form is valid
    */
-  const isFormValid = () => userName.length > 0 && password.length > 0
+  const isFormValid = () => username.length > 0 && password.length > 0
 
   /**
    * call server to log user
    * @param {*} credentials
    * @return {Promise} login promise
    */
-  const loginUser = (credentials) =>
-    axios
-      .post('api/front/login', JSON.stringify(credentials), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-      .catch((error) => {
-        const resMsg = error.response?.data
-        let errMsg
-        if (resMsg == 'No user found' || resMsg.startsWith('User not found or incorrect password'))
-          errMsg = ['Utilisateur ou mot de passe incorrect']
-        else if (resMsg.startsWith('Admin validation required for user')) {
-          errMsg = [
-            'Ce compte utilisateur requiert une validation : ',
-            'veuillez contacter l‘administrateur de votre nœud Rudi ' +
-              'pour qu‘il assigne un rôle à votre compte utilisateur.',
-          ]
-        } else errMsg = `Mot de passe incorrect`
-
-        changeOptions({
-          text: [errMsg],
-          title: 'Une erreur est survenue',
-          type: 'error',
-          buttons: [{ text: 'Ok', action: () => {} }],
-        })
-        toggle()
-      })
+  const loginUser = async (credentials) =>
+    back?.isLoaded &&
+    axios.post(back.getBackFront('login'), JSON.stringify(credentials), {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
   /**
    * handle submit login form
    * @param {*} event
    */
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault()
-    loginUser({ username: userName, password })
+    loginUser({ username: username, password })
       .then(() => updateToken())
-      .catch((err) => {
-        console.error('T (handleSubmit) handleSubmit ERR', err)
-        defaultErrorHandler(err)
+      .catch((error) => {
+        const errMsg = error.response?.data?.startsWith('Admin validation required for user')
+          ? ACCOUNT_VALIDATION_MSG
+          : ['Utilisateur ou mot de passe incorrect']
+
+        changeOptions({
+          text: errMsg,
+          title: 'Une erreur est survenue',
+          type: 'error',
+          buttons: [{ text: 'Ok', action: () => {} }],
+        })
+        toggle()
       })
   }
 
@@ -110,7 +106,7 @@ export default function Login({ updateToken }) {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button variant="warning" id="button-addon2" onClick={togglePwdVisibility}>
-              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+              {isPasswordShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
             </Button>
           </InputGroup>
         </Form.Group>
@@ -120,12 +116,7 @@ export default function Login({ updateToken }) {
 
   return (
     <div className="Login">
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
         <div className="login-form">
           <Form.Group size="lg" controlId="usr">
@@ -133,9 +124,9 @@ export default function Login({ updateToken }) {
             <Form.Control
               autoFocus={true}
               type="text"
-              value={userName}
+              value={username}
               autoComplete="username"
-              onChange={(e) => setUserName(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </Form.Group>
         </div>

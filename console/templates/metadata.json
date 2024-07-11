@@ -28,11 +28,7 @@
                   "attr": { "required": true },
                   "class": ["row"],
                   "children": [
-                    {
-                      "id": "@restricted_access",
-                      "tag": "select-input",
-                      "class": ["col", "s4", "m4"]
-                    },
+                    { "id": "@restricted_access", "tag": "select-input", "class": ["col", "s4", "m4"] },
                     {
                       "id": "@gdpr_sensitive",
                       "tag": "checkbox-input",
@@ -57,11 +53,7 @@
                                 "tag": "div",
                                 "class": ["row", "flex"],
                                 "children": [
-                                  {
-                                    "id": "@media_name",
-                                    "tag": "text-input",
-                                    "class": ["col", "s4", "m4"]
-                                  },
+                                  { "id": "@media_name", "tag": "text-input", "class": ["col", "s4", "m4"] },
                                   {
                                     "id": "@url",
                                     "tag": "text-input",
@@ -76,22 +68,12 @@
                         ],
                         "focusElement": "media_name",
                         "submitBtn": "submit_btn",
-                        "submitTemplate": {
-                          "media_name": "media_name",
-                          "connector": { "url": "url" }
-                        },
+                        "submitTemplate": { "media_name": "media_name", "connector": { "url": "url" } },
                         "displayTemplate": [
                           { "id": "media_name", "tag": "p", "class": ["card-title"] },
-                          {
-                            "id": "url",
-                            "tag": "a",
-                            "class": ["card-subtitle"],
-                            "attr": { "tabindex": "-1" }
-                          }
+                          { "id": "url", "tag": "a", "class": ["card-subtitle"], "attr": { "tabindex": "-1" } }
                         ],
-                        "displayFragmentSet": {
-                          "url": { "textContent": "$url", "attr": { "href": "$url" } }
-                        }
+                        "displayFragmentSet": { "url": { "textContent": "$url", "attr": { "href": "$url" } } }
                       },
                       "length": 1
                     }
@@ -121,42 +103,12 @@
               "attr": { "required": true }
             },
             { "id": "@collection_tag", "tag": "text-input", "class": ["col", "s4", "m4"] },
-            {
-              "id": "@synopsis",
-              "tag": "multi-textarea",
-              "class": ["col", "s4"],
-              "attr": { "required": true }
-            },
-            {
-              "id": "@summary",
-              "tag": "multi-textarea",
-              "class": ["col", "s4"],
-              "attr": { "required": true }
-            },
-            {
-              "id": "@theme",
-              "tag": "select-input",
-              "class": ["col", "s4", "m4"],
-              "attr": { "required": true }
-            },
-            {
-              "id": "@keywords",
-              "tag": "datalist-input",
-              "class": ["col", "s4", "m4"],
-              "attr": { "required": true }
-            },
-            {
-              "id": "@producer",
-              "tag": "select-input",
-              "class": ["col", "s4"],
-              "attr": { "required": true }
-            },
-            {
-              "id": "@contacts",
-              "tag": "selectm-input",
-              "class": ["col", "s4"],
-              "attr": { "required": true }
-            },
+            { "id": "@synopsis", "tag": "multi-textarea", "class": ["col", "s4"], "attr": { "required": true } },
+            { "id": "@summary", "tag": "multi-textarea", "class": ["col", "s4"], "attr": { "required": true } },
+            { "id": "@theme", "tag": "select-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
+            { "id": "@keywords", "tag": "datalist-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
+            { "id": "@producer", "tag": "select-input", "class": ["col", "s4"], "attr": { "required": true } },
+            { "id": "@contacts", "tag": "selectm-input", "class": ["col", "s4"], "attr": { "required": true } },
             { "id": "@resource_languages", "tag": "selectm-input", "class": ["col", "s4", "m4"] },
             {
               "tag": "form-section",
@@ -172,11 +124,7 @@
               "class": ["row"],
               "children": [
                 { "id": "dataset_size", "tag": "h1" },
-                {
-                  "id": "@numbers_of_records",
-                  "tag": "number-input",
-                  "class": ["col", "s4", "m4"]
-                },
+                { "id": "@numbers_of_records", "tag": "number-input", "class": ["col", "s4", "m4"] },
                 { "id": "@number_of_fields", "tag": "number-input", "class": ["col", "s4", "m4"] }
               ]
             },
@@ -185,20 +133,10 @@
               "class": ["row"],
               "children": [
                 { "id": "dataset_dates", "tag": "h1" },
-                {
-                  "id": "@created",
-                  "tag": "date-input",
-                  "class": ["col", "s4", "m4"],
-                  "attr": { "required": true }
-                },
+                { "id": "@created", "tag": "date-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
                 { "id": "@validated", "tag": "date-input", "class": ["col", "s4", "m4"] },
                 { "id": "@published", "tag": "date-input", "class": ["col", "s4", "m4"] },
-                {
-                  "id": "@updated",
-                  "tag": "date-input",
-                  "class": ["col", "s4", "m4"],
-                  "attr": { "required": true }
-                },
+                { "id": "@updated", "tag": "date-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
                 { "id": "@deleted", "tag": "date-input", "class": ["col", "s4", "m4"] }
               ]
             },
@@ -316,10 +254,7 @@
     "available_formats": { "files": "files", "services": "services" },
     "restricted_access": "restricted_access",
     "resource_languages": "resource_languages",
-    "dataset_size": {
-      "numbers_of_records": "numbers_of_records",
-      "number_of_fields": "number_of_fields"
-    },
+    "dataset_size": { "numbers_of_records": "numbers_of_records", "number_of_fields": "number_of_fields" },
     "temporal_spread": { "start_date": "start_date", "end_date": "end_date" },
     "geography": "geography",
     "dataset_dates": {
@@ -371,64 +306,33 @@
       "geography_title": { "textContent": "Distribution géographique" },
       "metadata_info": { "textContent": "Informations de la métadonnée" },
       "submit_btn": { "textContent": "Valider" },
-      "global_id": {
-        "attr": {
-          "label": "Identifiant Global",
-          "helper": "Identifiant de la métadonnée dans RUDI"
-        }
-      },
+      "global_id": { "attr": { "label": "Identifiant Global", "helper": "Identifiant de la métadonnée dans RUDI" } },
       "local_id": {
         "attr": {
           "label": "Identifiant local",
           "helper": "Identifiant de la métadonnée dans le système local du producteur"
         }
       },
-      "doi": {
-        "attr": { "label": "DOI", "helper": "Identifiant unique de la métadonnée sur internet" }
-      },
-      "resource_title": {
-        "attr": { "label": "Titre de la ressource", "helper": "Nom de la ressource" }
-      },
-      "collection_tag": {
-        "attr": { "label": "Tag", "helper": "Un tag empêche un jdd d'être publié sur le portail" }
-      },
-      "synopsis": {
-        "attr": { "label": "Synopsis", "helper": "Courte description de la ressource" }
-      },
-      "summary": {
-        "attr": { "label": "Description", "helper": "Description plus précise de la ressource" }
-      },
-      "theme": {
-        "attr": { "label": "Thème", "helper": "Thème le plus adapté pour classifier la ressource" }
-      },
+      "doi": { "attr": { "label": "DOI", "helper": "Identifiant unique de la métadonnée sur internet" } },
+      "resource_title": { "attr": { "label": "Titre de la ressource", "helper": "Nom de la ressource" } },
+      "collection_tag": { "attr": { "label": "Tag", "helper": "Un tag empêche un jdd d'être publié sur le portail" } },
+      "synopsis": { "attr": { "label": "Synopsis", "helper": "Courte description de la ressource" } },
+      "summary": { "attr": { "label": "Description", "helper": "Description plus précise de la ressource" } },
+      "theme": { "attr": { "label": "Thème", "helper": "Thème le plus adapté pour classifier la ressource" } },
       "keywords": {
         "attr": {
           "label": "Mot clés",
           "helper": "Liste de mots-clés qui caractérisent la ressource (séparés par des virgules)"
         }
       },
-      "producer": {
-        "attr": {
-          "label": "Producteur de la donnée",
-          "helper": "Organisation qui a produit la donnée"
-        }
-      },
-      "contacts": {
-        "attr": { "label": "Contact", "helper": "Liste de personnes référentes pour la donnée" }
-      },
-      "files": {
-        "attr": { "label": "Fichiers", "helper": "Liste des formats disponibles pour la donnée" }
-      },
-      "media_id": {
-        "attr": { "label": "Identifiant du media", "helper": "Identifiant unique du service" }
-      },
+      "producer": { "attr": { "label": "Producteur de la donnée", "helper": "Organisation qui a produit la donnée" } },
+      "contacts": { "attr": { "label": "Contact", "helper": "Liste de personnes référentes pour la donnée" } },
+      "files": { "attr": { "label": "Fichiers", "helper": "Liste des formats disponibles pour la donnée" } },
+      "media_id": { "attr": { "label": "Identifiant du media", "helper": "Identifiant unique du service" } },
       "media_name": { "attr": { "label": "Nom du service", "helper": "Nom du service" } },
       "url": { "attr": { "label": "URL du service", "helper": "URL pour accéder au service" } },
       "resource_languages": {
-        "attr": {
-          "label": "Langue de la ressource",
-          "helper": "Liste des langages disponibles dans la ressource"
-        }
+        "attr": { "label": "Langue de la ressource", "helper": "Liste des langages disponibles dans la ressource" }
       },
       "start_date": {
         "attr": {
@@ -443,49 +347,23 @@
         }
       },
       "numbers_of_records": {
-        "attr": {
-          "label": "Nombre d'enregistrements",
-          "helper": "Nombre de valeurs (en général, lignes)"
-        }
+        "attr": { "label": "Nombre d'enregistrements", "helper": "Nombre de valeurs (en général, lignes)" }
       },
       "number_of_fields": {
-        "attr": {
-          "label": "Nombre de champs",
-          "helper": "Nombres de propriétés (en général, colonnes)"
-        }
+        "attr": { "label": "Nombre de champs", "helper": "Nombres de propriétés (en général, colonnes)" }
       },
-      "created": {
-        "attr": { "label": "Date de création", "helper": "Date de création du jeu de données" }
-      },
+      "created": { "attr": { "label": "Date de création", "helper": "Date de création du jeu de données" } },
       "updated": {
-        "attr": {
-          "label": "Date de modification",
-          "helper": "Dernière date de modification du jeu de données"
-        }
+        "attr": { "label": "Date de modification", "helper": "Dernière date de modification du jeu de données" }
       },
       "validated": {
-        "attr": {
-          "label": "Date de validation",
-          "helper": "Dernière date de validation du jeu de données"
-        }
+        "attr": { "label": "Date de validation", "helper": "Dernière date de validation du jeu de données" }
       },
-      "published": {
-        "attr": {
-          "label": "Date de publication",
-          "helper": "Date de publication du jeu de données"
-        }
-      },
-      "deleted": {
-        "attr": { "label": "Date de supression", "helper": "Date de suppression du jeu de données" }
-      },
-      "storage_status": {
-        "attr": { "label": "Statut du stockage", "helper": "Statut du stockage du jeu de données" }
-      },
+      "published": { "attr": { "label": "Date de publication", "helper": "Date de publication du jeu de données" } },
+      "deleted": { "attr": { "label": "Date de supression", "helper": "Date de suppression du jeu de données" } },
+      "storage_status": { "attr": { "label": "Statut du stockage", "helper": "Statut du stockage du jeu de données" } },
       "restricted_access": {
-        "attr": {
-          "label": "Restriction d'accès",
-          "helper": "Le nom de la clé publique qui chiffre les données"
-        }
+        "attr": { "label": "Restriction d'accès", "helper": "Le nom de la clé publique qui chiffre les données" }
       },
       "gdpr_sensitive": {
         "attr": {
@@ -499,10 +377,7 @@
         "attr": { "label": "Nom de la licence externe", "helper": "Nom de la licence externe" }
       },
       "custom_licence_uri": {
-        "attr": {
-          "label": "URL vers la licence",
-          "helper": "URL vers le texte décrivant la licence"
-        }
+        "attr": { "label": "URL vers la licence", "helper": "URL vers le texte décrivant la licence" }
       },
       "usage_constraint": {
         "attr": {
@@ -522,17 +397,10 @@
           "helper": "Mention devant être citée sur chaque publication qui fait usage de la donnée"
         }
       },
-      "access_constraint": {
-        "attr": { "label": "Contrainte d'accès", "helper": "Autres restrictions d'accès" }
-      },
-      "other_constraints": {
-        "attr": { "label": "Autre contrainte", "helper": "Autres restrictions" }
-      },
+      "access_constraint": { "attr": { "label": "Contrainte d'accès", "helper": "Autres restrictions d'accès" } },
+      "other_constraints": { "attr": { "label": "Autre contrainte", "helper": "Autres restrictions" } },
       "geography": {
-        "attr": {
-          "label": "Distribution géographique",
-          "helper": "Localisation géographique de la donnée"
-        }
+        "attr": { "label": "Distribution géographique", "helper": "Localisation géographique de la donnée" }
       },
       "metadata_api_version": {
         "attr": {
@@ -541,34 +409,20 @@
         }
       },
       "metadata_metadata_dates": {
-        "attr": {
-          "label": "Date de référence",
-          "helper": "Dates des actions réalisées sur la métadonnée"
-        }
+        "attr": { "label": "Date de référence", "helper": "Dates des actions réalisées sur la métadonnée" }
       },
-      "metadata_created": {
-        "attr": { "label": "Date de création", "helper": "Date de création de la métadonnée" }
-      },
+      "metadata_created": { "attr": { "label": "Date de création", "helper": "Date de création de la métadonnée" } },
       "metadata_updated": {
-        "attr": {
-          "label": "Date de modification",
-          "helper": "Dernière date de modification de la métadonnée"
-        }
+        "attr": { "label": "Date de modification", "helper": "Dernière date de modification de la métadonnée" }
       },
       "metadata_validated": {
-        "attr": {
-          "label": "Date de validation",
-          "helper": "Dernière date de validation de la métadonnée"
-        }
+        "attr": { "label": "Date de validation", "helper": "Dernière date de validation de la métadonnée" }
       },
       "metadata_published": {
         "attr": { "label": "Date de publication", "helper": "Date de publication de la métadonnée" }
       },
       "metadata_provider": {
-        "attr": {
-          "label": "Producteur de la métadonnée",
-          "helper": "Organisation qui a produit la métadonnée"
-        }
+        "attr": { "label": "Producteur de la métadonnée", "helper": "Organisation qui a produit la métadonnée" }
       },
       "metadata_contacts": {
         "attr": { "label": "Contact", "helper": "Liste de personnes référentes pour la métadonnée" }
@@ -579,9 +433,7 @@
           "setTemplate": {
             "1": {
               "media_name": { "attr": { "label": "Nom du service", "helper": "Nom du service" } },
-              "url": {
-                "attr": { "label": "URL du service", "helper": "URL pour accéder au service" }
-              }
+              "url": { "attr": { "label": "URL du service", "helper": "URL pour accéder au service" } }
             },
             "length": 2
           }

@@ -1,11 +1,9 @@
-/* eslint-disable require-jsdoc */
+export const STATUS_CODE = 'statusCode'
 
-const STATUS_CODE = 'statusCode'
-
-class RudiError extends Error {
+export class RudiError extends Error {
   constructor(message, code, name, desc, ctxMod, ctxFun) {
     super(message)
-    this[STATUS_CODE] = code || 500
+    this[STATUS_CODE] = code ?? 500
     this.name = name
     this.description = desc
     this.ctxMod = ctxMod
@@ -59,7 +57,7 @@ class RudiError extends Error {
   }
 }
 
-class BadRequestError extends RudiError {
+export class BadRequestError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(errMessage, 400, 'Bad request', 'The JSON (or the request) is not valid', ctxMod, ctxFun)
   }
@@ -69,32 +67,25 @@ class BadRequestError extends RudiError {
   }
 }
 
-class UnauthorizedError extends RudiError {
+export class UnauthorizedError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
-    super(
-      errMessage,
-      401,
-      'Unauthorized',
-      'The request requires an user authentication',
-      ctxMod,
-      ctxFun
-    )
+    super(errMessage, 401, 'Unauthorized', 'The request requires an user authentication', ctxMod, ctxFun)
   }
 }
 
-class ForbiddenError extends RudiError {
+export class ForbiddenError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(errMessage, 403, 'Forbidden', 'The access is not allowed', ctxMod, ctxFun)
   }
 }
 
-class NotFoundError extends RudiError {
+export class NotFoundError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(errMessage, 404, 'Not Found', 'The resource was not found', ctxMod, ctxFun)
   }
 }
 
-class MethodNotAllowedError extends RudiError {
+export class MethodNotAllowedError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
@@ -107,7 +98,7 @@ class MethodNotAllowedError extends RudiError {
   }
 }
 
-class NotAcceptableError extends RudiError {
+export class NotAcceptableError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
@@ -120,13 +111,13 @@ class NotAcceptableError extends RudiError {
   }
 }
 
-class InternalServerError extends RudiError {
+export class InternalServerError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(errMessage, 500, 'Internal Server Error', 'Internal Server Error', ctxMod, ctxFun)
   }
 }
 
-class NotImplementedError extends RudiError {
+export class NotImplementedError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
@@ -139,13 +130,13 @@ class NotImplementedError extends RudiError {
   }
 }
 
-class ServiceUnavailableError extends RudiError {
+export class ServiceUnavailableError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(errMessage, 503, 'Service Unavailable', 'The server is unreachable', ctxMod, ctxFun)
   }
 }
 
-class ConnectionError extends RudiError {
+export class ConnectionError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
     super(
       errMessage,
@@ -158,20 +149,9 @@ class ConnectionError extends RudiError {
   }
 }
 
-exports.statusOK = (message) => ({ status: 'OK', message })
+export const statusOK = (message) => ({ status: 'OK', message })
 
-exports.BadRequestError = BadRequestError
-exports.UnauthorizedError = UnauthorizedError
-exports.ForbiddenError = ForbiddenError
-exports.NotFoundError = NotFoundError
-exports.MethodNotAllowedError = MethodNotAllowedError
-exports.NotAcceptableError = NotAcceptableError
-exports.InternalServerError = InternalServerError
-exports.ConnectionError = ConnectionError
-exports.RudiError = RudiError
-exports.STATUS_CODE = STATUS_CODE
-
-exports.STATUS_CODES = {
+export const STATUS_CODES = {
   100: 'Continue',
   101: 'Switching Protocols',
   102: 'Processing',

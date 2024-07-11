@@ -1,56 +1,60 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
 
-const propId = 'id'
-const urlUsers = `api/secu/users`
-const urlRoles = `api/secu/roles`
+const PAGE_SIZE = 20
 
 CatalogueUser.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
-export default function CatalogueUser({ editMode }) {
+export default function CatalogueUser({ editMode, logout }) {
+  const { backConf } = useContext(BackConfContext)
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const urlUsers = back?.getBackSecu('users')
+  const urlRoles = back?.getBackSecu('roles')
+
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const [roleList, setRoleList] = useState([])
   const [userList, setUserList] = useState([])
   const [hasMore, setHasMore] = useState(false)
-  const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  useEffect(() => fetchInitialData(), [])
+  useEffect(() => {
+    fetchUserData()
+  }, [backConf])
 
-  const refresh = () => fetchInitialData()
+  const refresh = () => fetchUserData()
 
   /**
    * recup la 1er page des métadonnéees et les countBy
    */
-  function fetchInitialData() {
-    axios
-      .get(urlRoles)
-      .then((res) => setRoleList(res.data))
-      .catch((err) => defaultErrorHandler(err))
-    axios
-      .get(urlUsers)
+  const fetchUserData = () =>
+    back?.isLoaded &&
+    Promise.all([axios.get(urlRoles), axios.get(urlUsers)])
       .then((res) => {
-        setCurrentOffset(PAGE_SIZE)
-        setUserList(res.data)
+        setRoleList(res[0].data)
+        setUserList(res[1].data)
       })
-      .catch((err) => defaultErrorHandler(err))
-  }
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
 
   /**
    * Fonction utilisée par InfiniteScroll
@@ -65,7 +69,7 @@ export default function CatalogueUser({ editMode }) {
         if (partialObjList.length < PAGE_SIZE) setHasMore(false)
         setUserList(userList.concat(partialObjList))
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   return (
@@ -83,12 +87,7 @@ export default function CatalogueUser({ editMode }) {
                 endMessage={<i>Aucune donnée supplémentaire</i>}
               >
                 {userList.map((user) => (
-                  <UserCard
-                    roleList={roleList}
-                    user={user}
-                    key={user[propId]}
-                    refresh={refresh}
-                  ></UserCard>
+                  <UserCard roleList={roleList} user={user} key={user.id} refresh={refresh}></UserCard>
                 ))}
               </InfiniteScroll>
             ) : (

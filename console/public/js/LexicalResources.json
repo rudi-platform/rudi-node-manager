@@ -55,7 +55,7 @@
     "reach_media_auth/fail": "La liaison ne peut être établie avec le serveur de stockage pour cet utilisateur, veuillez contacter le support.",
     "reach_media/fail": "Echec de la liaison avec le serveur de stockage : veuillez contacter le support.",
     "reach_pm/fail": "Echec de la liaison avec le nœud producteur : veuillez contacter le support.",
-    "reach_local/fail": "Echec de la récupérassion de la ressource locale : veuillez contacter le support.",
+    "reach_local/fail": "Echec de la récupération de la ressource locale : veuillez contacter le support.",
     "readonly/fetch/fail": "La donnée que vous essayez de visualiser est introuvable",
     "submit/fail": "Formulaire incorrect, l‘une des contraintes n‘est pas respectée.",
     "submit/start": "Envoi en cours",

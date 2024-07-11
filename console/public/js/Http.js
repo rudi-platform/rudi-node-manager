@@ -18,7 +18,7 @@ class HttpRequest extends XMLHttpRequest {
         try {
           this.setRequestHeader(header, value)
         } catch {
-          console.log('HttpRequest: header=', header, ', value=', encodeURIComponent(value))
+          console.trace('T HttpRequest: header=', header, ', value=', encodeURIComponent(value))
           this.setRequestHeader(header, encodeURIComponent(value))
         }
       }
@@ -79,10 +79,7 @@ class JsonHttpRequest extends HttpRequest {
       res = JSON.parse(res)
     } catch (e) {
       if (e instanceof SyntaxError)
-        throw new SyntaxError(
-          `Cannot parse result of request '${this.method} ${this.url}'\n${res}`,
-          { cause: e }
-        )
+        throw new SyntaxError(`Cannot parse result of request '${this.method} ${this.url}'\n${res}`, { cause: e })
       console.error(e)
       throw e
     }

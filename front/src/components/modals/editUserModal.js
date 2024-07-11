@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import PropTypes from 'prop-types'
 
@@ -11,17 +11,29 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import Modal from 'react-bootstrap/Modal'
 import Row from 'react-bootstrap/Row'
 
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
-// import { showObj } from '../../utils/utils'
+import { BackConfContext } from '../../context/backConfContext.js'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler.js'
+import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation.js'
 
-const urlUser = 'api/secu/users'
-const modalTitle = 'Modifier l‘utilisateur'
-const modalSubmitBtnTxt = 'Sauver'
+export const useEditUserModal = () => {
+  const [isVisibleEditModal, setIsVisibleEditModal] = useState(false)
+  /**
+   * toggle l'affichage de la modal
+   * @return {void}
+   */
+  const toggleIsVisibleEditModal = () => setIsVisibleEditModal(!isVisibleEditModal)
+  return { isVisibleEditModal, toggleEditModal: toggleIsVisibleEditModal }
+}
 
-const validation = {
-  username: [VALID_NOT_EMPTY_USERNAME],
-  email: [VALID_EMAIL],
+export const useEditUserModalOptions = () => {
+  const [editModalOptions, setEditModalOptions] = useState({})
+  /**
+   * change la valeur des options
+   * @param {*} param nouvelles options
+   * @return {void}
+   */
+  const changeEditModalOptions = (param) => setEditModalOptions(param)
+  return { editModalOptions, changeEditModalOptions }
 }
 
 EditUserModal.propTypes = {
@@ -39,13 +51,25 @@ EditUserModal.propTypes = {
  */
 export default function EditUserModal({ user, roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const [userInfo, setUserInfo] = useState(user)
+
+  const modalTitle = 'Modifier l‘utilisateur'
+  const modalSubmitBtnTxt = 'Sauver'
+
+  const validation = {
+    username: [VALID_NOT_EMPTY_USERNAME],
+    email: [VALID_EMAIL],
+  }
 
   const hasErrors = (prop, val) => {
     if (!userInfo) return true
     if (!val) val = userInfo[prop]
-    if (prop === 'roles')
-      return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
+    if (prop === 'roles') return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
 
     if (!val) {
       // console.error('T (hasErrors)', prop, user[prop])
@@ -53,7 +77,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     }
     let isInvalid
     validation[prop]?.map((valid) => {
-      if (!`${val}`.match(valid[0])) isInvalid = valid[1].replace('{VALUE}', val)
+      if (!RegExp(valid[0]).exec(`${val}`)) isInvalid = valid[1].replace('{VALUE}', val)
     })
     return isInvalid
   }
@@ -63,24 +87,19 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     email: hasErrors('email'),
     roles: hasErrors('roles'),
   })
-  const isValid = (prop) =>
-    prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
+  const isValid = (prop) => (prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles)
 
   const editUserInfo = (prop, val) => {
     setErrors((errors) => ({ ...errors, [prop]: hasErrors(prop, val) }))
     setUserInfo((userInfo) => ({ ...userInfo, [prop]: val }))
   }
 
-  const isInUserRole = (userRoles, role) =>
-    !!(userRoles?.findIndex((element) => element === role.role) >= 0)
+  const isInUserRole = (userRoles, role) => userRoles?.findIndex((element) => element === role.role) >= 0
 
   const handleChange = (event) => {
     const prop = event.target.id
     const val = event.target.value
-    // console.log('T (handleChange)', prop, '=>', val)
     editUserInfo(prop, val)
-    // if (errors[prop]) console.error('(handleChange) errorDetected:', errors[prop])
-    // console.log('T (handleChange) userInfo after:', showObj(userInfo))
   }
 
   const handleRoleChange = (event) => {
@@ -102,18 +121,6 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     // console.log('(handleRoleChange) usrRoles:', userRoles, '=>', nextUserRoles)
     editUserInfo('roles', nextUserRoles)
   }
-  // const hasError = (prop) => validateProp(prop, userInfo[prop]);
-
-  // const handleClick = (event) => {
-  //   const form = event.currentTarget;
-  //   console.log('handleClick', event);
-  //   if (form.checkValidity() === false) {
-  //     event.preventDefault();
-  //     event.stopPropagation();
-  //   }
-
-  //   // toggleEdit()
-  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -122,7 +129,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     // console.log('(handleSubmit)', 'userInfo:', userInfo)
     // if (!event.target.checkValidity()) event.stopPropagation()
     if (isValid()) {
-      await sendUserInfo(userInfo)
+      await sendUserInfo()
       toggleEdit()
       refresh()
     } else {
@@ -134,15 +141,10 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
   /**
    * Update user information
    */
-  const sendUserInfo = async () => {
-    try {
-      // console.log('T (edit.sendingUserInfo)', userInfo)
-      await axios.put(urlUser, userInfo)
-      // console.log('T (edit.sendUserInfo)', res.data)
-    } catch (err) {
-      defaultErrorHandler(err)
-    }
-  }
+
+  const sendUserInfo = () =>
+    (!userInfo && console.error('T (sendUserInfo) No user info!')) ||
+    (back?.isLoaded && axios.put(back.getBackSecu('users'), userInfo).catch((err) => defaultErrorHandler(err)))
 
   return (
     <Modal show={visible} onHide={toggleEdit} animation={false}>
@@ -234,25 +236,4 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
       </Form>
     </Modal>
   )
-}
-
-export const useEditUserModal = () => {
-  const [isVisibleEditModal, setVisible] = useState(false)
-  /**
-   * toggle l'affichage de la modal
-   * @return {void}
-   */
-  const toggleEditModal = () => setVisible(!isVisibleEditModal)
-  return { isVisibleEditModal, toggleEditModal }
-}
-
-export const useEditUserModalOptions = () => {
-  const [editModalOptions, setOptions] = useState({})
-  /**
-   * change la valeur des options
-   * @param {*} param nouvelles options
-   * @return {void}
-   */
-  const changeEditModalOptions = (param) => setOptions(param)
-  return { editModalOptions, changeEditModalOptions }
 }

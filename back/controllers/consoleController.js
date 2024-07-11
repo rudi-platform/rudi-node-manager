@@ -1,57 +1,62 @@
 const mod = 'consoleCtrl'
 
 // Internal dependencies
-const { getConsoleFormUrl, getRudiMediaUrl } = require('../config/config')
-const log = require('../utils/logger')
-const { UnauthorizedError } = require('../utils/errors')
-const { getPortalUrl, getApiExternalUrl } = require('./dataController')
-const { handleError } = require('./errorHandler')
+import { getPublicBack, getPublicConsole, getPublicFront, getPublicManager } from '../config/config.js'
+import { UnauthorizedError } from '../utils/errors.js'
+import { getContext, logE, logW, sysError } from '../utils/logger.js'
+import { getCatalogPublicUrl, getPortalUrl } from './dataController.js'
+import { handleError } from './errorHandler.js'
+import { getStoragePublicUrl } from './mediaController.js'
 
-exports.getNodeUrls = async (req, reply) => {
+export const getNodeUrls = async () => {
   const fun = 'getNodeUrls'
   try {
-    const urls = await Promise.all([getApiExternalUrl(), getPortalUrl()])
+    const urls = await Promise.all([getCatalogPublicUrl(), getStoragePublicUrl(), getPortalUrl()])
     const nodeUrls = {
-      api_url: urls[0],
-      console_url: getConsoleFormUrl(),
-      media_url: getRudiMediaUrl(),
+      catalogUrl: urls[0],
+      catalog_url: urls[0],
+      storageUrl: urls[1],
+      media_url: urls[1],
+      consolePath: getPublicConsole(),
+      frontPath: getPublicFront(),
+      backPath: getPublicBack(),
+      managerPath: getPublicManager(),
+      portalUrl: urls[2],
+      portal_url: urls[2],
     }
-    if (urls[1] != 'No portal connected') nodeUrls['portal_url'] = urls[1]
+    return nodeUrls
+  } catch (err) {
+    logE(mod, fun, err)
+  }
+}
 
+export async function sendNodeUrls(req, reply) {
+  const fun = 'sendNodeUrls'
+  try {
+    const nodeUrls = await getNodeUrls()
     return reply.status(200).send(nodeUrls)
   } catch (err) {
-    log.sysError(mod, fun, err, log.getContext(req, { opType: 'get_node_urls' }))
+    sysError(mod, fun, err, getContext(req, { opType: 'get_node_urls' }))
     handleError(req, reply, err, 404, fun)
   }
 }
 
 // Controllers
-exports.getFormUrl = (req, reply) => {
-  try {
-    reply.status(200).send(getConsoleFormUrl())
-  } catch (err) {
-    log.e('', '', err)
-    log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_form_url' }))
-    throw err
-  }
-}
-
-// Controllers
-exports.getPortalConnection = (req, reply) => {
+export function getPortalConnection(req, reply) {
   try {
     reply.status(200).send(getPortalUrl())
   } catch (err) {
-    log.e('', '', err)
-    log.sysError(mod, 'getPortalConnection', err, log.getContext(req, { opType: 'get_portal_url' }))
+    sysError(mod, 'getPortalConnection', err, getContext(req, { opType: 'get_portal_url' }))
     throw err
   }
 }
 
-exports.getUserInfo = (req, reply) => {
+export function getUserInfo(req, reply) {
+  const fun = 'getUserInfo'
   const user = req.user
   if (!user) {
     const errMsg = 'User info not available'
-    log.w(mod, fun, errMsg)
+    logW(mod, fun, errMsg)
     return reply.status(401).send(new UnauthorizedError(errMsg))
   }
   const { username, roles } = user

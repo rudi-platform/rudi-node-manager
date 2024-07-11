@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { getApiData } from '../../utils/frontOptions'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard, ObjCard } from '../generic/objCard'
 
@@ -49,6 +49,10 @@ export default function ObjCatalogue({
 }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
 
@@ -57,11 +61,11 @@ export default function ObjCatalogue({
   const [currentOffset, setCurrentOffset] = useState(-1)
   const initialRender = useRef(true)
 
-  const getApiUrlObj = (suffix) => getApiData(objType, suffix)
-  const deleteUrl = (id) => getApiUrlObj(id)
+  const getCatalogUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog(objType, suffix)
+  const deleteUrl = (id) => getCatalogUrlObj(id)
 
-  const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')
-  useEffect(() => setSortBy(propSortBy || '-updatedAt'), [propSortBy])
+  const [sortBy, setSortBy] = useState(propSortBy ?? '-updatedAt')
+  useEffect(() => setSortBy(propSortBy ?? '-updatedAt'), [propSortBy])
 
   const refresh = () => {
     setHasMore(true)
@@ -95,7 +99,7 @@ export default function ObjCatalogue({
    */
   function getInitialData() {
     axios
-      .get(getApiUrlObj(), {
+      .get(getCatalogUrlObj(), {
         params: { sort_by: sortBy, limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
@@ -110,7 +114,7 @@ export default function ObjCatalogue({
    */
   const fetchMoreData = () => {
     axios
-      .get(getApiUrlObj(), {
+      .get(getCatalogUrlObj(), {
         params: { sort_by: sortBy, limit: PAGE_SIZE, offset: currentOffset },
       })
       .then((res) => {

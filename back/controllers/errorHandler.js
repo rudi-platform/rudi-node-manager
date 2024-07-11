@@ -1,22 +1,28 @@
-const { RudiError, ConnectionError } = require('../utils/errors')
-const log = require('../utils/logger')
-const { cleanErrMsg } = require('../utils/utils')
-
+/* eslint-disable complexity */
+/* eslint-disable no-console */
 const mod = 'errHandler'
 
-exports.error = (error, req, options) => {
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { MANAGER } from '../config/config.js'
+import { ConnectionError, RudiError } from '../utils/errors.js'
+import { getContext, logD, logE, sysError } from '../utils/logger.js'
+import { cleanErrMsg } from '../utils/utils.js'
+
+export function formatError(error, req, options) {
   const fun = 'error'
   try {
-    log.sysError(mod, fun, cleanErrMsg(error), log.getContext(req, options))
+    sysError(mod, fun, cleanErrMsg(error), getContext(req, options))
     let errorToDisplay
     if (!error) return new RudiError(`Error was unidentified`)
     let statusCode =
-      error?.response?.data?.statusCode ||
-      error?.response?.status ||
-      error?.response?.statusCode ||
-      error?.statusCode ||
-      error?.status ||
-      error?.code ||
+      error?.response?.data?.statusCode ??
+      error?.response?.status ??
+      error?.response?.statusCode ??
+      error?.statusCode ??
+      error?.status ??
+      error?.code ??
       501
     if (statusCode === 'ERR_INVALID_URL') {
       statusCode = 404
@@ -30,15 +36,10 @@ exports.error = (error, req, options) => {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      log.sysError(
-        mod,
-        fun,
-        cleanErrMsg(error.response?.data || error.response),
-        log.getContext(req, options)
-      )
+      sysError(mod, fun, cleanErrMsg(error.response?.data ?? error.response), getContext(req, options))
 
       errorToDisplay = Object.keys(error) > 0 ? error : error.toJSON()
-      errorToDisplay.moreInfo = cleanErrMsg(error.response?.data || error.response)
+      errorToDisplay.moreInfo = cleanErrMsg(error.response?.data ?? error.response)
     } else if (error.request) {
       errorToDisplay = cleanErrMsg(error)
     }
@@ -47,15 +48,15 @@ exports.error = (error, req, options) => {
     // http.ClientRequest in node.js
     else {
       // Something happened in setting up the request that triggered an Error
-      errorToDisplay = { message: cleanErrMsg(error?.message || error, statusCode) }
+      errorToDisplay = { message: cleanErrMsg(error?.message ?? error, statusCode) }
     }
-    // log.e(mod, fun, error?.message || error)
-    log.sysError(mod, fun, cleanErrMsg(errorToDisplay), log.getContext(req, options))
-    if (error?.config) log.e(mod, fun, cleanErrMsg(error.config))
+    // log.e(mod, fun, error?.message ?? error)
+    sysError(mod, fun, cleanErrMsg(errorToDisplay), getContext(req, options))
+    if (error?.config) logE(mod, fun, cleanErrMsg(error.config))
 
     return errorToDisplay
   } catch (err) {
-    log.e(mod, fun, `Error in errHandler: ${cleanErrMsg(err)}`)
+    logE(mod, fun, `Error in errHandler: ${cleanErrMsg(err)}`)
     return {
       statusCode: 500,
       message: cleanErrMsg(err),
@@ -74,81 +75,70 @@ exports.error = (error, req, options) => {
  * @param {String} objectType The type of the object
  * @param {String} id The UUID of the object
  */
-exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id) => {
-  log.e(mod, 'handleError.' + srcFun)
+export function handleError(req, reply, initialError, errCode, srcFun, objectType, id) {
+  logE(mod, 'handleError.' + srcFun)
   try {
     if (initialError instanceof RudiError) {
       return reply.status(initialError.code).json(initialError)
     }
-    if (isAxiosError(initialError)) return this.treatAxiosError(initialError, reply, mod)
+    if (isAxiosError(initialError)) return treatAxiosError(initialError, mod, reply)
     if (initialError?.response?.data) {
       const statusCode = initialError.response.data.statusCode
       const message = cleanErrMsg(initialError.response.data.message)
       const error = cleanErrMsg(initialError.response.data.error)
-      if (statusCode && message && error)
-        return reply.status(statusCode).json({ statusCode, error, message })
+      if (statusCode && message && error) return reply.status(statusCode).json({ statusCode, error, message })
     }
     if (initialError.statusCode && initialError.message && initialError.error) {
       const statusCode = initialError.statusCode
       const message = cleanErrMsg(initialError.message)
       const error = cleanErrMsg(initialError.error)
-      if (statusCode && message && error)
-        return reply.status(statusCode).json({ statusCode, error, message })
+      if (statusCode && message && error) return reply.status(statusCode).json({ statusCode, error, message })
     }
-    initialError.statusCode =
-      initialError.statusCode || initialError.response?.data?.statusCode || errCode || 500
+    initialError.statusCode = initialError.statusCode ?? initialError.response?.data?.statusCode ?? errCode ?? 500
     const errPayload = {}
     if (srcFun) errPayload.opType = srcFun
     if (id) errPayload.id = `${objectType}+${id}`
-    const finalErr = this.error(initialError, req, errPayload)
-    reply.status(finalErr.statusCode || errCode).json(finalErr.moreInfo || finalErr)
+    const finalErr = formatError(initialError, req, errPayload)
+    reply.status(finalErr.statusCode ?? errCode).json(finalErr.moreInfo ?? finalErr)
   } catch (err) {
     console.error(mod, 'handleError.initialError', cleanErrMsg(initialError))
     console.error(mod, 'handleError failed', cleanErrMsg(err))
   }
 }
 
-const isAxiosError = (err) => err?.name == 'AxiosError'
+const isAxiosError = (err) => err?.name === 'AxiosError'
 
-exports.treatAxiosError = (err, rudiModuleCalled, reply) => {
+export function treatAxiosError(err, rudiModuleCalled, req, reply) {
   const fun = 'treatAxiosError'
-  if (err.response) {
-    const { data, status = '' } = err.response
-    log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
-    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
-  } else {
-    // err.message
-    const { message, status, code } = err
-    log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
-    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
-  }
   let statusCode, error
-  if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+  if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
     statusCode = 503
-    error = {
-      statusCode,
-      message: `La connection de “RUDI Prod Manager” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`,
-    }
-    // log.e(mod,fun,err. )
-    if (reply) return reply.status(statusCode).json(error)
-    else throw new ConnectionError(error.message)
+    const message = `La connection de “${MANAGER}” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`
+    if (reply) return reply.status(statusCode).json({ statusCode, message })
+    throw new ConnectionError(error.message)
   }
+  if (err.code?.startsWith('E')) {
+    statusCode = err.status ?? 400
+    const errData = err.response?.data ?? { statusCode, message: err.message ?? 'Bad Request' }
+    return reply.headerSent || reply.status(err.status ?? 400).json(errData)
+  }
+  reply.headerSent || reply.status(err.code ?? 400).json(err)
 }
 
-exports.expressErrorHandler = (err, req, reply) => {
+export function expressErrorHandler(err, req, reply) {
   const fun = 'expressErrorHandler'
-  log.d(mod, fun)
+  logD(mod, fun)
   const now = new Date()
   // console.error(now, `[Express default error handler]`, err)
   // log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
   const errMsg = cleanErrMsg(err.message)
-  console.error(`An error happened on ${req.method} ${req.url}: ${errMsg}`)
+  console.error(`An error happened on ${req?.method} ${req?.url}: ${errMsg}`)
 
-  if (reply.headersSent) return
+  if (reply?.headersSent) return
 
   // res.status(500)
   // res.render('error', { time: now.getTime(), error: err })
-  log.e(mod, fun + '.uncaught', errMsg)
+  logE(mod, fun + '.uncaught', errMsg)
   reply?.status(500).json({
     error: `An error was thrown, please contact the Admin with the information bellow`,
     message: errMsg,

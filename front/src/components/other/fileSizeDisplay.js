@@ -13,8 +13,7 @@ export default function FileSizeDisplay({ number }) {
    * @return {String} text to display
    */
   function getLabel() {
-    if (!Number.isFinite(number))
-      throw new TypeError(`Expected a finite number, got ${typeof number}: ${number}`)
+    if (!Number.isFinite(number)) throw new TypeError(`Expected a finite number, got ${typeof number}: ${number}`)
 
     const UNITS = BYTE_UNITS
 

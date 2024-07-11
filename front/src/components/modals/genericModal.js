@@ -75,5 +75,5 @@ export const useGenericModalOptions = () => {
    * @return {void}
    */
   const changeOptions = (param) => setOptions(param)
-  return { changeOptions, options }
+  return { options, changeOptions }
 }

@@ -9,7 +9,6 @@ yarn.lock
 logs
 _logs
 
-
 # tests
 coverage
 junit.xml
@@ -27,5 +26,5 @@ env
 .ssh
 .gitconfig
 bak
+*.bak
 _
-

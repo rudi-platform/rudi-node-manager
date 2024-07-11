@@ -1,40 +1,49 @@
-const { hashPassword } = require('@aqmo.org/jwt-lib')
+const mod = 'usrCtrl'
 
-const errorHandler = require('./errorHandler')
-const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
-const {
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { hashPassword } from '@aqmo.org/jwt-lib'
+
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import {
+  dbClose,
   dbCreateUser,
   dbDeleteUserWithId,
   dbDeleteUserWithName,
   dbGetUserByEmail,
   dbGetUserById,
   dbGetUserByUsername,
+  dbGetUserInfoByUsername,
   dbGetUsers,
   dbOpen,
   dbUpdateUser,
   dbUpdateUserRoles,
-  dbClose,
-  dbGetUserInfoByUsername,
-} = require('../database/database')
-const { initPwdSecret } = require('../utils/secu.js')
+} from '../database/database.js'
+import { BadRequestError, ForbiddenError, NotFoundError, RudiError } from '../utils/errors.js'
+import { logW } from '../utils/logger.js'
+import { initPwdSecret } from '../utils/secu.js'
+import { formatError } from './errorHandler.js'
 
 const INIT_PWD = initPwdSecret()
 
-exports.getUsersList = async (req, reply, next) => {
+export async function getUsersList(req, reply, next) {
   try {
     const users = await dbGetUsers()
     return reply.status(200).json(users)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_users' })
+    const error = formatError(err, req, { opType: 'get_users' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'getUsersList', e)
     }
   }
 }
 
-exports.getUserByUsername = async (req, reply, next) => {
+export async function getUserByUsername(req, reply, next) {
   try {
     const { username: name } = req.params
     const userInfo = await dbGetUserByUsername(null, name)
@@ -42,16 +51,16 @@ exports.getUserByUsername = async (req, reply, next) => {
     const { id, username, email, roles } = userInfo
     return reply.status(200).json({ id, username, email, roles })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_user' })
+    const error = formatError(err, req, { opType: 'get_user' })
     try {
-      reply.status(error.statusCode || 500).json(new RudiError(error.message))
+      reply.status(error.statusCode ?? 500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'getUserByUsername', e)
     }
   }
 }
 
-exports.getUserInfoByUsername = async (req, reply, next) => {
+export async function getUserInfoByUsername(req, reply, next) {
   try {
     const { username: name } = req.params
     const userInfo = await dbGetUserInfoByUsername(null, name)
@@ -59,16 +68,16 @@ exports.getUserInfoByUsername = async (req, reply, next) => {
     const { id, username, email, roles } = userInfo
     return reply.status(200).json({ id, username, email, roles })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_user' })
+    const error = formatError(err, req, { opType: 'get_user' })
     try {
-      reply.status(error.statusCode || 500).json(new RudiError(error.message))
+      reply.status(error.statusCode ?? 500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'getUserInfoByUsername', e)
     }
   }
 }
 
-exports.deleteUserWithName = async (req, reply, next) => {
+export async function deleteUserWithName(req, reply, next) {
   try {
     // ONLY ADMIN !
     const { username } = req.params
@@ -82,16 +91,16 @@ exports.deleteUserWithName = async (req, reply, next) => {
     dbClose(db)
     return reply.status(200).json({ message: `User deleted: ${username}` })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'delete_user' })
+    const error = formatError(err, req, { opType: 'delete_user' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'deleteUserWithName', e)
     }
   }
 }
 
-exports.deleteUserWithId = async (req, reply, next) => {
+export async function deleteUserWithId(req, reply, next) {
   try {
     // ONLY ADMIN !
     const { id } = req.params
@@ -101,34 +110,26 @@ exports.deleteUserWithId = async (req, reply, next) => {
     await dbDeleteUserWithId(db, id)
     return reply.status(200).json({ message: `User deleted: ${userInfo?.username}` })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'delete_user' })
+    const error = formatError(err, req, { opType: 'delete_user' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'deleteUserWithId', e)
     }
   }
 }
 
-exports.createUser = async (req, reply) => {
+export async function createUser(req, reply) {
   try {
     const userInfo = req.body
-    // console.log('T (addUser) userInfo', userInfo)
+    // console.trace('T (addUser) userInfo', userInfo)
     const { username, email, password, roles } = userInfo
-    if (!username)
-      return reply
-        .status(400)
-        .json(new BadRequestError('La requête doit comporter un username non null'))
-    if (!email)
-      return reply
-        .status(400)
-        .json(new BadRequestError('La requête doit comporter un email non null'))
-    if (!roles || !Array.isArray(roles) || roles.length == 0)
-      return reply
-        .status(400)
-        .json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
+    if (!username) return reply.status(400).json(new BadRequestError('La requête doit comporter un username non null'))
+    if (!email) return reply.status(400).json(new BadRequestError('La requête doit comporter un email non null'))
+    if (!roles || !Array.isArray(roles) || roles.length === 0)
+      return reply.status(400).json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
 
-    const hashedPassword = hashPassword(password || INIT_PWD)
+    const hashedPassword = hashPassword(password ?? INIT_PWD)
 
     const db = dbOpen()
 
@@ -144,30 +145,28 @@ exports.createUser = async (req, reply) => {
       return reply.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
     }
     const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
-    // console.log('T (createUser) id:', id)
+    // console.trace('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
 
-    const updatedUser = await dbGetUserById(db, id)
+    const updatedUser = await dbGetUserById(db, id) // NOSONAR
     dbClose(db)
     return reply.status(200).json(updatedUser)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'add_user' })
+    const error = formatError(err, req, { opType: 'add_user' })
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'createUser', e)
     }
   }
 }
 
-exports.editUser = async (req, reply, next) => {
+export async function editUser(req, reply, next) {
   try {
     const { id, email, roles } = req.body
     let username = req.body.username
     if ((id !== 0 && !id) || !username || !email || !roles) {
-      return reply
-        .status(400)
-        .json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
+      return reply.status(400).json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
     }
     const db = dbOpen()
     const reqUsername = req?.user?.username
@@ -182,9 +181,7 @@ exports.editUser = async (req, reply, next) => {
     const dbUserSameName = await dbGetUserByUsername(db, username)
     if (dbUserSameName && dbUserSameName.id !== dbUser.id) {
       dbClose(db)
-      return reply
-        .status(403)
-        .json(`Ce nom est déjà utilisé: '${username}' (${dbUserSameName.id} !== ${dbUser.id})`)
+      return reply.status(403).json(`Ce nom est déjà utilisé: '${username}' (${dbUserSameName.id} !== ${dbUser.id})`)
     }
     const dbUserSameMail = await dbGetUserByEmail(db, email)
     if (dbUserSameMail && dbUserSameMail.id !== dbUser.id) {
@@ -197,11 +194,11 @@ exports.editUser = async (req, reply, next) => {
     dbClose(db)
     return reply.status(200).json(updatedUser)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'edit_user' })
+    const error = formatError(err, req, { opType: 'edit_user' })
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      logW(mod, 'editUser', e)
     }
   }
 }

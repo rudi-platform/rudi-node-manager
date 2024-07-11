@@ -1,22 +1,19 @@
 const mod = 'genCtrl'
 
-const log = require('../utils/logger')
-const axios = require('axios')
-const {
-  getRudiApi,
-  getAdminApi,
-  getCompleteRudiApiUrl,
-  getConsoleFormUrl,
-} = require('../config/config')
-const {
-  CONSOLE_TOKEN_NAME,
-  getRudiApiToken,
-  PM_FRONT_TOKEN_NAME,
-  refreshTokens,
-} = require('../utils/secu')
-const { sysWarn, d } = require('../utils/logger')
-const { handleError } = require('./errorHandler')
-const { rudiApiGet } = require('../utils/connect.js')
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import axios from 'axios'
+
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { CATALOG, getCatalogAdminUrl as getCatalogAdminApiUrl } from '../config/config.js'
+
+import { logD, logE, logW } from '../utils/logger.js'
+import { getCatalogHeaders, sendJsonAndTokens } from '../utils/secu.js'
+import { beautify, cleanErrMsg } from '../utils/utils.js'
+import { handleError, treatAxiosError } from './errorHandler.js'
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -35,154 +32,134 @@ const checkObjectType = (req, reply, fun, objectType) => {
   return true
 }
 
-exports.getObjectList = async (req, reply) => {
-  const opType = 'get_objects'
+export async function searchObjects(req, reply) {
+  const opType = 'search_objects'
   const { objectType } = req.params
-  if (!checkObjectType(req, reply, opType, objectType)) return reply.status(404).json('Not found')
-  try {
-    const data = await rudiApiGet(getCompleteRudiApiUrl(getAdminApi(objectType), req))
-    const { consoleToken, pmFrontToken } = refreshTokens(req)
-    return reply
-      .status(200)
-      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
-      .json(data)
-  } catch (err) {
-    handleError(req, reply, err, 501, opType, objectType)
-  }
-}
+  logD(mod, opType + '.params', beautify(req.params))
 
-exports.getObjectById = async (req, reply, next) => {
-  const opType = 'get_object_by_id'
-  const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
-    const rudiObj = await rudiApiGet(getCompleteRudiApiUrl(getAdminApi(objectType, id), req))
-    return reply.status(200).json(rudiObj)
+    const opts = { params: req?.query, ...getCatalogHeaders() }
+    const res = await axios.get(getCatalogAdminApiUrl(objectType, 'search'), opts)
+    return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
-    handleError(req, reply, err, 501, opType, objectType, id)
+    logW(mod, opType, cleanErrMsg(err))
+    logW(mod, opType, err)
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
-exports.postObject = async (req, reply, next) => {
+export async function getObjectList(req, reply) {
+  const opType = 'get_objects'
+  const { objectType } = req.params
+  // logD(mod, opType + '.params', beautify(req.params))
+
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  try {
+    const opts = { params: req?.query, ...getCatalogHeaders() }
+    const res = await axios.get(getCatalogAdminApiUrl(objectType), opts)
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, opType, cleanErrMsg(err))
+    logW(mod, opType, err)
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
+}
+
+export async function getObjectById(req, reply) {
+  const opType = 'get_object_by_id'
+  const { objectType, id } = req.params
+  // log.d(mod, opType + '.params', beautify(req.params))
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  try {
+    const res = await axios.get(getCatalogAdminApiUrl(objectType, id), getCatalogHeaders())
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, opType, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
+}
+
+export async function postObject(req, reply) {
   const opType = 'post_object'
   const { objectType } = req.params
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    if (!checkObjectType(req, reply, opType, objectType)) return
-    let data
-    try {
-      const url = getAdminApi(objectType)
-      const resRudiApi = await axios.post(getRudiApi(url), req.body, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getRudiApiToken()}`,
-        },
-      })
-      data = resRudiApi.data
-    } catch (e) {
-      sysWarn(mod, opType, `ERR ${e.statusCode || ''} Contacting RUDI API failed:`, e.message)
-      throw e
-    }
-
-    const { consoleToken, pmFrontToken } = refreshTokens(req)
-    reply
-      .status(200)
-      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
-      .json(data)
+    const res = await axios.post(getCatalogAdminApiUrl(objectType), req.body, opts)
+    return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
-    const id = req.body[OBJECT_TYPES[objectType].id]
-    handleError(req, reply, err, 501, opType, objectType, id)
+    logW(mod, opType, cleanErrMsg(err.response?.data ?? err))
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
-exports.putObject = async (req, reply) => {
+export async function putObject(req, reply) {
   const opType = 'put_object'
   const { objectType } = req.params
-  d(opType, 'req.params', req.params)
-  d(opType, 'req', req)
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    if (!checkObjectType(req, reply, opType, objectType)) return
-    let data
-    try {
-      const url = getAdminApi(objectType)
-      const resRudiApi = await axios.put(getRudiApi(url), req.body, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getRudiApiToken()}`,
-        },
-      })
-      data = resRudiApi.data
-    } catch (e) {
-      sysWarn(mod, opType, `ERR ${e.statusCode} Contacting RUDI API failed:`, e.message)
-      throw e
-    }
-
-    const { consoleToken, pmFrontToken } = refreshTokens(req)
-    reply
-      .status(200)
-      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
-      .json(data)
-  } catch (error) {
-    const id = req.body[OBJECT_TYPES[objectType].id]
-    handleError(req, reply, error, error.statusCode || 501, opType, objectType, id)
+    const res = await axios.put(getCatalogAdminApiUrl(objectType), req.body, opts)
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, opType, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
-exports.deleteObject = (req, reply, next) => {
-  const fun = 'del_object'
+export async function deleteObject(req, reply) {
+  const opType = 'del_object'
   const { objectType, id } = req.params
-  if (!checkObjectType(req, reply, fun, objectType)) return
-
-  const url = getAdminApi(objectType, id)
-  return axios
-    .delete(getRudiApi(url), {
-      params: req.query,
-      headers: { Authorization: `Bearer ${getRudiApiToken()}` },
-    })
-    .then((resRudiApi) => {
-      const rudiObj = resRudiApi.data
-      reply.status(200).json(rudiObj)
-    })
-    .catch((error) => handleError(req, reply, error, 501, fun, objectType, id))
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = { params: req?.query, ...getCatalogHeaders() }
+  try {
+    const res = await axios.delete(getCatalogAdminApiUrl(objectType, id), opts)
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, opType, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
 }
 
-exports.deleteObjects = (req, reply) => {
-  const fun = 'del_objects'
+export async function deleteObjects(req, reply) {
+  const opType = 'del_objects'
   const { objectType } = req.params
-  if (!checkObjectType(req, reply, fun, objectType)) return
-
-  const url = getAdminApi(objectType)
-  return axios
-    .delete(getRudiApi(url), {
-      params: req.query,
-      headers: { Authorization: `Bearer ${getRudiApiToken()}` },
-    })
-    .then((resRudiApi) => {
-      const rudiObj = resRudiApi.data
-      reply.status(200).json(rudiObj)
-    })
-    .catch((error) => handleError(req, reply, error, 501, fun, objectType))
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = { params: req?.query, ...getCatalogHeaders() }
+  try {
+    const res = await axios.delete(getCatalogAdminApiUrl(objectType), opts)
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, opType, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
 }
 
 const COUNT_BY_LABELS = ['metadata_status', 'theme', 'keywords', 'producer']
-exports.getCounts = async (req, reply) => {
+export async function getCounts(req, reply) {
   const fun = `${mod}.getCounts`
+  let res
   try {
-    const data = await Promise.all(
-      COUNT_BY_LABELS.map((label) =>
-        rudiApiGet(getRudiApi(getAdminApi(`resources?count_by=${label}`)))
-      )
+    res = await Promise.all(
+      COUNT_BY_LABELS.map((label) => {
+        logD(mod, fun, `${label}: ` + getCatalogAdminApiUrl(`resources?count_by=${label}`))
+        return axios.get(getCatalogAdminApiUrl(`resources?count_by=${label}`), getCatalogHeaders())
+      })
     )
-
+  } catch (err) {
+    logW(mod, fun, err)
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
+  try {
     const counts = {}
+    logD(mod, fun, beautify(res.data))
     COUNT_BY_LABELS.forEach((label, i) => {
-      counts[label] = data[i]
+      counts[label] = res[i].data
     })
     reply.status(200).json(counts)
   } catch (err) {
-    log.e(mod, fun, 'Could not get counts')
-    reply.status(500).json({ statusCode: err.statusCode || 500, message: err.message })
+    logE(mod, fun, 'Could not get counts -> ERR ', err)
+    reply.status(500).json({ statusCode: err.statusCode ?? 500, message: err.message })
   }
 }

@@ -4,10 +4,8 @@ import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
-import { BackDataContext } from '../../context/backDataContext'
-import { getPublicUrl } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { mergeStrings } from '../../utils/utils.js'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
 ObjCard.propTypes = {
@@ -41,12 +39,15 @@ export function ObjCard({
   deleteMsg,
   refresh,
 }) {
-  const { appInfo } = useContext(BackDataContext)
-  const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const { changeOptions, toggle } = useContext(ModalContext)
+
+  const getFormObj = (obj, query) => back?.isLoaded && back.getConsole(obj, query)
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
@@ -54,7 +55,6 @@ export function ObjCard({
   const objId = obj[propId]
   const objName = obj[propName]
 
-  const getForm = (obj, query) => mergeStrings('?', getPublicUrl(formUrl, obj), query)
   /**
    * Call for organization deletion
    * @param {*} id Identifier of the object to delete
@@ -87,7 +87,7 @@ export function ObjCard({
               <div className="btn-group" role="group">
                 {!hideEdit && (
                   <a
-                    href={getForm(objType, `update=${objId}`)}
+                    href={getFormObj(objType, `update=${objId}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-warning"
@@ -95,11 +95,7 @@ export function ObjCard({
                     <Pencil />
                   </a>
                 )}
-                <button
-                  type={'button'}
-                  className="btn btn-danger"
-                  onClick={() => triggerDeleteObj(objId)}
-                >
+                <button type={'button'} className="btn btn-danger" onClick={() => triggerDeleteObj(objId)}>
                   <Trash />
                 </button>
               </div>
@@ -112,9 +108,7 @@ export function ObjCard({
               obj[key] && (
                 <p className="card-text" key={`${objId}.${key}`}>
                   {displayFields[key]}&nbsp;:&nbsp;
-                  <small className="text-muted">
-                    {!Array.isArray(obj[key]) ? obj[key] : JSON.stringify(obj[key])}
-                  </small>
+                  <small className="text-muted">{!Array.isArray(obj[key]) ? obj[key] : JSON.stringify(obj[key])}</small>
                 </p>
               )
           )}
@@ -149,16 +143,17 @@ export function EditObjCard({
   deleteMsg,
   refresh,
 }) {
-  const { appInfo } = useContext(BackDataContext)
+  const { backConf } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const getFormObj = (obj, query) => back?.isLoaded && back.getConsole(obj, query)
 
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)
 
-  const getForm = (suffix, query) => mergeStrings('?', getPublicUrl(formUrl, suffix), query)
   /**
    * met a jour le state lors de la modification de l'input de modification de JDD
    * @param {*} event event
@@ -191,7 +186,7 @@ export function EditObjCard({
   const button = {
     edit: (
       <a
-        href={getForm(objType, `update=${editID}`)}
+        href={getFormObj(objType, `update=${editID}`)}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-warning"
@@ -210,12 +205,7 @@ export function EditObjCard({
       <div className="card edit-card-margin">
         <div className="card-body">
           <div className="inline">
-            <a
-              href={getForm(objType)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
+            <a href={getFormObj(objType)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
               {btnTextAdd} <Plus />
             </a>
           </div>

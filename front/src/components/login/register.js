@@ -1,16 +1,16 @@
 import axios from 'axios'
 
-import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
 
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
-import InputGroup from 'react-bootstrap/InputGroup'
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
 
-import './login.css'
+import { BackConfContext } from '../../context/backConfContext.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
+import './login.css'
 
 export const btnColor = 'warning'
 export const btnText = 'Créer un compte'
@@ -34,16 +34,19 @@ Register.propTypes = {
  * @return {ReactNode} Register html component
  */
 export default function Register({ backToLogin }) {
-  const { defaultErrorHandler } = useDefaultErrorHandler()
+  const { backConf } = useContext(BackConfContext)
 
-  const [username, setUserName] = useState('')
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const [isPwdShown, setPasswordShown] = useState(false)
-  const togglePwdVisibility = () => setPasswordShown(!isPwdShown)
-  const stateType = () => (isPwdShown ? 'text' : 'password')
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const togglePwdVisibility = () => setIsPasswordShown(!isPasswordShown)
+  const stateType = () => (isPasswordShown ? 'text' : 'password')
 
   const { toggle, visible } = useGenericModal()
   const { options, changeOptions } = useGenericModalOptions()
@@ -60,42 +63,29 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const registerUser = (credentials) =>
-    axios.post(`api/front/register`, JSON.stringify(credentials), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    back?.isLoaded &&
+    axios.post(back.getBackFront('register'), JSON.stringify(credentials), {
+      headers: { 'Content-Type': 'application/json' },
     })
 
+  const displayMsgForAccountCreated = () => {
+    changeOptions({
+      text: ['Contactez l‘administrateur pour la validation de votre compte'],
+      title: 'Action Validée',
+      type: 'success',
+      buttons: [{ text: 'Connexion', action: () => backToLogin() }],
+    })
+    toggle()
+  }
   /**
    * handle submit Register form
    * @param {*} event
    */
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault()
-    registerUser({
-      username,
-      email,
-      password,
-      confirmPassword,
-    })
-      .then((res) => {
-        changeOptions({
-          text: [`L'utilisateur '${username}' a bien été créé.`],
-          title: 'Action Validée',
-          type: 'success',
-          buttons: [
-            {
-              text: 'Connexion',
-              action: () => backToLogin(),
-            },
-          ],
-        })
-        toggle()
-      })
-      .catch((err) => {
-        toggle()
-        defaultErrorHandler(err)
-      })
+    registerUser({ username, email, password, confirmPassword })
+      .then(displayMsgForAccountCreated)
+      .catch(displayMsgForAccountCreated)
   }
 
   const formGroup = (id, label, val, type, onChangeMethod, autoCompl, hasFocus) => {
@@ -128,7 +118,7 @@ export default function Register({ backToLogin }) {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button variant="warning" id={`button-${id}`} onClick={togglePwdVisibility}>
-              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+              {isPasswordShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
             </Button>
           </InputGroup>
         </Form.Group>
@@ -138,14 +128,9 @@ export default function Register({ backToLogin }) {
 
   return (
     <div className="Login">
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
-        {formGroup('username', 'Nom', username, 'text', setUserName, 'username', true)}
+        {formGroup('username', 'Nom', username, 'text', setUsername, 'username', true)}
         {formGroup('email', 'E-mail', email, 'text', setEmail, 'email')}
         {inputPassword('pwd', 'Mot de passe', password, setPassword)}
         {inputPassword('pwd2', 'Confirmation du mot de passe', confirmPassword, setConfirmPassword)}

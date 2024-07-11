@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use strict'
 
 /**
@@ -13,7 +12,7 @@ const material_icons_font = new FontFace('Material Icons', 'url(./font/material_
 document.fonts.add(material_icons_font)
 
 function createStyleElement(...styles) {
-  let style = document.createElement('style')
+  const style = document.createElement('style')
   style.textContent = styles.join('')
   return style
 }
@@ -1039,7 +1038,7 @@ let mapStyle = `
 }
 `
 /** A mixin for element with list of focusable options */
-export let ListMixin = (superclass) =>
+export const ListMixin = (superclass) =>
   class extends superclass {
     constructor(...args) {
       super(...args)
@@ -1179,7 +1178,7 @@ export let ListMixin = (superclass) =>
   }
 
 /** A mixin for element with list of selectable options */
-export let SelectListMixin = (superclass) =>
+export const SelectListMixin = (superclass) =>
   class extends ListMixin(superclass) {
     constructor(...args) {
       super(...args)
@@ -1209,11 +1208,11 @@ export let SelectListMixin = (superclass) =>
           this.focusElement(this.optionById.get(this.getId(findValue)))
         }
 
-        if (event.key == 'Backspace') {
+        if (event.key === 'Backspace') {
           this.searchText = undefined
           this.focusElement(this.optionById.get(''))
           event.preventDefault()
-        } else if (event.key == 'Enter') {
+        } else if (event.key === 'Enter') {
           event.stopPropagation()
           this.showList()
         }
@@ -1222,7 +1221,7 @@ export let SelectListMixin = (superclass) =>
 
     /** @inheritdoc */
     showList() {
-      // console.trace('show SelectMixin');
+      // console.trace('T show SelectMixin');
       if (!this.focusedElement && !this.focusNext()) return false
       super.showList()
       this.focusedElement.focus()
@@ -1258,7 +1257,7 @@ export let SelectListMixin = (superclass) =>
       // Read newOptions to fill option wrapper
       if (Array.isArray(newOptions)) {
         for (let opt of newOptions) {
-          if (typeof opt == 'object') {
+          if (typeof opt === 'object') {
             this.optionById.set(this.getId(opt.value), addToOption(opt.value, opt.name))
           } else this.optionById.set(this.getId(opt), addToOption(opt, opt))
         }
@@ -1291,7 +1290,7 @@ export let SelectListMixin = (superclass) =>
       }
 
       option.addEventListener('keyup', (event) => {
-        if (event.key == 'Enter') {
+        if (event.key === 'Enter') {
           this.select(option)
           event.stopPropagation()
         }
@@ -1305,7 +1304,7 @@ export let SelectListMixin = (superclass) =>
      * Should always return the same id for the same value
      */
     getId(value) {
-      return typeof value == 'object' ? JSON.stringify(value) : value
+      return typeof value === 'object' ? JSON.stringify(value) : value
     }
 
     /** Return the option div with the given value */
@@ -1321,8 +1320,7 @@ export let SelectListMixin = (superclass) =>
     hide(value) {
       let option = this.getOption(value)
       option.toggleAttribute('hidden', true)
-      if (option == this.focusedElement)
-        this.focusedElement = this.focusNext() || this.focusPrevious()
+      if (option === this.focusedElement) this.focusedElement = this.focusNext() ?? this.focusPrevious()
     }
 
     show(value) {
@@ -1335,7 +1333,7 @@ export let SelectListMixin = (superclass) =>
      * @return the dom element selected
      */
     select(option) {
-      let selectedOption = typeof option == 'string' ? this.getOption(option) : option
+      let selectedOption = typeof option === 'string' ? this.getOption(option) : option
 
       // Reset search
       this.searchText = undefined
@@ -1364,7 +1362,7 @@ export let SelectListMixin = (superclass) =>
     }
   }
 
-export let ActionMixin = (superclass) =>
+export const ActionMixin = (superclass) =>
   class extends superclass {
     constructor(action, ...args) {
       super(...args)
@@ -1417,7 +1415,7 @@ export class ActionIcon extends HTMLElement {
     this.shadowRoot.appendChild(this.icon)
 
     this.addEventListener('keyup', (e) => {
-      if (e.key == 'Enter') {
+      if (e.key === 'Enter') {
         e.stopImmediatePropagation()
         this.click()
       }
@@ -1432,7 +1430,7 @@ export class ActionIcon extends HTMLElement {
   /** @inheritdoc  */
   addEventListener(type, listener, ...rest) {
     let customListener =
-      type == 'click'
+      type === 'click'
         ? (event, ...other) => {
             if (this.attributes.disabled || this.attributes.readonly) return
             event.stopPropagation()
@@ -1449,11 +1447,7 @@ export class ActionIcon extends HTMLElement {
    */
   #updateFocusable(noFocus) {
     if (noFocus) this.icon.toggleAttribute('tabindex', false)
-    else if (
-      !this.hasAttribute('readonly') &&
-      !this.hasAttribute('disabled') &&
-      !this.hasAttribute('tabindex')
-    ) {
+    else if (!this.hasAttribute('readonly') && !this.hasAttribute('disabled') && !this.hasAttribute('tabindex')) {
       this.icon.setAttribute('tabindex', 0)
     }
   }
@@ -1524,9 +1518,7 @@ export class MatFormElement extends HTMLElement {
     })
 
     // Append elements
-    this.shadowRoot.appendChild(
-      createStyleElement(theme, iconStyle, matFormElementStyle, ...styles)
-    )
+    this.shadowRoot.appendChild(createStyleElement(theme, iconStyle, matFormElementStyle, ...styles))
     this.shadowRoot.appendChild(this.wrapper)
   }
 
@@ -1612,7 +1604,7 @@ export class BaseTextInput extends BaseInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.value = newValue || ''
+    this.input.value = newValue ?? ''
   }
   get value() {
     return this.input.value
@@ -1654,19 +1646,18 @@ export class TextInput extends BaseTextInput {
   }
 
   #setValidation(name) {
-    if (name == 'email') this.#validationHandler = this.#emailValidation
+    if (name === 'email') this.#validationHandler = this.#emailValidation
     else this.#validationHandler = undefined
   }
 
   #emailValidation() {
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.input.value))
-      this.setAttribute('error', 'Email invalide')
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.input.value)) this.setAttribute('error', 'Email invalide')
     else this.toggleAttribute('error', false)
   }
 
   // Lifecycle
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name == 'validation') this.#setValidation(newValue)
+    if (name === 'validation') this.#setValidation(newValue)
     else super.attributeChangedCallback(name, oldValue, newValue)
   }
 
@@ -1690,7 +1681,8 @@ export class NumberInput extends BaseTextInput {
 export class DateInput extends BaseTextInput {
   constructor(...styles) {
     super(dateStyle, ...styles)
-    this.input.setAttribute('type', 'date')
+    this.input.setAttribute('type', 'datetime-local')
+    this.input.setAttribute('step', '1')
     this.iconBefore.textContent = 'event'
     this.input.addEventListener('blur', () => {
       this.value = this.input.value
@@ -1699,7 +1691,16 @@ export class DateInput extends BaseTextInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.value = newValue?.substring(0, 10) || ''
+    const fun = 'MaterialInputs.DateInput'
+    try {
+      if (!newValue) return
+      const newDate = new Date(newValue).toISOString().replace('Z', '')
+      if (newDate.length > 19 && !newDate.endsWith('.000')) this.input.setAttribute('step', '.001')
+      this.input.value = newDate
+    } catch (e) {
+      console.debug(`T [${fun}] Value couldn't be handled as a date:`, newValue)
+      console.error(`E [${fun}]`, e)
+    }
   }
   get value() {
     return super.value
@@ -1903,7 +1904,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
       let inRange = dataDiv.name.toLowerCase().startsWith(this.input.value.toLowerCase())
       dataDiv.toggleAttribute('show', inRange)
       if (inRange) {
-        if (count == 0) firstElement = dataDiv
+        if (count === 0) firstElement = dataDiv
         count++
       }
     }
@@ -1929,9 +1930,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
 
   /** @inheritdoc */
   focusNext() {
-    let nextFocused = this.focusedElement
-      ? this.focusedElement.nextElementSibling
-      : this.listWrapper.firstElementChild
+    let nextFocused = this.focusedElement ? this.focusedElement.nextElementSibling : this.listWrapper.firstElementChild
 
     while (nextFocused && !nextFocused.hasAttribute('show')) {
       nextFocused = nextFocused.nextElementSibling
@@ -1962,18 +1961,9 @@ export class DataListInput extends ListMixin(BaseTextInput) {
 
     // Scrolling
     let twoOffsetHeight = 2 * this.focusedElement.offsetHeight
-    if (
-      this.focusedElement.offsetTop + twoOffsetHeight >
-      this.listWrapper.offsetHeight + this.listWrapper.scrollTop
-    ) {
-      this.listWrapper.scroll(
-        0,
-        this.focusedElement.offsetTop - this.listWrapper.offsetHeight + twoOffsetHeight
-      )
-    } else if (
-      this.focusedElement.offsetTop - this.focusedElement.offsetHeight <
-      this.listWrapper.scrollTop
-    ) {
+    if (this.focusedElement.offsetTop + twoOffsetHeight > this.listWrapper.offsetHeight + this.listWrapper.scrollTop) {
+      this.listWrapper.scroll(0, this.focusedElement.offsetTop - this.listWrapper.offsetHeight + twoOffsetHeight)
+    } else if (this.focusedElement.offsetTop - this.focusedElement.offsetHeight < this.listWrapper.scrollTop) {
       this.listWrapper.scroll(0, this.focusedElement.offsetTop - this.focusedElement.offsetHeight)
     }
     return this.focusedElement
@@ -2000,7 +1990,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
     // Read newOptions to fill option wrapper
     if (Array.isArray(newDataList)) {
       for (let data of newDataList) {
-        if (typeof data == 'object') {
+        if (typeof data === 'object') {
           this.dataById.set(data.value, addToData(data.value, data.name))
         } else this.dataById.set(data, addToData(data, data))
       }
@@ -2189,7 +2179,7 @@ export class BaseCardsBlock extends BaseInput {
     return function* () {
       let children = [...this.children]
       for (let card of children) {
-        if (card.slot == 'display') yield card
+        if (card.slot === 'display') yield card
       }
     }
   }
@@ -2346,7 +2336,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
     this.currentTab = this.tabsWrapper.firstChild
     this.currentTab.toggleAttribute('selected', true)
     // this.currentTab.setAttribute('tabindex', 1);
-    this.textarea.value = this.currentTab.text || ''
+    this.textarea.value = this.currentTab.text ?? ''
     this.dispatchEvent(new Event('change'))
   }
 
@@ -2397,7 +2387,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
 
   removeTab(tab) {
     if (!tab) return
-    if (tab == this.currentTab) this.currentTab = this.tabNext() || this.tabPrevious()
+    if (tab === this.currentTab) this.currentTab = this.tabNext() ?? this.tabPrevious()
     tab.remove()
     this.action.show(tab.tabValue)
     if (!this.currentTab) {
@@ -2414,7 +2404,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
   }
 
   tabTo(tab) {
-    if (!tab || tab == this.currentTab) return
+    if (!tab || tab === this.currentTab) return
     if (this.currentTab) {
       this.currentTab.toggleAttribute('selected', false)
       // this.currentTab.setAttribute('tabindex', -1);
@@ -2424,7 +2414,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
     this.currentTab.toggleAttribute('selected', true)
     // this.currentTab.setAttribute('tabindex', 1);
     this.currentTab.focus()
-    this.textarea.value = this.currentTab.text || ''
+    this.textarea.value = this.currentTab.text ?? ''
 
     // Scrolling
     let scrollZone = 0.2 * this.tabsWrapper.offsetWidth
@@ -2503,17 +2493,17 @@ export class FileCard extends ActionCard {
   set value(file) {
     if (file instanceof ForeignFile) this.toggleAttribute('cornered', true)
     else if (!(file instanceof File))
-      throw new SetValueError(
-        this,
-        file,
-        new TypeError('Value should be a File or ForeignFile instance')
-      )
+      throw new SetValueError(this, file, new TypeError('Value should be a File or ForeignFile instance'))
+    console.debug('T [MatIn.FileCard]', 'file.size', file.size)
     this.#value = file
     this.name.textContent = file?.name
     this.type.textContent = file?.type
-    this.size.textContent = file?.size ? this.humanReadableByteCountSI(file.size) : ''
-    if (file.file_storage_status === 'missing')
-      this.size.innerHTML = "<span class='alert'>indisponible</span>"
+    if (file.size) {
+      this.size.textContent = this.humanReadableByteCountSI(file.size)
+      if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"
+    } else {
+      this.size.innerHTML = "<span class='alert'>0 Ko!!!</span>"
+    }
   }
 
   get value() {
@@ -2664,8 +2654,7 @@ export class MapInput extends BaseInput {
 
     this.map = L.map(this.map, { scrollWheelZoom: false })
     L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="http://osm.org/copyright" tabindex="-1">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="http://osm.org/copyright" tabindex="-1">OpenStreetMap</a> contributors',
     }).addTo(this.map)
 
     // Initialise the FeatureGroup to store editable layers
@@ -2743,10 +2732,12 @@ export class MapInput extends BaseInput {
     this.currentLayer = undefined
 
     if (geography) {
-      geography.geographic_distribution.properties =
-        geography.geographic_distribution.properties || {}
-      let geoJsonLayers = L.geoJson(geography.geographic_distribution)
+      // console.log('T [MapInput] geography:', geography)
+      geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
+      const geoJsonLayers = L.geoJson(geography.geographic_distribution)
+      // console.log('T [MapInput] geoJsonLayers :', geoJsonLayers)
       this.currentLayer = geoJsonLayers.getLayers()[0]
+      // console.log('T [MapInput] this.currentLayer :', this.currentLayer)
       this.drawnItems.addLayer(this.currentLayer)
     }
 
@@ -2756,15 +2747,27 @@ export class MapInput extends BaseInput {
 
   get value() {
     if (!this.currentLayer) return undefined
-
-    let bounds = this.currentLayer.getBounds()
-    return {
-      bounding_box: {
+    let bounding_box
+    if (typeof this.currentLayer.getBounds === 'function') {
+      const bounds = this.currentLayer.getBounds()
+      bounding_box = {
         west_longitude: bounds._southWest.lng,
         east_longitude: bounds._northEast.lng,
         north_latitude: bounds._northEast.lat,
         south_latitude: bounds._southWest.lat,
-      },
+      }
+    } else if (typeof this.currentLayer.getLatLng()) {
+      const latLng = this.currentLayer.getLatLng()
+      bounding_box = {
+        west_longitude: latLng.lng,
+        east_longitude: latLng.lng,
+        north_latitude: latLng.lat,
+        south_latitude: latLng.lat,
+      }
+    }
+
+    return {
+      bounding_box,
       geographic_distribution: this.currentLayer.toGeoJSON(),
       projection: 'WGS 84',
     }
@@ -2818,9 +2821,9 @@ export class MapInput extends BaseInput {
   // Lifecycle
   connectedCallback() {
     this.appendChild(this.map._container)
-    let lat = this.getAttribute('lat') || 0
-    let lng = this.getAttribute('lng') || 0
-    let zoom = this.getAttribute('zoom') || 2
+    let lat = this.getAttribute('lat') ?? 0
+    let lng = this.getAttribute('lng') ?? 0
+    let zoom = this.getAttribute('zoom') ?? 2
 
     // Hack to Wait for childrens to be connected
     setTimeout(() => {
@@ -2829,10 +2832,7 @@ export class MapInput extends BaseInput {
     })
 
     // Remove tabindex on a element
-    this.map._controlContainer.lastElementChild.lastElementChild.firstElementChild.setAttribute(
-      'tabindex',
-      -1
-    )
+    this.map._controlContainer.lastElementChild.lastElementChild.firstElementChild.setAttribute('tabindex', -1)
     this.fullScreenBtn.setAttribute('tabindex', -1)
     let control = this.map._controlContainer.firstElementChild.children[0].children
     for (let c of control) c.setAttribute('tabindex', -1)
@@ -2863,11 +2863,24 @@ export class MapInput extends BaseInput {
 }
 
 /** Represent a foreign file for the file input */
+function normalyseType(type) {
+  if (type === 'application/x-yaml') return 'text/x-yaml'
+  if (type === 'text/x-markdown') return 'text/markdown'
+  return [
+    'application/zip-compressed',
+    'application/x-zip-compressed',
+    'application/x-zip',
+    'multipart/x-zip',
+  ].includes(type)
+    ? 'application/zip'
+    : type
+}
+
 export class ForeignFile {
   constructor(name, size, type, file_storage_status) {
     this.name = name
     this.size = size
-    this.type = type
+    this.type = normalyseType(type)
     this.file_storage_status = file_storage_status
   }
 }

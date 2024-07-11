@@ -9,7 +9,7 @@ import { ActionMixin, BaseCardsBlock, SetValueError } from '../lib/MaterialInput
 
 import { HttpRequest, JsonHttpRequest } from './Http.js'
 import OverlayManager from './OverlayManager.js'
-import { getCookie, pathJoin } from './utils.js'
+import { fetchConf, getCookie, pathJoin } from './utils.js'
 
 export const STYLE_ERR = 'banner-error'
 export const STYLE_WRN = 'banner-warning'
@@ -30,10 +30,8 @@ function keepNotInTemplate(template, outputValue, originalValue) {
   if (!originalValue || !template || originalValue instanceof Array) return
   else if (originalValue instanceof Object) {
     for (let key in originalValue) {
-      if (!Object.hasOwn(outputValue, key) && !Object.hasOwn(template, key))
-        outputValue[key] = originalValue[key]
-      else if (outputValue instanceof Object)
-        keepNotInTemplate(template[key], outputValue[key], originalValue[key])
+      if (!Object.hasOwn(outputValue, key) && !Object.hasOwn(template, key)) outputValue[key] = originalValue[key]
+      else if (outputValue instanceof Object) keepNotInTemplate(template[key], outputValue[key], originalValue[key])
     }
   }
 }
@@ -66,102 +64,87 @@ export class RudiForm {
       throw new Error(error_msg, { cause: err })
     }
   }
+  // getConf = (param) => {
+  //   if (!this.conf)
+  //     throw new Error('Configuration has not been defined yet, please call init() beforehand')
+  //   if (this.conf?.[param] !== undefined) return this.conf[param]
+  //   const errMsg = `[Rudi/getConf] Configuration not found for '${param}'`
+  //   if (this.isDev) console.warn(errMsg)
+  //   throw new Error(errMsg)
+  // }
 
-  getConf = (param) => {
-    if (!this.conf)
-      throw new Error('Configuration has not been defined yet, please call init() beforehand')
-    if (this.conf?.[param] !== undefined) return this.conf[param]
-    const errMsg = `[Rudi/getConf] Configuration not found for '${param}'`
-    if (this.isDev) console.warn(errMsg)
-    throw new Error(errMsg)
-  }
+  // get isDev() {
+  //   return this.conf?.dev || this.conf?.env == 'dev'
+  // }
 
-  get isDev() {
-    return this.conf?.dev || this.conf?.env == 'dev'
-  }
-
-  init = async () => {
-    const here = 'init'
-    // this.conf = await this.importJSON('./conf', 'No config')
-    // this.ok(here, 'conf')
-    // this.ok(here, 'isDev:', this.isDev)
-    const lexR = await this.importJSON('./js/LexicalResources.json', 'No lexical resources')
-    this.lexR = lexR[this.language]
-    this.ok(here, 'lexR')
-
-    this.ok(here, 'pmUrl:', this.pmUrl)
-    this._initPmHeaders()
-    this.ok(here, 'pmHeaders')
-
-    await this._initNodeUrls()
-    this._initForm()
-    this.initialized = true
-  }
-
-  async _initNodeUrls() {
+  async initNodeUrls() {
     const here = 'initNodeUrls'
     try {
       if (this.state == 'fail') throw new Error(`Aborting (${here})`)
       this.ok(here)
-      if (!this._nodeUrls) {
-        this._nodeUrls = await this.getPmJson('front/node-urls')
-      }
-      this.ok(
+
+      this.conf = await fetchConf()
+      this.hostUrl = this.conf.hostUrl
+      this.backPath = this.conf.backPath
+      this.consolePath = this.conf.consolePath
+      this.storageUrl = this.conf.storagePubUrl
+      this.catalogUrl = this.conf.catalogPubUrl
+      console.debug(
         here,
-        `\n   - consoleUrl: ${this.formUrl}`,
-        `\n   - mediaUrl: ${this.mediaUrl}`,
-        `\n   - apiUrl:${this.apiUrl}`
+        `\n   - backPath: ${this.backPath}`,
+        `\n   - consolePath: ${this.consolePath}`,
+        `\n   - storageUrl: ${this.storageUrl}`,
+        `\n   - catalogUrl: ${this.catalogUrl}`
       )
-      return this._nodeUrls
+      this.isDev = this.conf.is_dev == 'development'
     } catch (err) {
       this.ko(here, err)
-      console.error(
-        `Prod manager ne peut être joint à l'adresse: ${this.getUrlPm('front/node-urls')}`
-      )
+      console.error(`La conf n'a pas été trouvée à l'adresse: ${'/conf'}`, err)
       return this.fail('reach_pm')
     }
   }
-  get nodeUrls() {
-    if (!this._nodeUrls) this._initNodeUrls()
-    return this._nodeUrls
-  }
-  get formUrl() {
-    return this.nodeUrls?.console_url
-  }
-  get mediaUrl() {
-    return this.nodeUrls?.media_url
-  }
-  get apiUrl() {
-    return this.nodeUrls?.api_url
+
+  async init() {
+    const here = 'init'
+    const lexR = await this.importJSON('./js/LexicalResources.json', 'No lexical resources')
+    this.lexR = lexR[this.language]
+    this.ok(here, 'lexR')
+
+    await this.initNodeUrls()
+    this.ok(here, 'node urls:', this.conf)
+
+    this.ok(here, 'backPath:', this.backPath)
+    this._initPmHeaders()
+    this.ok(here, 'pmHeaders')
+
+    this._initForm()
+    this.initialized = true
   }
 
-  _baseUrl = ''
-  get baseUrl() {
-    if (!this._baseUrl) this._baseUrl = document.baseURI.split('/form/')[0]
-    return this._baseUrl
-  }
-  formUrl = pathJoin(this.baseUrl, 'form')
-  pmUrl = pathJoin(this.baseUrl, 'api')
+  getUrlBack = (...args) => pathJoin(this.backPath, ...args)
+  getUrlLocal = (...args) => pathJoin(this.consolePath, ...args)
+  getUrlStorage = (...args) => pathJoin(this.storageUrl, ...args)
 
-  getUrlPm = (...args) => pathJoin(this.pmUrl, ...args)
-  getUrlLocal = (...args) => pathJoin(this.formUrl, ...args)
-  getUrlMedia = (...args) => pathJoin(this.mediaUrl, ...args)
+  getUrlBackCatalog = (...args) => this.getUrlBack('catalog', ...args)
+  getUrlBackStorage = (...args) => this.getUrlBack('storage', ...args)
 
   async _getPm(isJson, ...urlBits) {
     const here = 'getPm'
-    if (!this.pmUrl) throw new Error('Init PM URL first')
+    if (!this.backPath) throw new Error('Init PM URL first')
+    // console.log('backPath:', this.backPath)
     if (this.state == 'fail') throw new Error(`Aborting (${here})`)
+    const url = this.getUrlBack(...urlBits)
+    // console.log('url:', url)
     try {
-      return await (isJson ? JsonHttpRequest : HttpRequest)
-        .get(this.getUrlPm(...urlBits), this.pmHeaders)
-        .send()
+      return await (isJson ? JsonHttpRequest : HttpRequest).get(url, this.pmHeaders).send()
     } catch {
-      console.error(`Prod manager ne peut être joint à l'adresse: ${this.getUrlPm(...urlBits)}`)
+      console.error(`Prod manager ne peut être joint à l'adresse: ${url}`)
       return this.fail('reach_pm')
     }
   }
 
   getPmJson = async (...urlBits) => await this._getPm(true, ...urlBits)
+  getCatalogData = async (...urlBits) => await this._getPm(true, 'catalog', ...urlBits)
   getPmStr = async (...urlBits) => await this._getPm(false, ...urlBits)
   getLocal = async (...urlBits) => {
     try {
@@ -239,19 +222,13 @@ export class RudiForm {
   addHeaderActions() {
     this.headerActions = this.customForm.htmlController.header_actions
 
-    const showBtn = icon_flat_btn('code', this.lexR['btn/show_value'], () =>
-      this.showResultOverlay()
-    )
+    const showBtn = icon_flat_btn('code', this.lexR['btn/show_value'], () => this.showResultOverlay())
     this.headerActions.appendChild(showBtn)
 
-    const reduceBtn = icon_flat_btn('keyboard_arrow_down', this.lexR['btn/show_required'], () =>
-      this.reduce()
-    )
+    const reduceBtn = icon_flat_btn('keyboard_arrow_down', this.lexR['btn/show_required'], () => this.reduce())
     this.headerActions.appendChild(reduceBtn)
 
-    const showDisabledBtn = icon_flat_btn('visibility_off', this.lexR['btn/show_disabled'], () =>
-      this.showDisabled()
-    )
+    const showDisabledBtn = icon_flat_btn('visibility_off', this.lexR['btn/show_disabled'], () => this.showDisabled())
     this.headerActions.appendChild(showDisabledBtn)
 
     const clearBtn = icon_flat_btn('delete', this.lexR['btn/clear_form'], () => this.clear())
@@ -283,15 +260,16 @@ export class RudiForm {
     try {
       if (updateId) {
         this.state = 'edit/fetch'
-        value = await this.getPmJson(pathJoin('data', objType, updateId))
+        value = await this.getCatalogData(objType, updateId)
         this.edit(value)
       } else if (readOnlyId) {
         this.state = 'readonly/fetch'
-        value = await this.getPmJson(pathJoin('data', objType, readOnlyId))
+        value = await this.getCatalogData(objType, readOnlyId)
         this.customForm.readOnly()
         this.setValue(value)
-      } else if (this.isDev) console.log(`T [${here}] Creating a new metadata`)
-      this.ok(here)
+      } else {
+        this.customForm?.htmlController?.organization_id?.toggleAttribute('disabled')
+      }
     } catch (e) {
       this.ko(here)
       console.error(`E [${here}]`, e)
@@ -305,10 +283,9 @@ export class RudiForm {
     if (!this.template) return
     propagateAttribute(this.template.htmlJsonTemplate)
 
-    let fragmentSets = [
-      this.template?.fragmentSet?.[this.language],
-      this.template?.fragmentSet?.enums,
-    ].filter((v) => v != undefined)
+    let fragmentSets = [this.template?.fragmentSet?.[this.language], this.template?.fragmentSet?.enums].filter(
+      (v) => v != undefined
+    )
     this.customForm.setTemplate(this.template, fragmentSets?.length ? fragmentSets : undefined)
     this.actions = this.addHeaderActions()
     this.state = 'create'
@@ -349,14 +326,7 @@ export class RudiForm {
       else if (Symbol.iterator in Object(e)) {
         for (const err of e) {
           if (err instanceof SetValueError) {
-            console.error(
-              'Error :',
-              err.message,
-              '\nwith value : ',
-              err.value,
-              '\nin field :',
-              err.target
-            )
+            console.error('Error :', err.message, '\nwith value : ', err.value, '\nin field :', err.target)
             err.target.setAttribute('error', 'Error with value: ' + JSON.stringify(err.value))
           } else {
             console.error(err)
@@ -386,8 +356,7 @@ export class RudiForm {
       console.error('getValue', e)
       throw new Error('Error in parseUserInput', { cause: e })
     }
-    if (this.originalValue && keep)
-      keepNotInTemplate(this.customForm.submitTemplate, parsedValue, this.originalValue)
+    if (this.originalValue && keep) keepNotInTemplate(this.customForm.submitTemplate, parsedValue, this.originalValue)
     return parsedValue
   }
 
@@ -495,18 +464,14 @@ export class RudiForm {
         return this.msgNode
       }
       if (this.state == 'fail' || this.state == 'critic') {
-        console.error(
-          'ERR11 already failed before this, will not display new error message:',
-          message
-        )
+        console.error('ERR11 already failed before this, will not display new error message:', message)
         return this.msgNode
       }
       if (style == STYLE_ERR) console.error(`E [${here}] An error occurred:`, message)
       else console.log('Action:', message)
 
       // else console.debug(message);
-      if (style != STYLE_ERR)
-        this.msgNode.innerHTML = !style ? message : `<span class="${style}">${message}</span>`
+      if (style != STYLE_ERR) this.msgNode.innerHTML = !style ? message : `<span class="${style}">${message}</span>`
       else this.msgNode.innerHTML += `<br/><span class="${style}">${message}</span>`
       return this.msgNode
     } catch (err) {
@@ -522,10 +487,7 @@ export class RudiForm {
       return this.msgNode
     }
     if (this.state == 'fail' || this.state == 'critic') {
-      console.error(
-        'ERR11 already failed before this, will not display new error message:',
-        message
-      )
+      console.error('ERR11 already failed before this, will not display new error message:', message)
       return this.msgNode
     }
     console.error(`E [${here}] An error occurred:`, message)
@@ -546,7 +508,7 @@ export class RudiForm {
 
   fail(state = this.state, cleanPreviousMessages = false) {
     this.customForm.textContent = ''
-    let message = this.lexR[state + '/fail'] || state
+    let message = this.lexR[state + '/fail'] ?? state
     this.addErrorMsg(message, cleanPreviousMessages) // .scrollIntoView({ block: 'center' });
     this.state = 'fail'
   }
@@ -562,8 +524,7 @@ export class RudiForm {
  * @param {Object|Array} htmlJsonTemplate
  */
 export function propagateAttribute(htmlJsonTemplate) {
-  if (htmlJsonTemplate instanceof Array)
-    for (let child of htmlJsonTemplate) propagateRecursively(child)
+  if (htmlJsonTemplate instanceof Array) for (let child of htmlJsonTemplate) propagateRecursively(child)
   else propagateRecursively(htmlJsonTemplate)
 }
 

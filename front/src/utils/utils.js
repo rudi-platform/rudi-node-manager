@@ -14,9 +14,7 @@ export const mergeStrings = (sep, ...args) => {
     if (args[i] === undefined || args[i] === null) break
     const newChunk = `${args[i]}`
     const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
-    accumulatedStr = accumulatedStr.endsWith(sep)
-      ? accumulatedStr + cleanChunk
-      : accumulatedStr + sep + cleanChunk
+    accumulatedStr = accumulatedStr.endsWith(sep) ? accumulatedStr + cleanChunk : accumulatedStr + sep + cleanChunk
   }
   return accumulatedStr
 }
@@ -64,3 +62,13 @@ export const getCookie = (name) =>
     ?.split('; ')
     ?.find((row) => row.startsWith(`${name}`))
     ?.split('=')[1]
+
+export function convertEncoding(data, fromEncoding = 'base64url', toEncoding = 'utf-8') {
+  try {
+    return Buffer.from(data, fromEncoding).toString(toEncoding)
+  } catch (err) {
+    console.error('[convertEncoding] ERR', err)
+    return ''
+  }
+}
+export const decodeBase64url = (data) => atob(data, 'base64url', 'utf-8')

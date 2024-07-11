@@ -16,16 +16,13 @@ const mergeStrings = (sep, ...args) => {
     if (args[i] === undefined || args[i] === null) break
     const newChunk = `${args[i]}`
     const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
-    accumulatedStr = accumulatedStr.endsWith(sep)
-      ? accumulatedStr + cleanChunk
-      : accumulatedStr + sep + cleanChunk
+    accumulatedStr = accumulatedStr.endsWith(sep) ? accumulatedStr + cleanChunk : accumulatedStr + sep + cleanChunk
   }
   return accumulatedStr
 }
 export const pathJoin = (...args) => mergeStrings('/', ...args)
 
-export const lastElementOfArray = (anArray) =>
-  !Array.isArray(anArray) ? null : anArray[anArray.length - 1]
+export const lastElementOfArray = (anArray) => anArray.slice(-1)[0]
 
 /**
  * Get the extension of a file name
@@ -121,13 +118,39 @@ export const checkCookieExp = (cookieStr) => {
 
 export const nowEpochS = () => Math.floor(new Date().getTime() / 1000)
 
-export const padEndModulo = (str, base, padSign) => {
-  const modulo = str.length % base
-  return modulo === 0
-    ? str
-    : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1) || '=')
+export const dateISO = (date) => new Date(date).toISOString()
+
+const pad = (number, length = 2) => String(number).padStart(length, '0')
+
+export function toLocalIsoStrWithoutOffset(dateInput = new Date()) {
+  const date = new Date(dateInput) // parse if needed
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1) // months are 0-indexed
+  const day = pad(date.getDate())
+  const hour = pad(date.getHours())
+  const minute = pad(date.getMinutes())
+  const second = pad(date.getSeconds())
+  const ms = pad(date.getMilliseconds(), 3)
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}`
 }
-export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4, '=')
+
+export function toLocalIsoStrWithOffset(dateInput = new Date()) {
+  const date = new Date(dateInput) // parse if needed
+  const offsetMinutes = date.getTimezoneOffset()
+  const offsetSign = offsetMinutes > 0 ? '-' : '+'
+  const offsetHours = pad(Math.floor(Math.abs(offsetMinutes) / 60))
+  const offsetMins = pad(Math.abs(offsetMinutes) % 60)
+  return `${toLocalIsoStrWithoutOffset(dateInput)}${offsetSign}${offsetHours}${offsetMins}`
+}
+
+export function fromLocalIsoWithoutOffsetToUtcDate(localDate) {}
+
+export const padEndModulo = (str, base, padSign = '=') => {
+  const modulo = str.length % base
+  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1))
+}
+export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4)
 
 export const base64urlToBase64 = (b64urlStr) => b64urlStr.replace(/\+/g, '-').replace(/\//g, '_')
 
@@ -136,4 +159,44 @@ export const decodeBase64url = (b64urlStr) => {
   return decodeURIComponent(atob(paddedB64Str))
 }
 
-export const uuidv4 = () => crypto.randomUUID()
+/**
+ * crypto.randomUUIDis is accessible only for HTTPS or localhost
+ * https://stackoverflow.com/a/2117523/1563072
+ * @returns
+ */
+export const uuidv4 = () =>
+  crypto?.randomUUID
+    ? crypto.randomUUID()
+    : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
+        (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
+      )
+
+export const getPageInfo = (field) => {
+  const url = window.location.pathname
+  const lastSlashIndex = url.lastIndexOf('/')
+  const path = url.slice(0, lastSlashIndex)
+  const name = url.slice(lastSlashIndex + 1)
+  const docInfo = { url, path, name }
+  // console.log('docInfo:', JSON.stringify(docInfo))
+  return field ? docInfo[field] : docInfo
+}
+
+export const fetchConf = () =>
+  fetch(pathJoin(getPageInfo('path'), 'conf'))
+    .then((response) => response.json())
+    .catch((error) => console.error('Error fetching config:', error))
+
+export const beautify = (obj) => {
+  const seen = []
+  return JSON.stringify(
+    obj,
+    (key, val) => {
+      if (val != null && typeof val == 'object') {
+        if (seen.indexOf(val) >= 0) return
+        seen.push(val)
+      }
+      return val
+    },
+    2
+  )
+}

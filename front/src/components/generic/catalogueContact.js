@@ -11,8 +11,8 @@ CatalogueContact.propTypes = {
  * @return {void}
  */
 export default function CatalogueContact({ editMode }) {
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   return (
     <ObjCatalogue
@@ -26,6 +26,7 @@ export default function CatalogueContact({ editMode }) {
         role: 'rôle',
         email: 'e-mail',
       }}
+      propSortBy="-updatedAt"
       btnTextAdd="Ajouter un contact"
       btnTextChg="Modifier un contact :"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression du contact ${id}?`}

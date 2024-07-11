@@ -3,13 +3,24 @@ const globals = require('globals')
 
 const js = require('@eslint/js')
 const cypress = require('eslint-plugin-cypress')
+const eslintReact = require('eslint-plugin-react')
+const eslintOnlyWarn = require('eslint-plugin-only-warn')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
 const unusedImports = require('eslint-plugin-unused-imports')
 
 module.exports = [
   js.configs.recommended,
   {
-    ignores: ['**/node_modules/**', '**/tests/**', '**/*.pub', 'cypress/**', 'dev/**'],
+    ignores: [
+      '**/*.pub',
+      '**/*.spec.js',
+      '**/*.test.js',
+      '**/node_modules/**',
+      '**/tests/**',
+      'build/**',
+      'cypress/**',
+      'dev/**',
+    ],
     languageOptions: {
       globals: { ...globals.browser, require: true, process: true },
       ecmaVersion: 'latest',
@@ -24,6 +35,7 @@ module.exports = [
       'cypress/no-force': 'warn',
       'cypress/no-async-tests': 'error',
       'cypress/no-pause': 'error',
+      eqeqeq: ['error', 'smart'],
       indent: 'off',
       'no-await-in-loop': 'error',
       'no-console': 'off',
@@ -40,10 +52,7 @@ module.exports = [
       quotes: ['error', 'single', { allowTemplateLiterals: true }],
       'prefer-arrow-callback': 'warn',
       'prettier/prettier': 'warn',
-      'space-before-function-paren': [
-        'error',
-        { anonymous: 'always', named: 'never', asyncArrow: 'always' },
-      ],
+      'space-before-function-paren': ['error', { anonymous: 'always', named: 'never', asyncArrow: 'always' }],
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
@@ -55,7 +64,8 @@ module.exports = [
         },
       ],
     },
-    plugins: { 'unused-imports': unusedImports, cypress },
+    plugins: { react: eslintReact, 'only-warn': eslintOnlyWarn, 'unused-imports': unusedImports, cypress },
+    settings: { react: { version: 'detect' } },
   },
   eslintPluginPrettierRecommended,
 ]

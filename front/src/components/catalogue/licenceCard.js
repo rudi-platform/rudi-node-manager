@@ -12,8 +12,8 @@ LicenceCard.propTypes = {
  * @return {ReactNode}
  */
 export default function LicenceCard({ obj, editMode }) {
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(editMode), [editMode])
 
   /**
    * affiche le text en fonction de la langue choisi

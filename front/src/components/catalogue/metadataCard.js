@@ -2,38 +2,29 @@ import axios from 'axios'
 
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import {
-  BoxArrowUpRight,
-  CloudDownload,
-  CloudSlash,
-  Eye,
-  Pencil,
-  Share,
-  Trash,
-} from 'react-bootstrap-icons'
+import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
-import { BackDataContext } from '../../context/backDataContext'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getLocaleFormatted, mergeStrings, pathJoin } from '../../utils/utils'
-import {
-  DefaultConfirmOption,
-  DefaultOkOption,
-  useModalContext,
-} from '../modals/genericModalContext'
+import { getLocaleFormatted } from '../../utils/utils'
+import { DefaultConfirmOption, DefaultOkOption, useModalContext } from '../modals/genericModalContext'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import ThemeDisplay from '../other/themeDisplay'
-import { getPublicUrl } from '../../utils/frontOptions.js'
 
-const downloadButton = (url) => (
+const getDownloadButton = (url) => (
   <button type="button" className="btn btn-green button-margin">
     <a id="downloadMedia" title="Télécharger" href={url}>
       <CloudDownload />
     </a>
   </button>
 )
-
-const externalUrlButton = (url) => (
+const getShareButton = (url) => (
+  <a className="btn btn-success" title="Partager la métadonnée" href={url} target="_blank" rel="noopener noreferrer">
+    <Share />
+  </a>
+)
+const getExternalUrlButton = (url) => (
   <button type="button" className="btn btn-green margin-right">
     <a id="downloadMedia" title="Site externe" href={url}>
       <BoxArrowUpRight />
@@ -41,49 +32,27 @@ const externalUrlButton = (url) => (
   </button>
 )
 
-const eyeButton = (id) => (
+const getEyeButton = (id) => (
   <Link to={`/show/${id}`}>
     <span className="btn btn-green" title="Aperçu">
       <Eye />
     </span>
   </Link>
 )
-const shareButton = (url) => (
-  <a
-    className="btn btn-success"
-    title="Partager la métadonnée"
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <Share />
-  </a>
-)
-const editButton = (url) => (
-  <a
-    className="btn btn-warning"
-    href={url}
-    title="Editer"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
+const getEditButton = (url) => (
+  <a className="btn btn-warning" href={url} title="Editer" target="_blank" rel="noopener noreferrer">
     <Pencil />
   </a>
 )
-const deleteButton = (triggerDelete) => (
-  <button
-    type="button"
-    className="btn btn-danger"
-    title="Supprimer"
-    onClick={() => triggerDelete()}
-  >
+const getDeleteButton = (triggerDelete) => (
+  <button type="button" className="btn btn-danger" title="Supprimer" onClick={() => triggerDelete()}>
     <Trash />
   </button>
 )
-const missButton = () => (
+const missButton = (
   <button type="button" className="btn btn-missing" title="Fichier manquant, à retransmettre">
-    {/* <CloudSlashFill /> */}
     <CloudSlash />
+    {/* <CloudSlashFill /> */}
     {/* <FileEarmarkExcel /> */}
     {/* <XLg /> */}
   </button>
@@ -139,38 +108,43 @@ export const displayMetadataStatus = (metadata) =>
  * @return {ReactNode}
  */
 export default function MetadataCard({ editMode, metadata, refresh, logout }) {
-  const { appInfo } = useContext(BackDataContext)
-  const { changeOptions, toggle } = useModalContext()
-
   const { defaultErrorHandler } = useDefaultErrorHandler()
-  const [appData, setAppData] = useState({})
-  useEffect(() => setAppData(appInfo), [appInfo])
 
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const [shareButton, setShareButton] = useState(getShareButton())
+  useEffect(
+    () =>
+      setShareButton(
+        getShareButton((back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id)) || getShareButton())
+      ),
+    [back]
+  )
+
+  const { changeOptions, toggle } = useModalContext()
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
 
-  const getForm = (query) => mergeStrings('?', getPublicUrl(appData.formUrl, 'metadata'), query)
+  const getFormMeta = (query) => back?.isLoaded && back?.getConsole('metadata', query)
 
   /**
    * call for metadata deletion
    */
-  function deleteRessource() {
+  const deleteRessource = () =>
+    back?.isLoaded &&
     axios
-      .delete(`api/data/resources/${metadata.global_id}`)
+      .delete(back.getBackCatalog('resources', metadata.global_id))
       .then((res) => {
         const options = DefaultOkOption
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`]
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => refresh(),
-          },
-        ]
+        options.buttons = [{ text: 'Ok', action: () => refresh() }]
         changeOptions(options)
         toggle()
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
-  }
+
   /**
    * call for confirmation before metadata deletion
    * @param {*} metadata metadata a suppr
@@ -179,14 +153,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     const options = DefaultConfirmOption
     options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`]
     options.buttons = [
-      {
-        text: 'Oui',
-        action: () => deleteRessource(),
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
+      { text: 'Oui', action: () => deleteRessource() },
+      { text: 'Non', action: () => {} },
     ]
     changeOptions(options)
     toggle()
@@ -210,16 +178,14 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    * calcule la taille total des fichiers
    * @return {Number} taille totale
    */
-  const getTotalFileSize = () =>
-    metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
+  const getTotalFileSize = () => metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
 
   /**
    * Check if the metadata has restricted access
    * @param {*} metadata
    * @return {boolean} True if letadata has restricted access
    */
-  const isRestricted = (metadata) =>
-    !!metadata?.access_condition?.confidentiality?.restricted_access
+  const isRestricted = (metadata) => !!metadata?.access_condition?.confidentiality?.restricted_access
   // console.log(metadata)
   const metaDates = metadata.metadata_info?.metadata_dates
 
@@ -244,68 +210,54 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   )
   const displayMissingMedia = (media) => (
     <div key={`${media.media_id}`}>
-      {missButton()}
+      {missButton}
       <span className="text-muted"> {media.media_name} </span>
     </div>
   )
-  const displayAvailableMedia = (media) =>
-    media.file_size ? displayMediaFile(media) : displayMediaService(media)
+  const displayAvailableMedia = (media) => (media.file_size ? displayMediaFile(media) : displayMediaService(media))
 
   const displayMedia = (media) =>
-    media.file_storage_status === 'missing'
-      ? displayMissingMedia(media)
-      : displayAvailableMedia(media)
+    media.file_storage_status === 'missing' ? displayMissingMedia(media) : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
-    edit: editButton(getForm(`update=${metadata.global_id}`)),
-    delete: deleteButton(triggerDeleteRessource),
-    download: (url) => downloadButton(url),
-    external: (url) => externalUrlButton(url),
-    visualize: (id) => eyeButton(id),
+    edit: getEditButton(getFormMeta(`update=${metadata.global_id}`)),
+    delete: getDeleteButton(triggerDeleteRessource),
+    download: (url) => getDownloadButton(url),
+    external: (url) => getExternalUrlButton(url),
+    visualize: (id) => getEyeButton(id),
   }
   return (
     <div className="col-12" key={metadata.global_id}>
       <div className="card card-margin">
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
-            <a
-              href={getForm(`read-only=${metadata.global_id}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className={metadata.storage_status === 'pending' ? 'danger' : ''}>
-                {metadata.resource_title}
-              </span>
+            <a href={getFormMeta(`read-only=${metadata.global_id}`)} target="_blank" rel="noopener noreferrer">
+              <span className={metadata.storage_status === 'pending' ? 'danger' : ''}>{metadata.resource_title}</span>
             </a>
             <span className="align-pill-right">{displayMetadataStatus(metadata)}</span>
             {isEdit ? (
               <div className="btn-group" role="group">
-                {button.share}
+                {shareButton}
                 {button.edit}
                 {button.delete}
               </div>
             ) : (
               <div className="btn-group" role="group">
-                {button.share}
+                {shareButton}
               </div>
             )}
           </div>
 
           <div>
             {metaDates?.updated && (
-              <small className="text-muted">
-                Modifié le : {getLocaleFormatted(metaDates.updated)}
-              </small>
+              <small className="text-muted">Modifié le : {getLocaleFormatted(metaDates.updated)}</small>
             )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
           </div>
 
           {metaDates?.published && (
             <div>
-              <small className="text-muted">
-                Publié le : {getLocaleFormatted(metaDates.published)}
-              </small>
+              <small className="text-muted">Publié le : {getLocaleFormatted(metaDates.published)}</small>
             </div>
           )}
         </h5>
@@ -317,9 +269,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
           <a href="#" className="btn btn-secondary card-margin">
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
-          <span className="card-text">
-            {metadata.available_formats.map((media) => displayMedia(media))}
-          </span>
+          <span className="card-text">{metadata.available_formats.map((media) => displayMedia(media))}</span>
         </div>
       </div>
     </div>

@@ -1,0 +1,4612 @@
+{
+	"info": {
+		"_postman_id": "a6193bbc-ba73-4aba-b004-d153d2adf602",
+		"name": "02. Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13557783",
+		"_collection_link": "https://rudirisa.postman.co/workspace/ce1a24e7-e510-4854-8451-d9ba84797044/collection/13557783-a6193bbc-ba73-4aba-b004-d153d2adf602?action=share&source=collection_link&creator=13557783"
+	},
+	"item": [
+		{
+			"name": "01. Check API open",
+			"item": [
+				{
+					"name": "Test availability",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing availability\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(responseStr).to.eq('test')",
+									"});",
+									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const cacheKeys = ['stamp',",
+									"    mem.get('catalogJwtName'),",
+									"    mem.get('storageJwtName'),",
+									"    mem.get('managerJwtName'),",
+									"    mem.get('managerCookieName'),",
+									"    mem.get('portalJwtName'),",
+									"]",
+									"const cache = {}",
+									"cacheKeys.map(key => { cache[key] = pm.collectionVariables.get(key) })",
+									"pm.collectionVariables.clear()",
+									"for (const key in cache) pm.collectionVariables.set(key, cache[key])",
+									"pm.collectionVariables.set('dateUpdate', time.now())"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/test",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get git hash",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get app hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(!!match.gitHash(responseStr)).to.be.true",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/hash",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"hash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get app tag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get app hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/tag",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"tag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get app tags",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get app hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/tags",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get conf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get app hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/{{$randomUUID}}/conf",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"{{$randomUUID}}",
+								"conf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hash credentials",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Hash credentials\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usr\":\"{{managerAdminUsr}}\",\n    \"pwd\":\"{{managerAdminPwd}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/open/hash-credentials",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"hash-credentials"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hash credentials Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Hash credentials\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usr\":\"rudinode admin\",\n    \"pwd\":\"manager admin password!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/open/hash-credentials",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"hash-credentials"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "02. Identification + init",
+			"item": [
+				{
+					"name": "Get PM cookies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store token\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.username).to.eq(pm.variables.get('managerAdminUsr'))",
+									"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
+									"    pm.collectionVariables.set(mem.get('managerJwtName') ?? 'managerJwt', pm.cookies.get('pmFrontToken'))",
+									"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
+									"    //const expirationTime = new Date(res.expires).getTime()",
+									"    //pm.expect(expirationTime).to.gt(new Date().getTime())",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"followOriginalHttpMethod": false,
+						"followAuthorizationHeader": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{managerAdminUsr}}\",\n    \"password\":\"{{managerAdminPwd}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/login",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store token\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.username).to.eq(pm.variables.get('managerAdminUsr'))",
+									"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
+									"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
+									"    //const expirationTime = new Date(res.expires).getTime()",
+									"    //pm.expect(expirationTime).to.gt(new Date().getTime())",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/user-info",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"user-info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orgs with cookies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get UUID with cookies\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(!!match.uuid(res?.organization_id)).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/organizations?limit=5",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"organizations"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get orgs with jwt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get orgs with JWT\", () => {",
+									"    pm.expect(pm.response.code).to.not.eq(200);",
+									"    // const res = pm.response.json()",
+									"    // pm.expect(!!match.uuid(res?.organization_id)).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{pmJwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/organizations",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get RUDI Media token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(!!match.jwt(res.token)).to.be.true",
+									"    pm.collectionVariables.set('mediaToken', res.token)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/media/jwt",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"media",
+								"jwt"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hash a password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Hash a password\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res.length > 0).to.be.true",
+									"})",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pwd\": \"cHJvZG1hbmFnZXIgYWRtaW4gcGFzc3dvcmQh\",\n    \"encoding\": \"base64\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/hash-password",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"hash-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. Check Front API",
+			"item": [
+				{
+					"name": "Get PM cookies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store token\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.username).to.eq(pm.variables.get('managerAdminUsr'))",
+									"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
+									"    pm.collectionVariables.set('pmJwt', pm.cookies.get('pmFrontToken'))",
+									"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
+									"    //const expirationTime = new Date(res.expires).getTime()",
+									"    //pm.expect(expirationTime).to.gt(new Date().getTime())",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{managerAdminUsr}}\",\n    \"password\":\"{{managerAdminPwd}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/login",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get conf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get conf\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.catalogPubUrl).to.be.not.undefined",
+									"    pm.expect(res.storagePubUrl).to.be.not.undefined",
+									"    pm.expect(res.consolePath).to.be.not.undefined",
+									"    pm.expect(res.backPath).to.be.not.undefined",
+									"",
+									"    pm.environment.set(\"storageUrl\",res.storagePubUrl)",
+									"    pm.environment.set(\"storageUrl\",res.storagePubUrl)",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/{{$randomUUID}}/conf",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"{{$randomUUID}}",
+								"conf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get env",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get env\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.text()",
+									"    pm.expect(['production', 'development', 'staging'].includes(res)).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/env",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"env"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get node URLs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get node URLs\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.catalogUrl).to.be.not.undefined",
+									"    pm.expect(res.storageUrl).to.be.not.undefined",
+									"    pm.expect(res.consolePath).to.be.not.undefined",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/node-urls",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"node-urls"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Portal URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get portal URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.text()",
+									"    pm.expect(res.startsWith('http') || res == 'No portal connected' || res == 'none').to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/portal-url",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"portal-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Catalog URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get node public URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = codec.streamToString(pm.response)",
+									"    pm.expect(res.startsWith('http')).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/ext-api-url",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"ext-api-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Console url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get Rudi console URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false,
+						"strictSSL": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/form-url",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"form-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Storage URL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get RUDI Media URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"    pm.expect(responseStr).to.match(/^https?\\:\\/\\/[\\w\\:\\.\\-\\/]+/)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/storage-url",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"storage-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get init data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get init data\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.gitHash).to.be.not.undefined",
+									"    pm.expect(res.catalogPubUrl).to.be.not.undefined",
+									"    pm.expect(res.storagePubUrl).to.be.not.undefined",
+									"    pm.expect(res.consolePath).to.be.not.undefined",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/init-data?lang=fr",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"init-data"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "fr"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get licences",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get licences\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res[0]?.concept_id).to.be.not.undefined",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/licences",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"licences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET pm app tag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get Rudi console URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/tag",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"tag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET pm git hash",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get Rudi console URL\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseStr = codec.streamToString(pm.response)",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/hash",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"hash"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET pm tags",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get Rudi prodmanager tag+hash\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.hash).to.be.not.undefined",
+									"    pm.expect(res.tag).to.be.not.undefined",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/open/tags",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"open",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET counts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get resources counted by\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res?.metadata_status).to.be.not.undefined",
+									"    pm.expect(res?.theme).to.be.not.undefined",
+									"    pm.expect(res?.keywords).to.be.not.undefined",
+									"    pm.expect(res?.producer).to.be.not.undefined",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableCookies": false
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/counts",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"counts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Check Catalog data",
+			"item": [
+				{
+					"name": "Get PM cookies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Store token\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.username).to.eq(pm.variables.get('managerAdminUsr'))",
+									"    pm.expect(res.roles[0]).to.eq('SuperAdmin')",
+									"    pm.collectionVariables.set('pmJwt', pm.cookies.get('pmFrontToken'))",
+									"    //pm.expect(res.success).to.eq(\"logged as 'PM Admin'\")",
+									"    //const expirationTime = new Date(res.expires).getTime()",
+									"    //pm.expect(expirationTime).to.gt(new Date().getTime())",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{managerAdminUsr}}\",\n    \"password\":\"{{managerAdminPwd}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/login",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const version = pm.response.stream.toString('utf8');",
+									"    pm.expect(!!match.version(version)).to.be.true",
+									"    pm.collectionVariables.set('apiVersion', version)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/version",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"version"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get catalog version",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const version = pm.response.stream.toString('utf8');",
+									"    pm.expect(!!match.version(version)).to.be.true",
+									"    pm.collectionVariables.set('apiVersion', version)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/catalog/version",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"catalog",
+								"version"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get UUID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get UUID\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const uuid = pm.response.stream.toString('utf8');",
+									"    pm.expect(!!match.uuid(uuid)).to.be.true",
+									"    pm.collectionVariables.set('uuid', uuid)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/uuid",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"uuid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 100 UUIDs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get 100 UUID\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const uuidList = pm.response.json();",
+									"    pm.expect(!!match.uuid(uuidList[0])).to.be.true",
+									"    pm.expect(!!match.uuid(uuidList[99])).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/uuid?nb=100",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"uuid"
+							],
+							"query": [
+								{
+									"key": "nb",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get API external URL (directly)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const catalogUrl = pm.response.stream.toString('utf8');",
+									"    pm.expect(catalogUrl.startsWith('http')).to.be.true",
+									"    pm.collectionVariables.set('catalogUrl', catalogUrl)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{{{catalogJwtName}}}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{catalogUrl}}/admin/check/node/url",
+							"host": [
+								"{{catalogUrl}}"
+							],
+							"path": [
+								"admin",
+								"check",
+								"node",
+								"url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get API external URL (from PM)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check version\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const catalogUrl = pm.response.stream.toString('utf8');",
+									"    pm.expect(catalogUrl.startsWith('http')).to.be.true",
+									"    pm.expect(catalogUrl).to.eq(pm.collectionVariables.get('catalogUrl'))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/front/ext-api-url",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"ext-api-url"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get enums EN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Get enums', () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.fileextensions.mp3).to.eq('audio/mpeg')",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/enum?lang=en",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"enum"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get enums FR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Get enums', () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.fileextensions.mp3).to.eq('audio/mpeg')",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/enum?lang=en",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"enum"
+							],
+							"query": [
+								{
+									"key": "lang",
+									"value": "en"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get themes FR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Get themes FR', () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.environment).to.eq('Environnement')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/enum/themes/fr",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"enum",
+								"themes",
+								"fr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get themes EN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Get themes EN', () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.environment).to.eq('Environment')",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/enum/themes/en",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"enum",
+								"themes",
+								"en"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get licences",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get licences\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res[0]?.concept_id).to.be.not.undefined",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/data/licences",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"data",
+								"licences"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "05. Get rudi objects",
+			"item": [
+				{
+					"name": "API Clean (pre)",
+					"item": [
+						{
+							"name": "Clean using API: meta",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: metadata\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: organizations\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"organizations"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: cont",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: contacts\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/contacts?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"contacts"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: media",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: media\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/media?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"media"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: keys",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/pub_keys?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"pub_keys"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Metadata",
+					"item": [
+						{
+							"name": "Get resources",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get resources\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const meta1 = responseJson[0]",
+											"    const metaId1 = meta1?.global_id",
+											"    pm.expect(!!match.uuid(metaId1)).to.be.true",
+											"",
+											"    const readOrgId = meta1?.producer?.organization_id",
+											"    pm.expect(!!match.uuid(readOrgId)).to.be.true",
+											"",
+											"    const readContId1 = meta1?.contacts[0].contact_id",
+											"    pm.expect(!!match.uuid(readContId1)).to.be.true",
+											"",
+											"    pm.collectionVariables.set('readMetaId', metaId1)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get resources catalog",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get resources\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const meta1 = responseJson[0]",
+											"    const metaId1 = meta1?.global_id",
+											"    pm.expect(!!match.uuid(metaId1)).to.be.true",
+											"",
+											"    const readOrgId = meta1?.producer?.organization_id",
+											"    pm.expect(!!match.uuid(readOrgId)).to.be.true",
+											"",
+											"    const readContId1 = meta1?.contacts[0].contact_id",
+											"    pm.expect(!!match.uuid(readContId1)).to.be.true",
+											"",
+											"    pm.collectionVariables.set('readMetaId', metaId1)",
+											"    pm.collectionVariables.set('title',meta1.resource_title)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/catalog/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"catalog",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search resources",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Search resources\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.total).to.gte(1)",
+											"    pm.expect(res.items.length).to.gte(1)",
+											"    pm.expect(res.items[0].resource_title).to.eq(pm.collectionVariables.get('title'))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources/search?{{title}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources",
+										"search"
+									],
+									"query": [
+										{
+											"key": "{{title}}",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Group by metadata_status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get resources\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const meta1 = responseJson[0].list[0]",
+											"    const metaId1 = meta1?.global_id",
+											"    pm.expect(!!match.uuid(metaId1)).to.be.true",
+											"",
+											"    const readOrgId = meta1?.producer?.organization_id",
+											"    pm.expect(!!match.uuid(readOrgId)).to.be.true",
+											"",
+											"    const readContId1 = meta1?.contacts[0].contact_id",
+											"    pm.expect(!!match.uuid(readContId1)).to.be.true",
+											"",
+											"    pm.collectionVariables.set('readMetaId', metaId1)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources?group_by=metadata_status",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "group_by",
+											"value": "metadata_status"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get resources by status",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get resources by status\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const statusGroup1 = responseJson[0]",
+											"    pm.expect(statusGroup1.count).to.be.gt(0)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources?count_by=metadata_status",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "count_by",
+											"value": "metadata_status"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get 1 resource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const meta1 = pm.response.json()",
+											"    pm.expect(meta1.global_id).to.eql(pm.variables.get('readMetaId'))",
+											"    pm.expect(!!match.uuid(meta1.producer.organization_id))",
+											"    pm.collectionVariables.set('org1Id', meta1.producer.organization_id)",
+											"    pm.collectionVariables.set('org1Name', meta1.producer.organization_name)",
+											"    pm.collectionVariables.set('org1Addr', meta1.producer.organization_address)",
+											"",
+											"    pm.expect(!!match.uuid(meta1.contacts[0].contact_id))",
+											"    pm.collectionVariables.set('cont1Id', meta1.contacts[0].contact_id)",
+											"    pm.collectionVariables.set('cont1Name', meta1.contacts[0].contact_name)",
+											"    pm.collectionVariables.set('cont1Mail', meta1.contacts[0].email)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources/{{readMetaId}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources",
+										"{{readMetaId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get last updated date",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200)",
+											"    pm.expect(pm.response.json()[0].updatedAt.startsWith(\"2024\"))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources?sort=-updatedAt&limit=1&fields=updatedAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "-updatedAt"
+										},
+										{
+											"key": "limit",
+											"value": "1"
+										},
+										{
+											"key": "fields",
+											"value": "updatedAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get last updated date Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200)",
+											"    pm.expect(pm.response.json()[0].updatedAt.startsWith(\"2024\"))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources?sort=-updatedAt&limit=1&fields=updatedAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "-updatedAt"
+										},
+										{
+											"key": "limit",
+											"value": "1"
+										},
+										{
+											"key": "fields",
+											"value": "updatedAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add resource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Add resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const metaId1 = responseJson.global_id",
+											"    pm.collectionVariables.set('metaTest', metaId1)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
+											"pm.collectionVariables.set('now', time.now())"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"{{cont1Mail}}\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2016-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit resource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const metaId1 = responseJson.global_id",
+											"    pm.expect(match.uuid(metaId1))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"",
+											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
+											"pm.collectionVariables.set('now', time.now())"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"cont1Mail\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2017-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del resources",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Del resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const meta = pm.response.json()",
+											"    pm.expect(meta.global_id).to.eql(pm.collectionVariables.get('metaId1'))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources/{{metaId1}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources",
+										"{{metaId1}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Orgs",
+					"item": [
+						{
+							"name": "Get orgs",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get organizations\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    pm.collectionVariables.set('org1', responseJson[0].organization_id)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations?limit=5",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get org 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/{{org1}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										"{{org1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!pm.collectionVariables.get('orgId')) pm.collectionVariables.set('orgId', rand.uuid())",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"Rennes {{stamp}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit org Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"Rennes 1 {{stamp}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Del 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"Rennes {{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/{{orgId}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										"{{orgId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Contact",
+					"item": [
+						{
+							"name": "Get contacts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get contacts\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    pm.collectionVariables.set('cont1', responseJson[0].contact_id)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts?sort=-updateAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "-updateAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get cont 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.contact_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/{{cont1}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										"{{cont1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add contact",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!pm.collectionVariables.get('contId')) pm.collectionVariables.set('contId', rand.uuid())",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ville_de_{{stamp}}@rennes.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit contact",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ma_ville@{{stamp}}.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del contact",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.contact_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"Rennes {{stamp}}\",\n    \"email\": \"add-{{stamp}}@irisa.fr\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/{{contId}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										"{{contId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Media",
+					"item": [
+						{
+							"name": "Get last updated media",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get last updated media\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res[0].media_id).to.be.not.undefined",
+											"    pm.collectionVariables.set('lastMediaId', res[0].media_id)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/media?sort_by=-updatedAt&limit=1",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"media"
+									],
+									"query": [
+										{
+											"key": "sort_by",
+											"value": "-updatedAt"
+										},
+										{
+											"key": "limit",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Keys",
+					"item": [
+						{
+							"name": "Add key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const pubKey1 = responseJson[0]?.name",
+											"    pm.collectionVariables.set('pubKey1', pubKey1)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{stamp}}\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEAp06ApPlbxFfT1EQcV8Qj+F2+JnYypEDvenVGN8u9ANA=\\n-----END PUBLIC KEY-----\\n\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit key",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const pubKey1 = responseJson[0]?.name",
+											"    pm.collectionVariables.set('pubKey1', pubKey1)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{stamp}}\",\n    \"pem\": \"-----BEGIN PUBLIC KEY-----\\nMCowBQYDK2VwAyEAp06ApPlbxFfT1EQcV8Qj+F2+JnYypEDvenVGN8u9ANA=\\n-----END PUBLIC KEY-----\\n\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get keys",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const pubKey1 = responseJson[0]?.name",
+											"    pm.collectionVariables.set('pubKey1', pubKey1)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys?limit=5&offset=1&sort_by=-updateAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										},
+										{
+											"key": "offset",
+											"value": "1"
+										},
+										{
+											"key": "sort_by",
+											"value": "-updateAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get keys Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const pubKey1 = responseJson[0]?.name",
+											"    pm.collectionVariables.set('pubKey1', pubKey1)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys?limit=5&offset=1&sort_by=-updateAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										},
+										{
+											"key": "offset",
+											"value": "1"
+										},
+										{
+											"key": "sort_by",
+											"value": "-updateAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get key 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 key\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.name).eql(pm.collectionVariables.get('stamp'))",
+											"    // responseJson.map(coll => console.log(coll))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys/{{stamp}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys",
+										"{{stamp}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del key 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Del 1 key\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.name).eql(pm.collectionVariables.get('stamp'))",
+											"    // responseJson.map(coll => console.log(coll))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/pub_keys/{{stamp}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"pub_keys",
+										"{{stamp}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reports",
+					"item": [
+						{
+							"name": "Delete old reports",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/reports/?treatedBefore=2024-08-11T07:45:51.185Z",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"reports",
+										""
+									],
+									"query": [
+										{
+											"key": "treatedBefore",
+											"value": "2024-08-11T07:45:51.185Z"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "API Clean (post)",
+					"item": [
+						{
+							"name": "Clean using API: meta",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: metadata\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/resources?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: organizations\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/organizations?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"organizations"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: cont",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: contacts\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/contacts?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"contacts"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: media",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: media\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/media?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"media"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clean using API: keys",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Cleanup through API: keys\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{{{catalogJwtName}}}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{catalogUrl}}/admin/pub_keys?collection_tag={{stamp}}",
+									"host": [
+										"{{catalogUrl}}"
+									],
+									"path": [
+										"admin",
+										"pub_keys"
+									],
+									"query": [
+										{
+											"key": "collection_tag",
+											"value": "{{stamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "06. Check API Storage",
+			"item": [
+				{
+					"name": "Get RUDI Storage token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Testing\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(!!match.jwt(res.token)).to.be.true",
+									"    pm.collectionVariables.set('mediaToken', res.token)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/media/jwt",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"media",
+								"jwt"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET media list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get list media\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.count).to.be.not.undefined",
+									"    pm.expect(res.total).to.be.not.undefined",
+									"    const zone = Object.keys(res)[0]",
+									"    pm.collectionVariables.set('mediaId',res[zone].list[0].uuid)",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{mediaToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{storageUrl}}/list",
+							"host": [
+								"{{storageUrl}}"
+							],
+							"path": [
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET media",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/media/{{mediaId}}",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"media",
+								"{{mediaId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET media Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/media/download/{{mediaId}}",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"media",
+								"download",
+								"{{mediaId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "07. Add/get user",
+			"item": [
+				{
+					"name": "Get all users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get all users\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const userList = pm.response.json();",
+									"    pm.expect(userList.length).to.gte(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Add user\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const user1 = pm.collectionVariables.get('softUser1username');",
+									"    pm.expect(responseJson.username).to.eq(user1);",
+									"    pm.collectionVariables.set('userId', responseJson.id)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softUser1username', pm.collectionVariables.get('stamp'))",
+									"pm.collectionVariables.set('softUser1email', rand.getContactEmail(pm.collectionVariables.get('softUser1username')))",
+									"pm.collectionVariables.set('softUser1password', 'test')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{softUser1username}}\",\n    \"email\": \"{{softUser1email}}\",\n    \"password\": \"{{softUser1password}}\",\n    \"confirmPassword\": \"{{softUser1password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/register",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get user\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.username).to.eq(pm.collectionVariables.get('softUser1username'));",
+									"    pm.collectionVariables.set('userId', res.id)",
+									"    // pm.expect(res.id).to.eq(pm.collectionVariables.get('userId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users/{{softUser1username}}",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								"{{softUser1username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Add user\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json();",
+									"    const user1 = pm.collectionVariables.get('softUser1username');",
+									"    pm.expect(responseJson.username).to.eq(user1);",
+									"    pm.expect(responseJson.id).to.eq(pm.collectionVariables.get('userId'));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('softUser1username', pm.collectionVariables.get('stamp'))",
+									"pm.collectionVariables.set('softUser1email', rand.getContactEmail(pm.collectionVariables.get('softUser1username')))",
+									"pm.collectionVariables.set('softUser1password', 'test')",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{userId}}\",\n    \"username\": \"{{softUser1username}}\",\n    \"email\": \"{{softUser1email}}\",\n    \"roles\": [\"Editeur\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users/",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user: not found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get user\", () => {",
+									"    pm.expect(pm.response.code).to.eql(404);",
+									"    const res = pm.response.json();",
+									"    pm.expect(res.statusCode).to.eq(404);",
+									"    pm.expect(res.message).to.eq(\"User not found: 'grul'\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users/grul",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								"grul"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get all users\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const responseJson = pm.response.json()",
+									"    // responseJson.map(coll => console.log(coll))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get super user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get user admin\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    // responseJson.map(coll => console.log(coll))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users/{{managerAdminUsr}}",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								"{{managerAdminUsr}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get roles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"DGet roles\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const roles = pm.response.json()",
+									"    pm.expect(roles[0].role.length).to.be.gt(0)",
+									"    pm.expect(roles[0].desc.length).to.be.gt(0)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/roles",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1 role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get role admin\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    // responseJson.map(coll => console.log(coll))",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/roles/Admin",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"roles",
+								"Admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete test user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const userId = pm.collectionVariables.get('userId')",
+									"pm.test(`Delete user with ID='${userId}'`, () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{managerUrl}}/api/secu/users/{{userId}}",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"secu",
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "99. Logout",
+			"item": [
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Logout\", () => {",
+									"    pm.expect(pm.response.code).to.eql(200);",
+									"    const res = pm.response.json()",
+									"    pm.expect(res.consoleToken).to.eq(\"\")",
+									"    pm.expect(res.pmFrontToken).to.eq(\"\")",
+									"    pm.expect(res.message).to.eq(\"logout\")",
+									"});",
+									"mem.wipeCollectionVars(pm.collectionVariables,[],1)",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"{{managerAdminUsr}}\",\n    \"password\":\"{{managerAdminPwd}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{managerUrl}}/api/front/logout",
+							"host": [
+								"{{managerUrl}}"
+							],
+							"path": [
+								"api",
+								"front",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Libs",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"",
+					"log = {",
+					"    lvl: 1,",
+					"    e: (here, ...args) => log.lvl >= 1 && console.error(`E [${here}] ERROR:`, ...args),",
+					"    d: (here, ...args) => log.lvl >= 2 && console.log(`D [${here}]`, ...args),",
+					"    t: (here, msg = '<', ...args) => log.lvl >= 3 && console.log(`T [${here}]`, msg, ...args),",
+					"}",
+					"",
+					"log.t('Time-related functions')",
+					"time = {",
+					"    now: () => new Date().toISOString(),",
+					"    nowEpochMS: () => new Date().getTime(),",
+					"    nowEpochS: () => Math.floor(new Date().getTime() / 1000),",
+					"    timezone: () => new Date().getTimezoneOffset(),",
+					"    wait: (delayMs, doSomething) => {",
+					"        log.t('wait', `Waiting ${delayMs / 1000}s...`)",
+					"        setTimeout(doSomething ? doSomething : () => { log.t('wait', `Waited ${delayMs / 1000}s`) }, delayMs)",
+					"    },",
+					"}",
+					"",
+					"log.t('Function to manipulate strings')",
+					"const mergeStrings = (sep, ...args) => {",
+					"    const here = 'mergeStrings'",
+					"    log.t(here)",
+					"    const argNb = args.length",
+					"    if (argNb == 0 || args[0] === undefined || args[0] === null) return ''",
+					"    let accumulatedStr = `${args[0]}`",
+					"    for (let i = 1; i < argNb; i++) {",
+					"        if (args[i] === undefined || args[i] === null) break",
+					"        const newChunk = `${args[i]}`",
+					"        const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk",
+					"        accumulatedStr = accumulatedStr.endsWith(sep)",
+					"            ? accumulatedStr + cleanChunk",
+					"            : accumulatedStr + sep + cleanChunk",
+					"    }",
+					"    return accumulatedStr",
+					"}",
+					"const pathJoin = (...args) => mergeStrings('/', ...args)",
+					"",
+					"log.t('Postman variables memory access functions')",
+					"mem = {",
+					"    get: (name) => {",
+					"        const val = pm.variables.get(name) ?? pm.collectionVariables.get(name) ?? pm.environment.get(name) ?? pm.globals.get(name)",
+					"        log.t('mem.get', name, val)",
+					"        return val",
+					"    },",
+					"",
+					"    set: (name, val) => pm.collectionVariables.set(name, val),",
+					"",
+					"    initStoredVar: (name, defaultVal) => {",
+					"        const here = 'initStoredVar'",
+					"        if (!mem.get(name)) {",
+					"            log.t(here, `No value stored for ${name}`)",
+					"            const val = mem.get(name) ?? defaultVal",
+					"            mem.set(name, val)",
+					"            return val",
+					"        }",
+					"        return mem.get(name)",
+					"    },",
+					"",
+					"    wipeCollectionVars: (collectionVariables = pm.collectionVariables, keepVals, force = false) => {",
+					"        // 'Function to wipe the cached values from previous tests'",
+					"        const here = 'wipeCollectionVars'",
+					"        log.t(here)",
+					"        if (!force && collectionVariables.get('postmanEnv') == pm.environment.name) return",
+					"        const cache = {}",
+					"        if (keepVals === undefined) keepVals = [CATALOG_JWT_NAME, STORAGE_JWT_NAME, MANAGER_JWT_NAME, PORTAL_TOKEN_NAME]",
+					"        keepVals = ['stamp', ...keepVals]",
+					"        keepVals.map(key => {",
+					"            const val = collectionVariables.get(key)",
+					"            if (val) {",
+					"                cache[key] = collectionVariables.get(key)",
+					"                log.t(here, `Memorizing the protected variable ${key}: ${cache[key]}`)",
+					"            }",
+					"        })",
+					"        collectionVariables.clear()",
+					"        log.t(here, 'collectionVariables wiped:', JSON.stringify(collectionVariables))",
+					"        log.t(here, 'collectionVariables:', JSON.stringify(collectionVariables.values))",
+					"",
+					"        for (const key in cache) {",
+					"            log.t(`Restoring the variable ${key}: ${cache[key]}`)",
+					"            collectionVariables.set(key, cache[key])",
+					"        }",
+					"        collectionVariables.set('dateUpdate', time.now())",
+					"        collectionVariables.set('postmanEnv', pm.environment.name)",
+					"    }",
+					"}",
+					"",
+					"log.t('Function to homogenize old environment variables')",
+					"function changeVarName(oldName, newName) {",
+					"    const here = 'changeVarName'",
+					"    const val = pm.environment.get(oldName)",
+					"    if (!val) return",
+					"    log.t(here, `${oldName}=\"${val}\"`)",
+					"    if (!mem.get(newName)) {",
+					"        pm.environment.set(newName, val)",
+					"        log.t(here, `${newName}=\"${val}\"`)",
+					"    } else {",
+					"        log.t(here, `(Already set) ${newName}=\"${val}\"`)",
+					"    }",
+					"    pm.environment.unset(oldName)",
+					"    log.t(here, `=> ${oldName}=\"${pm.environment.get(oldName)}\"`)",
+					"    log.t(here, `=> ${newName}=\"${pm.environment.get(newName)}\"`)",
+					"}",
+					"",
+					"log.t('Variable names homogenization')",
+					"function homogenizeVars() {",
+					"    changeVarName('apiUrl', 'catalogUrl')",
+					"    changeVarName('pmBackUrl', 'managerUrl')",
+					"    changeVarName('pmFrontUrl', 'managerFrontUrl')",
+					"    changeVarName('mediaUrl', 'storageUrl')",
+					"    changeVarName('pmAdminUsr', 'managerAdminUsr')",
+					"    changeVarName('pmAdminPwd', 'managerAdminPwd')",
+					"    if (!(pm.environment.get('storageUrl'))) {",
+					"        pm.environment.set('storageUrl', `${mem.get('managerUrl')}`.replace('/prodmanager', '/media'))",
+					"    }",
+					"    const catalogUrl = pm.environment.get('catalogUrl')",
+					"    if (!(catalogUrl.endsWith('api') || catalogUrl.endsWith('catalog'))) {",
+					"",
+					"        const catalogPrefix = mem.get('catalogPrefix') ?? 'api'",
+					"        pm.environment.set('catalogServer', catalogUrl)",
+					"        pm.environment.set('catalogUrl', pathJoin(catalogUrl, catalogPrefix))",
+					"        pm.environment.unset(catalogPrefix)",
+					"    } else {",
+					"        pm.environment.set('catalogServer', catalogUrl.replace(/\\/(api|catalog)/, ''))",
+					"    }",
+					"    pm.environment.set('homogenized', true)",
+					"}",
+					"if (!pm.environment.get('homogenized')) homogenizeVars()",
+					"",
+					"",
+					"const regexCheck = (regex, str) => str ? regex.exec(`${str}`) : regex",
+					"",
+					"log.t('Constants initialization')",
+					"const REGEX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i",
+					"const REGEX_JWT = /^[\\w-]+\\.[\\w-]+\\.([\\w-]+={0,3})$/",
+					"const REGEX_API_VERSION = /^[0-9]+\\.[0-9]+(\\.[0-9]+)?[a-z]*$/",
+					"const REGEX_URI = /^(https?|ftp):\\/\\/([\\w-]+(\\.[\\w-]+)+|(:[0-9]+)?)([\\w.,@?^=%&amp;:\\/~+#-]*[\\w@?^=%&amp;\\/~+#-])?$/",
+					"const REGEX_GIT_HASH_SHORT = /^[a-z0-9]{7}/",
+					"",
+					"match = {",
+					"    uuid: (str) => regexCheck(REGEX_UUID, str),",
+					"    jwt: (str) => regexCheck(REGEX_JWT, str),",
+					"    version: (str) => regexCheck(REGEX_API_VERSION, str),",
+					"    uri: (str) => regexCheck(REGEX_URI, str),",
+					"    gitHash: (str) => regexCheck(REGEX_GIT_HASH_SHORT, str),",
+					"}",
+					"",
+					"error = {",
+					"    throwNotFound: (msg) => { throw { statusCode: 404, name: 'NotFound', message: msg } }",
+					"}",
+					"",
+					"codec = {",
+					"    streamToString: (data) => data?.stream?.toString('utf8'),",
+					"    getResJson: (res, prop) => {",
+					"        const resJson = JSON.parse(codec.streamToString(res))",
+					"        return prop ? resJson?.[prop] : resJson",
+					"    },",
+					"    fromBase64: (data) => Buffer.from(data, 'base64')?.toString('utf-8'),",
+					"",
+					"    fromBase64Url: (base64UrlStr) => {",
+					"        const here = 'fromBase64Url'",
+					"        log.t(here)",
+					"        if (!base64UrlStr) return ''",
+					"        const paddedStr = (base64UrlStr.length % 4 == 0)",
+					"            ? base64UrlStr",
+					"            : base64UrlStr + \"====\".substring(base64UrlStr.length % 4)",
+					"        const base64Str = paddedStr",
+					"            .replace(\"_\", \"/\")",
+					"            .replace(\"-\", \"+\")",
+					"        return codec.fromBase64(base64Str)",
+					"    }",
+					"}",
+					"",
+					"log.t('Functions to initialiaze test variables')",
+					"rand = {",
+					"    get: (randName) => pm.collectionVariables.replaceIn(randName),",
+					"",
+					"    uuid: () => rand.get('{{$randomUUID}}'),",
+					"",
+					"    pickInList: (list) => list[(require('lodash')).random(0, list.length - 1)],",
+					"",
+					"    pick: (listName) => rand.pickInList(mem.get(listName)),",
+					"",
+					"    initVal: (field) => {",
+					"        const val = mem.get(field)",
+					"        if (val) return val",
+					"        const randVal = rand.uuid()",
+					"        mem.set(field, randVal, 'string')",
+					"        return randVal",
+					"    },",
+					"",
+					"    getContactEmail: (contactName) => `${contactName",
+					"        .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
+					"        .toLowerCase()",
+					"        .replace(/\\s+|\\.\\./g, '.')",
+					"        .replace(/^\\.+|\\.+$|\\'+/g, '')",
+					"        }@irisa.fr`,",
+					"",
+					"    randomize: (field) => {",
+					"        const randVal = rand.uuid()",
+					"        mem.set(field, randVal)",
+					"        return randVal",
+					"    },",
+					"}",
+					"",
+					"log.t('Functions for connections')",
+					"co = {",
+					"    reqToStr: (req) => `${req.method} ${req.url}`,",
+					"    sendRequest: (req) => {",
+					"        const here = 'sendRequest'",
+					"        log.t(here, co.reqToStr(req))",
+					"        return new Promise(",
+					"            (resolve, reject) => pm.sendRequest(req, (err, res) => {",
+					"                if (!err && res?.code / 100 < 4) {",
+					"                    log.t(`Request ${co.reqToStr(req)} succeeded with code ${res?.code}`)",
+					"                    return resolve(res)",
+					"                }",
+					"                log.t(`Request ${co.reqToStr(req)} failed with code ${res?.code}`)",
+					"                let message = `Request \"${req.url ?? req}\" failed (${res?.code})`",
+					"                if (err?.message) message += `: ${err.message}`",
+					"                return reject({ message })",
+					"            })",
+					"        )",
+					"    },",
+					"}",
+					"",
+					"log.t('Constants initialization')",
+					"const TOKEN_DURATION_S = 4147200",
+					"const MANAGER_COOKIE_NAME = `pmFrontToken`",
+					"",
+					"const CATALOG_JWT_NAME = `catalogJwt-${pm.environment.name}`; mem.set('catalogJwtName', CATALOG_JWT_NAME)",
+					"const STORAGE_JWT_NAME = `storageJwt-${pm.environment.name}`; mem.set('storageJwtName', STORAGE_JWT_NAME)",
+					"const MANAGER_JWT_NAME = `managerJwt-${pm.environment.name}`; mem.set('managerJwtName', MANAGER_JWT_NAME)",
+					"const PORTAL_TOKEN_NAME = `portalJwt-${pm.environment.name}`; mem.set('portalJwtName', PORTAL_TOKEN_NAME)",
+					"",
+					"if (!pm.environment.get('portalUsr')) mem.set('skipPortalConnection', true)",
+					"",
+					"log.t('Functions for creating JWTs')",
+					"secu = {",
+					"    isTokenValid: (token) => {",
+					"        const here = 'isTokenValid'",
+					"        log.t(here, 'Checking token', token)",
+					"        if (!token || typeof token !== 'string' || !match.jwt(token)) {",
+					"            log.d(here, `Token is invalid: ${token}`)",
+					"            return false",
+					"        }",
+					"        const jwtBodyEncoded = token.split('.')[1]",
+					"        const jwtBody = JSON.parse(codec.fromBase64Url(jwtBodyEncoded))",
+					"        if (!jwtBody.exp) {",
+					"            log.d(here, 'No expiration time was found')",
+					"            return false",
+					"        }",
+					"        const isValid = jwtBody.exp > time.nowEpochS()",
+					"        log.d(here, `Token is ${(isValid ? '' : 'not ')}valid`)",
+					"        return isValid",
+					"    },",
+					"",
+					"    getCookie: (res, cookieName) => {",
+					"        const here = 'getCookie'",
+					"        log.t(here)",
+					"        for (const cookie in res['Set-Cookie']) {",
+					"            log.d(here, 'cookie', cookie)",
+					"            if (cookie.startsWith(cookieName + '='))",
+					"                return cookie.slice(cookieName.length() + 1)",
+					"        }",
+					"        return 'OK'",
+					"    },",
+					"",
+					"    renewToken: async (tokenName, req, body, extractToken = (res) => codec.streamToString(res)) => {",
+					"        const here = 'renewToken'",
+					"        log.t(here)",
+					"        let res",
+					"        try {",
+					"            if (body && !body.raw) req.body = { mode: 'raw', raw: JSON.stringify(body) }",
+					"            log.d(here, 'req body:', req.body)",
+					"            res = await co.sendRequest(req)",
+					"            log.d(here, 'reply received:', res)",
+					"        } catch (err) {",
+					"            log.e(here, `Cannot reach ${req.url}:`, err.message)",
+					"            throw new Error(`Cannot reach ${req.url}`)",
+					"        }",
+					"        pm.expect(res.code == 200).to.be.true",
+					"",
+					"        const token = extractToken(res)",
+					"        log.d(here, 'extractedToken:', token)",
+					"        if (!token) {",
+					"            log.e(here, 'Could not extract token from', res)",
+					"            throw new Error(`Could not extract token from ${res}`)",
+					"        }",
+					"        if (token == 'OK') return",
+					"        if (!secu.isTokenValid(token)) {",
+					"            log.e(here, `Token not vaild: ${token}`)",
+					"            throw new Error(`Token not vaild: ${token}`)",
+					"        }",
+					"        mem.set(tokenName, token)",
+					"        return token",
+					"    },",
+					"",
+					"    getStorageJwt: async () => {",
+					"        const here = 'getStorageJwt'",
+					"        log.t(here)",
+					"        const tokenName = mem.get(STORAGE_JWT_NAME)",
+					"        const token = pm.vault.get(tokenName)",
+					"        if (secu.isTokenValid(token)) return token",
+					"",
+					"        jwtAuthUrl = pathJoin(mem.get('jwtAuthUrl'), 'forge')",
+					"        body = {",
+					"            target: \"storage\",",
+					"            url: mem.get('storageUrl'),",
+					"            user_id: 102,",
+					"            user_name: \"storage_postman\",",
+					"            group_name: \"producer\"",
+					"        }",
+					"        const req = {",
+					"            url: pathJoin(mem.get('jwtAuthUrl'), 'forge'),",
+					"            method: 'POST',",
+					"            header: { 'Content-Type': 'application/json' },",
+					"        }",
+					"        return await secu.renewToken(STORAGE_JWT_NAME, req, body)",
+					"    },",
+					"",
+					"    getCatalogJwt: async () => {",
+					"        const here = 'getCatalogJwt'",
+					"        log.t(here)",
+					"        const token = mem.get(CATALOG_JWT_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
+					"        const body = {",
+					"            'exp': time.nowEpochS() + TOKEN_DURATION_S,",
+					"            'sub': mem.get('jwtAuthDelegate') ?? 'postman',",
+					"            'client_id': mem.get('jwtAuthUser') ?? 'pm',",
+					"        }",
+					"        const req = {",
+					"            url: pathJoin(mem.get('jwtAuthUrl'), 'forge'),",
+					"            method: 'POST',",
+					"            header: { 'Content-Type': 'application/json' }",
+					"        }",
+					"        return await secu.renewToken(CATALOG_JWT_NAME, req, body)",
+					"    },",
+					"",
+					"    getPortalJwt: async () => {",
+					"        const here = 'getPortalJwt'",
+					"        log.t(here)",
+					"        if (mem.get('skipPortalConnection')) return NO_PORTAL_MSG",
+					"",
+					"        const token = mem.get(PORTAL_TOKEN_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
+					"",
+					"        const catalogToken = await secu.getCatalogJwt()",
+					"        const req = {",
+					"            url: pathJoin(mem.get('apiUrl'), catalogPrefix, 'admin/portal/token'),",
+					"            method: 'GET',",
+					"            header: {",
+					"                'Content-Type': 'application/json',",
+					"                'Authorization': `Bearer ${catalogToken}`",
+					"            },",
+					"        }",
+					"        return await secu.renewToken(PORTAL_TOKEN_NAME, req, null, (res) => codec.getResJson(res, 'access_token'))",
+					"    },",
+					"",
+					"    getManagerJwt: async () => {",
+					"        const here = 'getManagerJwt'",
+					"        log.t(here)",
+					"",
+					"        const token = mem.get(MANAGER_JWT_NAME)",
+					"        if (secu.isTokenValid(token)) return token",
+					"        const body = {",
+					"            'username': mem.get('managerAdminUsr'),",
+					"            'password': mem.get('managerAdminPwd')",
+					"        }",
+					"        const req = {",
+					"            url: pathJoin(mem.get('managerUrl'), mem.get('managerBack'), '/front/login'),",
+					"            method: 'POST',",
+					"            header: { 'Content-Type': 'application/json' }",
+					"        }",
+					"        return await secu.renewToken(MANAGER_JWT_NAME, req, body, res => secu.getCookie(res, MANAGER_COOKIE_NAME))",
+					"    }",
+					"}",
+					"",
+					"",
+					"",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Init function",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"const init = async () => {",
+					"    await Promise.all([secu.getCatalogJwt(), secu.getManagerJwt()])",
+					"}",
+					"",
+					"",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"// Launch",
+					"// --------------------------------------------------------------------------------------------------------------",
+					"init().then(() => log.t('run', 'Init completed'))",
+					"time.wait(50, () => log.t('run', 'Pre-request Scripts loaded'))",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "stamp",
+			"value": "manager-tests"
+		},
+		{
+			"key": "dateUpdate",
+			"value": ""
+		},
+		{
+			"key": "postmanEnv",
+			"value": ""
+		}
+	]
+}

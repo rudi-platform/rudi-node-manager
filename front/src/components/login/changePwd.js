@@ -1,13 +1,14 @@
 import axios from 'axios'
-import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
 
-import './login.css'
-import InputGroup from 'react-bootstrap/InputGroup'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button'
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
+import './login.css'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'secondary'
@@ -32,14 +33,19 @@ ChangePwd.propTypes = {
  * @return {ReactNode} Register html component
  */
 export default function ChangePwd({ backToLogin }) {
-  const [username, setUserName] = useState('')
-  const [password, setPwd] = useState('')
-  const [newPassword, setNewPwd] = useState('')
-  const [confirmNewPassword, setConfirmNewPwd] = useState('')
+  const { backConf } = useContext(BackConfContext)
 
-  const [isPwdShown, setPasswordShown] = useState(false)
-  const togglePwdVisibility = () => setPasswordShown(!isPwdShown)
-  const stateType = () => (isPwdShown ? 'text' : 'password')
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const togglePwdVisibility = () => setIsPasswordShown(!isPasswordShown)
+  const stateType = () => (isPasswordShown ? 'text' : 'password')
 
   const { toggle, visible } = useGenericModal()
   const { options, changeOptions } = useGenericModalOptions()
@@ -62,17 +68,16 @@ export default function ChangePwd({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const putPassword = (credentials) =>
-    axios.put(`api/front/change-password`, JSON.stringify(credentials), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    back?.isLoaded &&
+    axios.put(back.getBackFront('change-password'), JSON.stringify(credentials), {
+      headers: { 'Content-Type': 'application/json' },
     })
 
   /**
    * handle submit Register form
    * @param {*} event
    */
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault()
     putPassword({
       username,
@@ -86,33 +91,16 @@ export default function ChangePwd({ backToLogin }) {
           text: [`Le mot de passe a bien été changé pour l'utilisateur '${username}'`],
           title: 'Action Validée',
           type: 'success',
-          buttons: [
-            {
-              text: 'Connexion',
-              action: () => {
-                backToLogin()
-              },
-            },
-          ],
+          buttons: [{ text: 'Connexion', action: () => backToLogin() }],
         })
         toggle()
       })
-      .catch((error) => {
-        const errMsg =
-          error.response?.data?.message === 'No user found'
-            ? `Cet utilisateur n'existe pas`
-            : `Erreur: ${error.response?.data?.message}`
-        // console.error('T (ChgPwd) ERR', JSON.stringify(error?.response?.data))
+      .catch(() => {
         changeOptions({
-          text: [errMsg],
+          text: ['Utilisateur ou mot de passe incorrect'],
           title: 'Une erreur est survenue',
           type: 'error',
-          buttons: [
-            {
-              text: 'Ok',
-              action: () => {},
-            },
-          ],
+          buttons: [{ text: 'Ok', action: () => {} }],
         })
         toggle()
       })
@@ -148,7 +136,7 @@ export default function ChangePwd({ backToLogin }) {
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button variant="warning" id={`button-${id}`} onClick={togglePwdVisibility}>
-              {isPwdShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
+              {isPasswordShown ? <Eye></Eye> : <EyeSlash></EyeSlash>}
             </Button>
           </InputGroup>
         </Form.Group>
@@ -158,22 +146,12 @@ export default function ChangePwd({ backToLogin }) {
 
   return (
     <div className="Login">
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
-        {formGroup('username', 'Nom', username, 'text', setUserName, true)}
-        {inputPassword('actualPwd', 'Mot de passe actuel', password, setPwd)}
-        {inputPassword('newPwd', 'Nouveau mot de passe', newPassword, setNewPwd)}
-        {inputPassword(
-          'newPwd2',
-          'Confirmation du mot de passe',
-          confirmNewPassword,
-          setConfirmNewPwd
-        )}
+        {formGroup('username', 'Nom', username, 'text', setUsername, true)}
+        {inputPassword('actualPwd', 'Mot de passe actuel', password, setPassword)}
+        {inputPassword('newPwd', 'Nouveau mot de passe', newPassword, setNewPassword)}
+        {inputPassword('newPwd2', 'Confirmation du mot de passe', confirmNewPassword, setConfirmNewPassword)}
         <div className="login-button">
           <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
             {btnText}

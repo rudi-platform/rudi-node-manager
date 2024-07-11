@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { createContext, useContext } from 'react'
 
-import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal'
+import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal.js'
 
-export const ModalContext = React.createContext('modal')
-export const useModalContext = () => React.useContext(ModalContext)
+export const ModalContext = createContext('modal')
+export const useModalContext = () => useContext(ModalContext)
 const { Provider } = ModalContext
 
 ModalProvider.propTypes = { children: PropTypes.node }
@@ -19,12 +19,7 @@ export default function ModalProvider({ children }) {
   const { options, changeOptions } = useGenericModalOptions()
   return (
     <Provider value={{ toggle, visible, options, changeOptions }}>
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       {children}
     </Provider>
   )
