@@ -80,11 +80,8 @@ export class RudiForm {
     return this.conf?.dev || this.conf?.env == 'dev'
   }
 
-  init = async () => {
+  async init() {
     const here = 'init'
-    // this.conf = await this.importJSON('./conf', 'No config')
-    // this.ok(here, 'conf')
-    // this.ok(here, 'isDev:', this.isDev)
     const lexR = await this.importJSON('./js/LexicalResources.json', 'No lexical resources')
     this.lexR = lexR[this.language]
     this.ok(here, 'lexR')
@@ -94,6 +91,7 @@ export class RudiForm {
     this.ok(here, 'pmHeaders')
 
     await this._initNodeUrls()
+    this.ok(here, 'node urls:', this.nodeUrls)
     this._initForm()
     this.initialized = true
   }
@@ -115,18 +113,13 @@ export class RudiForm {
       return this._nodeUrls
     } catch (err) {
       this.ko(here, err)
-      console.error(
-        `Prod manager ne peut être joint à l'adresse: ${this.getUrlPm('front/node-urls')}`
-      )
+      console.error(`Prod manager ne peut être joint à l'adresse: ${'front/node-urls'}`)
       return this.fail('reach_pm')
     }
   }
   get nodeUrls() {
     if (!this._nodeUrls) this._initNodeUrls()
     return this._nodeUrls
-  }
-  get formUrl() {
-    return this.nodeUrls?.console_url
   }
   get mediaUrl() {
     return this.nodeUrls?.media_url
@@ -140,7 +133,9 @@ export class RudiForm {
     if (!this._baseUrl) this._baseUrl = document.baseURI.split('/form/')[0]
     return this._baseUrl
   }
-  formUrl = pathJoin(this.baseUrl, 'form')
+  get formUrl() {
+    return pathJoin(this.baseUrl, this.nodeUrls?.form_url)
+  }
   pmUrl = pathJoin(this.baseUrl, 'api')
 
   getUrlPm = (...args) => pathJoin(this.pmUrl, ...args)
@@ -150,13 +145,14 @@ export class RudiForm {
   async _getPm(isJson, ...urlBits) {
     const here = 'getPm'
     if (!this.pmUrl) throw new Error('Init PM URL first')
+    console.log('pmUrl:', this.pmUrl)
     if (this.state == 'fail') throw new Error(`Aborting (${here})`)
+    const url = this.getUrlPm(...urlBits)
+    console.log('url:', url)
     try {
-      return await (isJson ? JsonHttpRequest : HttpRequest)
-        .get(this.getUrlPm(...urlBits), this.pmHeaders)
-        .send()
+      return await (isJson ? JsonHttpRequest : HttpRequest).get(url, this.pmHeaders).send()
     } catch {
-      console.error(`Prod manager ne peut être joint à l'adresse: ${this.getUrlPm(...urlBits)}`)
+      console.error(`Prod manager ne peut être joint à l'adresse: ${url}`)
       return this.fail('reach_pm')
     }
   }

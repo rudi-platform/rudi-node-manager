@@ -1,7 +1,7 @@
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 
-import { pathJoin } from '../utils/utils'
+import { mergeStrings, pathJoin } from '../utils/utils'
 
 // ------------------------------------------------------------------------------------------------
 export const PUBLIC_URL = 'PUBLIC_URL'
@@ -54,3 +54,5 @@ export const getApiFront = (...suffix) => getBackApi('front', ...suffix)
 export const getApiOpen = (...suffix) => getBackApi('open', ...suffix)
 export const getApiData = (...suffix) => getBackApi('data', ...suffix)
 export const getApiMedia = (...suffix) => getBackApi('media', ...suffix)
+export const getForm = (formUrl, suffix, query) =>
+  mergeStrings('?', getPublicUrl(formUrl, suffix), query)

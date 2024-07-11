@@ -80,7 +80,7 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
     if (initialError instanceof RudiError) {
       return reply.status(initialError.code).json(initialError)
     }
-    if (isAxiosError(initialError)) return this.treatAxiosError(initialError, reply, mod)
+    if (isAxiosError(initialError)) return this.treatAxiosError(initialError, mod, reply)
     if (initialError?.response?.data) {
       const statusCode = initialError.response.data.statusCode
       const message = cleanErrMsg(initialError.response.data.message)
@@ -110,18 +110,9 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
 
 const isAxiosError = (err) => err?.name == 'AxiosError'
 
-exports.treatAxiosError = (err, rudiModuleCalled, reply) => {
+exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
   const fun = 'treatAxiosError'
-  if (err.response) {
-    const { data, status = '' } = err.response
-    log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
-    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
-  } else {
-    // err.message
-    const { message, status, code } = err
-    log.e(mod, fun, `ERR (axios) ${status} (${code}): ${cleanErrMsg(message)}`)
-    // log.e(mod, fun, `ERR req headers: ${cleanErrMsg(headers)}`)
-  }
+  log.d(mod, fun, req.url)
   let statusCode, error
   if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
     statusCode = 503
@@ -131,7 +122,27 @@ exports.treatAxiosError = (err, rudiModuleCalled, reply) => {
     }
     // log.e(mod,fun,err. )
     if (reply) return reply.status(statusCode).json(error)
-    else throw new ConnectionError(error.message)
+    throw new ConnectionError(error.message)
+  }
+  if (err.response) {
+    const { data, status = '' } = err.response
+    log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)
+    const { statusCode, message } = data
+    log.d(mod, fun, cleanErrMsg(message || data))
+    const errMsg = rudiModuleCalled
+      ? `[${rudiModuleCalled}] ${cleanErrMsg(message || data)}`
+      : cleanErrMsg(message | data)
+    log.d(mod, fun, cleanErrMsg(errMsg))
+
+    if (reply) return reply.status(statusCode || status).send(errMsg)
+    throw RudiError.createRudiHttpError(statusCode || status, errMsg)
+  } else {
+    // err.message
+    const { message, status, code } = err
+    const errMsg = (rudiModuleCalled ? `[${rudiModuleCalled}] ` : '') + cleanErrMsg(message || err)
+    log.sysWarn(mod, fun, `ERR (axios) ${status || ''} (${code}): ${errMsg}`)
+    if (reply) return reply.status(status).send(errMsg)
+    throw RudiError.createRudiHttpError(status, errMsg)
   }
 }
 

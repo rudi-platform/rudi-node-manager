@@ -1,7 +1,7 @@
 const mod = 'consoleCtrl'
 
 // Internal dependencies
-const { getConsoleFormUrl, getRudiMediaUrl } = require('../config/config')
+const { FORM_PREFIX, getRudiMediaUrl } = require('../config/config')
 const log = require('../utils/logger')
 const { UnauthorizedError } = require('../utils/errors')
 const { getPortalUrl, getApiExternalUrl } = require('./dataController')
@@ -13,7 +13,7 @@ exports.getNodeUrls = async (req, reply) => {
     const urls = await Promise.all([getApiExternalUrl(), getPortalUrl()])
     const nodeUrls = {
       api_url: urls[0],
-      console_url: getConsoleFormUrl(),
+      form_url: FORM_PREFIX,
       media_url: getRudiMediaUrl(),
     }
     if (urls[1] != 'No portal connected') nodeUrls['portal_url'] = urls[1]
@@ -28,7 +28,7 @@ exports.getNodeUrls = async (req, reply) => {
 // Controllers
 exports.getFormUrl = (req, reply) => {
   try {
-    reply.status(200).send(getConsoleFormUrl())
+    reply.status(200).send(FORM_PREFIX)
   } catch (err) {
     log.e('', '', err)
     log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_form_url' }))

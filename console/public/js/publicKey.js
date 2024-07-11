@@ -16,7 +16,7 @@ import { RudiObjForm } from './rudiObj.js'
 
 export class RudiKeyForm extends RudiObjForm {
   constructor(language) {
-    super(language, 'pub_keys', 'name', 'templates/publicKey.json')
+    super(language, 'pub_keys', 'name', this.getUrlLocal('templates/publicKey.json'))
   }
 
   /**

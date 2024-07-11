@@ -1,6 +1,6 @@
 // ----- External dependencies
 const jwtAA = require('jsonwebtoken')
-const axios = require('axios')
+const { default: axios } = require('axios')
 const { v4: uuidv4 } = require('uuid')
 const jwtLib = require(`@aqmo.org/jwt-lib`)
 
@@ -95,6 +95,20 @@ exports.refreshTokens = (req) => {
     [this.PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: pmFrontCookieOpts },
   }
 }
+
+exports.sendJsonAndTokens = (req, reply, data) => {
+  try {
+    const { consoleToken, pmFrontToken } = this.refreshTokens(req)
+    reply
+      .status(200)
+      .cookie(this.CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(this.PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .json(data)
+  } catch (err) {
+    log.w(mod, 'sendJsonAndTokens', cleanErrMsg(err))
+  }
+}
+
 exports.getTokenFromMediaForUser = async (user, exp) => {
   const fun = 'getTokenFromMediaForUser'
   const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null)

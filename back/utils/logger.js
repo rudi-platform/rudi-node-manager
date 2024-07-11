@@ -122,16 +122,13 @@ const noCycle = () => {
     return value
   }
 }
-const logWhere = (srcMod, srcFun) => {
-  return !srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`
-}
+const logWhere = (srcMod, srcFun) => (!srcMod ? srcFun : !srcFun ? srcMod : `${srcMod} . ${srcFun}`)
 
-const displayStr = (srcMod, srcFun, msg) => {
-  return `[ ${logWhere(srcMod, srcFun)} ] ${msg !== undefined && msg !== '' ? JSON.stringify(msg, noCycle()) : '<-'}`
-}
-const createLogLine = (level, srcMod, srcFun, msg) => {
-  return `${nowFormatted()} ${level} ${displayStr(srcMod, srcFun, msg)}`
-}
+const displayStr = (srcMod, srcFun, ...msg) =>
+  `[ ${logWhere(srcMod, srcFun)} ] ${msg.length > 0 ? msg.map((m) => JSON.stringify(m, noCycle())) : '<-'}`
+
+const createLogLine = (level, srcMod, srcFun, ...msg) =>
+  `${nowFormatted()} ${level} ${displayStr(srcMod, srcFun, ...msg)}`
 
 // Controllers
 exports.getContext = (req, options = {}) => {

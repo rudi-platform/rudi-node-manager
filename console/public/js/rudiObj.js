@@ -144,7 +144,7 @@ export class RudiObjForm extends RudiForm {
       this.ko(here)
       if (this.isDev) console.error('ERF02 rudiForm', e)
       this.addErrorMsg(e)
-      throw e
+      console.error(e)
     }
   }
 }

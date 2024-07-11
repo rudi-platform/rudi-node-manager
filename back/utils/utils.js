@@ -46,7 +46,6 @@ exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf
 exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   try {
     const dataStr = data
-    // if (typeof data === 'object') dataStr = JSON.stringify(data)
     return Buffer.from(dataStr, fromEncoding).toString(toEncoding)
   } catch (err) {
     throw err
@@ -55,7 +54,6 @@ exports.convertEncoding = (data, fromEncoding, toEncoding) => {
 
 exports.toInt = (str) => {
   const i = parseInt(str, 10)
-  // console.log('T (toInt)', str, '->', i);
   return Number.isNaN(i) || `${i}` !== str ? str : i
 }
 

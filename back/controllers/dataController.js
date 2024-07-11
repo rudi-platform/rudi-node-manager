@@ -1,16 +1,19 @@
 const mod = 'callApiSimple'
 
 // Internal dependencies
+const { default: axios } = require('axios')
+
 const {
-  getRudiApi,
   getAdminApi,
-  getConsoleFormUrl,
   getRudiMediaUrl,
   getCompleteRudiApiUrl,
+  FORM_PREFIX,
 } = require('../config/config')
-const { handleError } = require('./errorHandler')
+
 const { getTags } = require('../config/backOptions')
-const { rudiApiGet } = require('../utils/connect.js')
+
+const { handleError } = require('./errorHandler')
+const { getRudiApiHeaders } = require('../utils/secu.js')
 
 let cache = {}
 // Helper functions
@@ -32,7 +35,8 @@ const callApiModule = async (url, req, reply) => {
   const fun = 'callApiModule'
   try {
     if (cache[url]) return reply ? reply.status(200).send(cache[url]) : cache[url]
-    const data = await rudiApiGet(getCompleteRudiApiUrl(url, req))
+    const res = await axios.get(getCompleteRudiApiUrl(url, req), getRudiApiHeaders())
+    const data = res.data
     cache[url] = data
     return reply ? reply.status(200).send(data) : data
   } catch (err) {
@@ -54,7 +58,7 @@ exports.getThemeByLang = (req, reply) =>
   callApiModule(getAdminApi('enum/themes', req.params?.lang || 'fr'), req, reply)
 
 const getThemes = (req, reply) => {
-  const lang = req.params?.lang || req.query?.lang || 'fr'
+  const lang = req?.params?.lang || req?.query?.lang || 'fr'
   return callApiModule(getAdminApi('enum/themes', lang), req, reply)
 }
 
@@ -72,7 +76,7 @@ exports.getInitData = async (req, reply) => {
       themeLabels: data[0],
       apiExtUrl: data[1],
       mediaExtUrl: getRudiMediaUrl(),
-      formUrl: getConsoleFormUrl(),
+      formUrl: FORM_PREFIX,
       portalConnected: !!data[2],
     }
     return reply ? reply.status(200).json(initData) : initData

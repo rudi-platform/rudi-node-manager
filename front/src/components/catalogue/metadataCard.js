@@ -14,8 +14,9 @@ import {
 import { Link } from 'react-router-dom'
 
 import { BackDataContext } from '../../context/backDataContext'
+import { getForm } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getLocaleFormatted, mergeStrings, pathJoin } from '../../utils/utils'
+import { getLocaleFormatted, pathJoin } from '../../utils/utils'
 import {
   DefaultConfirmOption,
   DefaultOkOption,
@@ -23,7 +24,6 @@ import {
 } from '../modals/genericModalContext'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import ThemeDisplay from '../other/themeDisplay'
-import { getPublicUrl } from '../../utils/frontOptions.js'
 
 const downloadButton = (url) => (
   <button type="button" className="btn btn-green button-margin">
@@ -143,13 +143,13 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const { changeOptions, toggle } = useModalContext()
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
-  const [appData, setAppData] = useState({})
+  const [appData, setAppData] = useState(appInfo)
   useEffect(() => setAppData(appInfo), [appInfo])
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
 
-  const getForm = (query) => mergeStrings('?', getPublicUrl(appData.formUrl, 'metadata'), query)
+  const getFormMeta = (query) => getForm(appData.formUrl, 'metadata', query)
 
   /**
    * call for metadata deletion
@@ -258,7 +258,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const button = {
     share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
-    edit: editButton(getForm(`update=${metadata.global_id}`)),
+    edit: editButton(getFormMeta(`update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
     external: (url) => externalUrlButton(url),
@@ -270,7 +270,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
             <a
-              href={getForm(`read-only=${metadata.global_id}`)}
+              href={getFormMeta(`read-only=${metadata.global_id}`)}
               target="_blank"
               rel="noopener noreferrer"
             >

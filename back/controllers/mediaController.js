@@ -1,10 +1,15 @@
 const mod = 'mediaCtrl'
 
 // External dependencies
-const axios = require('axios')
+const { default: axios } = require('axios')
 
 // Internal dependencies
-const { getMediaDwnlUrl, getRudiApi, getRudiMediaUrl, getAdminApi } = require('../config/config')
+const {
+  getMediaDwnlUrl,
+  getRudiMediaUrl,
+  CATALOG,
+  rudiCatalogAdminApi,
+} = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
 const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
@@ -15,11 +20,11 @@ const {
   readJwtBody,
   getTokenFromMediaForUser,
   getRudiApiHeaders,
+  sendJsonAndTokens,
 } = require('../utils/secu')
 const { handleError, treatAxiosError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
-const { beautify } = require('../utils/utils.js')
-const { rudiApiGet } = require('../utils/connect.js')
+const { beautify, cleanErrMsg } = require('../utils/utils.js')
 
 // Controllers
 exports.getMediaToken = async (req, reply, next) => {
@@ -42,7 +47,7 @@ exports.getMediaToken = async (req, reply, next) => {
     if (exp * 1000 < new Date().getTime())
       throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
-    const user = await dbGetUserByUsername(null, payloadUser.username)
+    const user = await dbGetUserByUsername(null, payloadUser.username) // NOSONAR
     if (!user)
       return reply.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
 
@@ -70,10 +75,11 @@ exports.getMediaInfoById = async (req, reply, next) => {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    const mediaInfo = await rudiApiGet(getRudiApi(getAdminApi('media', id)), { params: req.query })
-    reply.status(200).json(mediaInfo)
+    const res = await axios.get(rudiCatalogAdminApi('media', id), getRudiApiHeaders())
+    reply.status(200).json(res.data)
   } catch (err) {
-    handleError(req, reply, err, 500, opType, 'media')
+    log.w(mod, opType, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
@@ -128,9 +134,8 @@ exports.commitMediaFile = async (req, reply, next) => {
     }
     return reply.status(200).send(res)
   } catch (err) {
-    log.e(mod, fun, err)
-    if (err.response?.data) return reply.send(err.response.code).json(err.response.data)
-    return treatAxiosError(err, reply, 'RudiApi')
+    log.w(mod, fun, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
@@ -176,18 +181,15 @@ const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
 
 const commitOnRudiApi = async (mediaId, commitId) => {
   const fun = 'commitOnRudiApi'
-  const url = getAdminApi('media', mediaId, 'commit')
   try {
-    const commitInfo = await axios.post(
-      getRudiApi(url),
+    const res = await axios.post(
+      rudiCatalogAdminApi('media', mediaId, 'commit'),
       { commit_id: commitId },
       getRudiApiHeaders()
     )
-    log.d(mod, fun, 'T (commitMedia) commit API OK:', commitInfo.data)
-    return {
-      place: 'rudi-api',
-      ...commitInfo,
-    }
+    const commitInfo = res.data
+    log.d(mod, fun, 'T (commitMedia) commit API OK:', commitInfo)
+    return { place: CATALOG, ...commitInfo }
   } catch (err) {
     console.error(
       `T (commitMedia) ERR${err.response?.status || err.statusCode || ''} Api commit:`,

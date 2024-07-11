@@ -54,25 +54,31 @@ exports.getConf = (section, subSection) => {
 }
 
 // Shortcuts to access popular conf values
-exports.getRudiApi = (...args) => pathJoin(config.rudi_api.rudi_api_url, ...args)
+exports.rudiCatalogUrl = (...args) => pathJoin(config.rudi_api.rudi_api_url, ...args)
+exports.rudiCatalogAdminApi = (...args) =>
+  pathJoin(config.rudi_api.rudi_api_url, config.rudi_api.admin_api, ...args)
+
 exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
 
 exports.getRudiMediaUrl = (...args) => pathJoin(config.rudi_media.rudi_media_url, ...args)
 exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
-exports.getConsoleFormUrl = () => '/form'
 
 exports.getDbConf = (subSection) => config.database[subSection]
 exports.SU_NAME = config?.database?.db_su_usr
 
 exports.getCompleteRudiApiUrl = (url, req) => {
-  const finalUrl = new URL(this.getRudiApi(url))
+  const finalUrl = new URL(this.rudiCatalogUrl(url))
   if (req) {
-    const origUrl = new URL(this.getRudiApi(req.url))
+    const origUrl = new URL(this.rudiCatalogUrl(req.url))
     if (origUrl?.search) {
       origUrl.searchParams.forEach((val, key) => finalUrl.searchParams.set(key, val))
     }
   }
   return finalUrl.href
 }
+
+exports.FORM_PREFIX = 'form'
+exports.CATALOG = 'rudi-catalog'
+exports.STORAGE = 'rudi-storage'

@@ -24,7 +24,6 @@ const {
   dbRegisterUser,
   dbUpdatePasswordWithField,
 } = require('../database/database')
-const { getConsoleFormUrl } = require('../config/config.js')
 
 // ---- Controllers ----
 /**

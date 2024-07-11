@@ -12,7 +12,7 @@ const helmet = require('helmet')
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-const { getConf, getConsoleFormUrl, getRudiMediaUrl } = require('./back/config/config')
+const { getConf, getConsoleFormUrl, getRudiMediaUrl, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
 const { isDevEnv } = require('./back/config/backOptions')
@@ -34,6 +34,7 @@ const passport = require('./back/utils/passportSetup')
 const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
 const { checkRolePerm } = require('./back/utils/roleCheck')
 const consoleRouter = require('./console/router.js')
+const { pathJoin } = require('./back/utils/utils.js')
 
 // -------------------------------------------------------------------------------------------------
 // Launching express app
@@ -106,8 +107,7 @@ backend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
 backend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
 // Serving the console frontend
-const CONSOLE_PREFIX = '/form'
-backend.use(CONSOLE_PREFIX, consoleRouter)
+backend.use(pathJoin('', FORM_PREFIX), consoleRouter)
 
 // This middleware informs the express application to serve our compiled React files
 // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
