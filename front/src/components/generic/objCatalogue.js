@@ -49,8 +49,8 @@ export default function ObjCatalogue({
 }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const [objList, setObjList] = useState([])
   const [hasMore, setHasMore] = useState(true)
@@ -59,6 +59,9 @@ export default function ObjCatalogue({
 
   const getApiUrlObj = (suffix) => getApiData(objType, suffix)
   const deleteUrl = (id) => getApiUrlObj(id)
+
+  const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')
+  useEffect(() => setSortBy(propSortBy || '-updatedAt'), [propSortBy])
 
   const refresh = () => {
     setHasMore(true)
@@ -93,7 +96,7 @@ export default function ObjCatalogue({
   function getInitialData() {
     axios
       .get(getApiUrlObj(), {
-        params: { sort_by: propSortBy || '-updateAt', limit: PAGE_SIZE, offset: 0 },
+        params: { sort_by: sortBy, limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
         if (res.data?.length < PAGE_SIZE) setHasMore(false)
@@ -108,7 +111,7 @@ export default function ObjCatalogue({
   const fetchMoreData = () => {
     axios
       .get(getApiUrlObj(), {
-        params: { sort_by: propSortBy || '-updateAt', limit: PAGE_SIZE, offset: currentOffset },
+        params: { sort_by: sortBy, limit: PAGE_SIZE, offset: currentOffset },
       })
       .then((res) => {
         const data = res.data
