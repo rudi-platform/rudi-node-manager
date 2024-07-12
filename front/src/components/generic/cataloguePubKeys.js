@@ -24,6 +24,7 @@ export default function CataloguePubKeys({ editMode }) {
         key: 'key',
         type: 'type',
       }}
+      propSortBy={'-updatedAt'}
       btnTextAdd="Ajouter une clé publique"
       btnTextChg="Modifier une clé publique :"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression de la clé publique ${id}?`}
