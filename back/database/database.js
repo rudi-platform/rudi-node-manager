@@ -10,7 +10,7 @@ const { hashPassword } = require('@aqmo.org/jwt-lib')
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 const { getDbConf, SU_NAME } = require('../config/config')
-const { beautify } = require('../utils/utils')
+const { beautify, pathJoin } = require('../utils/utils')
 
 const {
   BadRequestError,
@@ -27,7 +27,7 @@ const log = require('../utils/logger')
 // Constants
 // -------------------------------------------------------------------------------------------------
 const DB_NAME = getDbConf('db_filename')
-const DB_FILE = (`${getDbConf('db_directory')}` + (DB_NAME && `/${DB_NAME}`)).trim()
+const DB_FILE = pathJoin(getDbConf('db_directory'), DB_NAME).trim()
 
 const TBL_USERS = 'Users'
 exports.TBL_USERS = TBL_USERS
