@@ -23,6 +23,7 @@ const {
   PM_FRONT_TOKEN_NAME,
 } = require('./secu')
 const { matchPassword } = require('@aqmo.org/jwt-lib')
+const { logout } = require('../controllers/authControllerPassport.js')
 
 // Passport configuration
 passport.serializeUser((user, done) => done(null, user.id))
@@ -45,7 +46,7 @@ passport.use(
       .catch((err) => {
         log.e(mod, 'passport', `ERR LocalStrategy: ${err}`)
         log.sysWarn(mod, 'LocalStrategy', `Error login: ${err}`)
-        this.logout()
+        logout()
         return done(null, false, err)
       })
   })
