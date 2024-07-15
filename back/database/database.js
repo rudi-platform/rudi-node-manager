@@ -72,7 +72,7 @@ exports.dbOpenOrCreate = () => {
         log.e(mod, fun, err)
         return reject(err)
       }
-      log.v(mod, fun, 'Creation of (or Connected to) the rudi_manager database.')
+      log.v(mod, fun, 'Connection to the RUDI manager database')
     })
     resolve(db)
   })
@@ -199,7 +199,7 @@ exports.dbGetUsers = (openedDb) => {
  * @return {Promise} User id and username when successful
  * @throws {ForbiddenError} user already exists
  */
-exports.dbCreateUserCheckExists = (openedDb, user) => {
+exports.dbCreateUserCheckExists = (openedDb, user, silent = false) => {
   const fun = 'safeCreateUser'
   const { username, password, email, id } = user
   const db = openedDb || dbOpen()
@@ -226,12 +226,13 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
             log.e(mod, fun + ' sqlReq', sqlReq)
             return reject(err)
           }
-          log.i(
-            mod,
-            fun,
-            `${TBL_USERS} : user created: '${username}'`,
-            log.getContext(null, { opType: 'post_user' })
-          )
+          if (!silent)
+            log.i(
+              mod,
+              fun,
+              `${TBL_USERS} : user created: '${username}'`,
+              log.getContext(null, { opType: 'post_user' })
+            )
           db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, userInfo) => {
             if (!openedDb) dbClose(db)
             if (err) {
@@ -248,7 +249,11 @@ exports.dbCreateUserCheckExists = (openedDb, user) => {
   })
 }
 
-exports.dbRegisterUser = async (db, { username, email, password, isSuPwdHashed, id }) => {
+exports.dbRegisterUser = async (
+  db,
+  { username, email, password, isSuPwdHashed, id },
+  silent = false
+) => {
   const fun = 'dbRegisterUser'
   try {
     const userCreds = {
@@ -258,7 +263,7 @@ exports.dbRegisterUser = async (db, { username, email, password, isSuPwdHashed, 
     }
     if (id) userCreds.id = id
 
-    const usrInfo = await this.dbCreateUserCheckExists(db, userCreds)
+    const usrInfo = await this.dbCreateUserCheckExists(db, userCreds, silent)
     return { id: usrInfo.id, username: usrInfo.username }
   } catch (err) {
     log.e(mod, fun, err)
@@ -303,16 +308,7 @@ exports.dbCreateUser = (openedDb, userInfo) => {
 exports.dbUpdateUser = (openedDb, userInfo) => {
   const fun = 'dbUpdateUser'
   const { id, username, password, email } = userInfo
-  log.d(mod, fun, `userInfo: ${beautify(userInfo)}`)
-  log.d(
-    mod,
-    fun,
-    `req: ${
-      `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
-      (password ? `, password = '${password}'` : '') +
-      ` WHERE id = ?`
-    }`
-  )
+  log.d(mod, fun, `userInfo: ${beautify({ ...userInfo, password: '***' })}`)
   const db = openedDb || dbOpen()
   const sqlReq =
     `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
@@ -374,7 +370,7 @@ exports.dbUpdatePasswordWithField = (openedDb, key, val, password) => {
   })
 }
 
-exports.dbDeleteUserWithId = (openedDb, id) => {
+exports.dbDeleteUserWithId = (openedDb, id, silent = false) => {
   const fun = 'deleteUser'
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
@@ -384,12 +380,13 @@ exports.dbDeleteUserWithId = (openedDb, id) => {
         log.e(mod, fun, err.message)
         return reject(err)
       }
-      log.i(
-        mod,
-        fun,
-        `${TBL_USERS} : A row was deleted with id ${id}`,
-        log.getContext(null, { opType: 'delete_user' })
-      )
+      if (!silent)
+        log.i(
+          mod,
+          fun,
+          `${TBL_USERS} : A row was deleted with id ${id}`,
+          log.getContext(null, { opType: 'delete_user' })
+        )
       resolve({ id })
     })
   })

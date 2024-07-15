@@ -45,6 +45,7 @@ passport.use(
       .catch((err) => {
         log.e(mod, 'passport', `ERR LocalStrategy: ${err}`)
         log.sysWarn(mod, 'LocalStrategy', `Error login: ${err}`)
+        this.logout()
         return done(null, false, err)
       })
   })

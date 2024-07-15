@@ -4,7 +4,7 @@ const mod = 'initDb'
 const fs = require('fs')
 
 // ---- Internal dependencies -----
-const { getDbConf, SU_NAME } = require('../../config/config')
+const { getDbConf, SU_NAME, SU_MAIL } = require('../../config/config')
 const { decodeBase64 } = require('../../utils/utils')
 const log = require('../../utils/logger')
 const { RudiError, statusOK } = require('../../utils/errors')
@@ -25,7 +25,13 @@ const {
   TBL_USERS,
   dbGetUsers,
   dbGetUserById,
+  dbGetUserByUsername,
+  dbCreateUser,
+  dbUpdateUser,
+  dbUpdateUserRoles,
 } = require('../database')
+const { getBackOptions, OPT_SU_CREDS } = require('../../config/backOptions.js')
+const { decodeCredentials } = require('../../controllers/authControllerPassport.js')
 // const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
 const USER_ID_START_VALUE = 6000
@@ -120,7 +126,7 @@ const dbNormalizeRoleTableAddHide = (openedDb) => {
       }
       if (rows.find((row) => row.name === 'hide')) {
         if (!openedDb) dbClose(db)
-        log.d(mod, `${fun}`, `Column 'hide' exists`)
+        // log.d(mod, `${fun}`, `Column 'hide' exists`)
         return resolve(statusOK(`Column 'hide' exists`))
       }
       db.run(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1) DEFAULT 0`, (err) => {
@@ -278,17 +284,64 @@ const dbNormalizeUserTableId = async (db) => {
     const dummyUserName = 'dummy'
     let dummyUsr = await dbGetUserById(db, USER_ID_START_VALUE)
     if (!dummyUsr)
-      dummyUsr = await dbRegisterUser(db, {
-        username: dummyUserName,
-        email: 'x',
-        password: 'x',
-        id: USER_ID_START_VALUE,
-      })
-    if (dummyUsr?.username === dummyUserName) await dbDeleteUserWithId(db, USER_ID_START_VALUE)
+      dummyUsr = await dbRegisterUser(
+        db,
+        {
+          username: dummyUserName,
+          email: 'x',
+          password: 'x',
+          id: USER_ID_START_VALUE,
+        },
+        true
+      )
+    if (dummyUsr?.username === dummyUserName)
+      await dbDeleteUserWithId(db, USER_ID_START_VALUE, true)
     return statusOK(`Users table IDs normalized`)
   } catch (err) {
     log.e(mod, 'dbNormalizeUsersTableId', err)
     throw err
+  }
+}
+
+const dbUpdateSuperUser = async (db, b64SuCreds) => {
+  const fun = 'dbUpdateSuperUser'
+  try {
+    const [username, password] = decodeCredentials(b64SuCreds)
+    const dbUsrInfo = await dbGetUserByUsername(db, username)
+    const isSuPwdHashed = true
+    if (dbUsrInfo) {
+      // Super user already exists, updating the password
+      await dbUpdateUser(db, {
+        ...dbUsrInfo,
+        password,
+        isSuPwdHashed,
+      })
+      await dbUpdateUserRoles(db, {
+        userId: dbUsrInfo.id,
+        username,
+        roles: [this.ROLE_SU],
+      })
+
+      log.w(mod, fun, `Super user updated: '${username}' (id ${dbUsrInfo.id})`)
+    } else {
+      // Super user doesn't exists, creating the user
+      const id = getDbConf('db_su_id') || 0
+      log.w(mod, fun, `Creating super user: '${username}' (id ${id})`)
+      const suUsrInfo = {
+        id,
+        username,
+        password,
+        isSuPwdHashed,
+        email: SU_MAIL,
+        role: [this.ROLE_SU, this.ROLE_ADMIN],
+      }
+      await dbCreateUser(db, suUsrInfo)
+      log.w(mod, fun, `Super user created: '${username}' (id ${id})`)
+    }
+    return username
+  } catch (error) {
+    log.e(mod, fun, error)
+    throw error
   }
 }
 
@@ -314,7 +367,7 @@ const dbCreateSuperUser = async (db) => {
     username: SU_NAME,
     password: suPwd,
     isSuPwdHashed: !!isSuPwdHashed,
-    email: 'security@rudi-univ-rennes1.fr',
+    email: SU_MAIL,
     role: this.ROLE_SU,
   }
 
@@ -352,14 +405,20 @@ exports.dbInitialize = async () => {
 
     await dbNormalizeUserTableName(db, 'x')
     await dbNormalizeUserTableName(db, 'users')
-    log.d(mod, fun, 'Table normalized: users')
+    log.d(mod, fun, 'Table normalized: Users')
 
     await dbInitTable(db, TBL_USERS, sqlCreateUserTable)
     await dbNormalizeUserTableId(db)
     log.d(mod, fun, 'Table initialized: Users')
 
-    await dbCreateSuperUser(db)
-    log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
+    const suCreds = getBackOptions(OPT_SU_CREDS)
+    if (suCreds) {
+      const suName = await dbUpdateSuperUser(db, suCreds)
+      log.w(mod, fun, `User created/updated: SU (${suName})`)
+    } else {
+      await dbCreateSuperUser(db)
+      log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
+    }
 
     await dbGetUsers(db)
     await dbGetUserRoles(db)

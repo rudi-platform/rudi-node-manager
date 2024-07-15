@@ -24,6 +24,7 @@ const {
   dbRegisterUser,
   dbUpdatePasswordWithField,
 } = require('../database/database')
+const { decodeBase64url, decodeBase64, toBase64 } = require('../utils/utils.js')
 
 // ---- Controllers ----
 /**
@@ -169,9 +170,53 @@ exports.resetPassword = async (req, reply, next) => {
   }
 }
 
-exports.logout = (req, reply, next) =>
+exports.logout = (req, reply) =>
   reply
     .status(200)
     .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
     .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
     .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '', message: 'logout' })
+
+/**
+ *
+ * @param {String} pwd the user's password
+ * @param {String} usr the user's name
+ * @param {String} encoding input encoding of both username and password
+ * @returns if usr was defined: a base64 encoded string with colon-separated <username>:<hashed password>. Otherwise : the hashed password (not encoded)
+ */
+exports.hashCredentials = (pwd, usr, encoding) => {
+  if (!pwd) throw new BadRequestError('Input password should be defined')
+  let decode
+  switch (encoding?.toLowerCase()) {
+    case 'base64':
+      decode = (x) => decodeBase64(x)
+      break
+    case 'base64url':
+      decode = (x) => decodeBase64url(x)
+      break
+    case undefined:
+      decode = (x) => x
+      break
+    default:
+      throw new BadRequestError(
+        `When defined, input encoding should be 'base64' or 'base64url', got '${encoding}'`
+      )
+  }
+  if (usr) return toBase64(`${decode(usr)}:${hashPassword(decode(pwd))}`)
+  return hashPassword(decode(pwd))
+}
+
+exports.decodeCredentials = (b64Credentials) => {
+  let creds
+  try {
+    creds = decodeBase64(b64Credentials)
+  } catch {
+    throw new BadRequestError('The input credentials should be base 64 encoded')
+  }
+  try {
+    const [usr, pwd] = creds.split(':')
+    return [usr, pwd]
+  } catch {
+    throw new BadRequestError('Credentials should be a <usr>:<pwd> string')
+  }
+}

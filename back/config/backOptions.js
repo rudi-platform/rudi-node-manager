@@ -8,6 +8,7 @@ exports.OPT_GIT_HASH = 'hash'
 exports.OPT_APP_TAG = 'tag'
 exports.OPT_NODE_ENV = 'nodeEnv'
 exports.OPT_BACK_PATH = 'backPath'
+exports.OPT_SU_CREDS = 'suCreds'
 
 const _argv = minimist(process.argv.slice(2))
 console.log('_argv:', _argv)
@@ -45,6 +46,11 @@ exports.OPTIONS = {
     text: 'Back-end path',
     cli: 'back_path',
     env: 'RUDI_PROD_MANAGER_BACK_PATH',
+  },
+  [this.OPT_SU_CREDS]: {
+    text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',
+    cli: 'su',
+    env: 'RUDI_PROD_MANAGER_SU_CREDS',
   },
 }
 // if (argv.indexOf('--opts') > -1) {
