@@ -32,7 +32,6 @@ const {
 } = require('../database')
 const { getBackOptions, OPT_SU_CREDS } = require('../../config/backOptions.js')
 const { decodeCredentials } = require('../../controllers/authControllerPassport.js')
-// const { dbInitDefaultFormTable } = require('./initDefaultForm')
 
 const USER_ID_START_VALUE = 6000
 

@@ -26,7 +26,7 @@ export default function CatalogueContact({ editMode }) {
         role: 'rôle',
         email: 'e-mail',
       }}
-      propSortBy={'-updatedAt'}
+      propSortBy="-updatedAt"
       btnTextAdd="Ajouter un contact"
       btnTextChg="Modifier un contact :"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression du contact ${id}?`}

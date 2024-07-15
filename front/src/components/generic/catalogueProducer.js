@@ -25,7 +25,7 @@ export default function CatalogueProducer({ editMode, logout }) {
       propNamesToDisplay={{
         organization_id: 'organization_id',
       }}
-      propSortBy={'-updatedAt'}
+      propSortBy="-updatedAt"
       btnTextAdd="Ajouter un producteur"
       btnTextChg="Modifier un producteur :"
       deleteConfirmMsg={(id) => `Confirmez vous la suppression du producteur ${id}?`}
