@@ -210,7 +210,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
 
   const getFirstKey = (obj) => Object.keys(obj)[0]
   const getAbsFilterVal = (str, toggle) =>
-    `${str}`.startsWith('-') ? `${str}`.substring(1) : `${toggle ? '-' : ''}${str}`
+    `${str}`.startsWith('-') ? `${str}`.slice(1) : `${toggle ? '-' : ''}${str}`
   const toggleFilterVal = (str) => getAbsFilterVal(str, true)
   /**
    * ajoute un filter pour la requete
