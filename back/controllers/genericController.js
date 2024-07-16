@@ -6,7 +6,7 @@ const { CATALOG, rudiCatalogAdminApi } = require('../config/config')
 const log = require('../utils/logger')
 const { getRudiApiHeaders, sendJsonAndTokens } = require('../utils/secu')
 const { handleError, treatAxiosError } = require('./errorHandler')
-const { jsonToString, cleanErrMsg } = require('../utils/utils.js')
+const { jsonToString, cleanErrMsg, beautify } = require('../utils/utils.js')
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -117,9 +117,10 @@ exports.getCounts = async (req, reply) => {
   let res
   try {
     res = await Promise.all(
-      COUNT_BY_LABELS.map((label) =>
-        axios.get(rudiCatalogAdminApi(`resources?count_by=${label}`), getRudiApiHeaders())
-      )
+      COUNT_BY_LABELS.map((label) => {
+        log.d(mod, fun, `${label}: ${rudiCatalogAdminApi(`resources?count_by=${label}`)}`)
+        return axios.get(rudiCatalogAdminApi(`resources?count_by=${label}`), getRudiApiHeaders())
+      })
     )
   } catch (err) {
     log.w(mod, fun, err)
@@ -127,8 +128,9 @@ exports.getCounts = async (req, reply) => {
   }
   try {
     const counts = {}
+    log.d(mod, fun, beautify(res.data))
     COUNT_BY_LABELS.forEach((label, i) => {
-      counts[label] = res.data[i]
+      counts[label] = res[i].data
     })
     reply.status(200).json(counts)
   } catch (err) {

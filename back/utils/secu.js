@@ -178,10 +178,10 @@ exports.createPmJwtForMedia = (body) =>
   )
 
 const PM_API_ID = getConf('rudi_api', 'pm_api_id')
-let cachedApiJwt
+let _cachedApiJwt
 exports.getRudiApiToken = () => {
-  if (!isJwtValid(cachedApiJwt)) {
-    cachedApiJwt = jwtLib.forgeToken(
+  if (!isJwtValid(_cachedApiJwt)) {
+    _cachedApiJwt = jwtLib.forgeToken(
       getPrvKey('api'),
       {},
       {
@@ -192,7 +192,7 @@ exports.getRudiApiToken = () => {
       }
     )
   }
-  return cachedApiJwt
+  return _cachedApiJwt
 }
 
 exports.getRudiApiHeaders = () => ({
