@@ -5,8 +5,8 @@
 # - linter needs install:dev as eslint and prettier are dev dependencies
 # --------------------------------------------------------------------------------------------------
 stages:
-  - install_back
   - build_front
+  - install_back
 
 variables:
   BRANCHES_AUTO: /^(release|shared)$/
@@ -14,7 +14,7 @@ variables:
 # npm install Front + build Front
 build:front:
   stage: build_front
-  needs: []
+  # needs: []
   rules:
     - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: always
@@ -41,7 +41,7 @@ build:front:
 #---------------------------------------------------------------------------------------------------
 install_back:
   stage: install_back
-  needs: []
+  # needs: []
   rules:
     - if: $CI_COMMIT_BRANCH =~ $BRANCHES_AUTO
       when: always
