@@ -59,8 +59,12 @@ exports.postObject = async (req, reply) => {
   const opType = 'post_object'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = {
+    params: req?.query,
+    ...getRudiApiHeaders(),
+  }
   try {
-    const res = await axios.post(rudiCatalogAdminApi(objectType), req.body, getRudiApiHeaders())
+    const res = await axios.post(rudiCatalogAdminApi(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -72,8 +76,12 @@ exports.putObject = async (req, reply) => {
   const opType = 'post_object'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = {
+    params: req?.query,
+    ...getRudiApiHeaders(),
+  }
   try {
-    const res = await axios.put(rudiCatalogAdminApi(objectType), req.body, getRudiApiHeaders())
+    const res = await axios.put(rudiCatalogAdminApi(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -85,8 +93,12 @@ exports.deleteObject = async (req, reply) => {
   const opType = 'del_object'
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
+  const opts = {
+    params: req?.query,
+    ...getRudiApiHeaders(),
+  }
   try {
-    const res = await axios.delete(rudiCatalogAdminApi(objectType, id), getRudiApiHeaders())
+    const res = await axios.delete(rudiCatalogAdminApi(objectType, id), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -98,12 +110,12 @@ exports.deleteObjects = async (req, reply) => {
   const opType = 'del_objects'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-
+  const opts = {
+    params: req?.query,
+    ...getRudiApiHeaders(),
+  }
   try {
-    const res = await axios.delete(rudiCatalogAdminApi(objectType), {
-      params: req.query,
-      ...getRudiApiHeaders(),
-    })
+    const res = await axios.delete(rudiCatalogAdminApi(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
