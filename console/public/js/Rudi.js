@@ -104,7 +104,7 @@ export class RudiForm {
       if (!this._nodeUrls) {
         this._nodeUrls = await this.getPmJson('front/node-urls')
       }
-      this.ok(
+      console.debug(
         here,
         `\n   - consoleUrl: ${this.formUrl}`,
         `\n   - mediaUrl: ${this.mediaUrl}`,
@@ -134,7 +134,7 @@ export class RudiForm {
     return this._baseUrl
   }
   get formUrl() {
-    return pathJoin(this.baseUrl, this.nodeUrls?.form_url)
+    return pathJoin(this.baseUrl, this.nodeUrls?.form_url || this.nodeUrls?.console_url)
   }
   pmUrl = pathJoin(this.baseUrl, 'api')
 
@@ -145,10 +145,10 @@ export class RudiForm {
   async _getPm(isJson, ...urlBits) {
     const here = 'getPm'
     if (!this.pmUrl) throw new Error('Init PM URL first')
-    console.log('pmUrl:', this.pmUrl)
+    // console.log('pmUrl:', this.pmUrl)
     if (this.state == 'fail') throw new Error(`Aborting (${here})`)
     const url = this.getUrlPm(...urlBits)
-    console.log('url:', url)
+    // console.log('url:', url)
     try {
       return await (isJson ? JsonHttpRequest : HttpRequest).get(url, this.pmHeaders).send()
     } catch {

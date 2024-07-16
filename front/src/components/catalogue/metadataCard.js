@@ -146,10 +146,12 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const [appData, setAppData] = useState(appInfo)
   useEffect(() => setAppData(appInfo), [appInfo])
 
+  const [formUrl, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.formUrl || 'form'), [appInfo])
+  const getFormMeta = (query) => getForm(formUrl, 'metadata', query)
+
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
-
-  const getFormMeta = (query) => getForm(appData.formUrl, 'metadata', query)
 
   /**
    * call for metadata deletion

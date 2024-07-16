@@ -12,10 +12,9 @@ const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('publ
 const consoleRouter = express.Router()
 
 // Package dependencies
-const dependenciesRouter = express.Router()
-dependenciesRouter.use('/leaflet', staticDependency('leaflet'))
-dependenciesRouter.use('/leaflet.draw', staticDependency('leaflet-draw'))
-consoleRouter.use('/dependencies', dependenciesRouter)
+// const dependenciesRouter = express.Router()
+consoleRouter.use('/dependencies/leaflet', staticDependency('leaflet'))
+consoleRouter.use('/dependencies/leaflet.draw', staticDependency('leaflet-draw'))
 
 // Main routes
 consoleRouter.get('/', staticPublicFile('metadata.html'))

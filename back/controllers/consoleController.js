@@ -26,17 +26,6 @@ exports.getNodeUrls = async (req, reply) => {
 }
 
 // Controllers
-exports.getFormUrl = (req, reply) => {
-  try {
-    reply.status(200).send(FORM_PREFIX)
-  } catch (err) {
-    log.e('', '', err)
-    log.sysError(mod, 'getFormUrl', err, log.getContext(req, { opType: 'get_form_url' }))
-    throw err
-  }
-}
-
-// Controllers
 exports.getPortalConnection = (req, reply) => {
   try {
     reply.status(200).send(getPortalUrl())

@@ -12,7 +12,7 @@ const helmet = require('helmet')
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-const { getConf, getConsoleFormUrl, getRudiMediaUrl, FORM_PREFIX } = require('./back/config/config')
+const { getConf, getRudiMediaUrl, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
 const { isDevEnv } = require('./back/config/backOptions')
