@@ -35,8 +35,8 @@ function extractIpRedirections(req) {
  */
 function getRudiLoggerOptions() {
   let facility = 20
-  if (getConf('syslog', 'syslog_facility').substr(0, 5) == 'local') {
-    facility = 16 + Number(getConf('syslog', 'syslog_facility').substr(5, 1))
+  if (getConf('syslog', 'syslog_facility').slice(0, 5) == 'local') {
+    facility = 16 + parseInt(getConf('syslog', 'syslog_facility').slice(5, 1))
   }
   let transports
   let path = getConf('syslog', 'syslog_host')
