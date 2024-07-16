@@ -31,7 +31,7 @@ exports.getObjectList = async (req, reply) => {
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
     const opts = {
-      query: req?.query,
+      params: req?.query,
       ...getRudiApiHeaders(),
     }
     const res = await axios.get(rudiCatalogAdminApi(objectType), opts)

@@ -108,7 +108,7 @@ export class RudiForm {
         here,
         `\n   - consoleUrl: ${this.formUrl}`,
         `\n   - mediaUrl: ${this.mediaUrl}`,
-        `\n   - apiUrl:${this.apiUrl}`
+        `\n   - apiUrl: ${this.apiUrl}`
       )
       return this._nodeUrls
     } catch (err) {
