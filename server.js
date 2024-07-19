@@ -15,7 +15,7 @@ const helmet = require('helmet')
 const { getConf, getRudiMediaUrl, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
-const { isDevEnv } = require('./back/config/backOptions')
+const { isDevEnv, OPT_BACK_PATH, getBackOptions } = require('./back/config/backOptions')
 const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
 // -------------------------------------------------------------------------------------------------
@@ -48,10 +48,15 @@ backend.use(
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        defaultSrc: ["'self'", 'data:'],
-        scriptSrc: ["'self'"],
-        connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
-        imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
+        defaultSrc: ["'self'", 'data:', getBackOptions(OPT_BACK_PATH)],
+        scriptSrc: ["'self'", getBackOptions(OPT_BACK_PATH)],
+        connectSrc: [
+          "'self'",
+          getRudiMediaUrl('/'),
+          getBackOptions(OPT_BACK_PATH),
+          ...getConf('security', 'trusted_domain'),
+        ],
+        imgSrc: ["'self'", 'data:', getBackOptions(OPT_BACK_PATH), 'https://*.tile.osm.org'],
       },
     },
   })

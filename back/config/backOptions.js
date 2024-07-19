@@ -44,8 +44,8 @@ exports.OPTIONS = {
   },
   [this.OPT_BACK_PATH]: {
     text: 'Back-end path',
-    cli: 'back_path',
-    env: 'RUDI_PROD_MANAGER_BACK_PATH',
+    cli: 'url',
+    env: 'RUDI_MANAGER_URL',
   },
   [this.OPT_SU_CREDS]: {
     text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',
