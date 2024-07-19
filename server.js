@@ -43,20 +43,24 @@ const backend = express()
 // Set our backend port to be either an environment variable or port 5000
 const port = getConf('server', 'listening_port') || 5000
 
+const backUrl = getBackOptions(OPT_BACK_PATH)
+const domain = backUrl.split(':')[0]
+const me = backUrl == domain ? [backUrl] : [domain, backUrl]
+
 backend.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        defaultSrc: ["'self'", 'data:', getBackOptions(OPT_BACK_PATH)],
-        scriptSrc: ["'self'", getBackOptions(OPT_BACK_PATH)],
+        defaultSrc: ["'self'", 'data:', ...me],
+        scriptSrc: ["'self'", ...me],
         connectSrc: [
           "'self'",
           getRudiMediaUrl('/'),
-          getBackOptions(OPT_BACK_PATH),
+          ...me,
           ...getConf('security', 'trusted_domain'),
         ],
-        imgSrc: ["'self'", 'data:', getBackOptions(OPT_BACK_PATH), 'https://*.tile.osm.org'],
+        imgSrc: ["'self'", 'data:', ...me, 'https://*.tile.osm.org'],
       },
     },
   })
