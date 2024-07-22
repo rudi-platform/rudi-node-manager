@@ -44,23 +44,22 @@ const backend = express()
 const port = getConf('server', 'listening_port') || 5000
 
 const backUrl = getBackOptions(OPT_BACK_PATH)
-const domain = backUrl.split(':')[0]
-const me = backUrl == domain ? [backUrl] : [domain, backUrl]
+const me = ["'self'"]
+if (backUrl) {
+  me.push(backUrl)
+  const domain = backUrl?.split(':')?.[0] || []
+  if (domain && domain != backUrl) me.push(domain)
+}
 
 backend.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        defaultSrc: ["'self'", 'data:', ...me],
-        scriptSrc: ["'self'", ...me],
-        connectSrc: [
-          "'self'",
-          getRudiMediaUrl('/'),
-          ...me,
-          ...getConf('security', 'trusted_domain'),
-        ],
-        imgSrc: ["'self'", 'data:', ...me, 'https://*.tile.osm.org'],
+        defaultSrc: [...me, 'data:'],
+        scriptSrc: me,
+        connectSrc: [...me, getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
+        imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
       },
     },
   })
