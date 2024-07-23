@@ -2,7 +2,7 @@ const mod = 'passSetup'
 
 // External dependencies
 const passport = require('passport')
-const debug = require('debug')('passport')
+// const debug = require('debug')('passport')
 
 const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
@@ -28,12 +28,12 @@ const { matchPassword } = require('@aqmo.org/jwt-lib')
 
 // Passport configuration
 passport.serializeUser((user, done) => {
-  debug('serializeUser', user)
+  // debug('serializeUser', user)
   done(null, user.id)
 })
 
 passport.deserializeUser((id, done) => {
-  debug('deserializeUser', id)
+  // debug('deserializeUser', id)
   dbGetUserById(null, id)
     .then((user) => done(null, user))
     .catch((err) => {
