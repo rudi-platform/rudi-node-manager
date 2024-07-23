@@ -48,6 +48,7 @@ exports.consoleCookieOpts = (exp) => {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
     domain: getBackOptions(OPT_BACK_PATH),
+    path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   }
@@ -58,6 +59,7 @@ exports.pmFrontCookieOpts = (exp) => {
     secure: SHOULD_SECURE,
     httpOnly: false,
     domain: getBackOptions(OPT_BACK_PATH),
+    path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   }
@@ -90,8 +92,8 @@ exports.refreshTokens = (req) => {
   // log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)
 
   const { consoleToken, pmFrontToken, exp } = this.createFrontUserTokens(user)
-  const consoleCookieOpts = Object.assign(this.consoleCookieOpts(exp), { overwrite: true })
-  const pmFrontCookieOpts = Object.assign(this.pmFrontCookieOpts(exp), { overwrite: true })
+  const consoleCookieOpts = { ...this.consoleCookieOpts(exp), overwrite: true }
+  const pmFrontCookieOpts = { ...this.pmFrontCookieOpts(exp), overwrite: true }
   return {
     [this.CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: consoleCookieOpts },
     [this.PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: pmFrontCookieOpts },
