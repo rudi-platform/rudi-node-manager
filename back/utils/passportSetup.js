@@ -2,6 +2,8 @@ const mod = 'passSetup'
 
 // External dependencies
 const passport = require('passport')
+const debug = require('debug')('passport')
+
 const LocalStrategy = require('passport-local').Strategy
 const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
 
@@ -25,9 +27,13 @@ const {
 const { matchPassword } = require('@aqmo.org/jwt-lib')
 
 // Passport configuration
-passport.serializeUser((user, done) => done(null, user.id))
+passport.serializeUser((user, done) => {
+  debug('serializeUser', user)
+  done(null, user.id)
+})
 
 passport.deserializeUser((id, done) => {
+  debug('deserializeUser', id)
   dbGetUserById(null, id)
     .then((user) => done(null, user))
     .catch((err) => {
@@ -101,7 +107,11 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromExtractors([
         // Take jwt from cookie
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN_NAME),
-        (req) => extractCookieFromReq(req, PM_FRONT_TOKEN_NAME),
+        (req) => {
+          const frontToken = extractCookieFromReq(req, PM_FRONT_TOKEN_NAME)
+          console.log('extracted fronttoken:', frontToken)
+          return frontToken
+        },
         // Take jwt from http header
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
