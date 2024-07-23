@@ -51,8 +51,8 @@ if (backUrl) {
   // In the case of backUrl = http://100.200.3.4:3000 we would like to remove port to accept
   // cookies from the IP
   const backUrlSplit = backUrl.split(':')
-  if (backUrlSplit.length > 2) return me.push(backUrlSplit.slice(0, -2).join(':'))
-  if (backUrlSplit.length == 2) me.push(backUrlSplit[0])
+  if (backUrlSplit.length > 2) me.push(backUrlSplit.slice(0, -2).join(':'))
+  else if (backUrlSplit.length == 2) me.push(backUrlSplit[0])
 }
 
 backend.use(
@@ -64,6 +64,20 @@ backend.use(
         scriptSrc: me,
         connectSrc: [...me, getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
         imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
+      },
+    },
+  })
+)
+
+backend.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'", 'data:'],
+        scriptSrc: ["'self'"],
+        connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
+        imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
       },
     },
   })
