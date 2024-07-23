@@ -9,7 +9,7 @@ const { getConf } = require('../config/config')
 const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
-const { isDevEnv } = require('../config/backOptions')
+const { isDevEnv, getBackOptions, OPT_BACK_PATH } = require('../config/backOptions')
 
 // ----- Constants
 const mod = 'jwt'
@@ -47,6 +47,7 @@ exports.consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
+    domain: getBackOptions(OPT_BACK_PATH),
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   }
@@ -56,6 +57,7 @@ exports.pmFrontCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
+    domain: getBackOptions(OPT_BACK_PATH),
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
   }

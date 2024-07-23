@@ -69,19 +69,19 @@ backend.use(
   })
 )
 
-backend.use(
-  helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        defaultSrc: ["'self'", 'data:'],
-        scriptSrc: ["'self'"],
-        connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
-        imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
-      },
-    },
-  })
-)
+// backend.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       useDefaults: true,
+//       directives: {
+//         defaultSrc: ["'self'", 'data:'],
+//         scriptSrc: ["'self'"],
+//         connectSrc: ["'self'", getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
+//         imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
+//       },
+//     },
+//   })
+// )
 
 // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
 backend.use((req, reply, next) => {
