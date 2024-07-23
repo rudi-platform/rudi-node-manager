@@ -51,8 +51,8 @@ if (backUrl) {
   // In the case of backUrl = http://100.200.3.4:3000 we would like to remove port to accept
   // cookies from the IP
   const backUrlSplit = backUrl.split(':')
-  if (backUrlSplit.length > 2) return me.push(':'.join(backUrlSplit.slice(0, -2)))
-  if (backUrlSplit.length == 2) me.push(':'.join(backUrlSplit[0]))
+  if (backUrlSplit.length > 2) return me.push(backUrlSplit.slice(0, -2).join(':'))
+  if (backUrlSplit.length == 2) me.push(backUrlSplit[0])
 }
 
 backend.use(
