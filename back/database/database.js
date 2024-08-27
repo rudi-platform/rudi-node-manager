@@ -3,7 +3,8 @@ const mod = 'db'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-const { Database, OPEN_READWRITE } = require('sqlite3').verbose()
+const sqlite3 = require('sqlite3')
+const { Database, OPEN_READWRITE } = sqlite3.verbose()
 const { hashPassword } = require('@aqmo.org/jwt-lib')
 
 // -------------------------------------------------------------------------------------------------
@@ -22,6 +23,8 @@ const {
   UnauthorizedError,
 } = require('../utils/errors')
 const log = require('../utils/logger')
+
+log.d('sqlite3.VERSION:', sqlite3.VERSION)
 
 // -------------------------------------------------------------------------------------------------
 // Constants
