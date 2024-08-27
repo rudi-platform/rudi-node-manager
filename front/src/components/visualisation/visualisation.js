@@ -169,7 +169,7 @@ function Visualisation({ logout }) {
           statusCode: 404,
           message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
         })
-      console.log(media)
+      // console.log(media)
       switch (mediaMime) {
         case 'application/geo+json':
         case 'application/json':
