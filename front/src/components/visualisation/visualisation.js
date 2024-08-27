@@ -201,7 +201,9 @@ function Visualisation({ logout }) {
           )
 
         default:
-          defaultErrorHandler({ message: `le type ${mediaMime} n'est pas supporté` })
+          defaultErrorHandler({
+            message: `la visualisation des fichiers de type ${mediaMime} n'est pas supportée`,
+          })
       }
     }
   }
