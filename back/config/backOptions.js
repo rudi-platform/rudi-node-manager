@@ -152,3 +152,15 @@ exports.getTags = () => {
 
 exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV)
 exports.isDevEnv = () => this.getNodeEnv() === 'development'
+
+const backDomain = () => {
+  const backPath = this.getBackOptions(this.OPT_BACK_PATH) || 'http://localhost'
+  try {
+    return new URL(backPath).hostname
+  } catch {
+    return backPath
+  }
+}
+
+const BACK_DOMAIN = backDomain()
+exports.getBackDomain = () => BACK_DOMAIN

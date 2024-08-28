@@ -3,13 +3,14 @@ const fs = require('fs')
 const ini = require('ini')
 
 // Internal dependencies
-const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
+const { getBackOptions, OPT_USER_CONF, getBackDomain } = require('./backOptions')
 const { pathJoin, jsonToString, removeTrailingSlash } = require('../utils/utils')
 
 // Constants
 exports.FORM_PREFIX = 'form'
 exports.CATALOG = 'rudi-catalog'
 exports.STORAGE = 'rudi-storage'
+exports.MANAGER = 'rudi-manager'
 
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
@@ -52,6 +53,7 @@ const RUDI_MEDIA_URL = config?.rudi_media?.rudi_media_url
 
 console.debug(`[CONF] ${this.CATALOG} url:`, RUDI_API_URL)
 console.debug(`[CONF] ${this.STORAGE} url:`, RUDI_MEDIA_URL)
+console.debug(`[CONF] ${this.MANAGER} domain:`, getBackDomain())
 
 if (!RUDI_API_URL) {
   throw new Error(`Configuration error: ${this.CATALOG} URL should be defined`)

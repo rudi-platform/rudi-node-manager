@@ -43,27 +43,24 @@ exports.readJwtBody = (jwt) => {
 // Constants
 const SHOULD_SECURE = !isDevEnv()
 
-let domain
-exports.getBackDomain = () => {
-  if (!domain) {
-    const backPath = getBackOptions(OPT_BACK_PATH) || 'http://localhost:300'
-    try {
-      domain = new URL(backPath).hostname
-    } catch {
-      domain = backPath
-    }
+const getBackDomain = () => {
+  const backPath = getBackOptions(OPT_BACK_PATH) || 'http://localhost'
+  try {
+    return new URL(backPath).hostname
+  } catch {
+    return backPath
   }
-
-  // console.info('domain:', domain)
-  return domain
 }
+
+const BACK_DOMAIN = getBackDomain()
+log.d(mod, 'back domain', BACK_DOMAIN)
 
 // Helper functions
 exports.consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
-    domain: this.getBackDomain(),
+    domain: BACK_DOMAIN,
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
@@ -74,7 +71,7 @@ exports.pmFrontCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
-    domain: this.getBackDomain(),
+    domain: BACK_DOMAIN,
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
