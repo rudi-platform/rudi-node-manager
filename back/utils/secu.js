@@ -11,7 +11,7 @@ const { getConf } = require('../config/config')
 const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
-const { isDevEnv, getBackOptions, OPT_BACK_PATH } = require('../config/backOptions')
+const { isDevEnv, getBackOptions, OPT_BACK_PATH, getBackDomain } = require('../config/backOptions')
 
 // ----- Constants
 
@@ -43,24 +43,12 @@ exports.readJwtBody = (jwt) => {
 // Constants
 const SHOULD_SECURE = !isDevEnv()
 
-const getBackDomain = () => {
-  const backPath = getBackOptions(OPT_BACK_PATH) || 'http://localhost'
-  try {
-    return new URL(backPath).hostname
-  } catch {
-    return backPath
-  }
-}
-
-const BACK_DOMAIN = getBackDomain()
-log.d(mod, 'back domain', BACK_DOMAIN)
-
 // Helper functions
 exports.consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
-    domain: BACK_DOMAIN,
+    domain: getBackDomain(),
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
@@ -71,7 +59,7 @@ exports.pmFrontCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
-    domain: BACK_DOMAIN,
+    domain: getBackDomain(),
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
