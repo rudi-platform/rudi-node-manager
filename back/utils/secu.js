@@ -54,7 +54,7 @@ exports.getBackDomain = () => {
     }
   }
 
-  console.info('domain:', domain)
+  // console.info('domain:', domain)
   return domain
 }
 
