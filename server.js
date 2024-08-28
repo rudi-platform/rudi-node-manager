@@ -46,13 +46,11 @@ const port = getConf('server', 'listening_port') || 5000
 const backUrl = getBackOptions(OPT_BACK_PATH)
 const me = ["'self'"]
 if (backUrl) {
-  me.push(backUrl)
-
-  // In the case of backUrl = http://100.200.3.4:3000 we would like to remove port to accept
-  // cookies from the IP
-  const backUrlSplit = backUrl.split(':')
-  if (backUrlSplit.length > 2) me.push(backUrlSplit.slice(0, -2).join(':'))
-  else if (backUrlSplit.length == 2) me.push(backUrlSplit[0])
+  try {
+    me.push(new URL(backUrl).hostname)
+  } catch {
+    me.push(backUrl)
+  }
 }
 
 backend.use(
@@ -154,6 +152,6 @@ backend.get('*', (req, reply) =>
 )
 
 // Configure our server to listen on the port defiend by our port variable
-backend.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`, {}))
+backend.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`))
 
 backend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))

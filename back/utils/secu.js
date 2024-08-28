@@ -1,3 +1,5 @@
+const mod = 'secu'
+
 // ----- External dependencies
 const jwtAA = require('jsonwebtoken')
 const { default: axios } = require('axios')
@@ -12,7 +14,6 @@ const { ForbiddenError, RudiError } = require('./errors')
 const { isDevEnv, getBackOptions, OPT_BACK_PATH } = require('../config/backOptions')
 
 // ----- Constants
-const mod = 'jwt'
 
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
@@ -42,12 +43,27 @@ exports.readJwtBody = (jwt) => {
 // Constants
 const SHOULD_SECURE = !isDevEnv()
 
+let domain
+exports.getBackDomain = () => {
+  if (!domain) {
+    const backPath = getBackOptions(OPT_BACK_PATH) || 'http://localhost:300'
+    try {
+      domain = new URL(backPath).hostname
+    } catch {
+      domain = backPath
+    }
+  }
+
+  console.info('domain:', domain)
+  return domain
+}
+
 // Helper functions
 exports.consoleCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: SHOULD_SECURE,
-    domain: getBackOptions(OPT_BACK_PATH),
+    domain: this.getBackDomain(),
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
@@ -58,7 +74,7 @@ exports.pmFrontCookieOpts = (exp) => {
   return {
     secure: SHOULD_SECURE,
     httpOnly: false,
-    domain: getBackOptions(OPT_BACK_PATH),
+    domain: this.getBackDomain(),
     path: '/', // Ensure the path covers all routes
     sameSite: 'Strict',
     expires: new Date(exp * 1000),
@@ -246,7 +262,6 @@ const prvKeyCache = {}
  * @return {object} the private key
  */
 const getPrvKey = (name) => {
-  const fun = 'getPrvKey'
   // Shortcuts
   switch (name) {
     case 'api':

@@ -140,7 +140,9 @@ exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
     // err.message
     const { message, status, code } = err
     const errMsg = (rudiModuleCalled ? `[${rudiModuleCalled}] ` : '') + cleanErrMsg(message || err)
-    log.sysWarn(mod, fun, `ERR (axios) ${status || ''} (${code}): ${errMsg}`)
+    const logMsg =
+      'ERR (axios) ' + (status ? `${status} ` : '') + (code ? `(${code}):` : ':') + errMsg
+    log.sysWarn(mod, fun, logMsg)
     if (reply) return reply.status(status).send(errMsg)
     throw RudiError.createRudiHttpError(status, errMsg)
   }

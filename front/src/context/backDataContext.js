@@ -19,7 +19,7 @@ const getCachedBackData = async (token) => {
     // console.info('Back vals:', cachedBackValues)
     return cachedBackValues
   } catch (err) {
-    console.error('E (callBackend)', err)
+    console.error('E (callBackend)', err.code, err.message)
     cachedBackValues = null
     return defaultBackValues
   }

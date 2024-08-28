@@ -6,6 +6,11 @@ const ini = require('ini')
 const { getBackOptions, OPT_USER_CONF } = require('./backOptions')
 const { pathJoin, jsonToString, removeTrailingSlash } = require('../utils/utils')
 
+// Constants
+exports.FORM_PREFIX = 'form'
+exports.CATALOG = 'rudi-catalog'
+exports.STORAGE = 'rudi-storage'
+
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
 const defaultCustomConfigFile = './prodmanager-conf-custom.ini' // if not set
@@ -42,7 +47,19 @@ for (const section in customConfig) {
 
 if (config.logging.displayConf) jsonToString(config)
 
-console.debug('[CONF] rudi_media_url:', config.rudi_media.rudi_media_url)
+const RUDI_API_URL = config?.rudi_api?.rudi_api_url
+const RUDI_MEDIA_URL = config?.rudi_media?.rudi_media_url
+
+console.debug(`[CONF] ${this.CATALOG} url:`, RUDI_API_URL)
+console.debug(`[CONF] ${this.STORAGE} url:`, RUDI_MEDIA_URL)
+
+if (!RUDI_API_URL) {
+  throw new Error(`Configuration error: ${this.CATALOG} URL should be defined`)
+}
+if (!RUDI_MEDIA_URL) {
+  throw new Error(`Configuration error: ${this.STORAGE} URL should be defined`)
+}
+
 console.debug()
 
 // Access conf values
@@ -54,13 +71,14 @@ exports.getConf = (section, subSection) => {
 }
 
 // Shortcuts to access popular conf values
-exports.rudiCatalogUrl = (...args) => pathJoin(config.rudi_api.rudi_api_url, ...args)
+
+exports.rudiCatalogUrl = (...args) => pathJoin(RUDI_API_URL, ...args)
 exports.rudiCatalogAdminApi = (...args) =>
-  pathJoin(config.rudi_api.rudi_api_url, config.rudi_api.admin_api, ...args)
+  pathJoin(RUDI_API_URL, config.rudi_api.admin_api, ...args)
 
 exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
 
-exports.getRudiMediaUrl = (...args) => pathJoin(config.rudi_media.rudi_media_url, ...args)
+exports.getRudiMediaUrl = (...args) => pathJoin(RUDI_MEDIA_URL, ...args)
 exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
@@ -79,7 +97,3 @@ exports.getCompleteRudiApiUrl = (url, req) => {
   }
   return finalUrl.href
 }
-
-exports.FORM_PREFIX = 'form'
-exports.CATALOG = 'rudi-catalog'
-exports.STORAGE = 'rudi-storage'

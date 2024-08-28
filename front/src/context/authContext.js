@@ -17,7 +17,7 @@ const callAuthBackend = async (token) => {
   try {
     return !token ? {} : (await axios.get(getApiFront('user-info')))?.data
   } catch (err) {
-    console.error('E (callAuthBackend)', err)
+    console.error('E (callAuthBackend)', err.code, err.status, err.message)
     return {}
   }
 }
