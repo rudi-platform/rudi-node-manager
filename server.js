@@ -41,7 +41,8 @@ const { pathJoin } = require('./back/utils/utils.js')
 // -------------------------------------------------------------------------------------------------
 const backend = express()
 // Set our backend port to be either an environment variable or port 5000
-const port = getConf('server', 'listening_port') || 5000
+const listeningPort = getConf('server', 'listening_port') || 5000
+const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
 
 const backUrl = getBackOptions(OPT_BACK_PATH)
 const me = ["'self'"]
@@ -152,6 +153,8 @@ backend.get('*', (req, reply) =>
 )
 
 // Configure our server to listen on the port defiend by our port variable
-backend.listen(port, () => log.i(mod, '', `BACK_END_SERVICE_PORT: ${port}`))
+backend.listen(listeningPort, listeningAddress, () =>
+  log.i(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
+)
 
 backend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
