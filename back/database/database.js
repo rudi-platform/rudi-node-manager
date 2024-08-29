@@ -10,7 +10,7 @@ const { hashPassword } = require('@aqmo.org/jwt-lib')
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-const { getDbConf, SU_NAME } = require('../config/config')
+const { getDbConf, getSuName } = require('../config/config')
 const { beautify, pathJoin } = require('../utils/utils')
 
 const {
@@ -286,7 +286,7 @@ exports.dbCreateUser = (openedDb, userInfo) => {
       (err) => {
         if (err) {
           if (!openedDb) dbClose(db)
-          log.e(mod, fun + ' insert', err.message)
+          log.e(mod, fun + '.insert', err.message)
           return reject(err)
         }
         log.i(
@@ -298,7 +298,7 @@ exports.dbCreateUser = (openedDb, userInfo) => {
         db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
           if (!openedDb) dbClose(db)
           if (err) {
-            log.e(mod, fun + ' select', err.message)
+            log.e(mod, fun + '.select', err.message)
             return reject(err)
           }
           resolve({ id: row.id, username: row.username })
@@ -488,8 +488,9 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
   try {
     if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await this.dbGetUserByUsername(db, username)
-    const id = userInfo?.id
-    if (!id && username != SU_NAME) {
+    const id = userInfo.id
+    if (!id && username != getSuName()) {
+      log.e(mod, fun, `${username} != ${getSuName()}`)
       dbClose(db)
       throw new UnauthorizedError(`User not found: ${username}`)
     }
@@ -513,6 +514,7 @@ exports.isValidatedUser = async (openedDb, userInfo) => {
     else if (userInfo.username) roles = await this.dbGetUserRolesByUsername(db, userInfo.username)
     else throw new UnauthorizedError(`User not found: ${userInfo.username || userInfo.id}`)
     if (!openedDb) dbClose(db)
+    console.debug('T (isValidatedUser) yes:', userInfo.username || userInfo.id, roles)
     return roles
   } catch (err) {
     if (!openedDb) dbClose(db)

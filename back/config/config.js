@@ -86,8 +86,11 @@ exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
 
 exports.getDbConf = (subSection) => config.database[subSection]
-exports.SU_NAME = config?.database?.db_su_usr
-exports.SU_MAIL = config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
+exports.getSuName = () => config?.database?.db_su_usr
+exports.setSuName = (userDefinedSuName) => {
+  config.database.db_su_usr = userDefinedSuName
+}
+exports.getSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
 
 exports.getCompleteRudiApiUrl = (url, req) => {
   const finalUrl = new URL(this.rudiCatalogUrl(url))
