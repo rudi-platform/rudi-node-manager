@@ -593,7 +593,7 @@ exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
   if (userId !== 0 && !userId)
     Promise.reject(new BadRequestError('Input parameter userId must be defined'))
   if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
-  console.log('T (dbCreateUserRole)', { userId, username, role })
+  console.log('T (Dbcreateuserrole)', { userId, username, role })
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     try {

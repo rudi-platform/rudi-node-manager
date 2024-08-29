@@ -306,6 +306,8 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
   const fun = 'dbInitSuperUser'
   try {
     const [username, password] = decodeCredentials(b64SuCreds)
+    setSuName(username)
+
     const dbUsrInfo = await dbGetUserByUsername(db, username)
     const isSuPwdHashed = true
     if (dbUsrInfo) {
@@ -320,7 +322,6 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
         username,
         roles: [this.ROLE_SU],
       })
-      setSuName(username)
       log.w(
         mod,
         fun,
