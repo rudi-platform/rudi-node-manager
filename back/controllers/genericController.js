@@ -129,7 +129,7 @@ exports.getCounts = async (req, reply) => {
   try {
     res = await Promise.all(
       COUNT_BY_LABELS.map((label) => {
-        log.d(mod, fun, `${label}: ${rudiCatalogAdminApi(`resources?count_by=${label}`)}`)
+        log.d(mod, fun, `${label}: ` + rudiCatalogAdminApi(`resources?count_by=${label}`))
         return axios.get(rudiCatalogAdminApi(`resources?count_by=${label}`), getRudiApiHeaders())
       })
     )

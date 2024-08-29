@@ -50,7 +50,7 @@ exports.postLogin = async (req, reply, next) => {
     }
     try {
       const username = user.username
-      const roles = await dbGetUserRolesByUsername(null, username)
+      const roles = await dbGetUserRolesByUsername(null, username) // NOSONAR
       if (!roles?.length) {
         const errMsg = `Admin validation is required for this user: '${user.username}'`
         log.w(mod, fun, errMsg)

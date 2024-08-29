@@ -152,6 +152,7 @@ exports.getTags = () => {
 
 exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV)
 exports.isDevEnv = () => this.getNodeEnv() === 'development'
+exports.isProdEnv = () => this.getNodeEnv() === 'production'
 
 const backDomain = () => {
   const backPath = this.getBackOptions(this.OPT_BACK_PATH)
