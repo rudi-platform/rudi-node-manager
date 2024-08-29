@@ -63,6 +63,7 @@ backend.use(
         scriptSrc: me,
         connectSrc: [...me, getRudiMediaUrl('/'), ...getConf('security', 'trusted_domain')],
         imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
+        upgradeInsecureRequests: null,
       },
     },
   })
