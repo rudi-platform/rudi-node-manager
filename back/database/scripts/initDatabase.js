@@ -321,7 +321,11 @@ const dbUpdateSuperUser = async (db, b64SuCreds) => {
         roles: [this.ROLE_SU],
       })
 
-      log.w(mod, fun, `Super user updated: '${username}' (id ${dbUsrInfo.id})`)
+      log.w(
+        mod,
+        fun,
+        `Super user updated: '${username}' (id ${dbUsrInfo.id}, role ${this.ROLE_SU})`
+      )
     } else {
       // Super user doesn't exists, creating the user
       const id = getDbConf('db_su_id') || 0
@@ -332,10 +336,17 @@ const dbUpdateSuperUser = async (db, b64SuCreds) => {
         password,
         isSuPwdHashed,
         email: SU_MAIL,
-        role: [this.ROLE_SU, this.ROLE_ADMIN],
+        role: [this.ROLE_SU],
       }
       await dbCreateUser(db, suUsrInfo)
       log.w(mod, fun, `Super user created: '${username}' (id ${id})`)
+
+      await dbUpdateUserRoles(db, {
+        userId: id,
+        username,
+        roles: [this.ROLE_SU],
+      })
+      log.w(mod, fun, `Super user updated: '${username}' (id ${id}, role ${this.ROLE_SU})`)
     }
     return username
   } catch (error) {
