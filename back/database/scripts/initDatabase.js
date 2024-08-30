@@ -5,7 +5,7 @@ const fs = require('fs')
 
 // ---- Internal dependencies -----
 const { getDbConf, getSuName, SU_MAIL, setSuName, getSuMail } = require('../../config/config')
-const { decodeBase64 } = require('../../utils/utils')
+const { decodeBase64, beautify } = require('../../utils/utils')
 const log = require('../../utils/logger')
 const { RudiError, statusOK } = require('../../utils/errors')
 
@@ -369,12 +369,17 @@ const dbCreateSuperUser = async (db) => {
   if (await dbExistsUser(db, getSuName)) return // NOSONAR
 
   const suId = getDbConf('db_su_id') || 0
+  const suInfo = await dbGetUserById(db, suId)
+  if (suInfo) {
+    log.i(mod, fun, `Super user exists: ${beautify(suInfo)}`)
+    return
+  } // NOSONAR
 
   const suPwd = !isSuPwdHashed ? decodeBase64(encodedSuPwd) : encodedSuPwd
 
   const superUser = {
     id: suId,
-    username: getSuName,
+    username: getSuName(),
     password: suPwd,
     isSuPwdHashed: !!isSuPwdHashed,
     email: SU_MAIL,
@@ -423,6 +428,7 @@ exports.dbInitialize = async () => {
 
     const suCreds = getBackOptions(OPT_SU_CREDS)
     if (suCreds) {
+      // log.i(mod, fun, `suCreds: ${suCreds}`)
       const suName = await dbInitSuperUser(db, suCreds)
       log.w(mod, fun, `User created/updated: SU (${suName})`)
     } else {

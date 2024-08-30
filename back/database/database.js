@@ -225,8 +225,8 @@ exports.dbCreateUserCheckExists = (openedDb, user, silent = false) => {
         db.run(sqlReq, [username, password, email, id], (err) => {
           if (err) {
             if (!openedDb) dbClose(db)
-            log.e(mod, fun + ' cannotCreateUser', err.message)
-            log.e(mod, fun + ' sqlReq', sqlReq)
+            log.e(mod, fun + '.cannotCreateUser', err.message)
+            log.e(mod, fun + '.sqlReq', sqlReq)
             return reject(err)
           }
           if (!silent)

@@ -1,5 +1,4 @@
 const express = require('express')
-const { v4: uuidv4 } = require('uuid')
 
 const router = new express.Router()
 const {
@@ -21,8 +20,9 @@ const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
 const { commitFileOnRudiApi } = require('../controllers/mediaController.js')
 const { expressErrorHandler } = require('../controllers/errorHandler.js')
+const { uuidv4 } = require('../utils/utils.js')
 
-router.get('/uuid', (_, reply) => reply.status(200).send(uuidv4()))
+router.get('/uuid', (req, reply) => reply.status(200).send(uuidv4(req.query?.nb)))
 router.get('/version', getVersion)
 router.get('/enum', getEnum)
 router.get('/enum/themes/:lang', getThemeByLang)

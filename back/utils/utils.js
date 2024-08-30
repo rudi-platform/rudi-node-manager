@@ -1,5 +1,6 @@
-const { floor } = require('lodash')
+const { floor, isInteger } = require('lodash')
 const { inspect } = require('util')
+const { v4 } = require('uuid')
 
 // ---- Dates
 exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
@@ -100,4 +101,14 @@ exports.makeRequestable = (func) => async (req, reply, next) => {
         .json({ statusCode: err.statusCode || 500, message: err.message })
     reply.status(500).json({ statusCode: 500, message: this.cleanErrMsg(err) })
   }
+}
+
+exports.uuidv4 = (nb) => {
+  if (!nb) return v4()
+  if (!isInteger(parseInt(nb))) throw new Error('Input parameter should be an integer')
+  const uuidArray = []
+  for (let i = 0; i < nb; i++) {
+    uuidArray.push(v4())
+  }
+  return uuidArray
 }

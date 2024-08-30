@@ -9,10 +9,9 @@
 import '../lib/HtmlFormTemplate.js'
 import '../lib/MaterialInputs.js'
 
-import { uuidv4 } from './utils.js'
-
 import { JsonHttpRequest } from './Http.js'
 import { RudiForm, STYLE_NRM, STYLE_THN } from './Rudi.js'
+import { uuidv4 } from './utils.js'
 
 export class RudiObjForm extends RudiForm {
   constructor(language, objType, idField, templatePath) {
