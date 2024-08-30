@@ -640,13 +640,11 @@ class MediaFile extends ForeignFile {
     try {
       digest = await crypto.subtle.digest(algo, await this.file.arrayBuffer())
     } catch (e) {
-      console.info(
-        'Crypto.subtle lib not available in non https context, or another error occurred',
-        e
-      )
+      console.info('Crypto.subtle available in https context only, or another error occurred:', e)
     }
-    if (!digest) digest = 'toBe2186bb13eabf0bc49eaa22ee08d52166' // md5('NoHashFunctionAvailable')
-    const hash = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
+    const hash = digest
+      ? [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
+      : 'toBe2186bb13eabf0bc49eaa22ee08d52166' // md5('NoHashFunctionAvailable')
     this.checksum = { algo, hash }
   }
 
