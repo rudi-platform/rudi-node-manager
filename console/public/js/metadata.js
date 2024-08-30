@@ -639,15 +639,15 @@ class MediaFile extends ForeignFile {
     let digest
     try {
       digest = await crypto.subtle.digest(algo, await this.file.arrayBuffer())
-    } catch {
-      digest = 'toBe2186bb13eabf0bc49eaa22ee08d52166' // 'NoHashFunctionAvailable'
+    } catch (e) {
+      console.info(
+        'Crypto.subtle lib not available in non https context, or another error occurred',
+        e
+      )
     }
-    let hashHex = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
-
-    this.checksum = {
-      algo: algo,
-      hash: hashHex,
-    }
+    if (!digest) digest = 'toBe2186bb13eabf0bc49eaa22ee08d52166' // md5('NoHashFunctionAvailable')
+    const hash = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
+    this.checksum = { algo, hash }
   }
 
   /** Override the JSON generated for this object */
