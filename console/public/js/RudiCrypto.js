@@ -66,7 +66,7 @@ export function ab2str(arrayBuffer) {
  */
 export async function encryptRsaOaepAesGcm(file, publicKey) {
   // Get file ArrayBuffer and generate an AES-GCM key
-  let [fileArrayBuffer, aesKey] = await Promise.all([
+  let [fileArrayBuffer, aezsKey] = await Promise.all([
     file.arrayBuffer(),
     await window.crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, [
       'encrypt',

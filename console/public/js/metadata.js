@@ -634,7 +634,7 @@ class MediaFile extends ForeignFile {
    */
   async computeChecksum(algo) {
     // Make a digest of the file and build the hexadecimal string
-    let digest = await window.crypto.subtle.digest(algo, await this.file.arrayBuffer())
+    let digest = await crypto.subtle.digest(algo, await this.file.arrayBuffer())
     let hashHex = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
 
     this.checksum = {
