@@ -114,9 +114,9 @@ exports.sendJsonAndTokens = (req, reply, data) => {
   }
 }
 
-exports.getTokenFromMediaForUser = async (user, exp) => {
+exports.getTokenFromMediaForUser = async (user) => {
   const fun = 'getTokenFromMediaForUser'
-  const pmHeaders = this.createPmHeadersForMedia(exp ? { exp } : null)
+  const pmHeaders = this.getStorageHeaders()
 
   const delegationBody = {
     user_id: user.id,
@@ -158,17 +158,6 @@ exports.getTokenFromMediaForUser = async (user, exp) => {
   }
 }
 
-exports.createPmHeadersForMedia = (body) => {
-  const pmHeadersJwt = this.createPmJwtForMedia(body)
-  return {
-    headers: {
-      Authorization: `Bearer ${pmHeadersJwt}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  }
-}
-
 exports.createPmJwtForMedia = (body) =>
   jwtLib.forgeToken(
     getPrvKey('media'),
@@ -181,6 +170,29 @@ exports.createPmJwtForMedia = (body) =>
       client_id: body?.client_id || getConf('rudi_media', 'pm_media_id'),
     }
   )
+
+let _cachedStorageJwt
+exports.getStorageJwt = (body) => {
+  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = this.createPmJwtForMedia(body)
+  return _cachedStorageJwt
+}
+
+exports.createPmHeadersForMedia = (body) => {
+  const pmHeadersJwt = this.createPmJwtForMedia(body)
+  return {
+    headers: {
+      Authorization: `Bearer ${pmHeadersJwt}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  }
+}
+
+let _cachedStorageHeaders
+exports.getStorageHeaders = (body) => {
+  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageHeaders = this.createPmHeadersForMedia(body)
+  return _cachedStorageHeaders
+}
 
 const PM_API_ID = getConf('rudi_api', 'pm_api_id')
 let _cachedApiJwt
@@ -200,7 +212,7 @@ exports.getRudiApiToken = () => {
   return _cachedApiJwt
 }
 
-exports.getRudiApiHeaders = () => ({
+exports.getCatalogHeaders = () => ({
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${this.getRudiApiToken()}`,

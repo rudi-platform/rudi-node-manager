@@ -2,20 +2,20 @@ const express = require('express')
 const router = new express.Router()
 
 const {
-  getMediaToken,
+  getStorageToken,
   commitMediaFile,
   getDownloadById,
   getMediaInfoById,
-  commitFileOnRudiMedia,
-  commitFileOnRudiApi,
+  commitFileOnStorage,
+  commitFileOnCatalog,
 } = require('../controllers/mediaController')
 const { ROLE_EDIT, ROLE_ADMIN } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
 const { expressErrorHandler } = require('../utils/errors.js')
 
-router.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getMediaToken)
-router.post('/media-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnRudiMedia)
-router.post('/api-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnRudiApi)
+router.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getStorageToken)
+router.post('/media-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnStorage)
+router.post('/api-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnCatalog)
 router.post('/commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitMediaFile)
 
 router.get('/:id', getMediaInfoById)

@@ -233,7 +233,7 @@ export class MetadataForm extends RudiForm {
   }
 
   /**
-   * Send a file to RudiMedia.
+   * Send a file to RudiStorage.
    * The MediaFile should have a file attached
    *
    * @param {MediaFile} mediaFile the file to send
@@ -308,7 +308,7 @@ export class MetadataForm extends RudiForm {
     try {
       this.state = 'send_files'
       // Sending the files
-      const rudiMediaResponse = await Promise.all(
+      const storageResponse = await Promise.all(
         mediaFiles?.map((file) =>
           this.sendFile(file, data.global_id).catch((err) => {
             const errMsg = `Couldn't send file '${file.name}' to media storage`
@@ -318,7 +318,7 @@ export class MetadataForm extends RudiForm {
         )
       )
       let errMsgDetected = []
-      for (const fileRes of rudiMediaResponse) {
+      for (const fileRes of storageResponse) {
         const fileResParsed = safeJsonParse(fileRes)
         if (
           fileResParsed?.length > 0 &&
@@ -329,7 +329,7 @@ export class MetadataForm extends RudiForm {
         }
       }
       if (errMsgDetected.length == 0) {
-        if (this.isDev) this.ok(here, 'every media was sent', rudiMediaResponse)
+        if (this.isDev) this.ok(here, 'every media was sent', storageResponse)
         return this.end(this.isUpdate ? 'edit' : 'create')
       } else {
         console.error(errMsgDetected)
@@ -388,9 +388,9 @@ export class MetadataForm extends RudiForm {
         )
       }
       if (resultArray.length < 3) {
-        const rudiMediaMessage = resultArray[resultArray.length - 1]?.msg
+        const storageMessage = resultArray[resultArray.length - 1]?.msg
         throw new Error(
-          rudiMediaMessage ||
+          storageMessage ||
             `Invalid response from media server for media ${mediaId}: status=${
               resultArray[resultArray.length - 1]
             }`

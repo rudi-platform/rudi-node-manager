@@ -3,7 +3,7 @@ const router = new express.Router()
 
 const passport = require('../utils/passportSetup')
 const { getUserInfo, getNodeUrls } = require('../controllers/consoleController')
-const { getApiExternalUrl, getPortalUrl, getInitData } = require('../controllers/dataController')
+const { getCatalogPublicUrl, getPortalUrl, getInitData } = require('../controllers/dataController')
 const {
   logout,
   postLogin,
@@ -11,17 +11,20 @@ const {
   putPassword,
 } = require('../controllers/authControllerPassport')
 const { makeRequestable } = require('../utils/utils')
-const { getRudiMediaUrl, FORM_PREFIX } = require('../config/config.js')
+const { FORM_PREFIX } = require('../config/config.js')
 const { expressErrorHandler } = require('../controllers/errorHandler.js')
+const { getStoragePublicUrl } = require('../controllers/mediaController.js')
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
 router.get('/node-urls', authenticate, getNodeUrls)
 router.get('/init-data', authenticate, getInitData)
 
-router.get('/form-url', authenticate, () => FORM_PREFIX)
-router.get('/media-url', authenticate, makeRequestable(getRudiMediaUrl))
-router.get('/ext-api-url', authenticate, makeRequestable(getApiExternalUrl))
+router.get('/form-url', authenticate, (req, reply) => reply.status(200).send(FORM_PREFIX))
+router.get('/media-url', authenticate, getStoragePublicUrl)
+router.get('/storage-url', authenticate, getStoragePublicUrl)
+router.get('/ext-api-url', authenticate, makeRequestable(getCatalogPublicUrl))
+router.get('/catalog-url', authenticate, makeRequestable(getCatalogPublicUrl))
 router.get('/portal-url', authenticate, makeRequestable(getPortalUrl))
 router.get('/user-info', authenticate, getUserInfo)
 

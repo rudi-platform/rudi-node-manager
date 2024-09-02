@@ -5,29 +5,38 @@ const { default: axios } = require('axios')
 
 // Internal dependencies
 const {
-  getMediaDwnlUrl,
-  getRudiMediaUrl,
+  getStorageDwnlUrl,
+  getStorageUrl,
   CATALOG,
-  rudiCatalogAdminApi,
+  getCatalogAdminUrl: getCatalogAdminApiUrl,
 } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
 const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
-  createPmHeadersForMedia,
   extractCookieFromReq,
   CONSOLE_TOKEN_NAME,
   readJwtBody,
   getTokenFromMediaForUser,
-  getRudiApiHeaders,
-  sendJsonAndTokens,
+  getCatalogHeaders,
+  getStorageHeaders,
 } = require('../utils/secu')
 const { handleError, treatAxiosError } = require('./errorHandler')
 const { extractJwt } = require('@aqmo.org/jwt-lib')
 const { beautify, cleanErrMsg } = require('../utils/utils.js')
 
+exports.getStoragePublicUrl = async (req, reply) => {
+  const fun = 'getStoragePublicUrl'
+  try {
+    const res = await axios.get(getStorageUrl('url'), getStorageHeaders())
+    return reply ? reply.status(200).send(res.data) : res.data
+  } catch (err) {
+    handleError(req, reply, err, 500, 'get_public_url', 'media', `media+${id}`)
+  }
+}
+
 // Controllers
-exports.getMediaToken = async (req, reply, next) => {
+exports.getStorageToken = async (req, reply, next) => {
   const fun = 'getMediaToken'
   try {
     // We extract
@@ -39,19 +48,16 @@ exports.getMediaToken = async (req, reply, next) => {
 
     const jwtPayload = readJwtBody(jwt)
     const payloadUser = jwtPayload.user
-    const exp = jwtPayload.exp
     if (!payloadUser)
       throw new UnauthorizedError(
         `JWT body token should contain an identified user: ${beautify(jwtPayload)}`
       )
-    if (exp * 1000 < new Date().getTime())
-      throw new ForbiddenError(`JWT expired: ${new Date(exp * 1000)} < ${new Date()}`)
 
     const user = await dbGetUserByUsername(null, payloadUser.username) // NOSONAR
     if (!user)
       return reply.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
 
-    const mediaToken = await getTokenFromMediaForUser(user, exp)
+    const mediaToken = await getTokenFromMediaForUser(user)
 
     return reply.status(200).send({ token: mediaToken })
   } catch (err) {
@@ -75,7 +81,7 @@ exports.getMediaInfoById = async (req, reply, next) => {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    const res = await axios.get(rudiCatalogAdminApi('media', id), getRudiApiHeaders())
+    const res = await axios.get(getCatalogAdminApiUrl('media', id), getCatalogHeaders())
     reply.status(200).json(res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -87,7 +93,7 @@ exports.getMediaInfoById = async (req, reply, next) => {
 exports.getDownloadById = (req, reply, next) => {
   const { id } = req.params
   return axios
-    .get(getMediaDwnlUrl(id), {
+    .get(getStorageDwnlUrl(id), {
       headers: { 'media-access-method': 'Direct', 'media-access-compression': true },
     })
     .then((resRUDI) => {
@@ -99,16 +105,16 @@ exports.getDownloadById = (req, reply, next) => {
     })
 }
 
-exports.commitFileOnRudiMedia = async (req, reply) => {
+exports.commitFileOnStorage = async (req, reply) => {
   const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
   try {
-    return await commitOnRudiMedia(mediaId, commitId, zoneName)
+    return await commitOnStorage(mediaId, commitId, zoneName)
   } catch (err) {
     return reply.status(err.response?.status || 500).send(err)
   }
 }
 
-exports.commitFileOnRudiApi = async (req, reply) => {
+exports.commitFileOnCatalog = async (req, reply) => {
   const { media_id: mediaId, commit_uuid: commitId } = req.body
   return await commitOnRudiApi(mediaId, commitId)
 }
@@ -119,7 +125,7 @@ exports.commitMediaFile = async (req, reply, next) => {
 
   // Let's commit the media on Media module
   try {
-    await commitOnRudiMedia(mediaId, commitId, zoneName)
+    await commitOnStorage(mediaId, commitId, zoneName)
   } catch (err) {
     log.e(mod, fun, err)
     return reply.status(err.code).json(err || err?.message)
@@ -139,14 +145,14 @@ exports.commitMediaFile = async (req, reply, next) => {
   }
 }
 
-const commitOnRudiMedia = async (mediaId, commitId, zoneName) => {
-  const fun = 'commitOnRudiMedia'
+const commitOnStorage = async (mediaId, commitId, zoneName) => {
+  const fun = 'commitOnStorage'
 
   try {
     const commitMediaRes = await axios.post(
-      getRudiMediaUrl('commit'),
+      getStorageUrl('commit'),
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
-      createPmHeadersForMedia()
+      getStorageHeaders()
     )
     log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
     return { status: 'OK', place: 'rudi-media', media_id: mediaId, commit_id: commitId }
@@ -183,9 +189,9 @@ const commitOnRudiApi = async (mediaId, commitId) => {
   const fun = 'commitOnRudiApi'
   try {
     const res = await axios.post(
-      rudiCatalogAdminApi('media', mediaId, 'commit'),
+      getCatalogAdminApiUrl('media', mediaId, 'commit'),
       { commit_id: commitId },
-      getRudiApiHeaders()
+      getCatalogHeaders()
     )
     const commitInfo = res.data
     log.d(mod, fun, 'T (commitMedia) commit API OK:', commitInfo)

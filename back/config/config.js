@@ -48,17 +48,17 @@ for (const section in customConfig) {
 
 if (config.logging.displayConf) jsonToString(config)
 
-const RUDI_API_URL = config?.rudi_api?.rudi_api_url
-const RUDI_MEDIA_URL = config?.rudi_media?.rudi_media_url
+const RUDI_CATALOG_URL = config?.rudi_api?.rudi_api_url
+const RUDI_STORAGE_URL = config?.rudi_media?.rudi_media_url
 
-console.debug(`[CONF] ${this.CATALOG} url:`, RUDI_API_URL)
-console.debug(`[CONF] ${this.STORAGE} url:`, RUDI_MEDIA_URL)
+console.debug(`[CONF] ${this.CATALOG} url:`, RUDI_CATALOG_URL)
+console.debug(`[CONF] ${this.STORAGE} url:`, RUDI_STORAGE_URL)
 console.debug(`[CONF] ${this.MANAGER} domain:`, getBackDomain())
 
-if (!RUDI_API_URL) {
+if (!RUDI_CATALOG_URL) {
   throw new Error(`Configuration error: ${this.CATALOG} URL should be defined`)
 }
-if (!RUDI_MEDIA_URL) {
+if (!RUDI_STORAGE_URL) {
   throw new Error(`Configuration error: ${this.STORAGE} URL should be defined`)
 }
 
@@ -73,15 +73,25 @@ exports.getConf = (section, subSection) => {
 }
 
 // Shortcuts to access popular conf values
+const RUDI_CATALOG_API_ADMIN = config.rudi_api?.admin_api || 'api/admin'
+exports.getCatalogUrl = (...args) => pathJoin(RUDI_CATALOG_URL, ...args)
+exports.getCatalogAdminUrl = (...args) =>
+  pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
+exports.getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...args)
 
-exports.rudiCatalogUrl = (...args) => pathJoin(RUDI_API_URL, ...args)
-exports.rudiCatalogAdminApi = (...args) =>
-  pathJoin(RUDI_API_URL, config.rudi_api.admin_api, ...args)
+exports.getCatalogUrlAndParams = (url, req) => {
+  const finalUrl = new URL(this.getCatalogUrl(url))
+  if (req) {
+    const origUrl = new URL(this.getCatalogUrl(req.url))
+    if (origUrl?.search) {
+      origUrl.searchParams.forEach((val, key) => finalUrl.searchParams.set(key, val))
+    }
+  }
+  return finalUrl.href
+}
 
-exports.getAdminApi = (...args) => pathJoin(config.rudi_api.admin_api, ...args)
-
-exports.getRudiMediaUrl = (...args) => pathJoin(RUDI_MEDIA_URL, ...args)
-exports.getMediaDwnlUrl = (id) => this.getRudiMediaUrl('download', id)
+exports.getStorageUrl = (...args) => pathJoin(RUDI_STORAGE_URL, ...args)
+exports.getStorageDwnlUrl = (id) => this.getStorageUrl('download', id)
 
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
 
@@ -91,14 +101,3 @@ exports.setSuName = (userDefinedSuName) => {
   config.database.db_su_usr = userDefinedSuName
 }
 exports.getSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
-
-exports.getCompleteRudiApiUrl = (url, req) => {
-  const finalUrl = new URL(this.rudiCatalogUrl(url))
-  if (req) {
-    const origUrl = new URL(this.rudiCatalogUrl(req.url))
-    if (origUrl?.search) {
-      origUrl.searchParams.forEach((val, key) => finalUrl.searchParams.set(key, val))
-    }
-  }
-  return finalUrl.href
-}

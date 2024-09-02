@@ -1,12 +1,12 @@
 const mod = 'genCtrl'
 
 const { default: axios } = require('axios')
-const { CATALOG, rudiCatalogAdminApi } = require('../config/config')
+const { CATALOG, getCatalogAdminUrl: getCatalogAdminApiUrl } = require('../config/config')
 
 const log = require('../utils/logger')
-const { getRudiApiHeaders, sendJsonAndTokens } = require('../utils/secu')
+const { getCatalogHeaders, sendJsonAndTokens } = require('../utils/secu')
 const { handleError, treatAxiosError } = require('./errorHandler')
-const { jsonToString, cleanErrMsg, beautify } = require('../utils/utils.js')
+const { cleanErrMsg, beautify } = require('../utils/utils.js')
 
 const OBJECT_TYPES = {
   resources: { url: 'resources', id: 'global_id' },
@@ -31,8 +31,8 @@ exports.getObjectList = async (req, reply) => {
 
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
-    const opts = { params: req?.query, ...getRudiApiHeaders() }
-    const res = await axios.get(rudiCatalogAdminApi(objectType), opts)
+    const opts = { params: req?.query, ...getCatalogHeaders() }
+    const res = await axios.get(getCatalogAdminApiUrl(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -46,7 +46,7 @@ exports.getObjectById = async (req, reply) => {
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
-    const res = await axios.get(rudiCatalogAdminApi(objectType, id), getRudiApiHeaders())
+    const res = await axios.get(getCatalogAdminApiUrl(objectType, id), getCatalogHeaders())
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -60,10 +60,10 @@ exports.postObject = async (req, reply) => {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = {
     params: req?.query,
-    ...getRudiApiHeaders(),
+    ...getCatalogHeaders(),
   }
   try {
-    const res = await axios.post(rudiCatalogAdminApi(objectType), req.body, opts)
+    const res = await axios.post(getCatalogAdminApiUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -77,10 +77,10 @@ exports.putObject = async (req, reply) => {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = {
     params: req?.query,
-    ...getRudiApiHeaders(),
+    ...getCatalogHeaders(),
   }
   try {
-    const res = await axios.put(rudiCatalogAdminApi(objectType), req.body, opts)
+    const res = await axios.put(getCatalogAdminApiUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -94,10 +94,10 @@ exports.deleteObject = async (req, reply) => {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = {
     params: req?.query,
-    ...getRudiApiHeaders(),
+    ...getCatalogHeaders(),
   }
   try {
-    const res = await axios.delete(rudiCatalogAdminApi(objectType, id), opts)
+    const res = await axios.delete(getCatalogAdminApiUrl(objectType, id), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -111,10 +111,10 @@ exports.deleteObjects = async (req, reply) => {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = {
     params: req?.query,
-    ...getRudiApiHeaders(),
+    ...getCatalogHeaders(),
   }
   try {
-    const res = await axios.delete(rudiCatalogAdminApi(objectType), opts)
+    const res = await axios.delete(getCatalogAdminApiUrl(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     log.w(mod, opType, cleanErrMsg(err))
@@ -129,8 +129,8 @@ exports.getCounts = async (req, reply) => {
   try {
     res = await Promise.all(
       COUNT_BY_LABELS.map((label) => {
-        log.d(mod, fun, `${label}: ` + rudiCatalogAdminApi(`resources?count_by=${label}`))
-        return axios.get(rudiCatalogAdminApi(`resources?count_by=${label}`), getRudiApiHeaders())
+        log.d(mod, fun, `${label}: ` + getCatalogAdminApiUrl(`resources?count_by=${label}`))
+        return axios.get(getCatalogAdminApiUrl(`resources?count_by=${label}`), getCatalogHeaders())
       })
     )
   } catch (err) {
