@@ -31,6 +31,7 @@ exports.getStoragePublicUrl = async (req, reply) => {
     const res = await axios.get(getStorageUrl('url'), getStorageHeaders())
     return reply ? reply.status(200).send(res.data) : res.data
   } catch (err) {
+    log.e(mod, fun, `An error occurred while trying to reach Storage module: ${err}`)
     handleError(req, reply, err, 500, 'get_public_url', 'media', `media+${id}`)
   }
 }
