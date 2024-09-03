@@ -113,7 +113,6 @@ const isAxiosError = (err) => err?.name == 'AxiosError'
 
 exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
   const fun = 'treatAxiosError'
-  log.d(mod, fun, req?.url)
   let statusCode, error
   if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
     statusCode = 503
@@ -125,6 +124,8 @@ exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
     if (reply) return reply.status(statusCode).json(error)
     throw new ConnectionError(error.message)
   }
+  if (req?.url) log.d(mod, fun, req?.url)
+
   if (err.response) {
     const { data, status = '' } = err.response
     log.e(mod, fun, `ERR (axios) ${status}: ${cleanErrMsg(data)}`)

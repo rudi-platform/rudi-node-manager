@@ -207,7 +207,10 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
 }
 
 async function runManagerBackend() {
+  const fun = 'runManagerBackend'
   const [catalogUrl, storageUrl] = await connectToRudiModules(15)
+  log.d(mod, fun, `catalogUrl: ${catalogUrl}`)
+  log.d(mod, fun, `storageUrl: ${storageUrl}`)
   const managerServer = await launchExpressApp({ catalogUrl, storageUrl })
 
   process.on('SIGINT', () => shutDown(managerServer, 'SIGINT'))
