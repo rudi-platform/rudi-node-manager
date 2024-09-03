@@ -65,7 +65,10 @@ async function connectToRudiModules(attemptLeft = 20) {
         new Promise((resolve, reject) =>
           getCatalogPublicUrl()
             .then((res) => resolve((catalogUrl = res)))
-            .catch((err) => reject(err))
+            .catch((err) => {
+              log.d(mod, fun, `attempt #${attemptLeft}: Catalog not responding`)
+              reject(err)
+            })
         )
       )
     if (!storageUrl)
@@ -73,14 +76,17 @@ async function connectToRudiModules(attemptLeft = 20) {
         new Promise((resolve, reject) =>
           getStoragePublicUrl()
             .then((res) => resolve((storageUrl = res)))
-            .catch((err) => reject(err))
+            .catch((err) => {
+              log.d(mod, fun, `attempt #${attemptLeft}}: Storage not responding`)
+              reject(err)
+            })
         )
       )
     await Promise.all(promises)
     return [catalogUrl, storageUrl]
   } catch (e) {
     await sleep(1000)
-    log.d(mod, fun, `attempt ${attemptLeft}`)
+    // log.d(mod, fun, `attempt ${attemptLeft}`)
     return connectToRudiModules(attemptLeft - 1)
   }
 }
@@ -90,6 +96,7 @@ async function connectToRudiModules(attemptLeft = 20) {
 // -------------------------------------------------------------------------------------------------
 const managerApp = express()
 const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
+  const fun = 'launchExpressApp'
   // Set our backend port to be either an environment variable or port 5000
   const listeningPort = getConf('server', 'listening_port') || 5000
   const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
@@ -99,9 +106,11 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   for (const rudiModuleUrl of [backUrl, catalogUrl, storageUrl]) {
     if (rudiModuleUrl) {
       const domain = getDomain(rudiModuleUrl)
+      log.d(mod, fun + '.domains', `${rudiModuleUrl} -> ${domain}`)
       if (!me.includes(domain)) me.push(domain)
     }
   }
+  log.d(mod, fun + '.domains', `rudi module Domains: ${me}`)
 
   managerApp.use(
     helmet({
