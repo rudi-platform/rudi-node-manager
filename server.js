@@ -44,136 +44,8 @@ const { getStoragePublicUrl } = require('./back/controllers/mediaController.js')
 const { getCatalogPublicUrl } = require('./back/controllers/dataController.js')
 
 // -------------------------------------------------------------------------------------------------
-// Launching express app
+// Check RUDI modules state
 // -------------------------------------------------------------------------------------------------
-const launchExpressServer = async ({ catalogUrl, storageUrl }) => {
-  const managerBackend = express()
-  // Set our backend port to be either an environment variable or port 5000
-  const listeningPort = getConf('server', 'listening_port') || 5000
-  const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
-
-  const backUrl = getBackOptions(OPT_BACK_PATH)
-  const me = ["'self'"]
-  for (const rudiModuleUrl of [backUrl, catalogUrl, storageUrl]) {
-    if (rudiModuleUrl) {
-      const domain = getDomain(rudiModuleUrl)
-      if (!me.includes(domain)) me.push(domain)
-    }
-  }
-
-  managerBackend.use(
-    helmet({
-      contentSecurityPolicy: {
-        useDefaults: true,
-        directives: {
-          defaultSrc: [...me, 'data:'],
-          scriptSrc: me,
-          connectSrc: [...me, ...getConf('security', 'trusted_domain')],
-          imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
-          upgradeInsecureRequests: null,
-        },
-      },
-    })
-  )
-
-  // backend.use(
-  //   helmet({
-  //     contentSecurityPolicy: {
-  //       useDefaults: true,
-  //       directives: {
-  //         defaultSrc: ["'self'", 'data:'],
-  //         scriptSrc: ["'self'"],
-  //         connectSrc: ["'self'", getStorageUrl('/'), ...getConf('security', 'trusted_domain')],
-  //         imgSrc: ["'self'", 'data:', 'https://*.tile.osm.org'],
-  //       },
-  //     },
-  //   })
-  // )
-
-  // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
-  managerBackend.use((req, reply, next) => {
-    const logReqMsg = `Request <= ${req?.method} ${req?.url} (from ${req?.ip})`
-    log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
-
-    // console.log('req.headers.cookie:', req.headers.cookie)
-    next()
-
-    reply.on('finish', () => {
-      if (reply.statusCode < 400) {
-        const okReplyMsg = `=> OK ${reply.statusCode}: ${req.method} ${req.originalUrl}`
-        log.sysInfo(mod, '', okReplyMsg, log.getContext(req, {}))
-      } else {
-        const errReplyMsg = `=> ERR ${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`
-        log.sysWarn(mod, '', errReplyMsg, log.getContext(req, {}))
-      }
-    })
-  })
-
-  // Note: bodyParser middleware has been replace with express bodyParser
-  managerBackend.use(express.json())
-  managerBackend.use(express.urlencoded({ extended: true }))
-  managerBackend.use(cookieParser())
-
-  // Access-Control-Allow-Origin
-  // Configure the CORs middleware
-  // backend.use(
-  //   cors({
-  //     credentials: true,
-  //     origin: WHITE_LIST,
-  //     allowedHeaders: ['Content-Type', 'Content-Length', 'Authorization'],
-  //     vary: 'Origin',
-  //     methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
-  //     maxAge: 600,
-  //   })
-  // )
-
-  // Passport middleware
-  managerBackend.use(passport.initialize())
-
-  const authenticate = passport.authenticate('jwt', { session: false })
-
-  // Configure app to use routes
-  managerBackend.use('/api/open', apiOpen)
-  managerBackend.use('/api/front', apiFront)
-  managerBackend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
-  managerBackend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
-  managerBackend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
-
-  // Serving the console frontend
-  managerBackend.use(pathJoin('', FORM_PREFIX), consoleRouter)
-
-  // This middleware informs the express application to serve our compiled React files
-  // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-  if (!isDevEnv()) {
-    console.log('Serving the built static page')
-    managerBackend.use(express.static(path.join(__dirname, 'front/build')))
-    managerBackend.get('/*', (req, reply) =>
-      reply.sendFile(path.join(__dirname, 'front/build/index.html'))
-    )
-  }
-
-  // Init database on startup
-  try {
-    await dbInitialize()
-    log.d(mod, 'initDatabase', 'SQL DB init OK')
-  } catch (err) {
-    log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`)
-    throw new Error(`SQL DB init ERR: ${err}`)
-  }
-
-  // Catch any bad requests
-  managerBackend.get('*', (req, reply) =>
-    reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`)
-  )
-
-  // Configure our server to listen on the port defiend by our port variable
-  managerBackend.listen(listeningPort, listeningAddress, () =>
-    log.i(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
-  )
-
-  managerBackend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
-}
-
 function checkUrls() {
   if (!catalogUrl && !storageUrl) throw new Error('Could not reach RUDI Catalog nor RUDI Storage')
   if (!storageUrl) throw new Error('Could not reach RUDI Storage')
@@ -213,9 +85,147 @@ async function connectToRudiModules(attemptLeft = 20) {
   }
 }
 
+// -------------------------------------------------------------------------------------------------
+// Launching express app
+// -------------------------------------------------------------------------------------------------
+const managerApp = express()
+const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
+  // Set our backend port to be either an environment variable or port 5000
+  const listeningPort = getConf('server', 'listening_port') || 5000
+  const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
+
+  const backUrl = getBackOptions(OPT_BACK_PATH)
+  const me = ["'self'"]
+  for (const rudiModuleUrl of [backUrl, catalogUrl, storageUrl]) {
+    if (rudiModuleUrl) {
+      const domain = getDomain(rudiModuleUrl)
+      if (!me.includes(domain)) me.push(domain)
+    }
+  }
+
+  managerApp.use(
+    helmet({
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          defaultSrc: [...me, 'data:'],
+          scriptSrc: me,
+          connectSrc: [...me, ...getConf('security', 'trusted_domain')],
+          imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
+          upgradeInsecureRequests: null,
+        },
+      },
+    })
+  )
+
+  // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
+  managerApp.use((req, reply, next) => {
+    const logReqMsg = `Request <= ${req?.method} ${req?.url} (from ${req?.ip})`
+    log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
+
+    // console.log('req.headers.cookie:', req.headers.cookie)
+    next()
+
+    reply.on('finish', () => {
+      if (reply.statusCode < 400) {
+        const okReplyMsg = `=> OK ${reply.statusCode}: ${req.method} ${req.originalUrl}`
+        log.sysInfo(mod, '', okReplyMsg, log.getContext(req, {}))
+      } else {
+        const errReplyMsg = `=> ERR ${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`
+        log.sysWarn(mod, '', errReplyMsg, log.getContext(req, {}))
+      }
+    })
+  })
+
+  // Note: bodyParser middleware has been replace with express bodyParser
+  managerApp.use(express.json())
+  managerApp.use(express.urlencoded({ extended: true }))
+  managerApp.use(cookieParser())
+
+  // Access-Control-Allow-Origin
+  // Configure the CORs middleware
+  // backend.use(
+  //   cors({
+  //     credentials: true,
+  //     origin: WHITE_LIST,
+  //     allowedHeaders: ['Content-Type', 'Content-Length', 'Authorization'],
+  //     vary: 'Origin',
+  //     methods: ['GET', 'PUT', 'POST', 'OPTIONS'],
+  //     maxAge: 600,
+  //   })
+  // )
+
+  // Passport middleware
+  managerApp.use(passport.initialize())
+
+  const authenticate = passport.authenticate('jwt', { session: false })
+
+  // Configure app to use routes
+  managerApp.use('/api/open', apiOpen)
+  managerApp.use('/api/front', apiFront)
+  managerApp.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
+  managerApp.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+  managerApp.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+
+  // Serving the console frontend
+  managerApp.use(pathJoin('', FORM_PREFIX), consoleRouter)
+
+  // This middleware informs the express application to serve our compiled React files
+  // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+  if (!isDevEnv()) {
+    console.log('Serving the built static page')
+    managerApp.use(express.static(path.join(__dirname, 'front/build')))
+    managerApp.get('/*', (req, reply) =>
+      reply.sendFile(path.join(__dirname, 'front/build/index.html'))
+    )
+  }
+
+  // Init database on startup
+  try {
+    await dbInitialize()
+    log.d(mod, 'initDatabase', 'SQL DB init OK')
+  } catch (err) {
+    log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`)
+    throw new Error(`SQL DB init ERR: ${err}`)
+  }
+
+  // Catch any bad requests
+  managerApp.get('*', (req, reply) =>
+    reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`)
+  )
+
+  // Configure our server to listen on the port defiend by our port variable
+  const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
+    log.i(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
+  )
+  managerServer.on('error', (err) => {
+    console.error('This error was uncaught:', err)
+  })
+
+  managerApp.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+  return managerServer
+}
+
 async function runManagerBackend() {
   const [catalogUrl, storageUrl] = await connectToRudiModules(15)
-  launchExpressServer({ catalogUrl, storageUrl }).catch((e) => console.error('Uncaught error:', e))
+  const managerServer = await launchExpressApp({ catalogUrl, storageUrl })
+
+  process.on('SIGINT', () => shutDown(managerServer, 'SIGINT'))
+  process.on('SIGTERM', () => shutDown(managerServer, 'SIGTERM'))
+  process.on('SIGQUIT', () => shutDown(managerServer, 'SIGQUIT'))
+}
+
+async function shutDown(managerServer, signal) {
+  console.debug(`Closing session on signal ${signal}`)
+  managerServer.close(() => {
+    console.log('Closed out remaining connections')
+    process.exit(0)
+  })
+
+  setTimeout(() => {
+    console.error('Could not close connections in time, forcefully shutting down')
+    process.exit(1)
+  }, 10000)
 }
 
 runManagerBackend()
