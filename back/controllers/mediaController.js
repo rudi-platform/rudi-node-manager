@@ -9,6 +9,8 @@ const {
   getStorageUrl,
   CATALOG,
   getCatalogAdminUrl: getCatalogAdminApiUrl,
+  STORAGE,
+  MANAGER,
 } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
 const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
@@ -29,10 +31,10 @@ exports.getStoragePublicUrl = async (req, reply) => {
   const fun = 'getStoragePublicUrl'
   try {
     const res = await axios.get(getStorageUrl('url'), getStorageHeaders())
-    return reply ? reply.status(200).send(res.data) : res.data
+    return reply ? reply.status(200).send(res?.data) : res?.data
   } catch (err) {
-    log.e(mod, fun, `An error occurred while trying to reach Storage module: ${err}`)
-    handleError(req, reply, err, 500, 'get_public_url', 'media', `media+${id}`)
+    // log.e(mod, fun, `An error occurred while trying to reach Storage module:`, Err)
+    treatAxiosError(err, STORAGE, req, reply)
   }
 }
 
@@ -65,13 +67,13 @@ exports.getStorageToken = async (req, reply, next) => {
     log.e(
       mod,
       fun,
-      '!! Liaison avec le module “Media” incomplète, création de JWT impossible: ' + err
+      `!! Liaison avec le module “${STORAGE}” incomplète, création de JWT impossible: ` + err
     )
     if (err.code == 'ECONNREFUSED')
       return reply.status(500).json({
         statusCode: 500,
-        message: '“RUDI Media” module is apparently down, contact the RUDI node admin',
-        error: 'Connection from “RUDI Prod Manager” to “RUDI Media” module failed',
+        message: `“${STORAGE}” module is apparently down, contact the RUDI node admin`,
+        error: `Connection from “${MANAGER}” to “${STORAGE}” module failed`,
       })
 
     reply.status(err.statusCode || 500).json(err)
@@ -163,7 +165,7 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
     if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
       throw RudiError.createRudiHttpError(
         503,
-        `La connection de “RUDI Prod Manager” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`
+        `La connection de “${MANAGER}” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`
       )
     }
 

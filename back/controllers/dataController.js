@@ -8,11 +8,12 @@ const {
   getStorageUrl,
   getCatalogUrlAndParams: getCompleteRudiApiUrl,
   FORM_PREFIX,
+  CATALOG,
 } = require('../config/config')
 
 const { getTags } = require('../config/backOptions')
 
-const { handleError } = require('./errorHandler')
+const { handleError, treatAxiosError } = require('./errorHandler')
 const { getCatalogHeaders } = require('../utils/secu.js')
 const { getStoragePublicUrl } = require('./mediaController.js')
 
@@ -42,8 +43,8 @@ const callCatalog = async (url, req, reply) => {
     return reply ? reply.status(200).send(data) : data
   } catch (err) {
     // log.w(mod, fun, cleanErrMsg(err))
-    if (reply) reply.status(err.statusCode).send(err.message)
-    throw err
+    // if (reply) reply.status(err.statusCode).send(err.message)
+    treatAxiosError(err, CATALOG, req, reply)
   }
 }
 

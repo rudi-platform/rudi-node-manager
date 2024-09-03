@@ -1,3 +1,4 @@
+const { MANAGER } = require('../config/config.js')
 const { RudiError, ConnectionError } = require('../utils/errors')
 const log = require('../utils/logger')
 const { cleanErrMsg } = require('../utils/utils')
@@ -112,13 +113,13 @@ const isAxiosError = (err) => err?.name == 'AxiosError'
 
 exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
   const fun = 'treatAxiosError'
-  log.d(mod, fun, req.url)
+  log.d(mod, fun, req?.url)
   let statusCode, error
   if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
     statusCode = 503
     error = {
       statusCode,
-      message: `La connection de “RUDI Prod Manager” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`,
+      message: `La connection de “${MANAGER}” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`,
     }
     // log.e(mod,fun,err. )
     if (reply) return reply.status(statusCode).json(error)
@@ -155,9 +156,9 @@ exports.expressErrorHandler = (err, req, reply) => {
   // console.error(now, `[Express default error handler]`, err)
   // log.sysError(`An error happened on ${req.method} ${req.url}: ${err}`)
   const errMsg = cleanErrMsg(err.message)
-  console.error(`An error happened on ${req.method} ${req.url}: ${errMsg}`)
+  console.error(`An error happened on ${req?.method} ${req?.url}: ${errMsg}`)
 
-  if (reply.headersSent) return
+  if (reply?.headersSent) return
 
   // res.status(500)
   // res.render('error', { time: now.getTime(), error: err })

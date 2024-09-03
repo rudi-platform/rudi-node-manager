@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid')
 const jwtLib = require(`@aqmo.org/jwt-lib`)
 
 // ----- Internal dependencies
-const { getConf } = require('../config/config')
+const { getConf, MANAGER, STORAGE } = require('../config/config')
 const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
 const log = require('./logger')
 const { ForbiddenError, RudiError } = require('./errors')
@@ -141,7 +141,7 @@ exports.getTokenFromMediaForUser = async (user) => {
     if (err.code == 'ECONNREFUSED')
       throw RudiError.createRudiHttpError(
         500,
-        'Connection from “RUDI Prod Manager” to “RUDI Media” module failed: ' +
+        `Connection from “${MANAGER}” to “${STORAGE}” module failed: ` +
           '“RUDI Media” module is apparently down, contact the RUDI node admin'
       )
     const rudiError = RudiError.createRudiHttpError(

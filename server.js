@@ -1,4 +1,4 @@
-const mod = 'server'
+const mod = 'manager.app'
 
 // -------------------------------------------------------------------------------------------------
 // External dependencies
@@ -12,7 +12,7 @@ const helmet = require('helmet')
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-const { getConf, getStorageUrl, FORM_PREFIX } = require('./back/config/config')
+const { getConf, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
 const { isDevEnv, OPT_BACK_PATH, getBackOptions } = require('./back/config/backOptions')
@@ -34,15 +34,15 @@ const passport = require('./back/utils/passportSetup')
 const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
 const { checkRolePerm } = require('./back/utils/roleCheck')
 const consoleRouter = require('./console/router.js')
-const { pathJoin } = require('./back/utils/utils.js')
-const { getStorageToken, getStoragePublicUrl } = require('./back/controllers/mediaController.js')
+const { pathJoin, sleep } = require('./back/utils/utils.js')
+const { getStoragePublicUrl } = require('./back/controllers/mediaController.js')
 const { getCatalogPublicUrl } = require('./back/controllers/dataController.js')
 
 // -------------------------------------------------------------------------------------------------
 // Launching express app
 // -------------------------------------------------------------------------------------------------
-const launchServer = async () => {
-  const backend = express()
+const launchExpressServer = async ({ catalogUrl, storageUrl }) => {
+  const managerBackend = express()
   // Set our backend port to be either an environment variable or port 5000
   const listeningPort = getConf('server', 'listening_port') || 5000
   const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
@@ -56,8 +56,7 @@ const launchServer = async () => {
       me.push(backUrl)
     }
   }
-  const [catalogUrl, storageUrl] = await Promise.all([getCatalogPublicUrl(), getStoragePublicUrl()])
-  backend.use(
+  managerBackend.use(
     helmet({
       contentSecurityPolicy: {
         useDefaults: true,
@@ -87,8 +86,8 @@ const launchServer = async () => {
   // )
 
   // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
-  backend.use((req, reply, next) => {
-    const logReqMsg = `Request <= ${req.method} ${req.url} (from ${req.ip})`
+  managerBackend.use((req, reply, next) => {
+    const logReqMsg = `Request <= ${req?.method} ${req?.url} (from ${req?.ip})`
     log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
 
     // console.log('req.headers.cookie:', req.headers.cookie)
@@ -106,9 +105,9 @@ const launchServer = async () => {
   })
 
   // Note: bodyParser middleware has been replace with express bodyParser
-  backend.use(express.json())
-  backend.use(express.urlencoded({ extended: true }))
-  backend.use(cookieParser())
+  managerBackend.use(express.json())
+  managerBackend.use(express.urlencoded({ extended: true }))
+  managerBackend.use(cookieParser())
 
   // Access-Control-Allow-Origin
   // Configure the CORs middleware
@@ -124,46 +123,94 @@ const launchServer = async () => {
   // )
 
   // Passport middleware
-  backend.use(passport.initialize())
+  managerBackend.use(passport.initialize())
 
   const authenticate = passport.authenticate('jwt', { session: false })
 
   // Configure app to use routes
-  backend.use('/api/open', apiOpen)
-  backend.use('/api/front', apiFront)
-  backend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
-  backend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
-  backend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
+  managerBackend.use('/api/open', apiOpen)
+  managerBackend.use('/api/front', apiFront)
+  managerBackend.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), apiData)
+  managerBackend.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), apiMedia)
+  managerBackend.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), apiSecu)
 
   // Serving the console frontend
-  backend.use(pathJoin('', FORM_PREFIX), consoleRouter)
+  managerBackend.use(pathJoin('', FORM_PREFIX), consoleRouter)
 
   // This middleware informs the express application to serve our compiled React files
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   if (!isDevEnv()) {
     console.log('Serving the built static page')
-    backend.use(express.static(path.join(__dirname, 'front/build')))
-    backend.get('/*', (req, reply) =>
+    managerBackend.use(express.static(path.join(__dirname, 'front/build')))
+    managerBackend.get('/*', (req, reply) =>
       reply.sendFile(path.join(__dirname, 'front/build/index.html'))
     )
   }
 
   // Init database on startup
-  dbInitialize()
-    .then((res) => log.d(mod, 'initDatabase', 'SQL DB init OK'))
-    .catch((err) => log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`))
+  try {
+    await dbInitialize()
+    log.d(mod, 'initDatabase', 'SQL DB init OK')
+  } catch (err) {
+    log.e(mod, 'initDatabase', `SQL DB init ERR: ${err}`)
+    throw new Error(`SQL DB init ERR: ${err}`)
+  }
 
   // Catch any bad requests
-  backend.get('*', (req, reply) =>
-    reply.status(404).send(`Route '${req.method} ${req.url}' not found`)
+  managerBackend.get('*', (req, reply) =>
+    reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`)
   )
 
   // Configure our server to listen on the port defiend by our port variable
-  backend.listen(listeningPort, listeningAddress, () =>
+  managerBackend.listen(listeningPort, listeningAddress, () =>
     log.i(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
   )
 
-  backend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+  managerBackend.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
 }
 
-launchServer().catch((e) => console.error('Uncaught error:', e))
+function checkUrls() {
+  if (!catalogUrl && !storageUrl) throw new Error('Could not reach RUDI Catalog nor RUDI Storage')
+  if (!storageUrl) throw new Error('Could not reach RUDI Storage')
+  if (!catalogUrl) throw new Error('Could not reach RUDI Catalog')
+  return [catalogUrl, storageUrl]
+}
+
+let catalogUrl, storageUrl
+async function connectToRudiModules(attemptLeft = 20) {
+  const fun = 'connectToRudiModules'
+  if (attemptLeft === 0) return checkUrls()
+
+  try {
+    const promises = []
+    if (!catalogUrl)
+      promises.push(
+        new Promise((resolve, reject) =>
+          getCatalogPublicUrl()
+            .then((res) => resolve((catalogUrl = res)))
+            .catch((err) => reject(err))
+        )
+      )
+    if (!storageUrl)
+      promises.push(
+        new Promise((resolve, reject) =>
+          getStoragePublicUrl()
+            .then((res) => resolve((storageUrl = res)))
+            .catch((err) => reject(err))
+        )
+      )
+    await Promise.all(promises)
+    return [catalogUrl, storageUrl]
+  } catch (e) {
+    await sleep(1000)
+    log.d(mod, fun, `attempt ${attemptLeft}`)
+    return connectToRudiModules(attemptLeft - 1)
+  }
+}
+
+async function runManagerBackend() {
+  const [catalogUrl, storageUrl] = await connectToRudiModules(15)
+  launchExpressServer({ catalogUrl, storageUrl }).catch((e) => console.error('Uncaught error:', e))
+}
+
+runManagerBackend()

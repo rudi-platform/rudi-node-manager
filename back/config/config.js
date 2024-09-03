@@ -82,7 +82,7 @@ exports.getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...a
 exports.getCatalogUrlAndParams = (url, req) => {
   const finalUrl = new URL(this.getCatalogUrl(url))
   if (req) {
-    const origUrl = new URL(this.getCatalogUrl(req.url))
+    const origUrl = new URL(this.getCatalogUrl(req?.url))
     if (origUrl?.search) {
       origUrl.searchParams.forEach((val, key) => finalUrl.searchParams.set(key, val))
     }

@@ -112,3 +112,5 @@ exports.uuidv4 = (nb) => {
   }
   return uuidArray
 }
+
+exports.sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
