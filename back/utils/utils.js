@@ -102,6 +102,15 @@ exports.makeRequestable = (func) => async (req, reply, next) => {
     reply.status(500).json({ statusCode: 500, message: this.cleanErrMsg(err) })
   }
 }
+exports.getDomain = (url) => this.checkIsURL(url)?.hostname
+
+exports.checkIsURL = (url) => {
+  try {
+    return new URL(url)
+  } catch {
+    return undefined
+  }
+}
 
 exports.uuidv4 = (nb) => {
   if (!nb) return v4()

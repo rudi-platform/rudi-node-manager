@@ -1,4 +1,5 @@
 const minimist = require('minimist')
+const { getDomain } = require('../utils/utils.js')
 
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
@@ -157,7 +158,7 @@ exports.isProdEnv = () => this.getNodeEnv() === 'production'
 const backDomain = () => {
   const backPath = this.getBackOptions(this.OPT_BACK_PATH)
   try {
-    return new URL(backPath).hostname
+    return getDomain(backPath)
   } catch {
     return backPath
   }

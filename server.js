@@ -15,7 +15,12 @@ const helmet = require('helmet')
 const { getConf, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
-const { isDevEnv, OPT_BACK_PATH, getBackOptions } = require('./back/config/backOptions')
+const {
+  isDevEnv,
+  OPT_BACK_PATH,
+  getBackOptions,
+  getBackDomain,
+} = require('./back/config/backOptions')
 const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +39,7 @@ const passport = require('./back/utils/passportSetup')
 const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
 const { checkRolePerm } = require('./back/utils/roleCheck')
 const consoleRouter = require('./console/router.js')
-const { pathJoin, sleep } = require('./back/utils/utils.js')
+const { pathJoin, sleep, getDomain } = require('./back/utils/utils.js')
 const { getStoragePublicUrl } = require('./back/controllers/mediaController.js')
 const { getCatalogPublicUrl } = require('./back/controllers/dataController.js')
 
@@ -49,13 +54,13 @@ const launchExpressServer = async ({ catalogUrl, storageUrl }) => {
 
   const backUrl = getBackOptions(OPT_BACK_PATH)
   const me = ["'self'"]
-  if (backUrl) {
-    try {
-      me.push(new URL(backUrl).hostname)
-    } catch {
-      me.push(backUrl)
+  for (const rudiModuleUrl of [backUrl, catalogUrl, storageUrl]) {
+    if (rudiModuleUrl) {
+      const domain = getDomain(rudiModuleUrl)
+      if (!me.includes(domain)) me.push(domain)
     }
   }
+
   managerBackend.use(
     helmet({
       contentSecurityPolicy: {
@@ -63,7 +68,7 @@ const launchExpressServer = async ({ catalogUrl, storageUrl }) => {
         directives: {
           defaultSrc: [...me, 'data:'],
           scriptSrc: me,
-          connectSrc: [...me, storageUrl, catalogUrl, ...getConf('security', 'trusted_domain')],
+          connectSrc: [...me, ...getConf('security', 'trusted_domain')],
           imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
           upgradeInsecureRequests: null,
         },
