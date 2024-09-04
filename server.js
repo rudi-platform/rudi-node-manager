@@ -20,6 +20,8 @@ const {
   OPT_BACK_PATH,
   getBackOptions,
   getBackDomain,
+  getNodeEnv,
+  isProdEnv,
 } = require('./back/config/backOptions')
 const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
@@ -91,6 +93,36 @@ async function connectToRudiModules(attemptLeft = 20) {
   }
 }
 
+function getHelmetDirectives({ catalogUrl, storageUrl }) {
+  const fun = 'getHelmetDirectives'
+  const backUrl = getBackOptions(OPT_BACK_PATH)
+
+  const moduleDomains = ["'self'"]
+  // const urls = ["'self'"]
+  for (const url of [backUrl, catalogUrl, storageUrl]) {
+    if (url) {
+      const domain = getDomain(url)
+      log.d(mod, fun + '.domains', `${url} -> ${domain}`)
+      if (!moduleDomains.includes(domain)) moduleDomains.push(domain)
+      // if (!urls.includes(url)) urls.push(url)
+    }
+  }
+
+  log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
+  const defaultSrc = ['data:', ...moduleDomains]
+  const scriptSrc = moduleDomains
+  const connectSrc = [
+    ...moduleDomains,
+    catalogUrl,
+    storageUrl,
+    ...getConf('security', 'trusted_domain'),
+  ]
+  const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
+  const helmetDirectives = { defaultSrc, scriptSrc, connectSrc, imgSrc }
+  if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
+  return helmetDirectives
+}
+
 // -------------------------------------------------------------------------------------------------
 // Launching express app
 // -------------------------------------------------------------------------------------------------
@@ -101,28 +133,11 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   const listeningPort = getConf('server', 'listening_port') || 5000
   const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
 
-  const backUrl = getBackOptions(OPT_BACK_PATH)
-  const me = ["'self'"]
-  for (const rudiModuleUrl of [backUrl, catalogUrl, storageUrl]) {
-    if (rudiModuleUrl) {
-      const domain = getDomain(rudiModuleUrl)
-      log.d(mod, fun + '.domains', `${rudiModuleUrl} -> ${domain}`)
-      if (!me.includes(domain)) me.push(domain)
-    }
-  }
-  log.d(mod, fun + '.domains', `rudi module Domains: ${me}`)
-
   managerApp.use(
     helmet({
       contentSecurityPolicy: {
         useDefaults: true,
-        directives: {
-          defaultSrc: [...me, 'data:'],
-          scriptSrc: me,
-          connectSrc: [...me, ...getConf('security', 'trusted_domain')],
-          imgSrc: [...me, 'data:', 'https://*.tile.osm.org'],
-          upgradeInsecureRequests: null,
-        },
+        directives: getHelmetDirectives({ catalogUrl, storageUrl }),
       },
     })
   )
