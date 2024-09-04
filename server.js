@@ -90,9 +90,10 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
   const fun = 'getHelmetDirectives'
   const backUrl = getBackOptions(OPT_BACK_PATH)
 
+  const trustedUrls = [backUrl, catalogUrl, storageUrl]
   const moduleDomains = ["'self'"]
   const moduleHosts = ["'self'"]
-  for (const url of [backUrl, catalogUrl, storageUrl]) {
+  for (const url of trustedUrls) {
     if (url) {
       const domain = getDomain(url)
       const host = getHost(url)
@@ -101,13 +102,21 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
       if (!moduleHosts.includes(host)) moduleHosts.push(host)
     }
   }
-
   log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
-  const defaultSrc = ['data:', ...moduleDomains]
+
+  /* Note about Content Security Policy:
+   * - connect-src, media-src, worker-src: Allow full hosts (including ports).
+   * - script-src, img-src, style-src, font-src: Only accept hostnames (domains); ports are not allowed.
+   */
+  const connectSrc = [...moduleHosts, ...getConf('security', 'trusted_domain')]
+
   const scriptSrc = moduleDomains
-  const connectSrc = [...moduleDomains, ...moduleHosts, ...getConf('security', 'trusted_domain')]
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
-  const helmetDirectives = { defaultSrc, scriptSrc, connectSrc, imgSrc }
+  const defaultSrc = [...moduleDomains]
+
+  const styleSrc = ["'self'"]
+  const objectSrcSrc = ["'none'"]
+  const helmetDirectives = { scriptSrc, connectSrc, imgSrc, styleSrc, objectSrcSrc, defaultSrc }
   if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
   return helmetDirectives
 }
