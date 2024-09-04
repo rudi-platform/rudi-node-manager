@@ -102,9 +102,15 @@ exports.makeRequestable = (func) => async (req, reply, next) => {
     reply.status(500).json({ statusCode: 500, message: this.cleanErrMsg(err) })
   }
 }
+
 exports.getDomain = (url) => {
   if (!url.startsWith('http')) url = 'http://' + url
   return this.checkIsURL(url)?.hostname
+}
+
+exports.getHost = (url) => {
+  if (!url.startsWith('http')) url = 'http://' + url
+  return this.checkIsURL(url)?.host
 }
 
 exports.checkIsURL = (url) => {

@@ -34,7 +34,7 @@ const passport = require('./back/utils/passportSetup')
 const { ROLE_ADMIN, dbInitialize, ROLE_ALL } = require('./back/database/scripts/initDatabase')
 const { checkRolePerm } = require('./back/utils/roleCheck')
 const consoleRouter = require('./console/router.js')
-const { pathJoin, sleep, getDomain } = require('./back/utils/utils.js')
+const { pathJoin, sleep, getDomain, getHost } = require('./back/utils/utils.js')
 const { getStoragePublicUrl } = require('./back/controllers/mediaController.js')
 const { getCatalogPublicUrl } = require('./back/controllers/dataController.js')
 
@@ -91,26 +91,21 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
   const backUrl = getBackOptions(OPT_BACK_PATH)
 
   const moduleDomains = ["'self'"]
-  // const urls = ["'self'"]
+  const moduleHosts = ["'self'"]
   for (const url of [backUrl, catalogUrl, storageUrl]) {
     if (url) {
       const domain = getDomain(url)
-      log.d(mod, fun + '.domains', `${url} -> ${domain}`)
+      const host = getHost(url)
+      new URL(storageUrl).host, log.d(mod, fun + '.domains', `${url} -> ${domain}`)
       if (!moduleDomains.includes(domain)) moduleDomains.push(domain)
-      // if (!urls.includes(url)) urls.push(url)
+      if (!moduleHosts.includes(host)) moduleHosts.push(host)
     }
   }
 
   log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
   const defaultSrc = ['data:', ...moduleDomains]
   const scriptSrc = moduleDomains
-  const connectSrc = [
-    ...moduleDomains,
-    catalogUrl,
-    storageUrl,
-    new URL(storageUrl).host,
-    ...getConf('security', 'trusted_domain'),
-  ]
+  const connectSrc = [...moduleDomains, ...moduleHosts, ...getConf('security', 'trusted_domain')]
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
   const helmetDirectives = { defaultSrc, scriptSrc, connectSrc, imgSrc }
   if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
