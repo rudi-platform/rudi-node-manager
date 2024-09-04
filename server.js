@@ -15,14 +15,7 @@ const helmet = require('helmet')
 const { getConf, FORM_PREFIX } = require('./back/config/config')
 
 const log = require('./back/utils/logger')
-const {
-  isDevEnv,
-  OPT_BACK_PATH,
-  getBackOptions,
-  getBackDomain,
-  getNodeEnv,
-  isProdEnv,
-} = require('./back/config/backOptions')
+const { isDevEnv, OPT_BACK_PATH, getBackOptions, isProdEnv } = require('./back/config/backOptions')
 const { expressErrorHandler } = require('./back/controllers/errorHandler.js')
 
 // -------------------------------------------------------------------------------------------------
@@ -115,6 +108,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
     ...moduleDomains,
     catalogUrl,
     storageUrl,
+    new URL(storageUrl).host,
     ...getConf('security', 'trusted_domain'),
   ]
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
@@ -165,6 +159,17 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   managerApp.use(express.json())
   managerApp.use(express.urlencoded({ extended: true }))
   managerApp.use(cookieParser())
+
+  // const WHITE_LIST = [
+  //   'self',
+  //   '::ffff:127.0.0.1',
+  //   /127\.0\.0\.1(:\d+)?/,
+  //   /localhost(:\d+)?/,
+  //   'localhost.*',
+  //   getConsoleFormUrl(),
+  //   ...getConf('security', 'trusted_domain'),
+  // ]
+  // const QUOTED_WHITE_LIST = WHITE_LIST.map((whiteListedIp) => `'${whiteListedIp}'`)
 
   // Access-Control-Allow-Origin
   // Configure the CORs middleware

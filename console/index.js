@@ -1,3 +1,8 @@
+// This code has been rendered obsolete.
+// The main server now uses the console router directly
+// managerApp.use(pathJoin('', FORM_PREFIX), consoleRouter)
+//
+
 /**
  * Code for the node server
  * Load config, serve dependencies and static content
@@ -15,7 +20,7 @@
 const express = require('express')
 const minimist = require('minimist')
 
-const router = require('./router.js')
+const consoleRouter = require('./router.js')
 
 const _argv = minimist(process.argv.slice(2))
 console.log('_argv:', _argv)
@@ -75,7 +80,7 @@ const launchServer = () => {
   // Routing
 
   const app = express()
-  app.use('/', router)
+  app.use('/', consoleRouter)
 
   // Serve config
   app.get('/conf', (req, res) => {
