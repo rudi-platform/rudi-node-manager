@@ -97,7 +97,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
     if (url) {
       const domain = getDomain(url)
       const host = getHost(url)
-      new URL(storageUrl).host, log.d(mod, fun + '.domains', `${url} -> ${domain}`)
+      // log.d(mod, fun + '.domains', `${url} -> ${domain}`)
       if (!moduleDomains.includes(domain)) moduleDomains.push(domain)
       if (!moduleHosts.includes(host)) moduleHosts.push(host)
     }
