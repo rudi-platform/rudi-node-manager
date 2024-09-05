@@ -114,9 +114,9 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
   const defaultSrc = [...moduleDomains]
 
-  const styleSrc = [...moduleDomains]
-  const objectSrcSrc = ["'none'"]
-  const helmetDirectives = { scriptSrc, connectSrc, imgSrc, styleSrc, objectSrcSrc, defaultSrc }
+  const styleSrc = [...moduleDomains, "'unsafe-inline'"]
+  const objectSrc = ["'none'"]
+  const helmetDirectives = { scriptSrc, connectSrc, imgSrc, styleSrc, objectSrc, defaultSrc }
   if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
   return helmetDirectives
 }
