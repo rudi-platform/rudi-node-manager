@@ -102,7 +102,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
       if (!moduleHosts.includes(host)) moduleHosts.push(host)
     }
   }
-  log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
+  // log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
 
   /* Note about Content Security Policy:
    * - connect-src, media-src, worker-src: Allow full hosts (including ports).
@@ -114,7 +114,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
   const defaultSrc = [...moduleDomains]
 
-  const styleSrc = ["'self'"]
+  const styleSrc = [...moduleDomains]
   const objectSrcSrc = ["'none'"]
   const helmetDirectives = { scriptSrc, connectSrc, imgSrc, styleSrc, objectSrcSrc, defaultSrc }
   if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
