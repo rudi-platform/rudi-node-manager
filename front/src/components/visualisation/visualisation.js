@@ -152,11 +152,20 @@ function Visualisation({ logout }) {
   const [htmlSrc, setHtmlSrc] = useState()
 
   const showContent = async (mediaUrl, mediaMime) => {
+    console.trace('T mediaMime:', mediaMime)
+    if (mediaMime.endsWith('crypt')) {
+      return setHtmlSrc(
+        <div className="body">
+          <div className="text-visu">
+            <pre>***[ Encrypted file ]***</pre>
+          </div>
+        </div>
+      )
+    }
     if (mediaMime.startsWith('image')) {
       await getContent(mediaUrl, (srcContent) => (
         <img src={srcContent} className="image90" alt="retrieving media..." />
       ))
-
       // setVisuOption({ displayType: 'IMG', data: imgUrl })
     } else if (mediaMime.startsWith('video')) {
       await getContent(mediaUrl, (srcContent) => (
@@ -231,7 +240,7 @@ function Visualisation({ logout }) {
 
   return (
     <div className="tempPaddingTop">
-      Afficher une donnée (csv ou JSON) :
+      Afficher une donnée (image, CSV ou JSON) :
       <div className="btn-group" role="group">
         <input
           type="text"
