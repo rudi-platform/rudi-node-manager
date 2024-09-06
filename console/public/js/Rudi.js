@@ -67,18 +67,18 @@ export class RudiForm {
     }
   }
 
-  getConf = (param) => {
-    if (!this.conf)
-      throw new Error('Configuration has not been defined yet, please call init() beforehand')
-    if (this.conf?.[param] !== undefined) return this.conf[param]
-    const errMsg = `[Rudi/getConf] Configuration not found for '${param}'`
-    if (this.isDev) console.warn(errMsg)
-    throw new Error(errMsg)
-  }
+  // getConf = (param) => {
+  //   if (!this.conf)
+  //     throw new Error('Configuration has not been defined yet, please call init() beforehand')
+  //   if (this.conf?.[param] !== undefined) return this.conf[param]
+  //   const errMsg = `[Rudi/getConf] Configuration not found for '${param}'`
+  //   if (this.isDev) console.warn(errMsg)
+  //   throw new Error(errMsg)
+  // }
 
-  get isDev() {
-    return this.conf?.dev || this.conf?.env == 'dev'
-  }
+  // get isDev() {
+  //   return this.conf?.dev || this.conf?.env == 'dev'
+  // }
 
   async init() {
     const here = 'init'
@@ -93,6 +93,8 @@ export class RudiForm {
     await this._initNodeUrls()
     this.ok(here, 'node urls:', this.nodeUrls)
     this._initForm()
+
+    this.isDev = (await this._getPm(false, '/front/env')) == 'development'
     this.initialized = true
   }
 

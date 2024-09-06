@@ -4,19 +4,21 @@ import ObjCatalogue from './objCatalogue'
 
 CataloguePubKeys.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : CataloguePubKeys
  * @return {void}
  */
-export default function CataloguePubKeys({ editMode }) {
+export default function CataloguePubKeys({ editMode, logout }) {
   return (
     <ObjCatalogue
       editMode={editMode}
-      objType="pub_key"
+      objType="pub_keys"
       propId="name"
       propName="name"
+      logout={logout}
       propNamesToDisplay={{
         url: 'url',
         prop: 'prop',
@@ -27,8 +29,8 @@ export default function CataloguePubKeys({ editMode }) {
       propSortBy="-updatedAt"
       btnTextAdd="Ajouter une clé publique"
       btnTextChg="Modifier une clé publique :"
-      deleteConfirmMsg={(id) => `Confirmez vous la suppression de la clé publique ${id}?`}
-      deleteMsg={(id) => `La clé publique ${id} a été supprimé`}
+      deleteConfirmMsg={(id) => `Confirmez-vous la suppression de la clé publique ${id}?`}
+      deleteMsg={(id) => `La clé publique ${id} a été supprimée`}
     />
   )
 }

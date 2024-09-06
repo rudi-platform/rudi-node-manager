@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
@@ -13,13 +13,14 @@ const urlRoles = `api/secu/roles`
 
 CatalogueUser.propTypes = {
   editMode: PropTypes.bool,
+  logout: PropTypes.func,
 }
 
 /**
  * Composant : CatalogueUser
  * @return {ReactNode}
  */
-export default function CatalogueUser({ editMode }) {
+export default function CatalogueUser({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setEdit] = useState(!!editMode)

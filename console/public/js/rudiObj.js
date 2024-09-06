@@ -11,6 +11,11 @@ import '../lib/MaterialInputs.js'
 
 import { JsonHttpRequest } from './Http.js'
 import { RudiForm, STYLE_NRM, STYLE_THN } from './Rudi.js'
+import {
+  generateRsaOaepKeyPair,
+  privateCryptoKeyToPem,
+  publicCryptoKeyToPem,
+} from './RudiCrypto.js'
 import { uuidv4 } from './utils.js'
 
 export class RudiObjForm extends RudiForm {
@@ -19,7 +24,8 @@ export class RudiObjForm extends RudiForm {
     super(language)
 
     this.objType = objType
-    this.idField = idField || `${this.objType.slice(0, -1)}_id`
+    this.idField =
+      idField || `${this.objType.endsWith('s') ? this.objType.slice(0, -1) : this.objType}_id`
     this.templatePath = templatePath || `templates/${this.objType}.json`
   }
 
@@ -170,8 +176,126 @@ export class RudiContactForm extends RudiObjForm {
   }
 }
 
-if (document.title == 'Rudi Contact') RudiContactForm.loadForm()
-else if (document.title == 'Rudi Producer') RudiOrgForm.loadForm()
-else {
-  console.log('document title should be "Rudi Contact" pr "Rudi Producer", got:', document.title)
+export class RudiKeyForm extends RudiObjForm {
+  constructor(language) {
+    super(language, 'pub_keys', 'name')
+  }
+
+  /**
+   * Update the form in function of its current state to hide and display
+   * inputs and values
+   */
+  async updateKeyDisplay() {
+    const here = 'updateKeyDisplay'
+    if (
+      this.customForm.hasAttribute('readonly') ||
+      this.customForm.htmlController.switch.value != 'URL'
+    )
+      return
+
+    // Clear display
+    this.customForm.htmlController.pem.value = ''
+
+    // Try get url
+    let res
+    let url = this.customForm.htmlController.url.value
+    if (url) {
+      try {
+        res = await HttpRequest.get(url).send()
+      } catch (e) {
+        this.ko(here, e)
+        this.customForm.htmlController.url.toggleAttribute('error', false)
+        return
+      }
+    }
+
+    // Try parse json
+    try {
+      const jsonRes = JSON.parse(res)
+      this.ok(here, 'json:', jsonRes)
+      let prop = this.customForm.htmlController.prop.value
+      const key = prop ? jsonRes[prop] : JSON.stringify(jsonRes, null, 4)
+      this.customForm.htmlController.pem.value = key
+      this.customForm.htmlController.prop.toggleAttribute('hidden', false)
+      this.ok(here)
+    } catch {
+      this.customForm.htmlController.prop.value = ''
+      this.customForm.htmlController.pem.value = res
+      this.customForm.htmlController.prop.toggleAttribute('hidden', true)
+    }
+  }
+
+  treatOutputValue = async (outputValue) => {
+    const here = 'treatOutputValue'
+    console.trace(here, 'outputValue:', outputValue)
+    if (!outputValue.pem) {
+      this.ok(here, 'Generating key pair...')
+      let keyPair = await generateRsaOaepKeyPair(4096, 'SHA-256')
+      let [publicPEM, privatePEM] = await Promise.all([
+        publicCryptoKeyToPem(keyPair.publicKey),
+        privateCryptoKeyToPem(keyPair.privateKey),
+      ])
+      this.download(privatePEM, `${outputValue.name}.prv`, 'application/x-pem-file')
+
+      outputValue = {
+        name: outputValue.name,
+        pem: publicPEM,
+      }
+      console.trace('pubKey outputValue:', outputValue)
+    }
+    return outputValue
+  }
+  submitListener = () =>
+    super.submitListener(async (outputvalue) => this.treatOutputValue(outputvalue))
+
+  // Function to download data to a file
+  download(data, filename, type) {
+    // console.trace('pubKey download filename:', filename)
+    const file = new Blob([data], { type: type })
+    const a = document.createElement('a')
+    const url = URL.createObjectURL(file)
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    setTimeout(function () {
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    }, 0)
+  }
+
+  publish = (data) => super.publish(data, false)
+
+  static async loadForm() {
+    const rudiObj = new RudiKeyForm('fr')
+    await rudiObj.loadForm()
+    await rudiObj.init()
+    rudiObj.customForm.htmlController.switch.addEventListener('change', () => {
+      rudiObj.customForm.htmlController.pem.value = ''
+      rudiObj.updateKeyDisplay()
+    })
+    rudiObj.customForm.htmlController.url.addEventListener('change', () =>
+      rudiObj.updateKeyDisplay()
+    )
+    rudiObj.customForm.htmlController.prop.addEventListener('change', () =>
+      rudiObj.updateKeyDisplay()
+    )
+  }
+}
+
+switch (document.title) {
+  case 'Rudi Contact':
+    RudiContactForm.loadForm()
+    break
+  case 'Rudi Producer':
+    RudiOrgForm.loadForm()
+    break
+  case 'Rudi Public Key':
+    RudiKeyForm.loadForm()
+    break
+  default:
+    console.log(
+      'document title should be "Rudi Contact", "Rudi Producer" or "Rudi Public Key", got:',
+      document.title
+    )
 }

@@ -14,11 +14,13 @@ const { makeRequestable } = require('../utils/utils')
 const { FORM_PREFIX } = require('../config/config.js')
 const { expressErrorHandler } = require('../controllers/errorHandler.js')
 const { getStoragePublicUrl } = require('../controllers/mediaController.js')
+const { getNodeEnv } = require('../config/backOptions.js')
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
 router.get('/node-urls', authenticate, getNodeUrls)
 router.get('/init-data', authenticate, getInitData)
+router.get('/env', authenticate, (req, reply) => reply.status(200).send(getNodeEnv()))
 
 router.get('/form-url', authenticate, (req, reply) => reply.status(200).send(FORM_PREFIX))
 router.get('/media-url', authenticate, getStoragePublicUrl)

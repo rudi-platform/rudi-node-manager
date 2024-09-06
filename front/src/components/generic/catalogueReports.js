@@ -84,6 +84,7 @@ export default function CatalogueReports({ editMode, logout }) {
           shouldPad={false}
           shouldRefresh={refreshState}
           hideEdit={true}
+          logout={logout}
           objType="reports"
           propId="report_id"
           propName="resource_title"
