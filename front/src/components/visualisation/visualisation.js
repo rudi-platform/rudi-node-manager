@@ -150,12 +150,11 @@ function Visualisation({ logout }) {
     return { mediaUrl, mediaMime, mediaCharset }
   }
   const [htmlSrc, setHtmlSrc] = useState()
+
   const displayForEncryptedFile = () =>
     setHtmlSrc(
-      <div className="body">
-        <div className="text-visu">
-          <pre>***[ Encrypted file ]***</pre>
-        </div>
+      <div className="body text-visu">
+        <pre>***[ Encrypted file ]***</pre>
       </div>
     )
 
@@ -205,10 +204,8 @@ function Visualisation({ logout }) {
               message: `Le media n'a pu être récupéré à l'adresse ${mediaUrl}`,
             })
           return setHtmlSrc(
-            <div className="body">
-              <div className="text-visu">
-                <pre>{media.data}</pre>
-              </div>
+            <div className="body text-visu">
+              <pre>{media.data}</pre>
             </div>
           )
 
