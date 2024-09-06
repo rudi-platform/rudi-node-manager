@@ -103,7 +103,7 @@ function Visualisation({ logout }) {
   const getContent = async (mediaUrl, displayContent) => {
     console.trace('T (visu.getContent) fetching image at:', mediaUrl)
     const response = await fetch(mediaUrl)
-    if (!response)
+    if (!response || response.status == 404)
       return defaultErrorHandler({
         statusCode: 404,
         message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
@@ -150,18 +150,19 @@ function Visualisation({ logout }) {
     return { mediaUrl, mediaMime, mediaCharset }
   }
   const [htmlSrc, setHtmlSrc] = useState()
+  const displayForEncryptedFile = () =>
+    setHtmlSrc(
+      <div className="body">
+        <div className="text-visu">
+          <pre>***[ Encrypted file ]***</pre>
+        </div>
+      </div>
+    )
 
   const showContent = async (mediaUrl, mediaMime) => {
     console.trace('T mediaMime:', mediaMime)
-    if (mediaMime.endsWith('crypt')) {
-      return setHtmlSrc(
-        <div className="body">
-          <div className="text-visu">
-            <pre>***[ Encrypted file ]***</pre>
-          </div>
-        </div>
-      )
-    }
+    if (mediaMime.endsWith('crypt')) return displayForEncryptedFile()
+
     if (mediaMime.startsWith('image')) {
       await getContent(mediaUrl, (srcContent) => (
         <img src={srcContent} className="image90" alt="retrieving media..." />
