@@ -636,16 +636,20 @@ class MediaFile extends ForeignFile {
    */
   async computeChecksum(algo) {
     // Make a digest of the file and build the hexadecimal string
-    let digest
-    try {
-      digest = await crypto.subtle.digest(algo, await this.file.arrayBuffer())
-    } catch (e) {
-      console.info('Crypto.subtle available in https context only, or another error occurred:', e)
+    if (!crypto?.subtle) {
+      console.info('Crypto.subtle is available in https context only, filling with a dummy hash')
+      this.checksum = { algo, hash: 'toBe2186bb13eabf0bc49eaa22ee08d52166' } // md5('NoHashFunctionAvailable')
+      return this.checksum
     }
-    const hash = digest
-      ? [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
-      : 'toBe2186bb13eabf0bc49eaa22ee08d52166' // md5('NoHashFunctionAvailable')
-    this.checksum = { algo, hash }
+    try {
+      const digest = await crypto.subtle.digest(algo, await this.file.arrayBuffer())
+      const hash = [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, '0')).join('')
+      this.checksum = { algo, hash }
+    } catch (e) {
+      console.error('An error occurred while computing the hash:', e)
+      this.checksum = { algo, hash: 'toBe2186bb13eabf0bc49eaa22ee08d52166' } // md5('NoHashFunctionAvailable')
+    }
+    return this.checksum
   }
 
   /** Override the JSON generated for this object */

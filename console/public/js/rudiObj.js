@@ -227,7 +227,7 @@ export class RudiKeyForm extends RudiObjForm {
 
   treatOutputValue = async (outputValue) => {
     const here = 'treatOutputValue'
-    console.trace(here, 'outputValue:', outputValue)
+    // console.trace(here, 'outputValue:', outputValue)
     if (!outputValue.pem) {
       this.ok(here, 'Generating key pair...')
       let keyPair = await generateRsaOaepKeyPair(4096, 'SHA-256')
@@ -241,7 +241,7 @@ export class RudiKeyForm extends RudiObjForm {
         name: outputValue.name,
         pem: publicPEM,
       }
-      console.trace('T pubKey outputValue:', outputValue)
+      // console.trace('T pubKey outputValue:', outputValue)
     }
     return outputValue
   }

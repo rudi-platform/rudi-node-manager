@@ -410,8 +410,8 @@ export default function CatalogueMetadata({ editMode, logout }) {
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
                 {allCountByFilters.map((filterObject, i) => {
-                  console.trace(filterObject)
-                  console.trace(filterObject?.values)
+                  // console.trace(filterObject)
+                  // console.trace(filterObject?.values)
                   return !filterObject?.values ? (
                     'No values'
                   ) : (

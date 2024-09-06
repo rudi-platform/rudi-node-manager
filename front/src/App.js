@@ -237,7 +237,7 @@ export default function App() {
           <Route path="monitoring" element={<Monitoring logout={logout} />} />
           <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
           <Route path="conf" element={<div className="tempPaddingTop">WIP</div>} />
-          <Route path="*" element={<CatalogueMetadata logout={logout} />} />
+          <Route path="*" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
         </Routes>
       </ModalProvider>
     </Router>

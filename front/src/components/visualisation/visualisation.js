@@ -101,14 +101,14 @@ function Visualisation({ logout }) {
   }
 
   const getContent = async (mediaUrl, displayContent) => {
-    console.trace('T (visu.getContent) fetching image at:', mediaUrl)
+    // console.trace('T (visu.getContent) fetching image at:', mediaUrl)
     const response = await fetch(mediaUrl)
     if (!response || response.status == 404)
       return defaultErrorHandler({
         statusCode: 404,
         message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
       })
-    console.trace('T (visu.getContent) fetched:', response)
+    // console.trace('T (visu.getContent) fetched:', response)
     const imageBlob = await response.blob()
     const reader = new FileReader()
     reader.readAsDataURL(imageBlob)
@@ -159,7 +159,7 @@ function Visualisation({ logout }) {
     )
 
   const showContent = async (mediaUrl, mediaMime) => {
-    console.trace('T mediaMime:', mediaMime)
+    // console.trace('T mediaMime:', mediaMime)
     if (mediaMime.endsWith('crypt')) return displayForEncryptedFile()
 
     if (mediaMime.startsWith('image')) {
