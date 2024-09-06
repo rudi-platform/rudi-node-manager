@@ -90,7 +90,7 @@ export default function App() {
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
   useEffect(() => setDisplayTags(displayVersion()), [appInfo?.appTag, appInfo?.gitHash])
-  // useEffect(() => console.log('T (displayAppInfo) appInfo', appInfo), [appInfo])
+  // useEffect(() => console.trace('T (displayAppInfo) appInfo', appInfo), [appInfo])
 
   /**
    *

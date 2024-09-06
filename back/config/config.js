@@ -4,7 +4,7 @@ const ini = require('ini')
 
 // Internal dependencies
 const { getBackOptions, OPT_USER_CONF, getBackDomain } = require('./backOptions')
-const { pathJoin, jsonToString, removeTrailingSlash } = require('../utils/utils')
+const { pathJoin, jsonToString } = require('../utils/utils')
 
 // Constants
 exports.FORM_PREFIX = 'form'

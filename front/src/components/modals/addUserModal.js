@@ -125,9 +125,9 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
         return
       }
       await axios.post(`${urlUser}`, userInfo)
-      // console.log('T (add.sendingUserInfo)', userInfo)
+      // console.trace('T (add.sendingUserInfo)', userInfo)
       // const res = await axios.post(`${urlUser}`, userInfo)
-      // console.log('T (add.sendUserInfo)', res.data)
+      // console.trace('T (add.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
     }

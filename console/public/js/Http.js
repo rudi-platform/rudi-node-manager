@@ -1,5 +1,7 @@
 'use strict'
 
+import { isDevEnv } from '../../../back/config/backOptions.js'
+
 /**
  * This module give simple way to make
  * http request with Promise
@@ -18,7 +20,8 @@ class HttpRequest extends XMLHttpRequest {
         try {
           this.setRequestHeader(header, value)
         } catch {
-          console.log('HttpRequest: header=', header, ', value=', encodeURIComponent(value))
+          if (isDevEnv())
+            console.trace('T HttpRequest: header=', header, ', value=', encodeURIComponent(value))
           this.setRequestHeader(header, encodeURIComponent(value))
         }
       }

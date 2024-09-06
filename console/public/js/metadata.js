@@ -494,7 +494,7 @@ const safeJsonParse = (str) => {
   try {
     return JSON.parse(str)
   } catch {
-    console.log(`T [safeJsonParse] could not parse\n${str}`)
+    console.warn(`[safeJsonParse] could not parse\n${str}`)
     return str
   }
 }

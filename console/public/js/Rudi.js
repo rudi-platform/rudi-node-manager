@@ -288,7 +288,7 @@ export class RudiForm {
         value = await this.getPmJson(pathJoin('data', objType, readOnlyId))
         this.customForm.readOnly()
         this.setValue(value)
-      } else if (this.isDev) console.log(`T [${here}] Creating a new metadata`)
+      } else if (this.isDev) console.trace(`T [${here}] Creating a new metadata`)
       this.ok(here)
     } catch (e) {
       this.ko(here)

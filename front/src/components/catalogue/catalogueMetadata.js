@@ -289,8 +289,8 @@ export default function CatalogueMetadata({ editMode, logout }) {
    */
   function getFilterLabel(filterValue, filterObject) {
     try {
-      // console.log('T getFilterLabel.filterValue:', filterValue)
-      // console.log('T getFilterLabel.filterObject:', filterObject)
+      // console.trace('T getFilterLabel.filterValue:', filterValue)
+      // console.trace('T getFilterLabel.filterObject:', filterObject)
       let result = filterValue[filterObject?.name] || 'ERR: "name" not found'
       if (filterObject?.displayName && result[filterObject?.displayName]) {
         result = result[filterObject.displayName]

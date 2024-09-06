@@ -241,7 +241,7 @@ export class RudiKeyForm extends RudiObjForm {
         name: outputValue.name,
         pem: publicPEM,
       }
-      console.trace('pubKey outputValue:', outputValue)
+      console.trace('T pubKey outputValue:', outputValue)
     }
     return outputValue
   }
@@ -250,7 +250,7 @@ export class RudiKeyForm extends RudiObjForm {
 
   // Function to download data to a file
   download(data, filename, type) {
-    // console.trace('pubKey download filename:', filename)
+    // console.trace('T pubKey download filename:', filename)
     const file = new Blob([data], { type: type })
     const a = document.createElement('a')
     const url = URL.createObjectURL(file)

@@ -12,7 +12,7 @@ const { resetPassword } = require('../controllers/authControllerPassport')
 const { expressErrorHandler } = require('../controllers/errorHandler.js')
 const { hashPassword } = require('@aqmo.org/jwt-lib')
 const { BadRequestError } = require('../utils/errors.js')
-const { decodeBase64url, toBase64url, decodeBase64 } = require('../utils/utils.js')
+const { decodeBase64url, decodeBase64 } = require('../utils/utils.js')
 
 router.post('/hash-password', (req, reply) => {
   if (!req?.body?.pwd)

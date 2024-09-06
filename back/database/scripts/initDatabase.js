@@ -245,15 +245,14 @@ const dbNormalizeUserTableName = (openedDb, oldTblName) => {
       (err, row) => {
         if (err) {
           if (!openedDb) dbClose(db)
-          log.d(mod, `${fun}.check`, err.message)
+          log.e(mod, `${fun}.check`, err.message)
           return reject(err)
         }
         if (!row) {
           if (!openedDb) dbClose(db)
           return resolve(`No table found with name '${oldTblName}'`)
         }
-
-        console.log(mod, `${fun}.check`, JSON.stringify(row))
+        log.d(mod, `${fun}.check`, JSON.stringify(row))
 
         db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`, [], (err, row) => {
           if (err) {
@@ -261,14 +260,14 @@ const dbNormalizeUserTableName = (openedDb, oldTblName) => {
             log.e(mod, `${fun}.renameToto`, err.message)
             return reject(err)
           }
-          console.log(mod, `${fun}.renameToto`, JSON.stringify(row))
+          log.d(mod, `${fun}.renameToto`, JSON.stringify(row))
           db.run(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
             if (!openedDb) dbClose(db)
             if (err) {
               log.e(mod, `${fun}.renameReal`, err.message)
               reject(err)
             } else {
-              console.log(mod, fun, JSON.stringify(row))
+              log.d(mod, fun, JSON.stringify(row))
               resolve('Users table name normalized')
             }
           })

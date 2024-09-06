@@ -13,7 +13,7 @@ const {
   MANAGER,
 } = require('../config/config')
 const { dbGetUserByUsername } = require('../database/database')
-const { ForbiddenError, UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
+const { UnauthorizedError, NotFoundError, RudiError } = require('../utils/errors')
 const log = require('../utils/logger')
 const {
   extractCookieFromReq,

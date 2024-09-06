@@ -14,9 +14,9 @@ const { BadRequestError } = require('../utils/errors')
 exports.getRoleList = async (req, reply, next) => {
   try {
     const roles = await dbGetRoles()
-    // console.log('T (getRoleList) roles:', roles)
+    // console.trace('T (getRoleList) roles:', roles)
     const visibleRoles = roles.filter((role) => !role.hide)
-    // console.log('T (getRoleList) unhiddenRoles:', visibleRoles)
+    // console.trace('T (getRoleList) unhiddenRoles:', visibleRoles)
     reply.status(200).json(
       visibleRoles.map((roleInfo) => {
         return { role: roleInfo.role, desc: roleInfo.desc }

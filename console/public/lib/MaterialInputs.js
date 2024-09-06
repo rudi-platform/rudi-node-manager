@@ -1039,7 +1039,7 @@ let mapStyle = `
 }
 `
 /** A mixin for element with list of focusable options */
-export let ListMixin = (superclass) =>
+export const ListMixin = (superclass) =>
   class extends superclass {
     constructor(...args) {
       super(...args)
@@ -1179,7 +1179,7 @@ export let ListMixin = (superclass) =>
   }
 
 /** A mixin for element with list of selectable options */
-export let SelectListMixin = (superclass) =>
+export const SelectListMixin = (superclass) =>
   class extends ListMixin(superclass) {
     constructor(...args) {
       super(...args)
@@ -1222,7 +1222,7 @@ export let SelectListMixin = (superclass) =>
 
     /** @inheritdoc */
     showList() {
-      // console.trace('show SelectMixin');
+      // console.trace('T show SelectMixin');
       if (!this.focusedElement && !this.focusNext()) return false
       super.showList()
       this.focusedElement.focus()
@@ -1364,7 +1364,7 @@ export let SelectListMixin = (superclass) =>
     }
   }
 
-export let ActionMixin = (superclass) =>
+export const ActionMixin = (superclass) =>
   class extends superclass {
     constructor(action, ...args) {
       super(...args)

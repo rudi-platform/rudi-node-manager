@@ -24,7 +24,7 @@ const minimist = require('minimist')
 const consoleRouter = require('./router.js')
 
 const _argv = minimist(process.argv.slice(2))
-console.log('_argv:', _argv)
+// console.log('_argv:', _argv)
 
 // Build config from default config and parse cli args
 const loadConfig = () => {

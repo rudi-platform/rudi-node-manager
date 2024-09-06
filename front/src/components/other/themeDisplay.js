@@ -13,10 +13,10 @@ export default function ThemeDisplay({ value }) {
   const [themeLabel, setThemeLabel] = useState(value)
 
   useEffect(() => setThemeLabel(appInfo.themeLabels?.[value] || value), [appInfo])
-  // console.log('T ThemeDisplay.value:', value)
-  // console.log('T ThemeDisplay.themeLabel:', themeLabel)
-  // console.log('T themeLabels:', value, appInfo.themeLabels)
-  // console.log('T themeLabels:', appInfo.themeLabels?.[value])
+  // console.trace('T ThemeDisplay.value:', value)
+  // console.trace('T ThemeDisplay.themeLabel:', themeLabel)
+  // console.trace('T themeLabels:', value, appInfo.themeLabels)
+  // console.trace('T themeLabels:', appInfo.themeLabels?.[value])
 
   return <span>{themeLabel}</span>
 }

@@ -125,7 +125,7 @@ exports.getTokenFromMediaForUser = async (user) => {
   }
   // Let's offset the user id to not mess with Media ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
-  // console.log(`T (${fun})`, 'delegationBody', delegationBody)
+  // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
   // log.d(mod, fun, `mediaForgeJwtUrl: ${mediaForgeJwtUrl}`)

@@ -84,10 +84,10 @@ const checkPassport = async (username, password) => {
     }
     try {
       const roles = await dbGetUserRolesByUsername(db, username)
-      // console.log('T (checkPassport) user roles:', roles)
+      // console.trace('T (checkPassport) user roles:', roles)
       if (!roles?.length)
         throw new ForbiddenError(`Admin validation required for user: '${username}'`)
-      // console.log('T (checkPassport)', 'User may login')
+      // console.trace('T (checkPassport)', 'User may login')
       dbClose(db)
       return statusOK('User may login')
     } catch (err) {
@@ -109,7 +109,7 @@ passport.use(
         (req) => extractCookieFromReq(req, CONSOLE_TOKEN_NAME),
         (req) => {
           const frontToken = extractCookieFromReq(req, PM_FRONT_TOKEN_NAME)
-          console.log('extracted fronttoken:', frontToken)
+          // console.log('extracted fronttoken:', frontToken)
           return frontToken
         },
         // Take jwt from http header

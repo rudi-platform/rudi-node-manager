@@ -1222,7 +1222,7 @@ export const SelectListMixin = (superclass) =>
 
     /** @inheritdoc */
     showList() {
-      // console.trace('show SelectMixin');
+      // console.trace('T show SelectMixin');
       if (!this.focusedElement && !this.focusNext()) return false
       super.showList()
       this.focusedElement.focus()

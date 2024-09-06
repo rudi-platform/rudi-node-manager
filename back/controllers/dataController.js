@@ -4,9 +4,8 @@ const mod = 'callApiSimple'
 const { default: axios } = require('axios')
 
 const {
-  getCatalogAdminPath: getCatalogAdminApiPath,
-  getStorageUrl,
-  getCatalogUrlAndParams: getCompleteRudiApiUrl,
+  getCatalogAdminPath,
+  getCatalogUrlAndParams,
   FORM_PREFIX,
   CATALOG,
 } = require('../config/config')
@@ -37,7 +36,7 @@ const callCatalog = async (url, req, reply) => {
   const fun = 'callCatalog'
   try {
     if (cache[url]) return reply ? reply.status(200).send(cache[url]) : cache[url]
-    const res = await axios.get(getCompleteRudiApiUrl(url, req), getCatalogHeaders())
+    const res = await axios.get(getCatalogUrlAndParams(url, req), getCatalogHeaders())
     const data = res.data
     cache[url] = data
     return reply ? reply.status(200).send(data) : data
@@ -52,32 +51,31 @@ const callCatalog = async (url, req, reply) => {
 exports.getVersion = (req, reply) => callCatalog('/api/version', req, reply)
 exports.getEnum = (req, reply) => {
   const lang = req.params?.lang || req.query?.lang || 'fr'
-  return callCatalog(getCatalogAdminApiPath(`enum?lang=${lang}`), req, reply)
+  return callCatalog(getCatalogAdminPath(`enum?lang=${lang}`), req, reply)
 }
-exports.getLicences = (req, reply) => callCatalog(getCatalogAdminApiPath('licences'), req, reply)
+exports.getLicences = (req, reply) => callCatalog(getCatalogAdminPath('licences'), req, reply)
 
 exports.getThemeByLang = (req, reply) =>
-  callCatalog(getCatalogAdminApiPath('enum/themes', req.params?.lang || 'fr'), req, reply)
+  callCatalog(getCatalogAdminPath('enum/themes', req.params?.lang || 'fr'), req, reply)
 
 const getThemes = (req, reply) => {
   const lang = req?.params?.lang || req?.query?.lang || 'fr'
-  return callCatalog(getCatalogAdminApiPath('enum/themes', lang), req, reply)
+  return callCatalog(getCatalogAdminPath('enum/themes', lang), req, reply)
 }
 
 exports.getThemeByLang = (req, reply) => getThemes(req, reply)
-exports.getCatalogPublicUrl = () => callCatalog(getCatalogAdminApiPath('check/node/url'))
-exports.getPortalUrl = () => callCatalog(getCatalogAdminApiPath('check/portal/url'))
+exports.getCatalogPublicUrl = () => callCatalog(getCatalogAdminPath('check/node/url'))
+exports.getPortalUrl = () => callCatalog(getCatalogAdminPath('check/portal/url'))
 
 exports.getInitData = async (req, reply) => {
   try {
-    console.log(0)
     const data = await Promise.all([
       getThemes(req),
       this.getCatalogPublicUrl(),
       getStoragePublicUrl(),
       this.getPortalUrl(),
     ])
-    console.log(data)
+    // console.log(data)
 
     const tags = getTags()
     const initData = {

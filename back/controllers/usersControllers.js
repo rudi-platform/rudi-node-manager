@@ -113,7 +113,7 @@ exports.deleteUserWithId = async (req, reply, next) => {
 exports.createUser = async (req, reply) => {
   try {
     const userInfo = req.body
-    // console.log('T (addUser) userInfo', userInfo)
+    // console.trace('T (addUser) userInfo', userInfo)
     const { username, email, password, roles } = userInfo
     if (!username)
       return reply
@@ -144,7 +144,7 @@ exports.createUser = async (req, reply) => {
       return reply.status(403).json(new ForbiddenError(`Cet email est déjà utilisé: '${email}'`))
     }
     const { id } = await dbCreateUser(db, { username, password: hashedPassword, email })
-    // console.log('T (createUser) id:', id)
+    // console.trace('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
 
     const updatedUser = await dbGetUserById(db, id)

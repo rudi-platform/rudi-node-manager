@@ -77,10 +77,10 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
   const handleChange = (event) => {
     const prop = event.target.id
     const val = event.target.value
-    // console.log('T (handleChange)', prop, '=>', val)
+    // console.trace('T (handleChange)', prop, '=>', val)
     editUserInfo(prop, val)
     // if (errors[prop]) console.error('(handleChange) errorDetected:', errors[prop])
-    // console.log('T (handleChange) userInfo after:', showObj(userInfo))
+    // console.trace('T (handleChange) userInfo after:', showObj(userInfo))
   }
 
   const handleRoleChange = (event) => {
@@ -136,9 +136,9 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
    */
   const sendUserInfo = async () => {
     try {
-      // console.log('T (edit.sendingUserInfo)', userInfo)
+      // console.trace('T (edit.sendingUserInfo)', userInfo)
       await axios.put(urlUser, userInfo)
-      // console.log('T (edit.sendUserInfo)', res.data)
+      // console.trace('T (edit.sendUserInfo)', res.data)
     } catch (err) {
       defaultErrorHandler(err)
     }

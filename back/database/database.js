@@ -128,7 +128,7 @@ exports.dbGetUserByField = (openedDb, field, val) => {
             // console.error(`T (dbGetUserByField) User not found with '${field}' = '${val}'`, err)
             return resolve(null)
           }
-          // console.log(` T (dbGetUserByField) Found with '${field}' = '${val}'`, userInfo)
+          // console.log(`T (dbGetUserByField) Found with '${field}' = '${val}'`, userInfo)
           return resolve(userInfo)
         }
       }
@@ -593,7 +593,7 @@ exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
   if (userId !== 0 && !userId)
     Promise.reject(new BadRequestError('Input parameter userId must be defined'))
   if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
-  console.log('T (Dbcreateuserrole)', { userId, username, role })
+  console.trace('T (Dbcreateuserrole)', { userId, username, role })
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
     try {
@@ -660,7 +660,7 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
               .log
               // `T (dbUpdateUserRoles) Role kept for user '${username || userId}': ${newRole}`
               ()
-            // console.log(`T (dbUpdateUserRoles) Roles left:`, origRoles)
+            // console.trace(`T (dbUpdateUserRoles) Roles left:`, origRoles)
             resolve(`Role kept for user '${username || userId}': ${newRole}`)
           }
         })
