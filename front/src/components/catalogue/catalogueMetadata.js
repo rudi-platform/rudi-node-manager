@@ -410,8 +410,9 @@ export default function CatalogueMetadata({ editMode, logout }) {
               <div className="label-lv1">Filtrer</div>
               <div className="row no-row-margin">
                 {allCountByFilters.map((filterObject, i) => {
-                  // console.log(filter)
-                  return !filterObject.values ? (
+                  console.trace(filterObject)
+                  console.trace(filterObject?.values)
+                  return !filterObject?.values ? (
                     'No values'
                   ) : (
                     <div
@@ -420,30 +421,32 @@ export default function CatalogueMetadata({ editMode, logout }) {
                     >
                       <div className="label-lv2">{filterObject.text}</div>
                       <ul className="list-group">
-                        {filterObject.values.map((filterValue, i) => {
-                          const filterLabel = getFilterLabel(filterValue, filterObject)
-                          const key = filterLabel + i
-                          return (
-                            <li
-                              className="filter-items"
-                              key={key}
-                              onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
-                            >
-                              {filterObject.display
-                                ? filterObject.display(filterValue, filterObject)
-                                : filterLabel}
-                              <span
-                                className={`badge rounded-pill text-bg-${
-                                  isSelectedFilter(filterObject.toFilterParam(filterValue))
-                                    ? 'success'
-                                    : 'primary'
-                                }`}
+                        {(filterObject.values?.items || filterObject.values)?.map(
+                          (filterValue, i) => {
+                            const filterLabel = getFilterLabel(filterValue, filterObject)
+                            const key = filterLabel + i
+                            return (
+                              <li
+                                className="filter-items"
+                                key={key}
+                                onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
                               >
-                                {filterValue.count}
-                              </span>
-                            </li>
-                          )
-                        })}
+                                {filterObject.display
+                                  ? filterObject.display(filterValue, filterObject)
+                                  : filterLabel}
+                                <span
+                                  className={`badge rounded-pill text-bg-${
+                                    isSelectedFilter(filterObject.toFilterParam(filterValue))
+                                      ? 'success'
+                                      : 'primary'
+                                  }`}
+                                >
+                                  {filterValue.count}
+                                </span>
+                              </li>
+                            )
+                          }
+                        )}
                       </ul>
                     </div>
                   )

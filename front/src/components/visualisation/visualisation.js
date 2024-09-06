@@ -101,12 +101,14 @@ function Visualisation({ logout }) {
   }
 
   const getContent = async (mediaUrl, displayContent) => {
+    console.trace('T (visu.getContent) fetching image at:', mediaUrl)
     const response = await fetch(mediaUrl)
     if (!response)
       return defaultErrorHandler({
         statusCode: 404,
         message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
       })
+    console.trace('T (visu.getContent) fetched:', response)
     const imageBlob = await response.blob()
     const reader = new FileReader()
     reader.readAsDataURL(imageBlob)
