@@ -10,8 +10,8 @@ const { hashPassword } = require('@aqmo.org/jwt-lib')
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-const { getDbConf, getSuName } = require('../config/config')
-const { beautify, pathJoin } = require('../utils/utils')
+const { getSuName, getDbPath } = require('../config/config')
+const { beautify } = require('../utils/utils')
 
 const {
   BadRequestError,
@@ -29,8 +29,7 @@ log.d('sqlite3.VERSION:', sqlite3.VERSION)
 // -------------------------------------------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------------------------------------------
-const DB_NAME = getDbConf('db_filename')
-const DB_FILE = pathJoin(getDbConf('db_directory'), DB_NAME).trim()
+const DB_FILE = getDbPath()
 
 const TBL_USERS = 'Users'
 exports.TBL_USERS = TBL_USERS

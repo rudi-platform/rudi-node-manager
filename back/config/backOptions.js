@@ -10,6 +10,7 @@ exports.OPT_APP_TAG = 'tag'
 exports.OPT_NODE_ENV = 'nodeEnv'
 exports.OPT_BACK_PATH = 'backPath'
 exports.OPT_SU_CREDS = 'suCreds'
+exports.OPT_DB_PATH = 'dbPath'
 
 const _argv = minimist(process.argv.slice(2))
 console.log('_argv:', _argv)
@@ -47,6 +48,11 @@ exports.OPTIONS = {
     text: 'Back-end path',
     cli: 'url',
     env: 'RUDI_MANAGER_URL',
+  },
+  [this.OPT_DB_PATH]: {
+    text: 'Full path for the usr db file',
+    cli: 'db',
+    env: 'RUDI_MANAGER_DB',
   },
   [this.OPT_SU_CREDS]: {
     text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',

@@ -4,7 +4,16 @@ const mod = 'initDb'
 const fs = require('fs')
 
 // ---- Internal dependencies -----
-const { getDbConf, getSuName, SU_MAIL, setSuName, getSuMail } = require('../../config/config')
+const {
+  getSuName,
+  SU_MAIL,
+  setSuName,
+  getSuMail,
+  getSuId,
+  getSuPwd,
+  getDbPath,
+  isSuPwdHashed: isSuPwdB64,
+} = require('../../config/config')
 const { decodeBase64, beautify } = require('../../utils/utils')
 const log = require('../../utils/logger')
 const { RudiError, statusOK } = require('../../utils/errors')
@@ -32,6 +41,7 @@ const {
 } = require('../database')
 const { getBackOptions, OPT_SU_CREDS } = require('../../config/backOptions.js')
 const { decodeCredentials } = require('../../controllers/authControllerPassport.js')
+const { dirname } = require('path')
 
 const USER_ID_START_VALUE = 6000
 
@@ -308,13 +318,12 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
     setSuName(username)
 
     const dbUsrInfo = await dbGetUserByUsername(db, username)
-    const isSuPwdHashed = true
     if (dbUsrInfo) {
       // Super user already exists, updating the password
       await dbUpdateUser(db, {
         ...dbUsrInfo,
         password,
-        isSuPwdHashed,
+        isSuPwdHashed: true,
       })
       await dbUpdateUserRoles(db, {
         userId: dbUsrInfo.id,
@@ -328,7 +337,7 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
       )
     } else {
       // Super user doesn't exists, creating the user
-      const id = getDbConf('db_su_id') || 0
+      const id = getSuId()
       log.w(mod, fun, `Creating super user: '${username}' (id ${id})`)
       const suUsrInfo = {
         id,
@@ -357,8 +366,8 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
 const dbCreateSuperUser = async (db) => {
   const fun = 'dbCreateSuperUser'
 
-  const encodedSuPwd = getDbConf('db_su_pwd')
-  const isSuPwdHashed = getDbConf('is_su_pwd_hashed')
+  const encodedSuPwd = getSuPwd()
+  const isSuPwdHashed = isSuPwdB64()
 
   if (!getSuName() || !encodedSuPwd) {
     log.e(mod, fun, 'No super user config was found')
@@ -367,8 +376,8 @@ const dbCreateSuperUser = async (db) => {
 
   if (await dbExistsUser(db, getSuName)) return // NOSONAR
 
-  const suId = getDbConf('db_su_id') || 0
-  const suInfo = await dbGetUserById(db, suId)
+  const suId = getSuId()
+  const suInfo = await dbGetUserById(db, suId) // NOSONAR
   if (suInfo) {
     log.i(mod, fun, `Super user exists: ${beautify(suInfo)}`)
     return
@@ -380,7 +389,7 @@ const dbCreateSuperUser = async (db) => {
     id: suId,
     username: getSuName(),
     password: suPwd,
-    isSuPwdHashed: !!isSuPwdHashed,
+    isSuPwdHashed,
     email: SU_MAIL,
     role: this.ROLE_SU,
   }
@@ -400,12 +409,9 @@ const dbCreateSuperUser = async (db) => {
 exports.dbInitialize = async () => {
   const fun = 'dbInitialize'
   try {
-    if (!fs.statSync(getDbConf('db_directory')).isDirectory())
-      throw new RudiError(
-        `Database folder not found: ${getDbConf('db_directory')}`,
-        500,
-        'Config error'
-      )
+    const DB_DIR = dirname(getDbPath())
+    if (!fs.statSync(DB_DIR).isDirectory())
+      throw new RudiError(`Database folder not found: ${DB_DIR}`, 500, 'Config error')
 
     const db = await dbOpenOrCreate()
 
@@ -432,7 +438,7 @@ exports.dbInitialize = async () => {
       log.w(mod, fun, `User created/updated: SU (${suName})`)
     } else {
       await dbCreateSuperUser(db)
-      log.d(mod, fun, `User created: SU (${getDbConf('db_su_usr')})`)
+      log.d(mod, fun, `User created: SU (${getSuName()})`)
     }
 
     await dbGetUsers(db)

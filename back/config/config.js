@@ -3,8 +3,15 @@ const fs = require('fs')
 const ini = require('ini')
 
 // Internal dependencies
-const { getBackOptions, OPT_USER_CONF, getBackDomain } = require('./backOptions')
+const {
+  getBackOptions,
+  OPT_USER_CONF,
+  getBackDomain,
+  getDbPath,
+  OPT_DB_PATH,
+} = require('./backOptions')
 const { pathJoin, jsonToString } = require('../utils/utils')
+const { dirname } = require('path')
 
 // Constants
 exports.FORM_PREFIX = 'form'
@@ -40,9 +47,8 @@ for (const section in customConfig) {
   const customParams = customConfig[section]
   if (customParams) {
     if (!config[section]) config[section] = {}
-    for (const param in customParams) {
+    for (const param in customParams)
       if (customParams[param]) config[section][param] = customParams[param]
-    }
   }
 }
 
@@ -55,12 +61,8 @@ console.debug(`[CONF] ${this.CATALOG} url:`, RUDI_CATALOG_URL)
 console.debug(`[CONF] ${this.STORAGE} url:`, RUDI_STORAGE_URL)
 console.debug(`[CONF] ${this.MANAGER} domain:`, getBackDomain())
 
-if (!RUDI_CATALOG_URL) {
-  throw new Error(`Configuration error: ${this.CATALOG} URL should be defined`)
-}
-if (!RUDI_STORAGE_URL) {
-  throw new Error(`Configuration error: ${this.STORAGE} URL should be defined`)
-}
+if (!RUDI_CATALOG_URL) throw new Error(`Configuration error: ${this.CATALOG} URL should be defined`)
+if (!RUDI_STORAGE_URL) throw new Error(`Configuration error: ${this.STORAGE} URL should be defined`)
 
 console.debug()
 
@@ -95,8 +97,17 @@ exports.getStorageDwnlUrl = (id) => this.getStorageUrl('download', id)
 
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
 
-exports.getDbConf = (subSection) => config.database[subSection]
-exports.getSuName = () => config?.database?.db_su_usr
+const getDbConf = (subSection) =>
+  config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false
+
+const DB_PATH = getBackOptions(OPT_DB_PATH)
+
+exports.getDbPath = () => DB_PATH || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
+
+exports.getSuId = () => getDbConf('db_su_id') || 0
+exports.getSuPwd = () => getDbConf('db_su_pwd')
+exports.isSuPwdHashed = () => getDbConf('is_su_pwd_hashed')
+exports.getSuName = () => getDbConf('db_su_usr')
 exports.setSuName = (userDefinedSuName) => {
   config.database.db_su_usr = userDefinedSuName
 }

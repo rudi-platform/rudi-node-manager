@@ -30,7 +30,7 @@ export default function CatalogueReports({ editMode, logout }) {
    */
   const deleteOldReports = () => {
     axios
-      .delete(getApiUrlReports(`?treatedBefore=${lastMonth().toISOString()}`))
+      .delete(getApiUrlReports(`?submitted_before=${lastMonth().toISOString()}`))
       .then((res) => {
         const deletedCount = res?.data?.deletedCount
         const msg = !deletedCount
