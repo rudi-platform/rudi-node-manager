@@ -166,7 +166,7 @@ exports.dbGetUserByEmail = (openedDb, email) => this.dbGetUserByField(openedDb, 
  * @returns {Object} the user info
  */
 exports.dbExistsUser = async (openedDb, username) => {
-  const userInfo = await this.dbGetUserByUsername(openedDb, username)
+  const userInfo = await this.dbGetUserByUsername(openedDb, username) // NOSONAR
   return !!userInfo?.username
 }
 

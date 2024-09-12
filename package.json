@@ -11,7 +11,7 @@
     "test": "jest --config ./jest.config.json --coverage",
     "testCI": "jest --ci --reporters=default --reporters=jest-junit",
     "front": "cd front && npm start",
-    "start": "nodemon      server.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf .env/prodmanager-conf-custom.ini --node_env development --ignore \"**/(front)/\"",
+    "start": "nodemon      server.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf .env/prodmanager-conf-custom.ini --node_env development --db ./db/manager.db --ignore \"**/(front)/\"",
     "start:stg": "nodemon  server.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf=.env/prodmanager-conf-custom.ini --node_env staging     --ignore \"**/(front)/\"",
     "start:prod": "nodemon server.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf=.env/prodmanager-conf-custom.ini --node_env production  --ignore \"**/(front)/\"",
     "start:prod:win": "Set NODE_ENV=production&node server",

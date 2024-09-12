@@ -23,8 +23,8 @@ CatalogueUser.propTypes = {
 export default function CatalogueUser({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const [roleList, setRoleList] = useState([])
   const [userList, setUserList] = useState([])

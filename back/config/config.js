@@ -3,15 +3,8 @@ const fs = require('fs')
 const ini = require('ini')
 
 // Internal dependencies
-const {
-  getBackOptions,
-  OPT_USER_CONF,
-  getBackDomain,
-  getDbPath,
-  OPT_DB_PATH,
-} = require('./backOptions')
+const { getBackOptions, OPT_USER_CONF, getBackDomain, OPT_DB_PATH } = require('./backOptions')
 const { pathJoin, jsonToString } = require('../utils/utils')
-const { dirname } = require('path')
 
 // Constants
 exports.FORM_PREFIX = 'form'
@@ -100,9 +93,10 @@ exports.getStorageDwnlUrl = (id) => this.getStorageUrl('download', id)
 const getDbConf = (subSection) =>
   config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false
 
-const DB_PATH = getBackOptions(OPT_DB_PATH)
+const DB_PATH =
+  getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 
-exports.getDbPath = () => DB_PATH || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
+exports.getDbPath = () => DB_PATH
 
 exports.getSuId = () => getDbConf('db_su_id') || 0
 exports.getSuPwd = () => getDbConf('db_su_pwd')
