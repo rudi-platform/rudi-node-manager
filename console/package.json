@@ -1,11 +1,10 @@
 {
-  "description": "Web service to update metadata for rudi project",
+  "description": "Web service to update metadata for rudi project (This file and index.js are obsolete, as now Console backend is routed and front is served by the Manager backend)",
   "name": "rudi_metadata_updater",
   "version": "2.3.1",
   "author": "Florian Desmortreux",
   "license": "EUPL-1.2",
   "main": "index.js",
-  "type": "commonjs",
   "scripts": {
     "prestart": "npm i",
     "test": "echo \"Error: no test specified\" && exit 1",

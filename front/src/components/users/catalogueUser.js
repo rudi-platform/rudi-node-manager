@@ -50,7 +50,7 @@ export default function CatalogueUser({ editMode, logout }) {
         setCurrentOffset(PAGE_SIZE)
         setUserList(res.data)
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   /**
@@ -66,7 +66,7 @@ export default function CatalogueUser({ editMode, logout }) {
         if (partialObjList.length < PAGE_SIZE) setHasMore(false)
         setUserList(userList.concat(partialObjList))
       })
-      .catch((err) => defaultErrorHandler(err))
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
 
   return (
