@@ -72,7 +72,7 @@ async function connectToRudiModules(attemptLeft = 20) {
           getStoragePublicUrl()
             .then((res) => resolve((storageUrl = res)))
             .catch((err) => {
-              log.d(mod, fun, `attempt #${attemptLeft}}: Storage not responding`)
+              log.d(mod, fun, `attempt #${attemptLeft}: Storage not responding`)
               reject(err)
             })
         )
