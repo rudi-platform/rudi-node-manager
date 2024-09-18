@@ -63,7 +63,7 @@ exports.OPTIONS = {
 // if (argv.indexOf('--opts') > -1) {
 console.log('--------------------------------------------------------------')
 
-// console.log('Options to run this app: ', _argv)
+console.log('Options to run this app: ')
 Object.keys(this.OPTIONS).forEach((opt) =>
   console.log(
     '    cli: --' +
