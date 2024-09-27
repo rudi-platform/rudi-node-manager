@@ -145,8 +145,15 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
     const logReqMsg = `Request <= ${req?.method} ${req?.url} (from ${req?.ip})`
     log.sysInfo(mod, '', logReqMsg, log.getContext(req, {}))
 
-    // console.log('req.headers.cookie:', req.headers.cookie)
-    next()
+    // Redirection for trailing slashes
+    // https://stackoverflow.com/a/15773824/1563072
+    if (req.path.length > 1 && req.path.slice(-1) === '/') {
+      const query = req.url.slice(req.path.length)
+      const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
+      reply.redirect(301, safepath + query)
+    } else {
+      next()
+    }
 
     reply.on('finish', () => {
       if (reply.statusCode < 400) {
