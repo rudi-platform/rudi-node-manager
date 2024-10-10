@@ -428,7 +428,7 @@ export class MetadataForm extends RudiForm {
   progressPercentMsg = (loaded, total) =>
     `Transmission en cours ${Math.floor((100 * loaded) / total)}%<br/>` +
     `<span class="${STYLE_ERR}" syle="font-weight:light">` +
-    'Veuillez attendre la fin du transfert pour fermer cette page</span>'
+    'Veuillez attendre que ce message disparaisse pour fermer cette page</span>'
 
   globalProgress = {}
   updateGlobalProgress(mediaId, mediaName, total, loaded) {
