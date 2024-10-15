@@ -197,11 +197,11 @@ const commitOnRudiApi = async (mediaId, commitId) => {
       getCatalogHeaders()
     )
     const commitInfo = res.data
-    log.d(mod, fun, 'T (commitMedia) commit API OK:', commitInfo)
+    log.d(mod, fun, `T (${fun}) commit API OK:`, commitInfo)
     return { place: CATALOG, ...commitInfo }
   } catch (err) {
     console.error(
-      `T (commitMedia) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
+      `T (${fun}) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
       err.response?.data || err.response?.statusText || err.response
     )
     throw err

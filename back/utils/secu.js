@@ -214,7 +214,7 @@ exports.getRudiApiToken = () => {
 
 exports.getCatalogHeaders = () => ({
   headers: {
-    'Content-Type': 'application/json',
+    Accept: 'application/json, text/plain, */*',
     Authorization: `Bearer ${this.getRudiApiToken()}`,
   },
 })
