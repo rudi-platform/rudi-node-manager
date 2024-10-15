@@ -182,8 +182,7 @@ exports.createPmHeadersForMedia = (body) => {
   return {
     headers: {
       Authorization: `Bearer ${pmHeadersJwt}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      Accept: 'application/json, text/plain, */*',
     },
   }
 }
