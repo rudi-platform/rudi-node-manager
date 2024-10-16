@@ -25,9 +25,27 @@ const checkObjectType = (req, reply, fun, objectType) => {
   return true
 }
 
+exports.searchObjects = async (req, reply) => {
+  const opType = 'search_objects'
+  const { objectType } = req.params
+  log.d(mod, opType + '.params', beautify(req.params))
+
+  if (!checkObjectType(req, reply, opType, objectType)) return
+  try {
+    const opts = { params: req?.query, ...getCatalogHeaders() }
+    const res = await axios.get(getCatalogAdminApiUrl(objectType, 'search'), opts)
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    log.w(mod, opType, cleanErrMsg(err))
+    log.w(mod, opType, err)
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
+}
+
 exports.getObjectList = async (req, reply) => {
   const opType = 'get_objects'
   const { objectType } = req.params
+  // log.d(mod, opType + '.params', beautify(req.params))
 
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
@@ -44,6 +62,7 @@ exports.getObjectList = async (req, reply) => {
 exports.getObjectById = async (req, reply) => {
   const opType = 'get_object_by_id'
   const { objectType, id } = req.params
+  // log.d(mod, opType + '.params', beautify(req.params))
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
     const res = await axios.get(getCatalogAdminApiUrl(objectType, id), getCatalogHeaders())

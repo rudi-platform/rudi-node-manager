@@ -15,6 +15,7 @@ const {
   deleteObject,
   deleteObjects,
   getCounts,
+  searchObjects,
 } = require('../controllers/genericController')
 const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
 const { checkRolePerm } = require('../utils/roleCheck')
@@ -31,6 +32,7 @@ router.get('/licences', getLicences)
 // TODO : propagate res.status
 router.get(`/counts`, getCounts)
 router.get(`/:objectType`, getObjectList)
+router.get(`/:objectType/search`, searchObjects)
 router.post(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), postObject)
 router.put(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), putObject)
 router.get(`/:objectType/:id`, getObjectById)
