@@ -546,7 +546,7 @@ class MediaFile extends ForeignFile {
    * @returns a new instance of AvailableFormat
    */
   static fromLitteral(media) {
-    let mediaFile = new MediaFile(
+    const mediaFile = new MediaFile(
       media.media_id || uuidv4(),
       media.media_name,
       media.media_caption,
@@ -617,6 +617,7 @@ class MediaFile extends ForeignFile {
     this.file = await encryptRsaOaepAesGcm(this.file, publicKey)
     const originalType = this.type
     this.type = originalType + '+crypt'
+    this.size = this.file.size
     this.name = this.name + '+crypt'
     this.connector.interface_contract = 'dwnl'
     const pubPemFirstLine = publicPEM.match(/([\w/\\+]+\n)/g)[0].slice(0, 64)
