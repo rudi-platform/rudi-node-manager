@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal'
+import GenericModal, { useGenericModal, useGenericModalOptions } from './genericModal.js'
 
 export const ModalContext = React.createContext('modal')
 export const useModalContext = () => React.useContext(ModalContext)
