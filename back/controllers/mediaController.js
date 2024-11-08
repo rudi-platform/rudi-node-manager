@@ -157,7 +157,7 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
       JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
       getStorageHeaders()
     )
-    log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
+    // log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
     return { status: 'OK', place: 'rudi-media', media_id: mediaId, commit_id: commitId }
   } catch (err) {
     log.e(mod, fun + '.origErr', err)
@@ -197,7 +197,7 @@ const commitOnRudiApi = async (mediaId, commitId) => {
       getCatalogHeaders()
     )
     const commitInfo = res.data
-    log.d(mod, fun, `T (${fun}) commit API OK:`, commitInfo)
+    // log.d(mod, fun, `T (${fun}) commit API OK:`, commitInfo)
     return { place: CATALOG, ...commitInfo }
   } catch (err) {
     console.error(
