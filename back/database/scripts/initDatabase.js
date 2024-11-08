@@ -365,42 +365,45 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
 
 const dbCreateSuperUser = async (db) => {
   const fun = 'dbCreateSuperUser'
-
-  const encodedSuPwd = getSuPwd()
-  const isSuPwdHashed = isSuPwdB64()
-
-  if (!getSuName() || !encodedSuPwd) {
-    log.e(mod, fun, 'No super user config was found')
-    throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
-  }
-
-  if (await dbExistsUser(db, getSuName)) return // NOSONAR
-
-  const suId = getSuId()
-  const suInfo = await dbGetUserById(db, suId) // NOSONAR
-  if (suInfo) {
-    log.i(mod, fun, `Super user exists: ${beautify(suInfo)}`)
-    return
-  } // NOSONAR
-
-  const suPwd = !isSuPwdHashed ? decodeBase64(encodedSuPwd) : encodedSuPwd
-
-  const superUser = {
-    id: suId,
-    username: getSuName(),
-    password: suPwd,
-    isSuPwdHashed,
-    email: SU_MAIL,
-    role: this.ROLE_SU,
-  }
-
-  const res = await dbRegisterUser(db, superUser)
-  const { id, username } = res
   try {
-    await dbCreateUserRole(db, { userId: id, role: superUser.role })
-    const msg = `Super user role created: '${username}' (id ${id}, role ${superUser.role})`
-    log.i(mod, fun, msg)
-    return statusOK(msg)
+    const encodedSuPwd = getSuPwd()
+    const isSuPwdHashed = isSuPwdB64()
+
+    if (!getSuName() || !encodedSuPwd) {
+      log.e(mod, fun, 'No super user config was found')
+      throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
+    }
+
+    if (await dbExistsUser(db, getSuName)) return // NOSONAR
+
+    const suId = getSuId()
+    const suInfo = await dbGetUserById(db, suId) // NOSONAR
+    if (suInfo) {
+      log.i(mod, fun, `Super user exists: ${beautify(suInfo)}`)
+      return
+    } // NOSONAR
+
+    const suPwd = !isSuPwdHashed ? decodeBase64(encodedSuPwd) : encodedSuPwd
+
+    const superUser = {
+      id: suId,
+      username: getSuName(),
+      password: suPwd,
+      isSuPwdHashed,
+      email: SU_MAIL,
+      role: this.ROLE_SU,
+    }
+
+    const res = await dbRegisterUser(db, superUser)
+    const { id, username } = res
+    try {
+      await dbCreateUserRole(db, { userId: id, role: superUser.role })
+      const msg = `Super user role created: '${username}' (id ${id}, role ${superUser.role})`
+      log.i(mod, fun, msg)
+      return statusOK(msg)
+    } catch (err) {
+      log.e(mod, fun, `Error: ${err}`)
+    }
   } catch (err) {
     log.e(mod, fun, `Error: ${err}`)
   }
