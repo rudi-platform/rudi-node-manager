@@ -31,12 +31,7 @@ exports.error = (error, req, options) => {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      log.sysError(
-        mod,
-        fun,
-        cleanErrMsg(error.response?.data || error.response),
-        log.getContext(req, options)
-      )
+      log.sysError(mod, fun, cleanErrMsg(error.response?.data || error.response), log.getContext(req, options))
 
       errorToDisplay = Object.keys(error) > 0 ? error : error.toJSON()
       errorToDisplay.moreInfo = cleanErrMsg(error.response?.data || error.response)
@@ -86,18 +81,15 @@ exports.handleError = (req, reply, initialError, errCode, srcFun, objectType, id
       const statusCode = initialError.response.data.statusCode
       const message = cleanErrMsg(initialError.response.data.message)
       const error = cleanErrMsg(initialError.response.data.error)
-      if (statusCode && message && error)
-        return reply.status(statusCode).json({ statusCode, error, message })
+      if (statusCode && message && error) return reply.status(statusCode).json({ statusCode, error, message })
     }
     if (initialError.statusCode && initialError.message && initialError.error) {
       const statusCode = initialError.statusCode
       const message = cleanErrMsg(initialError.message)
       const error = cleanErrMsg(initialError.error)
-      if (statusCode && message && error)
-        return reply.status(statusCode).json({ statusCode, error, message })
+      if (statusCode && message && error) return reply.status(statusCode).json({ statusCode, error, message })
     }
-    initialError.statusCode =
-      initialError.statusCode || initialError.response?.data?.statusCode || errCode || 500
+    initialError.statusCode = initialError.statusCode || initialError.response?.data?.statusCode || errCode || 500
     const errPayload = {}
     if (srcFun) errPayload.opType = srcFun
     if (id) errPayload.id = `${objectType}+${id}`
@@ -142,8 +134,7 @@ exports.treatAxiosError = (err, rudiModuleCalled, req, reply) => {
     // err.message
     const { message, status, code } = err
     const errMsg = (rudiModuleCalled ? `[${rudiModuleCalled}] ` : '') + cleanErrMsg(message || err)
-    const logMsg =
-      'ERR (axios) ' + (status ? `${status} ` : '') + (code ? `(${code}):` : ':') + errMsg
+    const logMsg = 'ERR (axios) ' + (status ? `${status} ` : '') + (code ? `(${code}):` : ':') + errMsg
     log.w(mod, fun, logMsg)
     if (reply) return reply.status(status).send(errMsg)
     throw RudiError.createRudiHttpError(status, errMsg)

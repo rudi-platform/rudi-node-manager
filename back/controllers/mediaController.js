@@ -52,23 +52,16 @@ exports.getStorageToken = async (req, reply, next) => {
     const jwtPayload = readJwtBody(jwt)
     const payloadUser = jwtPayload.user
     if (!payloadUser)
-      throw new UnauthorizedError(
-        `JWT body token should contain an identified user: ${beautify(jwtPayload)}`
-      )
+      throw new UnauthorizedError(`JWT body token should contain an identified user: ${beautify(jwtPayload)}`)
 
     const user = await dbGetUserByUsername(null, payloadUser.username) // NOSONAR
-    if (!user)
-      return reply.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
+    if (!user) return reply.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
 
     const mediaToken = await getTokenFromMediaForUser(user)
 
     return reply.status(200).send({ token: mediaToken })
   } catch (err) {
-    log.e(
-      mod,
-      fun,
-      `!! Liaison avec le module “${STORAGE}” incomplète, création de JWT impossible: ` + err
-    )
+    log.e(mod, fun, `!! Liaison avec le module “${STORAGE}” incomplète, création de JWT impossible: ` + err)
     if (err.code == 'ECONNREFUSED')
       return reply.status(500).json({
         statusCode: 500,

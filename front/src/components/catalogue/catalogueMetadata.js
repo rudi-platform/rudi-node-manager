@@ -209,8 +209,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   }
 
   const getFirstKey = (obj) => Object.keys(obj)[0]
-  const getAbsFilterVal = (str, toggle) =>
-    `${str}`.startsWith('-') ? `${str}`.slice(1) : `${toggle ? '-' : ''}${str}`
+  const getAbsFilterVal = (str, toggle) => (`${str}`.startsWith('-') ? `${str}`.slice(1) : `${toggle ? '-' : ''}${str}`)
   const toggleFilterVal = (str) => getAbsFilterVal(str, true)
   /**
    * ajoute un filter pour la requete
@@ -221,9 +220,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
     const newFilterVal = filterParam[filterKey]
 
     const filterList = currentFilters.slice()
-    const existingFilterIndex = filterList.findIndex(
-      (existingFilter) => getFirstKey(existingFilter) === filterKey
-    )
+    const existingFilterIndex = filterList.findIndex((existingFilter) => getFirstKey(existingFilter) === filterKey)
     // should add
     const newFilter = { [filterKey]: newFilterVal }
     if (existingFilterIndex === -1) {
@@ -347,28 +344,16 @@ export default function CatalogueMetadata({ editMode, logout }) {
                     ...
                   </button>
                   <div className="dropdown-menu" aria-labelledby="sortDrop">
-                    <a
-                      className="dropdown-item"
-                      onClick={() => addToFilter({ sort_by: `resource_title` })}
-                    >
+                    <a className="dropdown-item" onClick={() => addToFilter({ sort_by: `resource_title` })}>
                       Alphabétique
                     </a>
-                    <a
-                      className="dropdown-item"
-                      onClick={() => addToFilter({ sort_by: `-resource_title` })}
-                    >
+                    <a className="dropdown-item" onClick={() => addToFilter({ sort_by: `-resource_title` })}>
                       Anti alphabétique
                     </a>
-                    <a
-                      className="dropdown-item"
-                      onClick={() => addToFilter({ sort_by: `-updatedAt` })}
-                    >
+                    <a className="dropdown-item" onClick={() => addToFilter({ sort_by: `-updatedAt` })}>
                       Récemment modifiés
                     </a>
-                    <a
-                      className="dropdown-item"
-                      onClick={() => addToFilter({ sort_by: `updatedAt` })}
-                    >
+                    <a className="dropdown-item" onClick={() => addToFilter({ sort_by: `updatedAt` })}>
                       Anciennement modifiés
                     </a>
                   </div>
@@ -415,38 +400,29 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   return !filterObject?.values ? (
                     'No values'
                   ) : (
-                    <div
-                      className={i ? 'col border rounded' : 'border rounded'}
-                      key={filterObject.name}
-                    >
+                    <div className={i ? 'col border rounded' : 'border rounded'} key={filterObject.name}>
                       <div className="label-lv2">{filterObject.text}</div>
                       <ul className="list-group">
-                        {(filterObject.values?.items || filterObject.values)?.map(
-                          (filterValue, i) => {
-                            const filterLabel = getFilterLabel(filterValue, filterObject)
-                            const key = filterLabel + i
-                            return (
-                              <li
-                                className="filter-items"
-                                key={key}
-                                onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
+                        {(filterObject.values?.items || filterObject.values)?.map((filterValue, i) => {
+                          const filterLabel = getFilterLabel(filterValue, filterObject)
+                          const key = filterLabel + i
+                          return (
+                            <li
+                              className="filter-items"
+                              key={key}
+                              onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
+                            >
+                              {filterObject.display ? filterObject.display(filterValue, filterObject) : filterLabel}
+                              <span
+                                className={`badge rounded-pill text-bg-${
+                                  isSelectedFilter(filterObject.toFilterParam(filterValue)) ? 'success' : 'primary'
+                                }`}
                               >
-                                {filterObject.display
-                                  ? filterObject.display(filterValue, filterObject)
-                                  : filterLabel}
-                                <span
-                                  className={`badge rounded-pill text-bg-${
-                                    isSelectedFilter(filterObject.toFilterParam(filterValue))
-                                      ? 'success'
-                                      : 'primary'
-                                  }`}
-                                >
-                                  {filterValue.count}
-                                </span>
-                              </li>
-                            )
-                          }
-                        )}
+                                {filterValue.count}
+                              </span>
+                            </li>
+                          )
+                        })}
                       </ul>
                     </div>
                   )

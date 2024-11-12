@@ -2,26 +2,14 @@ import axios from 'axios'
 
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import {
-  BoxArrowUpRight,
-  CloudDownload,
-  CloudSlash,
-  Eye,
-  Pencil,
-  Share,
-  Trash,
-} from 'react-bootstrap-icons'
+import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
 import { BackDataContext } from '../../context/backDataContext'
 import { getForm } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getLocaleFormatted, pathJoin } from '../../utils/utils'
-import {
-  DefaultConfirmOption,
-  DefaultOkOption,
-  useModalContext,
-} from '../modals/genericModalContext'
+import { DefaultConfirmOption, DefaultOkOption, useModalContext } from '../modals/genericModalContext'
 import FileSizeDisplay from '../other/fileSizeDisplay'
 import ThemeDisplay from '../other/themeDisplay'
 
@@ -49,34 +37,17 @@ const eyeButton = (id) => (
   </Link>
 )
 const shareButton = (url) => (
-  <a
-    className="btn btn-success"
-    title="Partager la métadonnée"
-    href={url}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
+  <a className="btn btn-success" title="Partager la métadonnée" href={url} target="_blank" rel="noopener noreferrer">
     <Share />
   </a>
 )
 const editButton = (url) => (
-  <a
-    className="btn btn-warning"
-    href={url}
-    title="Editer"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
+  <a className="btn btn-warning" href={url} title="Editer" target="_blank" rel="noopener noreferrer">
     <Pencil />
   </a>
 )
 const deleteButton = (triggerDelete) => (
-  <button
-    type="button"
-    className="btn btn-danger"
-    title="Supprimer"
-    onClick={() => triggerDelete()}
-  >
+  <button type="button" className="btn btn-danger" title="Supprimer" onClick={() => triggerDelete()}>
     <Trash />
   </button>
 )
@@ -212,16 +183,14 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    * calcule la taille total des fichiers
    * @return {Number} taille totale
    */
-  const getTotalFileSize = () =>
-    metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
+  const getTotalFileSize = () => metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
 
   /**
    * Check if the metadata has restricted access
    * @param {*} metadata
    * @return {boolean} True if letadata has restricted access
    */
-  const isRestricted = (metadata) =>
-    !!metadata?.access_condition?.confidentiality?.restricted_access
+  const isRestricted = (metadata) => !!metadata?.access_condition?.confidentiality?.restricted_access
   // console.log(metadata)
   const metaDates = metadata.metadata_info?.metadata_dates
 
@@ -250,13 +219,10 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       <span className="text-muted"> {media.media_name} </span>
     </div>
   )
-  const displayAvailableMedia = (media) =>
-    media.file_size ? displayMediaFile(media) : displayMediaService(media)
+  const displayAvailableMedia = (media) => (media.file_size ? displayMediaFile(media) : displayMediaService(media))
 
   const displayMedia = (media) =>
-    media.file_storage_status === 'missing'
-      ? displayMissingMedia(media)
-      : displayAvailableMedia(media)
+    media.file_storage_status === 'missing' ? displayMissingMedia(media) : displayAvailableMedia(media)
 
   const button = {
     share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
@@ -271,14 +237,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       <div className="card card-margin">
         <h5 className={isRestricted(metadata) ? 'card-header restricted' : 'card-header'}>
           <div className="d-flex justify-content-between align-items-center">
-            <a
-              href={getFormMeta(`read-only=${metadata.global_id}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className={metadata.storage_status === 'pending' ? 'danger' : ''}>
-                {metadata.resource_title}
-              </span>
+            <a href={getFormMeta(`read-only=${metadata.global_id}`)} target="_blank" rel="noopener noreferrer">
+              <span className={metadata.storage_status === 'pending' ? 'danger' : ''}>{metadata.resource_title}</span>
             </a>
             <span className="align-pill-right">{displayMetadataStatus(metadata)}</span>
             {isEdit ? (
@@ -296,18 +256,14 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
           <div>
             {metaDates?.updated && (
-              <small className="text-muted">
-                Modifié le : {getLocaleFormatted(metaDates.updated)}
-              </small>
+              <small className="text-muted">Modifié le : {getLocaleFormatted(metaDates.updated)}</small>
             )}
             <FileSizeDisplay number={getTotalFileSize()}></FileSizeDisplay>
           </div>
 
           {metaDates?.published && (
             <div>
-              <small className="text-muted">
-                Publié le : {getLocaleFormatted(metaDates.published)}
-              </small>
+              <small className="text-muted">Publié le : {getLocaleFormatted(metaDates.published)}</small>
             </div>
           )}
         </h5>
@@ -319,9 +275,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
           <a href="#" className="btn btn-secondary card-margin">
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
-          <span className="card-text">
-            {metadata.available_formats.map((media) => displayMedia(media))}
-          </span>
+          <span className="card-text">{metadata.available_formats.map((media) => displayMedia(media))}</span>
         </div>
       </div>
     </div>

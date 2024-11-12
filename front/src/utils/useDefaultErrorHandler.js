@@ -15,13 +15,10 @@ export default function useDefaultErrorHandler() {
       options.text = [displayMsg(err.message)]
     } else if (err.response.data?.message) {
       options.text = [displayMsg(err.response.data.message)]
-      if (err.response.data.moreInfo?.message)
-        options.text.push(displayMsg(err.response.data.moreInfo.message))
+      if (err.response.data.moreInfo?.message) options.text.push(displayMsg(err.response.data.moreInfo.message))
     } else {
       options.text =
-        err.response?.data?.status == 'error'
-          ? [displayMsg(err.response.data.msg)]
-          : [displayMsg(err.response.data)]
+        err.response?.data?.status == 'error' ? [displayMsg(err.response.data.msg)] : [displayMsg(err.response.data)]
     }
     changeOptions(options)
     toggle()

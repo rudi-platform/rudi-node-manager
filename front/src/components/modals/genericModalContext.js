@@ -19,12 +19,7 @@ export default function ModalProvider({ children }) {
   const { options, changeOptions } = useGenericModalOptions()
   return (
     <Provider value={{ toggle, visible, options, changeOptions }}>
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       {children}
     </Provider>
   )

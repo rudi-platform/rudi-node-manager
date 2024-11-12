@@ -44,8 +44,7 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
   const hasErrors = (prop, val) => {
     if (!userInfo) return true
     if (!val) val = userInfo[prop]
-    if (prop === 'roles')
-      return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
+    if (prop === 'roles') return !(Array.isArray(val) && val.length > 0) ? 'Au moins un rôle doit être défini' : false
 
     if (!val) {
       // console.error('T (hasErrors)', prop, user[prop])
@@ -63,16 +62,14 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
     email: hasErrors('email'),
     roles: hasErrors('roles'),
   })
-  const isValid = (prop) =>
-    prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
+  const isValid = (prop) => (prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles)
 
   const editUserInfo = (prop, val) => {
     setErrors((errors) => ({ ...errors, [prop]: hasErrors(prop, val) }))
     setUserInfo((userInfo) => ({ ...userInfo, [prop]: val }))
   }
 
-  const isInUserRole = (userRoles, role) =>
-    !!(userRoles?.findIndex((element) => element === role.role) >= 0)
+  const isInUserRole = (userRoles, role) => !!(userRoles?.findIndex((element) => element === role.role) >= 0)
 
   const handleChange = (event) => {
     const prop = event.target.id

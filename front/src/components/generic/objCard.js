@@ -95,11 +95,7 @@ export function ObjCard({
                     <Pencil />
                   </a>
                 )}
-                <button
-                  type={'button'}
-                  className="btn btn-danger"
-                  onClick={() => triggerDeleteObj(objId)}
-                >
+                <button type={'button'} className="btn btn-danger" onClick={() => triggerDeleteObj(objId)}>
                   <Trash />
                 </button>
               </div>
@@ -112,9 +108,7 @@ export function ObjCard({
               obj[key] && (
                 <p className="card-text" key={`${objId}.${key}`}>
                   {displayFields[key]}&nbsp;:&nbsp;
-                  <small className="text-muted">
-                    {!Array.isArray(obj[key]) ? obj[key] : JSON.stringify(obj[key])}
-                  </small>
+                  <small className="text-muted">{!Array.isArray(obj[key]) ? obj[key] : JSON.stringify(obj[key])}</small>
                 </p>
               )
           )}
@@ -210,12 +204,7 @@ export function EditObjCard({
       <div className="card edit-card-margin">
         <div className="card-body">
           <div className="inline">
-            <a
-              href={getFormObj(objType)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
+            <a href={getFormObj(objType)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
               {btnTextAdd} <Plus />
             </a>
           </div>

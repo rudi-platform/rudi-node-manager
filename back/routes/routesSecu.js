@@ -16,9 +16,7 @@ const { decodeBase64url, decodeBase64 } = require('../utils/utils.js')
 
 router.post('/hash-password', (req, reply) => {
   if (!req?.body?.pwd)
-    throw new BadRequestError(
-      `Input should be a JSON { pwd: <mandatory_pwd>, encoding: 'base64url|base64|null' }`
-    )
+    throw new BadRequestError(`Input should be a JSON { pwd: <mandatory_pwd>, encoding: 'base64url|base64|null' }`)
   const inputPwd = req.body.pwd
   const encoding = `${req.body.encoding}`?.toLowerCase()
   let pwd = inputPwd

@@ -16,9 +16,7 @@ describe('RoleController', () => {
   })
 
   test('roleList should return data', async () => {
-    databaseManager.getRoles.mockImplementation(() =>
-      Promise.resolve([{ role: 'role', desc: 'desc' }])
-    )
+    databaseManager.getRoles.mockImplementation(() => Promise.resolve([{ role: 'role', desc: 'desc' }]))
 
     await controllers.roleList({}, response, null)
 
@@ -34,9 +32,7 @@ describe('RoleController', () => {
     expect(response.statusCode).toStrictEqual(501)
   })
   test('getRoleById should return data', async () => {
-    databaseManager.getRoleById.mockImplementation(() =>
-      Promise.resolve({ role: 'role', desc: 'desc' })
-    )
+    databaseManager.getRoleById.mockImplementation(() => Promise.resolve({ role: 'role', desc: 'desc' }))
 
     await controllers.getRoleById({ params: { role: 'role' } }, response, null)
 
@@ -53,9 +49,7 @@ describe('RoleController', () => {
   })
 
   test('getUserRolesByUsername should return data', async () => {
-    databaseManager.getUserRolesByUsername.mockImplementation(() =>
-      Promise.resolve([{ role: 'role', userId: 'id' }])
-    )
+    databaseManager.getUserRolesByUsername.mockImplementation(() => Promise.resolve([{ role: 'role', userId: 'id' }]))
 
     await controllers.getUserRolesByUsername({ params: { username: 'user' } }, response, null)
 
@@ -89,9 +83,7 @@ describe('RoleController', () => {
   })
 
   test('postUserRole should return data', async () => {
-    databaseManager.createUserRole.mockImplementation(() =>
-      Promise.resolve({ role: 'role', userId: 'id' })
-    )
+    databaseManager.createUserRole.mockImplementation(() => Promise.resolve({ role: 'role', userId: 'id' }))
 
     await controllers.postUserRole({ body: { role: 'role', userId: 'id' } }, response, null)
 

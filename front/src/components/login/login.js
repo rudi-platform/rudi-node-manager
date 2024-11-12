@@ -109,12 +109,7 @@ export default function Login({ updateToken }) {
 
   return (
     <div className="Login">
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
         <div className="login-form">
           <Form.Group size="lg" controlId="usr">

@@ -18,12 +18,7 @@ const {
   dbClose,
   dbOpen,
 } = require('../database/database')
-const {
-  extractCookieFromReq,
-  CONSOLE_TOKEN_NAME,
-  jwtSecretKey,
-  PM_FRONT_TOKEN_NAME,
-} = require('./secu')
+const { extractCookieFromReq, CONSOLE_TOKEN_NAME, jwtSecretKey, PM_FRONT_TOKEN_NAME } = require('./secu')
 const { matchPassword } = require('@aqmo.org/jwt-lib')
 
 // Passport configuration
@@ -84,8 +79,7 @@ const checkPassport = async (username, password) => {
     try {
       const roles = await dbGetUserRolesByUsername(db, username)
       // console.trace('T (checkPassport) user roles:', roles)
-      if (!roles?.length)
-        throw new ForbiddenError(`Admin validation required for user: '${username}'`)
+      if (!roles?.length) throw new ForbiddenError(`Admin validation required for user: '${username}'`)
       // console.trace('T (checkPassport)', 'User may login')
       dbClose(db)
       return statusOK('User may login')

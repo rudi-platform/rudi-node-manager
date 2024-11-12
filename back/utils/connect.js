@@ -12,8 +12,7 @@ const rudiErrMsg = (rudiModuleCalled, message, status = '') =>
     ? `ERR ${status} while calling ${rudiModuleCalled}: ${cleanErrMsg(message)}`
     : `ERR ${status}: ${message}`
 
-exports.rudiApiGet = async (url, opts) =>
-  this.safeAxiosGet('RUDI API', url, { ...opts, ...getRudiApiHeaders() })
+exports.rudiApiGet = async (url, opts) => this.safeAxiosGet('RUDI API', url, { ...opts, ...getRudiApiHeaders() })
 
 exports.safeAxiosGet = async (rudiModuleCalled, url, opts) => {
   const fun = 'safeAxiosGet'

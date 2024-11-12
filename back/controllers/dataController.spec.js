@@ -130,11 +130,7 @@ describe('AdminController', () => {
   test('putDefaultForm should return data', async () => {
     databaseManager.updateDefaultForm.mockImplementation(() => Promise.resolve({ test: 'tata' }))
 
-    await controllers.putDefaultForm(
-      { user: { username: 'toto' }, body: { test: 'tata' } },
-      response,
-      null
-    )
+    await controllers.putDefaultForm({ user: { username: 'toto' }, body: { test: 'tata' } }, response, null)
 
     expect(response.body).toStrictEqual({ test: 'tata' })
   })
@@ -147,11 +143,7 @@ describe('AdminController', () => {
     axiosError.toJSON = () => axiosError
     databaseManager.updateDefaultForm.mockImplementation(() => Promise.reject(axiosError))
 
-    await controllers.putDefaultForm(
-      { user: { username: 'toto' }, body: { test: 'tata' } },
-      response,
-      null
-    )
+    await controllers.putDefaultForm({ user: { username: 'toto' }, body: { test: 'tata' } }, response, null)
 
     expect(response.statusCode).toStrictEqual(501)
   })

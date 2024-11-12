@@ -84,12 +84,7 @@ export default function CatalogueUser({ editMode, logout }) {
                 endMessage={<i>Aucune donnée supplémentaire</i>}
               >
                 {userList.map((user) => (
-                  <UserCard
-                    roleList={roleList}
-                    user={user}
-                    key={user[propId]}
-                    refresh={refresh}
-                  ></UserCard>
+                  <UserCard roleList={roleList} user={user} key={user[propId]} refresh={refresh}></UserCard>
                 ))}
               </InfiniteScroll>
             ) : (

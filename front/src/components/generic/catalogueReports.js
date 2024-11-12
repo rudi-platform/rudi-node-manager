@@ -51,10 +51,7 @@ export default function CatalogueReports({ editMode, logout }) {
    */
   const triggerDeleteOldReports = () => {
     changeOptions(
-      getOptConfirm(
-        "Voulez-vous supprimer les rapports d'intégration d'il y a plus d'un mois ?",
-        deleteOldReports
-      )
+      getOptConfirm("Voulez-vous supprimer les rapports d'intégration d'il y a plus d'un mois ?", deleteOldReports)
     )
     toggle()
   }
@@ -65,9 +62,7 @@ export default function CatalogueReports({ editMode, logout }) {
         <div className="col-9">
           <div className="card edit-card-margin ">
             <div className="card-body align-right valign-middle inline">
-              <div className="text-button inline-block">
-                Supprimer les rapports des mois précédents
-              </div>
+              <div className="text-button inline-block">Supprimer les rapports des mois précédents</div>
               <button
                 type="button"
                 title="Supprimer les rapports des mois précédents"

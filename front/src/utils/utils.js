@@ -14,9 +14,7 @@ export const mergeStrings = (sep, ...args) => {
     if (args[i] === undefined || args[i] === null) break
     const newChunk = `${args[i]}`
     const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
-    accumulatedStr = accumulatedStr.endsWith(sep)
-      ? accumulatedStr + cleanChunk
-      : accumulatedStr + sep + cleanChunk
+    accumulatedStr = accumulatedStr.endsWith(sep) ? accumulatedStr + cleanChunk : accumulatedStr + sep + cleanChunk
   }
   return accumulatedStr
 }

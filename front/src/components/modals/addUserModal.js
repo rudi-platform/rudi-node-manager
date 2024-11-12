@@ -65,8 +65,7 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
     roles: hasErrors('roles'),
   })
 
-  const isValid = (prop) =>
-    prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles
+  const isValid = (prop) => (prop ? !errors[prop] : !errors.username && !errors.email && !errors.roles)
 
   const editUserInfo = (prop, val) => {
     setErrors((errors) => ({ ...errors, [prop]: hasErrors(prop, val) }))

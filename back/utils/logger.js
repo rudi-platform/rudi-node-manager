@@ -70,11 +70,7 @@ function getRudiLoggerOptions() {
   return rudiLoggerOpts
 }
 
-const syslog = new rudiLogger.RudiLogger(
-  APP_NAME,
-  getBackOptions(OPT_GIT_HASH),
-  getRudiLoggerOptions()
-)
+const syslog = new rudiLogger.RudiLogger(APP_NAME, getBackOptions(OPT_GIT_HASH), getRudiLoggerOptions())
 
 const rplog = function (logLevel, srcMod, srcFun, msg, context) {
   const Severity = rudiLogger.Severity
@@ -185,8 +181,7 @@ exports.d = (srcMod, srcFun, ...msg) => {
 // ------------------------------------------------------------------------------------------------
 
 // System-related "panic" conditions
-exports.sysEmerg = (srcMod, srcFun, msg, context) =>
-  rplog('emergency', srcMod, srcFun, msg, context)
+exports.sysEmerg = (srcMod, srcFun, msg, context) => rplog('emergency', srcMod, srcFun, msg, context)
 
 // Something bad is about to happen, deal with it NOW!
 exports.sysCrit = (srcMod, srcFun, msg, context) => rplog('critical', srcMod, srcFun, msg, context)
@@ -215,8 +210,7 @@ exports.sysInfo = (srcMod, srcFun, msg, context) => rplog('info', srcMod, srcFun
 // Events that are unusual but not error conditions - might be summarized in an email to developers
 // or admins to spot potential problems - no immediate action required.
 // No action required.
-exports.sysVerbose = (srcMod, srcFun, msg, context) =>
-  rplog('verbose', srcMod, srcFun, msg, context)
+exports.sysVerbose = (srcMod, srcFun, msg, context) => rplog('verbose', srcMod, srcFun, msg, context)
 
 // Info useful to developers for debugging the application, not useful during operations.
 // No action required.

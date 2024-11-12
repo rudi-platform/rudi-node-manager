@@ -71,14 +71,7 @@ class BadRequestError extends RudiError {
 
 class UnauthorizedError extends RudiError {
   constructor(errMessage, ctxMod, ctxFun) {
-    super(
-      errMessage,
-      401,
-      'Unauthorized',
-      'The request requires an user authentication',
-      ctxMod,
-      ctxFun
-    )
+    super(errMessage, 401, 'Unauthorized', 'The request requires an user authentication', ctxMod, ctxFun)
   }
 }
 

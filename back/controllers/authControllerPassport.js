@@ -43,8 +43,7 @@ exports.postLogin = async (req, reply, next) => {
       return reply.status(400).send(err)
     }
     if (!user) {
-      const errMsg =
-        info?.message || `User not found or incorrect password: '${req?.body?.username}'`
+      const errMsg = info?.message || `User not found or incorrect password: '${req?.body?.username}'`
       log.w(mod, fun, errMsg)
       return reply.status(401).send(errMsg)
     }
@@ -117,13 +116,7 @@ exports.putPassword = async (req, reply, next) => {
   const fun = 'changePwd'
   try {
     const { username, password, newPassword, confirmNewPassword } = req.body
-    if (
-      !username ||
-      !password ||
-      !newPassword ||
-      newPassword === password ||
-      newPassword !== confirmNewPassword
-    ) {
+    if (!username || !password || !newPassword || newPassword === password || newPassword !== confirmNewPassword) {
       const errMsg = 'Prerequisites not met'
       log.w(mod, fun, errMsg)
       reply.status(401).send(errMsg)
@@ -156,8 +149,7 @@ exports.resetPassword = async (req, reply, next) => {
   try {
     // ONLY ADMIN !
     const { id } = req.params
-    if (id === 0)
-      throw new UnauthorizedError(`Le mot de passe du SU ne peut être modifié via l'API`)
+    if (id === 0) throw new UnauthorizedError(`Le mot de passe du SU ne peut être modifié via l'API`)
     await dbUpdatePasswordWithField(null, 'id', id, hashPassword(INIT_PWD))
     reply.status(200).send(`Password reinitialized for user ${id}`)
   } catch (err) {
@@ -198,9 +190,7 @@ exports.hashCredentials = (pwd, usr, encoding) => {
       decode = (x) => x
       break
     default:
-      throw new BadRequestError(
-        `When defined, input encoding should be 'base64' or 'base64url', got '${encoding}'`
-      )
+      throw new BadRequestError(`When defined, input encoding should be 'base64' or 'base64url', got '${encoding}'`)
   }
   if (usr) return toBase64(`${decode(usr)}:${hashPassword(decode(pwd))}`)
   return hashPassword(decode(pwd))

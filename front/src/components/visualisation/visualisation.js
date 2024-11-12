@@ -163,9 +163,7 @@ function Visualisation({ logout }) {
     if (mediaMime.endsWith('crypt')) return displayForEncryptedFile()
 
     if (mediaMime.startsWith('image')) {
-      await getContent(mediaUrl, (srcContent) => (
-        <img src={srcContent} className="image90" alt="retrieving media..." />
-      ))
+      await getContent(mediaUrl, (srcContent) => <img src={srcContent} className="image90" alt="retrieving media..." />)
       // setVisuOption({ displayType: 'IMG', data: imgUrl })
     } else if (mediaMime.startsWith('video')) {
       await getContent(mediaUrl, (srcContent) => (
@@ -240,13 +238,7 @@ function Visualisation({ logout }) {
     <div className="tempPaddingTop">
       Afficher une donnée (image, CSV ou JSON) :
       <div className="btn-group" role="group">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="media_id"
-          value={mediaId}
-          onChange={handleChange}
-        />
+        <input type="text" className="form-control" placeholder="media_id" value={mediaId} onChange={handleChange} />
         <button type="button" className="btn btn-success" onClick={handleOnClick}>
           <Check />
         </button>

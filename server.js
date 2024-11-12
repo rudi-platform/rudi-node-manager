@@ -215,9 +215,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   if (!isDevEnv()) {
     console.log('Serving the built static page')
     managerApp.use(express.static(path.join(__dirname, 'front/build')))
-    managerApp.get('/*', (req, reply) =>
-      reply.sendFile(path.join(__dirname, 'front/build/index.html'))
-    )
+    managerApp.get('/*', (req, reply) => reply.sendFile(path.join(__dirname, 'front/build/index.html')))
   }
 
   // Init database on startup
@@ -230,9 +228,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   }
 
   // Catch any bad requests
-  managerApp.get('*', (req, reply) =>
-    reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`)
-  )
+  managerApp.get('*', (req, reply) => reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`))
 
   // Configure our server to listen on the port defiend by our port variable
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>

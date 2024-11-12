@@ -139,22 +139,12 @@ export default function ChangePwd({ backToLogin }) {
 
   return (
     <div className="Login">
-      <GenericModal
-        visible={visible}
-        toggle={toggle}
-        options={options}
-        animation={false}
-      ></GenericModal>
+      <GenericModal visible={visible} toggle={toggle} options={options} animation={false}></GenericModal>
       <Form onSubmit={handleSubmit}>
         {formGroup('username', 'Nom', username, 'text', setUsername, true)}
         {inputPassword('actualPwd', 'Mot de passe actuel', password, setPassword)}
         {inputPassword('newPwd', 'Nouveau mot de passe', newPassword, setNewPassword)}
-        {inputPassword(
-          'newPwd2',
-          'Confirmation du mot de passe',
-          confirmNewPassword,
-          setConfirmNewPassword
-        )}
+        {inputPassword('newPwd2', 'Confirmation du mot de passe', confirmNewPassword, setConfirmNewPassword)}
         <div className="login-button">
           <Button type="submit" variant={btnColor} disabled={!isFormValid()}>
             {btnText}

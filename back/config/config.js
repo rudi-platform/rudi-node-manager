@@ -40,8 +40,7 @@ for (const section in customConfig) {
   const customParams = customConfig[section]
   if (customParams) {
     if (!config[section]) config[section] = {}
-    for (const param in customParams)
-      if (customParams[param]) config[section][param] = customParams[param]
+    for (const param in customParams) if (customParams[param]) config[section][param] = customParams[param]
   }
 }
 
@@ -70,8 +69,7 @@ exports.getConf = (section, subSection) => {
 // Shortcuts to access popular conf values
 const RUDI_CATALOG_API_ADMIN = config.rudi_api?.admin_api || 'api/admin'
 exports.getCatalogUrl = (...args) => pathJoin(RUDI_CATALOG_URL, ...args)
-exports.getCatalogAdminUrl = (...args) =>
-  pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
+exports.getCatalogAdminUrl = (...args) => pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
 exports.getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...args)
 
 exports.getCatalogUrlAndParams = (url, req) => {
@@ -90,11 +88,9 @@ exports.getStorageDwnlUrl = (id) => this.getStorageUrl('download', id)
 
 // const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
 
-const getDbConf = (subSection) =>
-  config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false
+const getDbConf = (subSection) => (config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false)
 
-const DB_PATH =
-  getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
+const DB_PATH = getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 
 exports.getDbPath = () => DB_PATH
 

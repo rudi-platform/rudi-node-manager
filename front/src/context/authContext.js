@@ -9,9 +9,7 @@ const hasRoleAdmin = (userInfo) =>
   userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1 || false
 
 const hasRoleEditor = (userInfo) =>
-  userInfo?.roles?.findIndex(
-    (role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur'
-  ) > -1 || false
+  userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1 || false
 
 const callAuthBackend = async (token) => {
   try {
@@ -58,7 +56,5 @@ export function UserContextProvider({ children }) {
     updateUserInfo()
   }, [token])
 
-  return (
-    <UserContext.Provider value={{ userInfo, isAdmin, isEditor }}>{children}</UserContext.Provider>
-  )
+  return <UserContext.Provider value={{ userInfo, isAdmin, isEditor }}>{children}</UserContext.Provider>
 }

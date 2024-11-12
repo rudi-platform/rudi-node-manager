@@ -59,8 +59,7 @@ exports.dbOpen = dbOpen
 
 const dbClose = (db) => {
   db.close((err) => {
-    if (err && err.message != 'SQLITE_MISUSE: Database handle is closed')
-      log.e(mod, 'dbClose', err.message)
+    if (err && err.message != 'SQLITE_MISUSE: Database handle is closed') log.e(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
 }
@@ -141,8 +140,7 @@ exports.dbGetUserByField = (openedDb, field, val) => {
  * @param {String} username the user's username
  * @returns {Object} the user info
  */
-exports.dbGetUserByUsername = (openedDb, username) =>
-  this.dbGetUserByField(openedDb, 'username', username)
+exports.dbGetUserByUsername = (openedDb, username) => this.dbGetUserByField(openedDb, 'username', username)
 
 /**
  * Retrieve the user info in DB from their id
@@ -219,8 +217,7 @@ exports.dbCreateUserCheckExists = (openedDb, user, silent = false) => {
         return reject(new ForbiddenError(errMsg))
       } else {
         const sqlReq =
-          `INSERT INTO ${TBL_USERS}(username,password,email${id ? ',id' : ''})` +
-          ` VALUES(?,?,?${id ? ',?' : ''})`
+          `INSERT INTO ${TBL_USERS}(username,password,email${id ? ',id' : ''})` + ` VALUES(?,?,?${id ? ',?' : ''})`
         db.run(sqlReq, [username, password, email, id], (err) => {
           if (err) {
             if (!openedDb) dbClose(db)
@@ -229,12 +226,7 @@ exports.dbCreateUserCheckExists = (openedDb, user, silent = false) => {
             return reject(err)
           }
           if (!silent)
-            log.i(
-              mod,
-              fun,
-              `${TBL_USERS} : user created: '${username}'`,
-              log.getContext(null, { opType: 'post_user' })
-            )
+            log.i(mod, fun, `${TBL_USERS} : user created: '${username}'`, log.getContext(null, { opType: 'post_user' }))
           db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, userInfo) => {
             if (!openedDb) dbClose(db)
             if (err) {
@@ -251,11 +243,7 @@ exports.dbCreateUserCheckExists = (openedDb, user, silent = false) => {
   })
 }
 
-exports.dbRegisterUser = async (
-  db,
-  { username, email, password, isSuPwdHashed, id },
-  silent = false
-) => {
+exports.dbRegisterUser = async (db, { username, email, password, isSuPwdHashed, id }, silent = false) => {
   const fun = 'dbRegisterUser'
   try {
     const userCreds = {
@@ -279,31 +267,22 @@ exports.dbCreateUser = (openedDb, userInfo) => {
 
   const db = openedDb || dbOpen()
   return new Promise((resolve, reject) => {
-    db.run(
-      `INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`,
-      [username, password, email],
-      (err) => {
+    db.run(`INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`, [username, password, email], (err) => {
+      if (err) {
+        if (!openedDb) dbClose(db)
+        log.e(mod, fun + '.insert', err.message)
+        return reject(err)
+      }
+      log.i(mod, fun, `(${TBL_USERS}) user created: '${username}'`, log.getContext(null, { opType: 'post_user' }))
+      db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
+        if (!openedDb) dbClose(db)
         if (err) {
-          if (!openedDb) dbClose(db)
-          log.e(mod, fun + '.insert', err.message)
+          log.e(mod, fun + '.select', err.message)
           return reject(err)
         }
-        log.i(
-          mod,
-          fun,
-          `(${TBL_USERS}) user created: '${username}'`,
-          log.getContext(null, { opType: 'post_user' })
-        )
-        db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            log.e(mod, fun + '.select', err.message)
-            return reject(err)
-          }
-          resolve({ id: row.id, username: row.username })
-        })
-      }
-    )
+        resolve({ id: row.id, username: row.username })
+      })
+    })
   })
 }
 
@@ -313,9 +292,7 @@ exports.dbUpdateUser = (openedDb, userInfo) => {
   log.d(mod, fun, `userInfo: ${beautify({ ...userInfo, password: '***' })}`)
   const db = openedDb || dbOpen()
   const sqlReq =
-    `UPDATE ${TBL_USERS} SET username = ?, email = ?` +
-    (password ? `, password = '${password}'` : '') +
-    ` WHERE id = ?`
+    `UPDATE ${TBL_USERS} SET username = ?, email = ?` + (password ? `, password = '${password}'` : '') + ` WHERE id = ?`
   return new Promise((resolve, reject) => {
     db.run(sqlReq, [username, email, id], (err) => {
       if (err) {
@@ -323,12 +300,7 @@ exports.dbUpdateUser = (openedDb, userInfo) => {
         log.e(mod, fun + ' insert', err.message)
         return reject(err)
       }
-      log.i(
-        mod,
-        fun,
-        `(${TBL_USERS}) user updated: '${username}'`,
-        log.getContext(null, { opType: 'post_user' })
-      )
+      log.i(mod, fun, `(${TBL_USERS}) user updated: '${username}'`, log.getContext(null, { opType: 'post_user' }))
       db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
         if (!openedDb) dbClose(db)
         if (err) {
@@ -401,23 +373,19 @@ exports.dbCreateRoles = (openedDb, roles) => {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       roles.forEach((role) => {
-        db.run(
-          `INSERT INTO ${TBL_ROLES}(role,desc,hide) VALUES(?,?,?)`,
-          [role.role, role.desc, !!role.hide],
-          (err) => {
-            if (err) {
-              log.e(mod, fun, err.message)
-              if (!openedDb) dbClose(db)
-              return reject(err)
-            }
-            log.i(
-              mod,
-              fun,
-              `(${TBL_ROLES}) A role has been created with name '${role.role}'`,
-              log.getContext(null, { opType: 'add_role' })
-            )
+        db.run(`INSERT INTO ${TBL_ROLES}(role,desc,hide) VALUES(?,?,?)`, [role.role, role.desc, !!role.hide], (err) => {
+          if (err) {
+            log.e(mod, fun, err.message)
+            if (!openedDb) dbClose(db)
+            return reject(err)
           }
-        )
+          log.i(
+            mod,
+            fun,
+            `(${TBL_ROLES}) A role has been created with name '${role.role}'`,
+            log.getContext(null, { opType: 'add_role' })
+          )
+        })
       })
       if (!openedDb) dbClose(db)
       resolve({ roles })
@@ -499,8 +467,7 @@ exports.dbGetUserRolesByUsername = async (openedDb, username) => {
   } catch (err) {
     if (!openedDb) dbClose(db)
     log.e(mod, fun, err.toString())
-    if (err[STATUS_CODE] === 400)
-      throw new ForbiddenError(`Admin validation required for user '${username}'`)
+    if (err[STATUS_CODE] === 400) throw new ForbiddenError(`Admin validation required for user '${username}'`)
     throw err
   }
 }
@@ -589,8 +556,7 @@ exports.dbDeleteUserRole = (openedDb, userId, role) => {
 
 exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
   const fun = 'dbCreateUserRole'
-  if (userId !== 0 && !userId)
-    Promise.reject(new BadRequestError('Input parameter userId must be defined'))
+  if (userId !== 0 && !userId) Promise.reject(new BadRequestError('Input parameter userId must be defined'))
   if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
   // console.trace(`T (${fun})`, { userId, username, role })
   const db = openedDb || dbOpen()
@@ -604,9 +570,7 @@ exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
             return reject(new BadRequestError(`Role already assigned to user`))
           if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
             return reject(
-              new BadRequestError(
-                `User ${userId}` + (username && ` (${username})`) + ` or role '${role}' not found`
-              )
+              new BadRequestError(`User ${userId}` + (username && ` (${username})`) + ` or role '${role}' not found`)
             )
           }
           return reject(new InternalServerError(err))
@@ -622,9 +586,7 @@ exports.dbCreateUserRole = (openedDb, { userId, username, role }) => {
     } catch (e) {
       reject(
         new InternalServerError(
-          `Role '${role}' could not be added to user '${
-            username || userId
-          }'. An error occured: ${e}`
+          `Role '${role}' could not be added to user '${username || userId}'. An error occured: ${e}`
         )
       )
     }
@@ -635,11 +597,9 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
   const fun = 'dbUpdateUserRoles'
   try {
     const { userId, username, roles: targetRoles } = userInfo
-    if (userId !== 0 && !userId)
-      Promise.reject(new BadRequestError(`Input parameter 'userId' must be defined`))
+    if (userId !== 0 && !userId) Promise.reject(new BadRequestError(`Input parameter 'userId' must be defined`))
     if (!targetRoles) Promise.reject(new BadRequestError(`Input parameter 'roles' must be defined`))
-    if (!Array.isArray(targetRoles))
-      throw new BadRequestError(`Parameter 'roles' should be an array`)
+    if (!Array.isArray(targetRoles)) throw new BadRequestError(`Parameter 'roles' should be an array`)
     const db = openedDb || dbOpen()
     let origRoles = await this.dbGetUserRolesByUserId(db, userId)
     await Promise.all(

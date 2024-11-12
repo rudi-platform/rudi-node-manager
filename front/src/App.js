@@ -147,11 +147,7 @@ export default function App() {
         <header>
           <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-navbar">
             <div className="container-fluid">
-              <img
-                className="icon-navbar logo-margin"
-                src={`logo_blanc_orange.png`}
-                alt="Rudi logo"
-              />
+              <img className="icon-navbar logo-margin" src={`logo_blanc_orange.png`} alt="Rudi logo" />
               <button
                 className="navbar-toggler align-right"
                 type="button"
@@ -199,11 +195,7 @@ export default function App() {
                   {navItem('conf', 'Configuration', false)}
 
                   <li className="nav-item center ">
-                    <button
-                      type="button"
-                      className="margin-logout btn btn-secondary"
-                      onClick={() => logout()}
-                    >
+                    <button type="button" className="margin-logout btn btn-secondary" onClick={() => logout()}>
                       Logout
                     </button>
                   </li>
@@ -217,18 +209,9 @@ export default function App() {
         <div id="root"></div>
 
         <Routes>
-          <Route
-            path="metadata"
-            element={<CatalogueMetadata editMode={isEditor} logout={logout} />}
-          />
-          <Route
-            path="producer"
-            element={<CatalogueProducer editMode={isEditor} logout={logout} />}
-          />
-          <Route
-            path="contact"
-            element={<CatalogueContact editMode={isEditor} logout={logout} />}
-          />
+          <Route path="metadata" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
+          <Route path="producer" element={<CatalogueProducer editMode={isEditor} logout={logout} />} />
+          <Route path="contact" element={<CatalogueContact editMode={isEditor} logout={logout} />} />
           <Route path="pub_key" element={<CataloguePubKeys editMode={isAdmin} logout={logout} />} />
           <Route path="report" element={<CatalogueReports editMode={isAdmin} logout={logout} />} />
           <Route path="licence" element={<CatalogueLicence logout={logout} />} />

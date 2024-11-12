@@ -3,12 +3,7 @@ const mod = 'callApiSimple'
 // Internal dependencies
 const { default: axios } = require('axios')
 
-const {
-  getCatalogAdminPath,
-  getCatalogUrlAndParams,
-  FORM_PREFIX,
-  CATALOG,
-} = require('../config/config')
+const { getCatalogAdminPath, getCatalogUrlAndParams, FORM_PREFIX, CATALOG } = require('../config/config')
 
 const { getTags } = require('../config/backOptions')
 

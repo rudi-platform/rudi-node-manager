@@ -11,11 +11,9 @@ function Monitoring({}) {
 
   useEffect(() => {
     Promise.all([
-      axios
-        .get(`api/data/resources`, { params: { count_by: 'metadata_info.api_version' } })
-        .catch(() => {
-          return { data: [] }
-        }),
+      axios.get(`api/data/resources`, { params: { count_by: 'metadata_info.api_version' } }).catch(() => {
+        return { data: [] }
+      }),
       axios.get(`api/data/resources`, { params: { count_by: 'storage_status' } }).catch(() => {
         return { data: [] }
       }),
@@ -65,8 +63,7 @@ function Monitoring({}) {
             <div className="card-body">
               <div className="card-text justify-content-between align-items-center">
                 <div className="badge-monitoring">
-                  {generalMonitoring.total &&
-                    generalMonitoring.total.reduce((accum, item) => accum + item.count, 0)}
+                  {generalMonitoring.total && generalMonitoring.total.reduce((accum, item) => accum + item.count, 0)}
                 </div>
               </div>
             </div>

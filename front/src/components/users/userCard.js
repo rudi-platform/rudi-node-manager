@@ -7,8 +7,7 @@ import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getOptOk, getOptConfirm, useModalContext } from '../modals/genericModalContext'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 
-const resetPwdConfirmMsg = (id) =>
-  `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
+const resetPwdConfirmMsg = (id) => `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
 const resetPwdCaption =
   `L'utilisateur devra utiliser l'invite "Modifier le mot de passe" pour changer son mot de passe. ` +
   `Le champ "mot de passe actuel" pourra être un simple espace`
@@ -105,18 +104,10 @@ export default function UserCard({ user, roleList, refresh }) {
                 <Pencil />
               </button>
 
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => triggerResetPwd(user)}
-              >
+              <button type="button" className="btn btn-secondary" onClick={() => triggerResetPwd(user)}>
                 <ArrowCounterclockwise />
               </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => triggerDeleteUser(user)}
-              >
+              <button type="button" className="btn btn-danger" onClick={() => triggerDeleteUser(user)}>
                 <Trash />
               </button>
             </div>

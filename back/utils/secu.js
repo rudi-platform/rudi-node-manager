@@ -31,8 +31,7 @@ function isJwtValid(jwt) {
   return jwtParts?.payload?.exp > timeEpochS()
 }
 
-exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) =>
-  req?.cookies?.[cookieName]
+exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) => req?.cookies?.[cookieName]
 
 exports.readJwtBody = (jwt) => {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')

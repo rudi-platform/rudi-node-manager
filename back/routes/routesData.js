@@ -1,12 +1,7 @@
 const express = require('express')
 
 const router = new express.Router()
-const {
-  getEnum,
-  getThemeByLang,
-  getLicences,
-  getVersion,
-} = require('../controllers/dataController')
+const { getEnum, getThemeByLang, getLicences, getVersion } = require('../controllers/dataController')
 const {
   getObjectList,
   postObject,

@@ -20,8 +20,7 @@ exports.checkRolePerm = (expectedRoles) => (req, reply, next) => {
       if (
         userRoles?.length &&
         userRoles.findIndex(
-          (userRole) =>
-            userRole === ROLE_SU || expectedRoles.findIndex((role) => userRole === role) > -1
+          (userRole) => userRole === ROLE_SU || expectedRoles.findIndex((role) => userRole === role) > -1
         ) > -1
       ) {
         next()
@@ -47,8 +46,6 @@ exports.checkRolePerm = (expectedRoles) => (req, reply, next) => {
         return logout(req, reply)
       }
       log.e(mod, fun, err)
-      return reply
-        .status(403)
-        .json(new ForbiddenError(`Admin validation required for user '${username}'`))
+      return reply.status(403).json(new ForbiddenError(`Admin validation required for user '${username}'`))
     })
 }

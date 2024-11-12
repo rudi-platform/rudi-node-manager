@@ -132,8 +132,7 @@ console.log('--------------------------------------------------------------')
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-exports.getBackOptions = (opt, altValue) =>
-  opt ? backOptionsValues[opt] || altValue : backOptionsValues
+exports.getBackOptions = (opt, altValue) => (opt ? backOptionsValues[opt] || altValue : backOptionsValues)
 
 exports.getAppTag = () => this.getBackOptions(this.OPT_APP_TAG) || ''
 

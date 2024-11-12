@@ -4,12 +4,7 @@ const router = new express.Router()
 const passport = require('../utils/passportSetup')
 const { getUserInfo, getNodeUrls } = require('../controllers/consoleController')
 const { getCatalogPublicUrl, getPortalUrl, getInitData } = require('../controllers/dataController')
-const {
-  logout,
-  postLogin,
-  postRegister,
-  putPassword,
-} = require('../controllers/authControllerPassport')
+const { logout, postLogin, postRegister, putPassword } = require('../controllers/authControllerPassport')
 const { makeRequestable } = require('../utils/utils')
 const { FORM_PREFIX } = require('../config/config.js')
 const { expressErrorHandler } = require('../controllers/errorHandler.js')
