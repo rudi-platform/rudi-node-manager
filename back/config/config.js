@@ -1,17 +1,26 @@
+/* eslint-disable no-console */
+
+// -------------------------------------------------------------------------------------------------
 // External dependencies
+// -------------------------------------------------------------------------------------------------
 const fs = require('fs')
 const ini = require('ini')
 
+// -------------------------------------------------------------------------------------------------
 // Internal dependencies
+// -------------------------------------------------------------------------------------------------
 const { getBackOptions, OPT_USER_CONF, getBackDomain, OPT_DB_PATH } = require('./backOptions')
 const { pathJoin, jsonToString } = require('../utils/utils')
 
+// -------------------------------------------------------------------------------------------------
 // Constants
+// -------------------------------------------------------------------------------------------------
 exports.FORM_PREFIX = 'form'
 exports.CATALOG = 'rudi-catalog'
 exports.STORAGE = 'rudi-storage'
 exports.MANAGER = 'rudi-manager'
 
+// -------------------------------------------------------------------------------------------------
 // Load default conf
 const defaultConfigFile = './prodmanager-conf-default.ini'
 const defaultCustomConfigFile = './prodmanager-conf-custom.ini' // if not set
@@ -19,16 +28,17 @@ const defaultCustomConfigFile = './prodmanager-conf-custom.ini' // if not set
 let defaultConfFileContent
 try {
   defaultConfFileContent = fs.readFileSync(defaultConfigFile, 'utf-8')
-} catch (error) {
+} catch {
   throw new Error(`No default configuration file was found at '${customConfigFile}'`)
 }
 
+// -------------------------------------------------------------------------------------------------
 // Load custom conf
 const customConfigFile = getBackOptions(OPT_USER_CONF, defaultCustomConfigFile)
 let customConfFileContent
 try {
   customConfFileContent = fs.readFileSync(customConfigFile, 'utf-8')
-} catch (error) {
+} catch {
   throw new Error(`No custom configuration file was found at '${customConfigFile}'`)
 }
 

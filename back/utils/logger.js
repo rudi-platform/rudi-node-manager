@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // External dependencies
 const rudiLogger = require('@aqmo.org/rudi_logger')
 const { Transport } = rudiLogger

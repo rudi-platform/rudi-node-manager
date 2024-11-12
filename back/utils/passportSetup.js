@@ -83,7 +83,7 @@ const checkPassport = async (username, password) => {
       // console.trace('T (checkPassport)', 'User may login')
       dbClose(db)
       return statusOK('User may login')
-    } catch (err) {
+    } catch {
       throw new ForbiddenError(`Admin validation required for user: '${username}'`)
     }
   } catch (err) {

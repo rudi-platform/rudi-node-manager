@@ -45,7 +45,7 @@ exports.getStorageToken = async (req, reply, next) => {
     // We extract
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwt(req)
     if (!jwt) {
-      console.error('T (getMediaToken) req:', req)
+      // console.error('T (getMediaToken) req:', req)
       throw new UnauthorizedError('No JWT was found in the request')
     }
 
@@ -193,10 +193,10 @@ const commitOnRudiApi = async (mediaId, commitId) => {
     // log.d(mod, fun, `T (${fun}) commit API OK:`, commitInfo)
     return { place: CATALOG, ...commitInfo }
   } catch (err) {
-    console.error(
-      `T (${fun}) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
-      err.response?.data || err.response?.statusText || err.response
-    )
+    // console.error(
+    //   `T (${fun}) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
+    //   err.response?.data || err.response?.statusText || err.response
+    // )
     throw err
   }
 }

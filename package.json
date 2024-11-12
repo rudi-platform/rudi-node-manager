@@ -19,7 +19,7 @@
     "server:win": "nodemon server.js --ignore './(front|console)/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "server:linux": "nodemon server.js --ignore './(front|console)/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",
     "front-build": "cd front && npm run build:prod",
-    "lintBack": "eslint \"**/*.js\"",
+    "lintBack": "npx eslint --ignore-pattern \"console/**\" --ignore-pattern \"front/**\" .",
     "lintFront": "eslint ./front/src/**/*.js -c front/.eslintrc --no-ignore",
     "prettify": "npx prettier --write .",
     "quality": "npm run prettify && npm run lintBack -- --fix",

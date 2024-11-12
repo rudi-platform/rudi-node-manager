@@ -1,3 +1,5 @@
+const mod = 'usrCtrl'
+
 const { hashPassword } = require('@aqmo.org/jwt-lib')
 
 const errorHandler = require('./errorHandler')
@@ -17,6 +19,7 @@ const {
   dbGetUserInfoByUsername,
 } = require('../database/database')
 const { initPwdSecret } = require('../utils/secu.js')
+const log = require('../utils/logger.js')
 
 const INIT_PWD = initPwdSecret()
 
@@ -29,7 +32,7 @@ exports.getUsersList = async (req, reply, next) => {
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'getUsersList', e)
     }
   }
 }
@@ -46,7 +49,7 @@ exports.getUserByUsername = async (req, reply, next) => {
     try {
       reply.status(error.statusCode || 500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'getUserByUsername', e)
     }
   }
 }
@@ -63,7 +66,7 @@ exports.getUserInfoByUsername = async (req, reply, next) => {
     try {
       reply.status(error.statusCode || 500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'getUserInfoByUsername', e)
     }
   }
 }
@@ -86,7 +89,7 @@ exports.deleteUserWithName = async (req, reply, next) => {
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'deleteUserWithName', e)
     }
   }
 }
@@ -105,7 +108,7 @@ exports.deleteUserWithId = async (req, reply, next) => {
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'deleteUserWithId', e)
     }
   }
 }
@@ -147,7 +150,7 @@ exports.createUser = async (req, reply) => {
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'createUser', e)
     }
   }
 }
@@ -189,7 +192,7 @@ exports.editUser = async (req, reply, next) => {
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      console.error(e)
+      log.w(mod, 'editUser', e)
     }
   }
 }

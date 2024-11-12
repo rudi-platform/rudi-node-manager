@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const { MANAGER } = require('../config/config.js')
 const { RudiError, ConnectionError } = require('../utils/errors')
 const log = require('../utils/logger')

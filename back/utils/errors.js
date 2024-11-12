@@ -1,5 +1,3 @@
-/* eslint-disable require-jsdoc */
-
 const STATUS_CODE = 'statusCode'
 
 class RudiError extends Error {

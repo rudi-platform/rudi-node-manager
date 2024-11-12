@@ -119,7 +119,7 @@ exports.dbGetUserByField = (openedDb, field, val) => {
         if (!openedDb) dbClose(db)
         if (err) {
           log.e(mod, fun, err)
-          console.error(' T (dbGetUserByField) ERR', err)
+          // console.error(' T (dbGetUserByField) ERR', err)
           return reject(err)
         } else {
           if (!userInfo || Object.keys(userInfo).length === 0) {
@@ -480,11 +480,11 @@ exports.isValidatedUser = async (openedDb, userInfo) => {
     else if (userInfo.username) roles = await this.dbGetUserRolesByUsername(db, userInfo.username)
     else throw new UnauthorizedError(`User not found: ${userInfo.username || userInfo.id}`)
     if (!openedDb) dbClose(db)
-    console.debug('T (isValidatedUser) yes:', userInfo.username || userInfo.id, roles)
+    // console.debug('T (isValidatedUser) yes:', userInfo.username || userInfo.id, roles)
     return roles
   } catch (err) {
     if (!openedDb) dbClose(db)
-    console.error('T (isValidatedUser)', userInfo.username || userInfo.id)
+    // console.error('T (isValidatedUser)', userInfo.username || userInfo.id)
     throw err
   }
 }
@@ -615,11 +615,6 @@ exports.dbUpdateUserRoles = async (openedDb, userInfo) => {
               .catch((err) => reject(new InternalServerError(`(dbUpdateUserRoles.addNew) ${err}`)))
           } else {
             origRoles.splice(i, 1)
-            console
-              .log
-              // `T (dbUpdateUserRoles) Role kept for user '${username || userId}': ${newRole}`
-              ()
-            // console.trace(`T (dbUpdateUserRoles) Roles left:`, origRoles)
             resolve(`Role kept for user '${username || userId}': ${newRole}`)
           }
         })

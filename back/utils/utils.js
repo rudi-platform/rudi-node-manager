@@ -65,7 +65,7 @@ exports.toInt = (str) => {
 exports.beautify = (jsonObject, option) => {
   try {
     return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
-  } catch (err) {
+  } catch {
     return `${inspect(jsonObject)}`
   }
 }
