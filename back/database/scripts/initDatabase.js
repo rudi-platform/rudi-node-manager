@@ -338,6 +338,15 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
     } else {
       // Super user doesn't exists, creating the user
       const id = getSuId()
+      const testUserExist = await dbGetUserById(db, id) // NOSONAR
+      if (testUserExist) {
+        log.w(
+          mod,
+          fun,
+          `User already exists for id ${id} (username: '${testUserExist.username}', role: ${testUserExist.roles}), skipping creation of a new super user`
+        )
+        return
+      }
       log.w(mod, fun, `Creating super user: '${username}' (id ${id})`)
       const suUsrInfo = {
         id,
