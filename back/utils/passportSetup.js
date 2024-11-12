@@ -49,8 +49,7 @@ passport.use(
     checkPassport(username, password)
       .then(() => done(null, { username }))
       .catch((err) => {
-        log.e(mod, 'passport', `ERR LocalStrategy: ${err}`)
-        log.sysWarn(mod, 'LocalStrategy', `Error login: ${err}`)
+        log.w(mod, 'LocalStrategy', `Error login: ${err}`)
         return done(null, false, err)
       })
   })

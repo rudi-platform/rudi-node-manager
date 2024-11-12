@@ -87,7 +87,7 @@ exports.refreshTokens = (req) => {
   const fun = 'renewTokens'
   const user = req.user
   if (!user) {
-    log.sysWarn(mod, fun, 'No user found in req')
+    log.w(mod, fun, 'No user found in req')
     return
   }
   // log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)

@@ -104,7 +104,7 @@ const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
           log.e(mod, `${fun}.${tableName}.create`, err.message)
           return reject(err)
         }
-        log.i(
+        log.sysInfo(
           mod,
           `${fun}.${tableName}.create`,
           `Table Created : ${tableName}`,

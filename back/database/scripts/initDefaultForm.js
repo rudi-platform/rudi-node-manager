@@ -31,10 +31,15 @@ exports.dbInitDefaultFormTable = (openedDb) => {
         db.run(sqlCreateDefaultFormTable, (err) => {
           if (!openedDb) dbClose(db)
           if (err) {
-            log.e(mod, fun + ' create', err.message)
+            log.sysError(
+              mod,
+              `${fun}.create`,
+              err.message,
+              log.getContext(null, { opType: 'init_table_defaultForm' })
+            )
             return reject(err)
           }
-          log.i(
+          log.sysInfo(
             mod,
             fun,
             `Table created: ${DEFAULT_VAL_FORM}`,

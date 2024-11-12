@@ -33,7 +33,7 @@ exports.getPortalConnection = (req, reply) => {
   try {
     reply.status(200).send(getPortalUrl())
   } catch (err) {
-    log.e('', '', err)
+    // log.e('', '', err)
     log.sysError(mod, 'getPortalConnection', err, log.getContext(req, { opType: 'get_portal_url' }))
     throw err
   }

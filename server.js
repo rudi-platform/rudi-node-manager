@@ -161,7 +161,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
         log.sysInfo(mod, '', okReplyMsg, log.getContext(req, {}))
       } else {
         const errReplyMsg = `=> ERR ${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`
-        log.sysWarn(mod, '', errReplyMsg, log.getContext(req, {}))
+        log.sysError(mod, '', errReplyMsg, log.getContext(req, {}))
       }
     })
   })

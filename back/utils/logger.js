@@ -4,7 +4,7 @@ const { Transport } = rudiLogger
 
 // Internal dependencies
 const { getConf } = require('../config/config')
-const { getBackOptions, OPT_GIT_HASH } = require('../config/backOptions')
+const { getBackOptions, OPT_GIT_HASH, isDevEnv } = require('../config/backOptions')
 const { nowFormatted, beautify } = require('./utils')
 
 // Constants
@@ -156,25 +156,28 @@ exports.getContext = (req, options = {}) => {
 }
 
 exports.e = (srcMod, srcFun, ...msg) => {
-  console.error(createLogLine('error', srcMod, srcFun, ...msg))
-  this.sysWarn(srcMod, srcFun, beautify(msg))
+  if (isDevEnv()) console.error(createLogLine('error', srcMod, srcFun, ...msg))
+  else this.sysError(srcMod, srcFun, beautify(msg))
 }
 
 exports.w = (srcMod, srcFun, ...msg) => {
-  console.warn(createLogLine('warn', srcMod, srcFun, ...msg))
+  if (isDevEnv()) console.warn(createLogLine('warn', srcMod, srcFun, ...msg))
+  else this.sysWarn(srcMod, srcFun, beautify(msg))
 }
 
 exports.i = (srcMod, srcFun, ...msg) => {
-  console.info(createLogLine('info', srcMod, srcFun, ...msg))
-  this.sysInfo(srcMod, srcFun, beautify(msg))
+  if (isDevEnv()) console.info(createLogLine('info', srcMod, srcFun, ...msg))
+  else this.sysInfo(srcMod, srcFun, beautify(msg))
 }
 
 exports.v = (srcMod, srcFun, ...msg) => {
-  console.log(createLogLine('verbose', srcMod, srcFun, ...msg))
+  if (isDevEnv()) console.log(createLogLine('verbose', srcMod, srcFun, ...msg))
+  else this.sysVerbose(srcMod, srcFun, beautify(msg))
 }
 
 exports.d = (srcMod, srcFun, ...msg) => {
-  console.debug(createLogLine('debug', srcMod, srcFun, ...msg))
+  if (isDevEnv()) console.debug(createLogLine('debug', srcMod, srcFun, ...msg))
+  else this.sysDebug(srcMod, srcFun, beautify(msg))
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -209,6 +212,12 @@ exports.sysWarn = (srcMod, srcFun, msg, context) => rplog('warn', srcMod, srcFun
 // No action required.
 exports.sysInfo = (srcMod, srcFun, msg, context) => rplog('info', srcMod, srcFun, msg, context)
 
-// Normal operational messages - may be harvested for reporting, measuring throughput, etc.
+// Events that are unusual but not error conditions - might be summarized in an email to developers
+// or admins to spot potential problems - no immediate action required.
+// No action required.
+exports.sysVerbose = (srcMod, srcFun, msg, context) =>
+  rplog('verbose', srcMod, srcFun, msg, context)
+
+// Info useful to developers for debugging the application, not useful during operations.
 // No action required.
 exports.sysDebug = (srcMod, srcFun, msg, context) => rplog('debug', srcMod, srcFun, msg, context)
