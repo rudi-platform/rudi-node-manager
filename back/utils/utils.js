@@ -1,14 +1,23 @@
+/* eslint-disable no-console */
+
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 const { floor, isInteger } = require('lodash')
 const { inspect } = require('util')
 const { v4 } = require('uuid')
 
-// ---- Dates
+// -------------------------------------------------------------------------------------------------
+// Dates
+// -------------------------------------------------------------------------------------------------
 exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
 exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS
 
 exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 
-// ---- Strings
+// -------------------------------------------------------------------------------------------------
+// Strings
+// -------------------------------------------------------------------------------------------------
 exports.removeTrailingChar = (str, char) => (`${str}`.endsWith(char) ? `${str}`.slice(0, -1) : `${str}`)
 exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
 

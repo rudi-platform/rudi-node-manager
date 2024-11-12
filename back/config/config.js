@@ -45,7 +45,6 @@ try {
 const customConfig = ini.parse(customConfFileContent)
 const config = ini.parse(defaultConfFileContent)
 
-// eslint-disable-next-line guard-for-in
 for (const section in customConfig) {
   const customParams = customConfig[section]
   if (customParams) {
