@@ -144,7 +144,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
   managerApp.use((req, reply, next) => {
     const logReqMsg = `${req?.method} ${req?.url} (from ${req?.ip})`
-    log.sysInfo('req', 'in <', logReqMsg, log.getContext(req, {})) // <= IN
+    log.sysInfo('req.in <', '', logReqMsg, log.getContext(req, {})) // <= IN
 
     // Redirection for trailing slashes
     // https://stackoverflow.com/a/15773824/1563072
@@ -159,10 +159,10 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
     reply.on('finish', () => {
       if (reply.statusCode < 400) {
         const okReplyMsg = `${reply.statusCode}: ${req.method} ${req.originalUrl}`
-        log.sysInfo('req', 'out >', okReplyMsg, log.getContext(req, {})) // => OK
+        log.sysInfo('req.out >', '', okReplyMsg, log.getContext(req, {})) // => OK
       } else {
         const errReplyMsg = `${reply.statusCode} ${reply.statusMessage} > ${req.method} ${req.originalUrl}`
-        log.sysError('req', 'err >', errReplyMsg, log.getContext(req, {})) // => ERR
+        log.sysError('req.err >', '', errReplyMsg, log.getContext(req, {})) // => ERR
       }
     })
   })
