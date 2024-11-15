@@ -14,7 +14,7 @@ exports.OPT_BACK_PATH = 'backPath'
 exports.OPT_SU_CREDS = 'suCreds'
 exports.OPT_DB_PATH = 'dbPath'
 
-const _argv = minimist(process.argv.slice(2))
+const _argv = minimist(process.argv.slice(2), { string: ['hash', 'tag', 'su'] })
 console.log('_argv:', _argv)
 
 // ------------------------------------------------------------------------------------------------
