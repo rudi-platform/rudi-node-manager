@@ -1,6 +1,6 @@
 {
   "description": "Application d'administration du noeud RUDI",
-  "name": "rudi-prodmanager-back",
+  "name": "rudi-node-manager",
   "version": "2.3.1",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
@@ -53,7 +53,7 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/preset-env": "^7.26.0",
     "braces": "^3.0.3",
-    "eslint": "^9.14.0",
+    "eslint": "^9.15.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-only-warn": "^1.1.0",
