@@ -27,7 +27,7 @@
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.12",
+    "@aqmo.org/jwt-lib": "^1.1.13",
     "@aqmo.org/rudi_logger": "^1.1.6",
     "axios": "^1.7.7",
     "body-parser": "^1.20.3",
