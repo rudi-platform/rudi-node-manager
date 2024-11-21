@@ -386,7 +386,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
                 <a className={'clear-btn'} onClick={clearSearch}>
                   <XCircle />
                 </a>
-                <button type="button" className="btn btn-success" onClick={refresh}>
+                <button type="submit" className="btn btn-success" onSubmit={refresh}>
                   <Search />
                 </button>
               </form>
