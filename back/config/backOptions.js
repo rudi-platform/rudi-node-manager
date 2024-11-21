@@ -1,62 +1,62 @@
 /* eslint-disable no-console */
 
-const minimist = require('minimist')
-const { getDomain } = require('../utils/utils.js')
-
-// ------------------------------------------------------------------------------------------------
-// Extract command line arguments
-// ------------------------------------------------------------------------------------------------
-exports.OPT_USER_CONF = 'conf'
-exports.OPT_GIT_HASH = 'hash'
-exports.OPT_APP_TAG = 'tag'
-exports.OPT_NODE_ENV = 'nodeEnv'
-exports.OPT_BACK_PATH = 'backPath'
-exports.OPT_SU_CREDS = 'suCreds'
-exports.OPT_DB_PATH = 'dbPath'
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import child from 'child_process'
+import minimist from 'minimist'
 
 const _argv = minimist(process.argv.slice(2), { string: ['hash', 'tag', 'su'] })
 console.log('_argv:', _argv)
 
-// ------------------------------------------------------------------------------------------------
-// App options
-// 'text': description
-// 'cli': option given through command line interface
-// 'env': option given through environment variable
-// 'file': option given through the configuration file
-// If found, 'cli' has priority over 'env' that has priority over 'file'
-// ------------------------------------------------------------------------------------------------
-exports.OPTIONS = {
-  [this.OPT_NODE_ENV]: {
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { getDomain } from '../utils/utils.js'
+
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
+export const OPT_USER_CONF = 'conf'
+export const OPT_GIT_HASH = 'hash'
+export const OPT_APP_TAG = 'tag'
+export const OPT_NODE_ENV = 'nodeEnv'
+export const OPT_BACK_PATH = 'backPath'
+export const OPT_SU_CREDS = 'suCreds'
+export const OPT_DB_PATH = 'dbPath'
+
+export const OPTIONS = {
+  [OPT_NODE_ENV]: {
     text: 'Node environment: production | development',
     cli: 'node_env',
     env: 'NODE_ENV',
   },
-  [this.OPT_USER_CONF]: {
+  [OPT_USER_CONF]: {
     text: 'Path for user conf file',
     cli: 'conf',
     env: 'RUDI_PROD_MANAGER_USER_CONF',
   },
-  [this.OPT_GIT_HASH]: {
+  [OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: 'hash',
     env: 'RUDI_PROD_MANAGER_GIT_REV',
   },
-  [this.OPT_APP_TAG]: {
+  [OPT_APP_TAG]: {
     text: 'Version tag displayed',
     cli: 'tag',
     env: 'RUDI_PROD_MANAGER_APP_TAG',
   },
-  [this.OPT_BACK_PATH]: {
+  [OPT_BACK_PATH]: {
     text: 'Back-end path',
     cli: 'url',
     env: 'RUDI_MANAGER_URL',
   },
-  [this.OPT_DB_PATH]: {
+  [OPT_DB_PATH]: {
     text: 'Full path for the usr db file',
     cli: 'db',
     env: 'RUDI_MANAGER_DB',
   },
-  [this.OPT_SU_CREDS]: {
+  [OPT_SU_CREDS]: {
     text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',
     cli: 'su',
     env: 'RUDI_PROD_MANAGER_SU_CREDS',
@@ -66,17 +66,14 @@ exports.OPTIONS = {
 console.log('--------------------------------------------------------------')
 
 console.log('Options to run this app: ')
-Object.keys(this.OPTIONS).forEach((opt) =>
+Object.keys(OPTIONS).forEach((opt) =>
   console.log(
-    '    cli: --' +
-      this.OPTIONS[opt].cli +
-      (this.OPTIONS[opt].cli.length < 8 ? '\t' : '') +
-      '\t| env: ' +
-      this.OPTIONS[opt].env
+    '    cli: --' + OPTIONS[opt].cli + (OPTIONS[opt].cli.length < 8 ? '\t' : '') + '\t| env: ' + OPTIONS[opt].env
   )
 )
 console.log('--------------------------------------------------------------')
 // }
+
 // ------------------------------------------------------------------------------------------------
 // Extract command line arguments
 // ------------------------------------------------------------------------------------------------
@@ -85,7 +82,7 @@ console.log('--------------------------------------------------------------')
 const cliOptionsValues = {}
 
 Object.keys(_argv).forEach((cliOption) => {
-  if (cliOption == '_') {
+  if (cliOption === '_') {
     if (_argv[cliOption].length > 0)
       console.error(
         '!!! ERR Command Line option not recognized. You might have used --opt = "value" with value ',
@@ -94,8 +91,8 @@ Object.keys(_argv).forEach((cliOption) => {
     return
   }
   let found = false
-  for (const appOpt of Object.keys(this.OPTIONS)) {
-    if (this.OPTIONS[appOpt]?.cli == cliOption) {
+  for (const appOpt of Object.keys(OPTIONS)) {
+    if (OPTIONS[appOpt]?.cli === cliOption) {
       cliOptionsValues[appOpt] = _argv[cliOption]
       found = true
       // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
@@ -113,12 +110,12 @@ Object.keys(_argv).forEach((cliOption) => {
 // ------------------------------------------------------------------------------------------------
 console.log('Extracted conf values:')
 const backOptionsValues = {}
-Object.keys(this.OPTIONS).forEach((opt) => {
+Object.keys(OPTIONS).forEach((opt) => {
   if (cliOptionsValues[opt] !== undefined) {
     backOptionsValues[opt] = cliOptionsValues[opt]
     console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt])
   } else {
-    const envVar = this.OPTIONS[opt].env
+    const envVar = OPTIONS[opt].env
     if (process.env[envVar]) {
       backOptionsValues[opt] = process.env[envVar]
       console.log('    (env) ' + opt + ' => ' + backOptionsValues[opt])
@@ -134,15 +131,15 @@ console.log('--------------------------------------------------------------')
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-exports.getBackOptions = (opt, altValue) => (opt ? backOptionsValues[opt] || altValue : backOptionsValues)
+export const getBackOptions = (opt, altValue) => (opt ? backOptionsValues[opt] || altValue : backOptionsValues)
 
-exports.getAppTag = () => this.getBackOptions(this.OPT_APP_TAG) || ''
+export const getAppTag = () => getBackOptions(OPT_APP_TAG) || ''
 
-exports.getHash = () => {
-  let gitHash = this.getBackOptions(this.OPT_GIT_HASH)
+export function getHash() {
+  let gitHash = getBackOptions(OPT_GIT_HASH)
   if (!gitHash) {
     try {
-      gitHash = require('child_process').execSync('git rev-parse --short HEAD')
+      gitHash = child.execSync('git rev-parse --short HEAD')
     } catch {
       console.error('WARNING: no --hash option provided + giv rev parse does not work')
       return 'v0_0;'
@@ -151,19 +148,19 @@ exports.getHash = () => {
   return gitHash
 }
 
-exports.getTags = () => {
-  const tags = { tag: this.getAppTag() }
-  const gitHash = this.getHash()
+export function getTags() {
+  const tags = { tag: getAppTag() }
+  const gitHash = getHash()
   if (gitHash) tags['hash'] = gitHash
   return tags
 }
 
-exports.getNodeEnv = () => this.getBackOptions(this.OPT_NODE_ENV)
-exports.isDevEnv = () => this.getNodeEnv() === 'development'
-exports.isProdEnv = () => this.getNodeEnv() === 'production'
+export const getNodeEnv = () => getBackOptions(OPT_NODE_ENV)
+export const isDevEnv = () => getNodeEnv() === 'development'
+export const isProdEnv = () => getNodeEnv() === 'production'
 
 const backDomain = () => {
-  const backPath = this.getBackOptions(this.OPT_BACK_PATH)
+  const backPath = getBackOptions(OPT_BACK_PATH)
   try {
     return getDomain(backPath)
   } catch {
@@ -172,4 +169,4 @@ const backDomain = () => {
 }
 
 const BACK_DOMAIN = backDomain()
-exports.getBackDomain = () => BACK_DOMAIN
+export const getBackDomain = () => BACK_DOMAIN

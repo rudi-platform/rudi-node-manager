@@ -1,14 +1,14 @@
 const mod = 'consoleCtrl'
 
 // Internal dependencies
-const { FORM_PREFIX } = require('../config/config')
-const log = require('../utils/logger')
-const { UnauthorizedError } = require('../utils/errors')
-const { getPortalUrl, getCatalogPublicUrl } = require('./dataController')
-const { handleError } = require('./errorHandler')
-const { getStoragePublicUrl } = require('./mediaController.js')
+import { FORM_PREFIX } from '../config/config.js'
+import { UnauthorizedError } from '../utils/errors.js'
+import { getContext, logW, sysError } from '../utils/logger.js'
+import { getCatalogPublicUrl, getPortalUrl } from './dataController.js'
+import { handleError } from './errorHandler.js'
+import { getStoragePublicUrl } from './mediaController.js'
 
-exports.getNodeUrls = async (req, reply) => {
+export async function getNodeUrls(req, reply) {
   const fun = 'getNodeUrls'
   try {
     const urls = await Promise.all([getCatalogPublicUrl(), getStoragePublicUrl(), getPortalUrl()])
@@ -23,27 +23,27 @@ exports.getNodeUrls = async (req, reply) => {
 
     return reply.status(200).send(nodeUrls)
   } catch (err) {
-    log.sysError(mod, fun, err, log.getContext(req, { opType: 'get_node_urls' }))
+    sysError(mod, fun, err, getContext(req, { opType: 'get_node_urls' }))
     handleError(req, reply, err, 404, fun)
   }
 }
 
 // Controllers
-exports.getPortalConnection = (req, reply) => {
+export function getPortalConnection(req, reply) {
   try {
     reply.status(200).send(getPortalUrl())
   } catch (err) {
-    log.sysError(mod, 'getPortalConnection', err, log.getContext(req, { opType: 'get_portal_url' }))
+    sysError(mod, 'getPortalConnection', err, getContext(req, { opType: 'get_portal_url' }))
     throw err
   }
 }
 
-exports.getUserInfo = (req, reply) => {
+export function getUserInfo(req, reply) {
   const fun = 'getUserInfo'
   const user = req.user
   if (!user) {
     const errMsg = 'User info not available'
-    log.w(mod, fun, errMsg)
+    logW(mod, fun, errMsg)
     return reply.status(401).send(new UnauthorizedError(errMsg))
   }
   const { username, roles } = user

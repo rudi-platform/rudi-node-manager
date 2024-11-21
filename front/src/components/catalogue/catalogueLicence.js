@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'

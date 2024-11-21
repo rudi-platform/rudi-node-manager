@@ -1,20 +1,30 @@
-const express = require('express')
-const router = new express.Router()
-const {
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import express from 'express'
+
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { hashPassword } from '@aqmo.org/jwt-lib'
+import { resetPassword } from '../controllers/authControllerPassport.js'
+import { expressErrorHandler } from '../controllers/errorHandler.js'
+import { getRoleById, getRoleList } from '../controllers/roleController.js'
+import {
   createUser,
   deleteUserWithId,
   editUser,
   getUserByUsername,
   getUsersList,
-} = require('../controllers/usersControllers')
-const { getRoleById, getRoleList } = require('../controllers/roleController')
-const { resetPassword } = require('../controllers/authControllerPassport')
-const { expressErrorHandler } = require('../controllers/errorHandler.js')
-const { hashPassword } = require('@aqmo.org/jwt-lib')
-const { BadRequestError } = require('../utils/errors.js')
-const { decodeBase64url, decodeBase64 } = require('../utils/utils.js')
+} from '../controllers/usersControllers.js'
+import { BadRequestError } from '../utils/errors.js'
+import { decodeBase64, decodeBase64url } from '../utils/utils.js'
 
-router.post('/hash-password', (req, reply) => {
+// -------------------------------------------------------------------------------------------------
+// Routing
+// -------------------------------------------------------------------------------------------------
+export const secuApi = new express.Router()
+secuApi.post('/hash-password', (req, reply) => {
   if (!req?.body?.pwd)
     throw new BadRequestError(`Input should be a JSON { pwd: <mandatory_pwd>, encoding: 'base64url|base64|null' }`)
   const inputPwd = req.body.pwd
@@ -25,16 +35,14 @@ router.post('/hash-password', (req, reply) => {
   return reply.status(200).send(hashPassword(pwd))
 })
 
-router.get('/roles', getRoleList)
-router.get('/roles/:role', getRoleById)
+secuApi.get('/roles', getRoleList)
+secuApi.get('/roles/:role', getRoleById)
 
-router.get('/users', getUsersList)
-router.get('/users/:username', getUserByUsername)
-router.post('/users', createUser)
-router.put('/users', editUser)
-router.put('/users/:id/reset-password', resetPassword) // Admin action that resets a user pwd
-router.delete('/users/:id', deleteUserWithId)
+secuApi.get('/users', getUsersList)
+secuApi.get('/users/:username', getUserByUsername)
+secuApi.post('/users', createUser)
+secuApi.put('/users', editUser)
+secuApi.put('/users/:id/reset-password', resetPassword) // Admin action that resets a user pwd
+secuApi.delete('/users/:id', deleteUserWithId)
 
-router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
-
-module.exports = router
+secuApi.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))

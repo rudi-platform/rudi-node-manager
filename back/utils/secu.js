@@ -1,121 +1,176 @@
 const mod = 'secu'
 
-// ----- External dependencies
-const jwtAA = require('jsonwebtoken')
-const { default: axios } = require('axios')
-const { v4: uuidv4 } = require('uuid')
-const jwtLib = require(`@aqmo.org/jwt-lib`)
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { forgeToken, readPrivateKeyFile, tokenStringToJwtObject } from '@aqmo.org/jwt-lib'
+import axios from 'axios'
+import _jwt from 'jsonwebtoken'
+import { v4 as uuidv4 } from 'uuid'
+const { sign } = _jwt
 
-// ----- Internal dependencies
-const { getConf, MANAGER, STORAGE } = require('../config/config')
-const { timeEpochS, toInt, cleanErrMsg } = require('./utils')
-const log = require('./logger')
-const { ForbiddenError, RudiError } = require('./errors')
-const { getBackDomain, isProdEnv } = require('../config/backOptions')
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { getBackDomain, isProdEnv } from '../config/backOptions.js'
+import { getConf, MANAGER, STORAGE } from '../config/config.js'
+import { dbGetUserRolesByUsername } from '../database/database.js'
+import { ForbiddenError, RudiError } from './errors.js'
+import { logE, logW } from './logger.js'
+import { cleanErrMsg, timeEpochS, toInt } from './utils.js'
 
-// ----- Constants
-
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
 const OFFSET_USR_ID = 5000
 const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
 const MEDIA_AUTH = getConf('rudi_media')
 
-exports.CONSOLE_TOKEN_NAME = 'consoleToken'
-exports.PM_FRONT_TOKEN_NAME = 'pmFrontToken'
+export const CONSOLE_TOKEN_NAME = 'consoleToken'
+export const PM_FRONT_TOKEN_NAME = 'pmFrontToken'
 
-// ----- Functions
+// -------------------------------------------------------------------------------------------------
+// Functions
+// -------------------------------------------------------------------------------------------------
 function isJwtValid(jwt) {
   if (!jwt) return false
-  const jwtParts = jwtLib.tokenStringToJwtObject(jwt)
+  const jwtParts = tokenStringToJwtObject(jwt)
   return jwtParts?.payload?.exp > timeEpochS()
 }
 
-exports.extractCookieFromReq = (req, cookieName = this.CONSOLE_TOKEN_NAME) => req?.cookies?.[cookieName]
+export const extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN_NAME) => req?.cookies?.[cookieName]
 
-exports.readJwtBody = (jwt) => {
+export function readJwtBody(jwt) {
   if (!jwt) throw new ForbiddenError(`No JWT provided`, mod, 'readJwtBody')
   if (!RegExp(REGEX_JWT).exec(`${jwt}`)) throw new ForbiddenError(`Wrong format for token ${jwt}`)
-  return jwtLib.tokenStringToJwtObject(jwt)?.payload
+  return tokenStringToJwtObject(jwt)?.payload
 }
 
 // Constants
 const SHOULD_SECURE = isProdEnv()
 
 // Helper functions
-exports.consoleCookieOpts = (exp) => {
-  return {
-    secure: SHOULD_SECURE,
-    httpOnly: SHOULD_SECURE,
-    domain: getBackDomain(),
-    path: '/', // Ensure the path covers all routes
-    sameSite: 'Strict',
-    expires: new Date(exp * 1000),
-  }
-}
+export const getFormCookieOpts = (exp, overwrite) => ({
+  secure: SHOULD_SECURE,
+  httpOnly: SHOULD_SECURE,
+  domain: getBackDomain(),
+  path: '/', // Ensure the path covers all routes
+  sameSite: 'Strict',
+  expires: new Date(exp * 1000),
+  overwrite,
+})
 
-exports.pmFrontCookieOpts = (exp) => {
-  return {
-    secure: SHOULD_SECURE,
-    httpOnly: false,
-    domain: getBackDomain(),
-    path: '/', // Ensure the path covers all routes
-    sameSite: 'Strict',
-    expires: new Date(exp * 1000),
-  }
-}
+export const getFrontCookieOpts = (exp, overwrite) => ({
+  secure: SHOULD_SECURE,
+  httpOnly: false,
+  domain: getBackDomain(),
+  path: '/', // Ensure the path covers all routes
+  sameSite: 'Strict',
+  expires: new Date(exp * 1000),
+  overwrite,
+})
 
 const JWT_SECRET = `${uuidv4()}${uuidv4()}`
-exports.jwtSecretKey = () => JWT_SECRET
+export const jwtSecretKey = () => JWT_SECRET
 
 const INIT_PWD_SECRET = `${uuidv4()}${uuidv4()}`
-exports.initPwdSecret = () => INIT_PWD_SECRET
+export const initPwdSecret = () => INIT_PWD_SECRET
 
-exports.createFrontUserTokens = (userInfo) => {
-  const exp = timeEpochS(toInt(DEFAULT_EXP))
-  delete userInfo?.password
-  const { username, roles } = { ...userInfo }
-  return {
-    [this.CONSOLE_TOKEN_NAME]: jwtAA.sign({ user: userInfo, roles, exp }, JWT_SECRET),
-    [this.PM_FRONT_TOKEN_NAME]: jwtAA.sign({ username, roles, exp }, JWT_SECRET),
-    exp,
+export function createFrontUserTokens(userInfo) {
+  const fun = 'createFrontUserTokens'
+  try {
+    const exp = timeEpochS(toInt(DEFAULT_EXP))
+    delete userInfo?.password
+    const { username, roles } = { ...userInfo }
+    return {
+      [CONSOLE_TOKEN_NAME]: sign({ user: userInfo, roles, exp }, JWT_SECRET),
+      [PM_FRONT_TOKEN_NAME]: sign({ username, roles, exp }, JWT_SECRET),
+      exp,
+    }
+  } catch (err) {
+    logW(mod, `${fun}.err`, cleanErrMsg(err))
+    throw err
   }
 }
 
-exports.refreshTokens = (req) => {
-  const fun = 'renewTokens'
+function refreshTokens(req) {
+  const fun = 'refreshTokens'
   const user = req.user
   if (!user) {
-    log.w(mod, fun, 'No user found in req')
+    logW(mod, fun, 'No user found in req')
     return
   }
   // log.sysInfo(mod, fun, `Refreshing tokens for user '${user.username}'`)
-
-  const { consoleToken, pmFrontToken, exp } = this.createFrontUserTokens(user)
-  const consoleCookieOpts = { ...this.consoleCookieOpts(exp), overwrite: true }
-  const pmFrontCookieOpts = { ...this.pmFrontCookieOpts(exp), overwrite: true }
-  return {
-    [this.CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: consoleCookieOpts },
-    [this.PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: pmFrontCookieOpts },
+  try {
+    const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
+    return {
+      [CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: getFormCookieOpts(exp, true) },
+      [PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: getFrontCookieOpts(exp, true) },
+    }
+  } catch (err) {
+    logW(mod, `${fun}.err`, cleanErrMsg(err))
+    throw err
   }
 }
 
-exports.sendJsonAndTokens = (req, reply, data) => {
+export const login = async (req, reply, user) => {
+  const fun = 'login'
+  if (!user) return reply.status(401).send(`User not found or incorrect password`)
   try {
-    const { consoleToken, pmFrontToken } = this.refreshTokens(req)
+    const username = user.username
+    const roles = await dbGetUserRolesByUsername(null, username) // NOSONAR
+    if (!roles?.length) {
+      const errMsg = `Admin validation is required for this user: '${user.username}'`
+      logW(mod, fun, errMsg)
+      return logout(req, reply, errMsg)
+    }
+
+    req.login(user, { session: false }, async (err) => {
+      if (err) return reply.status(400).json({ errors: err })
+      user.roles = roles
+      const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
+
+      // sameSite: 'Lax' ?
+      return reply
+        .status(200)
+        .cookie(CONSOLE_TOKEN_NAME, consoleToken, getFormCookieOpts(exp))
+        .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, getFrontCookieOpts(exp))
+        .json({ username, roles })
+    })
+  } catch (er) {
+    logE(mod, fun, er)
+    logout()
+    return reply.status(er?.statusCode || 501).send(er)
+  }
+}
+
+export const logout = (req, reply, msg) =>
+  reply
+    .status(msg ? 401 : 200)
+    .cookie(CONSOLE_TOKEN_NAME, '', getFormCookieOpts(0))
+    .cookie(PM_FRONT_TOKEN_NAME, '', getFrontCookieOpts(0))
+    .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '', message: msg || 'logout' })
+
+export function sendJsonAndTokens(req, reply, data) {
+  const fun = 'sendJsonAndTokens'
+  try {
+    const { consoleToken, pmFrontToken } = refreshTokens(req)
     reply
       .status(200)
-      .cookie(this.CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
-      .cookie(this.PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
+      .cookie(CONSOLE_TOKEN_NAME, consoleToken.jwt, consoleToken.opts)
+      .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken.jwt, pmFrontToken.opts)
       .json(data)
   } catch (err) {
-    log.w(mod, 'sendJsonAndTokens', cleanErrMsg(err))
+    logW(mod, `${fun}.err`, cleanErrMsg(err))
+    logout()
   }
 }
 
-exports.getTokenFromMediaForUser = async (user) => {
+export async function getTokenFromMediaForUser(user) {
   const fun = 'getTokenFromMediaForUser'
-  const pmHeaders = this.getStorageHeaders()
+  const pmHeaders = getStorageHeaders()
 
   const delegationBody = {
     user_id: user.id,
@@ -127,9 +182,6 @@ exports.getTokenFromMediaForUser = async (user) => {
   // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
-  // log.d(mod, fun, `mediaForgeJwtUrl: ${mediaForgeJwtUrl}`)
-  // log.d(mod, fun, `delegationBody: ${beautify(delegationBody)}`)
-  // log.d(mod, fun, `pmHeaders: ${cleanErrMsg(pmHeaders)}`)
   try {
     const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
     if (!mediaRes) throw Error(`No answer received from Media module`)
@@ -152,13 +204,13 @@ exports.getTokenFromMediaForUser = async (user) => {
       fun
     )
 
-    log.e(mod, fun, `Could not forge a token on Media: ${rudiError}`)
+    logE(mod, fun, `Could not forge a token on Media: ${rudiError}`)
     throw rudiError
   }
 }
 
-exports.createPmJwtForMedia = (body) =>
-  jwtLib.forgeToken(
+export function createPmJwtForMedia(body) {
+  return forgeToken(
     getPrvKey('media'),
     {},
     {
@@ -169,15 +221,16 @@ exports.createPmJwtForMedia = (body) =>
       client_id: body?.client_id || getConf('rudi_media', 'pm_media_id'),
     }
   )
+}
 
 let _cachedStorageJwt
-exports.getStorageJwt = (body) => {
-  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = this.createPmJwtForMedia(body)
+export function getStorageJwt(body) {
+  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = createPmJwtForMedia(body)
   return _cachedStorageJwt
 }
 
-exports.createPmHeadersForMedia = (body) => {
-  const pmHeadersJwt = this.createPmJwtForMedia(body)
+export function createPmHeadersForMedia(body) {
+  const pmHeadersJwt = createPmJwtForMedia(body)
   return {
     headers: {
       Authorization: `Bearer ${pmHeadersJwt}`,
@@ -187,16 +240,16 @@ exports.createPmHeadersForMedia = (body) => {
 }
 
 let _cachedStorageHeaders
-exports.getStorageHeaders = (body) => {
-  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageHeaders = this.createPmHeadersForMedia(body)
+export function getStorageHeaders(body) {
+  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageHeaders = createPmHeadersForMedia(body)
   return _cachedStorageHeaders
 }
 
 const PM_API_ID = getConf('rudi_api', 'pm_api_id')
 let _cachedApiJwt
-exports.getRudiApiToken = () => {
+export function getRudiApiToken() {
   if (!isJwtValid(_cachedApiJwt)) {
-    _cachedApiJwt = jwtLib.forgeToken(
+    _cachedApiJwt = forgeToken(
       getPrvKey('api'),
       {},
       {
@@ -210,17 +263,19 @@ exports.getRudiApiToken = () => {
   return _cachedApiJwt
 }
 
-exports.getCatalogHeaders = () => ({
-  headers: {
-    Accept: 'application/json, text/plain, */*',
-    Authorization: `Bearer ${this.getRudiApiToken()}`,
-  },
-})
+export function getCatalogHeaders() {
+  return {
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      Authorization: `Bearer ${getRudiApiToken()}`,
+    },
+  }
+}
 
 let cachedUrlJwt = {}
-exports.getRudiApiTokenPrecise = (url, req) => {
+export function getRudiApiTokenPrecise(url, req) {
   if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]
-  cachedUrlJwt[url] = jwtLib.forgeToken(
+  cachedUrlJwt[url] = forgeToken(
     getPrvKey('api'),
     {},
     {
@@ -276,6 +331,6 @@ const getPrvKey = (name) => {
   if (prvKeyCache[name]) return prvKeyCache[name]
   const keyPath = getKeyPath(name)
   // log.d(mod, fun, `keyPath (${name}}: ${keyPath}`)
-  prvKeyCache[name] = jwtLib.readPrivateKeyFile(keyPath)
+  prvKeyCache[name] = readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
 }

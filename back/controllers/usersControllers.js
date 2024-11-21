@@ -1,43 +1,49 @@
 const mod = 'usrCtrl'
 
-const { hashPassword } = require('@aqmo.org/jwt-lib')
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { hashPassword } from '@aqmo.org/jwt-lib'
 
-const errorHandler = require('./errorHandler')
-const { NotFoundError, RudiError, BadRequestError, ForbiddenError } = require('../utils/errors')
-const {
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import {
+  dbClose,
   dbCreateUser,
   dbDeleteUserWithId,
   dbDeleteUserWithName,
   dbGetUserByEmail,
   dbGetUserById,
   dbGetUserByUsername,
+  dbGetUserInfoByUsername,
   dbGetUsers,
   dbOpen,
   dbUpdateUser,
   dbUpdateUserRoles,
-  dbClose,
-  dbGetUserInfoByUsername,
-} = require('../database/database')
-const { initPwdSecret } = require('../utils/secu.js')
-const log = require('../utils/logger.js')
+} from '../database/database.js'
+import { BadRequestError, ForbiddenError, NotFoundError, RudiError } from '../utils/errors.js'
+import { logW } from '../utils/logger.js'
+import { initPwdSecret } from '../utils/secu.js'
+import { formatError } from './errorHandler.js'
 
 const INIT_PWD = initPwdSecret()
 
-exports.getUsersList = async (req, reply, next) => {
+export async function getUsersList(req, reply, next) {
   try {
     const users = await dbGetUsers()
     return reply.status(200).json(users)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_users' })
+    const error = formatError(err, req, { opType: 'get_users' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'getUsersList', e)
+      logW(mod, 'getUsersList', e)
     }
   }
 }
 
-exports.getUserByUsername = async (req, reply, next) => {
+export async function getUserByUsername(req, reply, next) {
   try {
     const { username: name } = req.params
     const userInfo = await dbGetUserByUsername(null, name)
@@ -45,16 +51,16 @@ exports.getUserByUsername = async (req, reply, next) => {
     const { id, username, email, roles } = userInfo
     return reply.status(200).json({ id, username, email, roles })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_user' })
+    const error = formatError(err, req, { opType: 'get_user' })
     try {
       reply.status(error.statusCode || 500).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'getUserByUsername', e)
+      logW(mod, 'getUserByUsername', e)
     }
   }
 }
 
-exports.getUserInfoByUsername = async (req, reply, next) => {
+export async function getUserInfoByUsername(req, reply, next) {
   try {
     const { username: name } = req.params
     const userInfo = await dbGetUserInfoByUsername(null, name)
@@ -62,16 +68,16 @@ exports.getUserInfoByUsername = async (req, reply, next) => {
     const { id, username, email, roles } = userInfo
     return reply.status(200).json({ id, username, email, roles })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_user' })
+    const error = formatError(err, req, { opType: 'get_user' })
     try {
       reply.status(error.statusCode || 500).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'getUserInfoByUsername', e)
+      logW(mod, 'getUserInfoByUsername', e)
     }
   }
 }
 
-exports.deleteUserWithName = async (req, reply, next) => {
+export async function deleteUserWithName(req, reply, next) {
   try {
     // ONLY ADMIN !
     const { username } = req.params
@@ -85,16 +91,16 @@ exports.deleteUserWithName = async (req, reply, next) => {
     dbClose(db)
     return reply.status(200).json({ message: `User deleted: ${username}` })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'delete_user' })
+    const error = formatError(err, req, { opType: 'delete_user' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'deleteUserWithName', e)
+      logW(mod, 'deleteUserWithName', e)
     }
   }
 }
 
-exports.deleteUserWithId = async (req, reply, next) => {
+export async function deleteUserWithId(req, reply, next) {
   try {
     // ONLY ADMIN !
     const { id } = req.params
@@ -104,16 +110,16 @@ exports.deleteUserWithId = async (req, reply, next) => {
     await dbDeleteUserWithId(db, id)
     return reply.status(200).json({ message: `User deleted: ${userInfo?.username}` })
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'delete_user' })
+    const error = formatError(err, req, { opType: 'delete_user' })
     try {
       reply.status(error.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'deleteUserWithId', e)
+      logW(mod, 'deleteUserWithId', e)
     }
   }
 }
 
-exports.createUser = async (req, reply) => {
+export async function createUser(req, reply) {
   try {
     const userInfo = req.body
     // console.trace('T (addUser) userInfo', userInfo)
@@ -146,16 +152,16 @@ exports.createUser = async (req, reply) => {
     dbClose(db)
     return reply.status(200).json(updatedUser)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'add_user' })
+    const error = formatError(err, req, { opType: 'add_user' })
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'createUser', e)
+      logW(mod, 'createUser', e)
     }
   }
 }
 
-exports.editUser = async (req, reply, next) => {
+export async function editUser(req, reply, next) {
   try {
     const { id, email, roles } = req.body
     let username = req.body.username
@@ -188,11 +194,11 @@ exports.editUser = async (req, reply, next) => {
     dbClose(db)
     return reply.status(200).json(updatedUser)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'edit_user' })
+    const error = formatError(err, req, { opType: 'edit_user' })
     try {
       reply.status(500).json(new RudiError(error.message))
     } catch (e) {
-      log.w(mod, 'editUser', e)
+      logW(mod, 'editUser', e)
     }
   }
 }

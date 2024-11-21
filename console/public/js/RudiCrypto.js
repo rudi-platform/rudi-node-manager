@@ -31,9 +31,7 @@ export function str2ab(str) {
  * @param {ArrayBuffer} arrayBuffer
  * @returns {string} the converted string
  */
-export function ab2str(arrayBuffer) {
-  return String.fromCharCode.apply(null, new Uint8Array(arrayBuffer))
-}
+export const ab2str = (arrayBuffer) => String.fromCharCode.apply(null, new Uint8Array(arrayBuffer))
 
 /**
  * Encrypt a file
@@ -74,16 +72,11 @@ export async function encryptRsaOaepAesGcm(file, publicKey) {
   let encryptedFileBuff
   let iv = window.crypto.getRandomValues(new Uint8Array(12))
   try {
-    encryptedFileBuff = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv },
-      aesKey,
-      fileArrayBuffer
-    )
+    encryptedFileBuff = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, aesKey, fileArrayBuffer)
   } catch (e) {
-    throw new Error(
-      `Could not encrypt '${file.name}'. Fail to encrypt file with AES-GCM auto-generated key and IV`,
-      { cause: e }
-    )
+    throw new Error(`Could not encrypt '${file.name}'. Fail to encrypt file with AES-GCM auto-generated key and IV`, {
+      cause: e,
+    })
   }
 
   let exportedAesKey = await crypto.subtle.exportKey('raw', aesKey)
@@ -93,10 +86,7 @@ export async function encryptRsaOaepAesGcm(file, publicKey) {
   try {
     encryptedAesKeyAndIv = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, aesKeyAndIv)
   } catch (e) {
-    throw new Error(
-      `Could not encrypt '${file.name}'. Fail to encrypt AES-GCM and IV with RSA-OAEP key`,
-      { cause: e }
-    )
+    throw new Error(`Could not encrypt '${file.name}'. Fail to encrypt AES-GCM and IV with RSA-OAEP key`, { cause: e })
   }
 
   return new File([encryptedAesKeyAndIv, encryptedFileBuff], file.name + 'crypt', {
@@ -141,16 +131,11 @@ export async function decryptRsaOaepAesGcm(encryptedFile, privateKey, keySize) {
 
   let aesKeyAndIv
   try {
-    aesKeyAndIv = await crypto.subtle.decrypt(
-      { name: 'RSA-OAEP' },
-      privateKey,
-      encryptedAesKeyAndIv
-    )
+    aesKeyAndIv = await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, encryptedAesKeyAndIv)
   } catch (e) {
-    throw new Error(
-      `Could not decrypt '${encryptedFile.name}. Fail to decrypt AES-GCM key and IV with RSA-OAEP key'`,
-      { cause: e }
-    )
+    throw new Error(`Could not decrypt '${encryptedFile.name}. Fail to decrypt AES-GCM key and IV with RSA-OAEP key'`, {
+      cause: e,
+    })
   }
 
   let exportedAesKey = aesKeyAndIv.slice(0, AES_GCM_KEY_SIZE)
@@ -160,11 +145,7 @@ export async function decryptRsaOaepAesGcm(encryptedFile, privateKey, keySize) {
 
   let fileArrayBuffer
   try {
-    fileArrayBuffer = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: iv },
-      aesKey,
-      encryptedFileBuff
-    )
+    fileArrayBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, aesKey, encryptedFileBuff)
   } catch (e) {
     throw new Error(
       `Could not decrypt '${encryptedFile.name}'. Fail to decrypt file with decrypted AES-GCM key and IV`,
@@ -280,10 +261,7 @@ export async function importPrivateRsaKey(pem, hash) {
 export async function importAesGcmSecretKey(rawKey) {
   let aesSecretKey
   try {
-    aesSecretKey = await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
-      'encrypt',
-      'decrypt',
-    ])
+    aesSecretKey = await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, ['encrypt', 'decrypt'])
   } catch (e) {
     throw new Error('Could not import AES-GCM secret key', { cause: e })
   }

@@ -1,20 +1,26 @@
 const mod = 'roleCtrl'
 
-const errorHandler = require('./errorHandler')
-const {
-  dbGetRoles,
-  dbGetRoleById,
-  dbGetUserRolesByUsername,
-  dbDeleteUserRole,
-  dbCreateUserRole,
-  dbGetUserById,
-  dbOpen,
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import {
   dbClose,
-} = require('../database/database')
-const { BadRequestError } = require('../utils/errors')
-const log = require('../utils/logger.js')
+  dbCreateUserRole,
+  dbDeleteUserRole,
+  dbGetRoleById,
+  dbGetRoles,
+  dbGetUserById,
+  dbGetUserRolesByUsername,
+  dbOpen,
+} from '../database/database.js'
+import { BadRequestError } from '../utils/errors.js'
+import { logE, logW } from '../utils/logger.js'
+import { formatError } from './errorHandler.js'
 
-exports.getRoleList = async (req, reply, next) => {
+// -------------------------------------------------------------------------------------------------
+// Functions
+// -------------------------------------------------------------------------------------------------
+export async function getRoleList(req, reply, next) {
   try {
     const roles = await dbGetRoles()
     // console.trace('T (getRoleList) roles:', roles)
@@ -26,31 +32,31 @@ exports.getRoleList = async (req, reply, next) => {
       })
     )
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_roles' })
+    const error = formatError(err, req, { opType: 'get_roles' })
     try {
       reply.status(error.statusCode).json(error)
     } catch (e) {
-      log.w(mod, 'getRoleList', e)
+      logW(mod, 'getRoleList', e)
     }
   }
 }
 
-exports.getRoleById = (req, reply, next) => {
+export function getRoleById(req, reply, next) {
   const { role } = req.params
   return dbGetRoleById(null, role)
     .then((row) => reply.status(200).json(row))
     .catch((err) => {
-      const error = errorHandler.error(err, req, { opType: 'get_role' })
+      const error = formatError(err, req, { opType: 'get_role' })
       try {
         reply.status(error.statusCode).json(error)
       } catch (e) {
-        log.w(mod, 'getRoleById', e)
+        logW(mod, 'getRoleById', e)
       }
     })
 }
 
 // User_Roles
-exports.getUserRolesByUsername = async (req, reply, next) => {
+export async function getUserRolesByUsername(req, reply, next) {
   const { username } = req.params
   if (!username) return reply.status(400).json(new BadRequestError('Request should provide a username'))
 
@@ -58,16 +64,16 @@ exports.getUserRolesByUsername = async (req, reply, next) => {
     const roles = await dbGetUserRolesByUsername(null, username)
     return reply.status(200).json(roles)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'get_userRole' })
+    const error = formatError(err, req, { opType: 'get_userRole' })
     try {
       reply.status(error.statusCode).json(error)
     } catch (e) {
-      log.w(mod, 'getUserRolesByUsername', e)
+      logW(mod, 'getUserRolesByUsername', e)
     }
   }
 }
 
-exports.deleteUserRole = async (req, reply, next) => {
+export async function deleteUserRole(req, reply, next) {
   try {
     const db = dbOpen()
     const { userId, role } = req.params
@@ -75,15 +81,15 @@ exports.deleteUserRole = async (req, reply, next) => {
     const user = await dbGetUserById(db, id)
     reply.status(200).json(user)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'delete_userRole' })
+    const error = formatError(err, req, { opType: 'delete_userRole' })
     try {
       reply.status(error.statusCode).json(error)
     } catch (e) {
-      log.w(mod, 'deleteUserRole', e)
+      logW(mod, 'deleteUserRole', e)
     }
   }
 }
-exports.postUserRole = async (req, reply, next) => {
+export async function postUserRole(req, reply, next) {
   try {
     const db = dbOpen()
     const { userId, username, role } = req.body
@@ -94,12 +100,12 @@ exports.postUserRole = async (req, reply, next) => {
     dbClose(db)
     reply.status(200).json(user)
   } catch (err) {
-    log.w(mod, 'postUserRole', err)
-    const error = errorHandler.error(err, req, { opType: 'post_userRole' })
+    logW(mod, 'postUserRole', err)
+    const error = formatError(err, req, { opType: 'post_userRole' })
     try {
       reply.status(error?.statusCode).json(error)
     } catch (e) {
-      log.e(mod, 'postUserRole', e)
+      logE(mod, 'postUserRole', e)
     }
   }
 }

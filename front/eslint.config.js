@@ -35,6 +35,7 @@ module.exports = [
       'cypress/no-force': 'warn',
       'cypress/no-async-tests': 'error',
       'cypress/no-pause': 'error',
+      eqeqeq: ['error', 'smart'],
       indent: 'off',
       'no-await-in-loop': 'error',
       'no-console': 'off',

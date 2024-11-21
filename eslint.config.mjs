@@ -30,6 +30,7 @@ export default [
       'arrow-body-style': 'off',
       'comma-dangle': ['error', 'only-multiline'],
       complexity: ['warn', { max: 20 }],
+      eqeqeq: ['error', 'smart'],
       indent: 'off',
       'no-await-in-loop': 'error',
       'no-console': 'warn',

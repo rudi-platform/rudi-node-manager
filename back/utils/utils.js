@@ -3,23 +3,27 @@
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-const { floor, isInteger } = require('lodash')
-const { inspect } = require('util')
-const { v4 } = require('uuid')
+
+import _ from 'lodash'
+const { floor, isInteger } = _
+
+import { inspect } from 'util'
+import { v4 } from 'uuid'
 
 // -------------------------------------------------------------------------------------------------
 // Dates
 // -------------------------------------------------------------------------------------------------
-exports.timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
-exports.timeEpochS = (delayS = 0) => floor(this.timeEpochMs() / 1000) + delayS
+export const timeEpochMs = (delayMs = 0) => new Date().getTime() + delayMs
 
-exports.nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
+export const timeEpochS = (delayS = 0) => floor(timeEpochMs() / 1000) + delayS
+
+export const nowFormatted = () => new Date().toISOString().replace(/T\./, ' ').replace('Z', '')
 
 // -------------------------------------------------------------------------------------------------
 // Strings
 // -------------------------------------------------------------------------------------------------
-exports.removeTrailingChar = (str, char) => (`${str}`.endsWith(char) ? `${str}`.slice(0, -1) : `${str}`)
-exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
+export const removeTrailingChar = (str, char) => (`${str}`.endsWith(char) ? `${str}`.slice(0, -1) : `${str}`)
+export const removeTrailingSlash = (path) => removeTrailingChar(path, '/')
 
 /**
  * Joins several string chunks with the first argument the function is called with.
@@ -29,7 +33,7 @@ exports.removeTrailingSlash = (path) => this.removeTrailingChar(path, '/')
  * @param {...string} args string chunks to be joined
  * @return {string}
  */
-exports.mergeStrings = (sep, ...args) => {
+export function mergeStrings(sep, ...args) {
   const argNb = args.length
   if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
   let accumulatedStr = `${args[0]}`
@@ -42,15 +46,15 @@ exports.mergeStrings = (sep, ...args) => {
   return accumulatedStr
 }
 
-exports.pathJoin = (...args) => this.mergeStrings('/', ...args)
+export const pathJoin = (...args) => mergeStrings('/', ...args)
 
 // ---- String encodings
-exports.toBase64 = (data) => this.convertEncoding(data, 'utf-8', 'base64')
-exports.toBase64url = (str) => this.convertEncoding(str, 'utf-8', 'base64url')
-exports.decodeBase64 = (data) => this.convertEncoding(data, 'base64', 'utf-8')
-exports.decodeBase64url = (data) => this.convertEncoding(data, 'base64url', 'utf-8')
+export const toBase64 = (data) => convertEncoding(data, 'utf-8', 'base64')
+export const toBase64url = (str) => convertEncoding(str, 'utf-8', 'base64url')
+export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
+export const decodeBase64url = (data) => convertEncoding(data, 'base64url', 'utf-8')
 
-exports.convertEncoding = (data, fromEncoding, toEncoding) => {
+export function convertEncoding(data, fromEncoding, toEncoding) {
   try {
     const dataStr = data
     return Buffer.from(dataStr, fromEncoding).toString(toEncoding)
@@ -59,7 +63,7 @@ exports.convertEncoding = (data, fromEncoding, toEncoding) => {
   }
 }
 
-exports.toInt = (str) => {
+export function toInt(str) {
   const i = parseInt(str, 10)
   return Number.isNaN(i) || `${i}` !== str ? str : i
 }
@@ -71,7 +75,7 @@ exports.toInt = (str) => {
  *                                    to display the JSON on several lines
  * @returns {String} JSON.stringify options
  */
-exports.beautify = (jsonObject, option) => {
+export function beautify(jsonObject, option) {
   try {
     return `${JSON.stringify(jsonObject, null, option).replace(/\\"/g, '"')}${option != null ? '\n' : ''}`
   } catch {
@@ -79,43 +83,43 @@ exports.beautify = (jsonObject, option) => {
   }
 }
 
-exports.jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
+export const jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
 
 /**
  * Cleans a headers string from the "Autorization: <whatever>" information
  */
-exports.cleanErrMsg = (str) => (str ? this.cleanHeadersAuth(str) : '')
-exports.cleanHeadersAuth = (str) =>
-  typeof str == 'string'
-    ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '"***"')
-    : this.cleanHeadersAuth(this.beautify(str))
+export const cleanErrMsg = (str) => (str ? cleanHeadersAuth(str) : '')
+export const cleanHeadersAuth = (str) =>
+  typeof str == 'string' ? str.replace(/["'](Bearer|Basic) [\w-/.]+["']/g, '"***"') : cleanHeadersAuth(beautify(str))
 
-exports.makeRequestable = (func) => async (req, reply, next) => {
-  try {
-    reply.status(200).send(await func())
-  } catch (err) {
-    console.warn('makeRequestable', 'ERR', this.cleanErrMsg(err))
-    if (typeof err == 'object' && err.message && err.statusCode && err.error)
-      return reply
-        .status(err.statusCode || 500)
-        .json({ statusCode: err.statusCode, error: err.error, message: err.message })
-    if (typeof err.message == 'string')
-      return reply.status(err.statusCode || 500).json({ statusCode: err.statusCode || 500, message: err.message })
-    reply.status(500).json({ statusCode: 500, message: this.cleanErrMsg(err) })
+export function makeRequestable(func) {
+  return async (req, reply, next) => {
+    try {
+      reply.status(200).send(await func())
+    } catch (err) {
+      console.warn('makeRequestable', 'ERR', cleanErrMsg(err))
+      if (typeof err == 'object' && err.message && err.statusCode && err.error)
+        return reply
+          .status(err.statusCode || 500)
+          .json({ statusCode: err.statusCode, error: err.error, message: err.message })
+      if (typeof err.message == 'string')
+        return reply.status(err.statusCode || 500).json({ statusCode: err.statusCode || 500, message: err.message })
+      reply.status(500).json({ statusCode: 500, message: cleanErrMsg(err) })
+    }
   }
 }
 
-exports.getDomain = (url) => {
+export function getDomain(url) {
   if (!url.startsWith('http')) url = 'http://' + url
-  return this.checkIsURL(url)?.hostname
+  return checkIsURL(url)?.hostname
 }
 
-exports.getHost = (url) => {
+export function getHost(url) {
   if (!url.startsWith('http')) url = 'http://' + url
-  return this.checkIsURL(url)?.host
+  return checkIsURL(url)?.host
 }
 
-exports.checkIsURL = (url) => {
+export function checkIsURL(url) {
   try {
     return new URL(url)
   } catch {
@@ -123,7 +127,7 @@ exports.checkIsURL = (url) => {
   }
 }
 
-exports.uuidv4 = (nb) => {
+export function uuidv4(nb) {
   if (!nb) return v4()
   if (!isInteger(parseInt(nb))) throw new Error('Input parameter should be an integer')
   const uuidArray = []
@@ -133,4 +137,4 @@ exports.uuidv4 = (nb) => {
   return uuidArray
 }
 
-exports.sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

@@ -1,32 +1,30 @@
 const mod = 'authController'
 
-// ---- External dependencies -----
-const passport = require('passport')
-const { hashPassword, matchPassword } = require('@aqmo.org/jwt-lib')
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import { hashPassword, matchPassword } from '@aqmo.org/jwt-lib'
 
-// ---- Internal dependencies -----
-const { BadRequestError, RudiError, UnauthorizedError } = require('../utils/errors')
-const log = require('../utils/logger')
-const errorHandler = require('./errorHandler')
-const {
-  CONSOLE_TOKEN_NAME,
-  createFrontUserTokens,
-  PM_FRONT_TOKEN_NAME,
-  consoleCookieOpts,
-  pmFrontCookieOpts,
-  initPwdSecret,
-} = require('../utils/secu')
-const {
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import {
   dbGetHashedPassword,
-  dbGetUserRolesByUsername,
   dbHashAndUpdatePassword,
   dbOpen,
   dbRegisterUser,
   dbUpdatePasswordWithField,
-} = require('../database/database')
-const { decodeBase64url, decodeBase64, toBase64 } = require('../utils/utils.js')
+} from '../database/database.js'
+import { BadRequestError, RudiError, UnauthorizedError } from '../utils/errors.js'
+import { logE, logW } from '../utils/logger.js'
+import { passportAuthenticate } from '../utils/passportSetup.js'
+import { initPwdSecret, login, logout } from '../utils/secu.js'
+import { decodeBase64, decodeBase64url, toBase64 } from '../utils/utils.js'
+import { formatError } from './errorHandler.js'
 
-// ---- Controllers ----
+// -------------------------------------------------------------------------------------------------
+// Controllers
+// -------------------------------------------------------------------------------------------------
 /**
  * Used for a user to login
  * @param {*} req
@@ -34,54 +32,31 @@ const { decodeBase64url, decodeBase64, toBase64 } = require('../utils/utils.js')
  * @param {*} next
  * @returns {Object} user info
  */
-exports.postLogin = async (req, reply, next) => {
+export async function postLogin(req, reply, next) {
   const fun = 'postLogin'
   // log.d(mod, 'postLogin', '<--')
-  passport.authenticate('local', async (err, user, info) => {
+  passportAuthenticate('local', async (err, user, info) => {
     if (err) {
-      log.w(mod, fun, err)
+      logW(mod, fun, err)
       return reply.status(400).send(err)
     }
     if (!user) {
       const errMsg = info?.message || `User not found or incorrect password: '${req?.body?.username}'`
-      log.w(mod, fun, errMsg)
+      logW(mod, fun, errMsg)
       return reply.status(401).send(errMsg)
     }
     try {
-      const username = user.username
-      const roles = await dbGetUserRolesByUsername(null, username) // NOSONAR
-      if (!roles?.length) {
-        const errMsg = `Admin validation is required for this user: '${user.username}'`
-        log.w(mod, fun, errMsg)
-        return reply
-          .status(401)
-          .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
-          .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-          .send(errMsg)
-      }
-
-      req.login(user, { session: false }, async (err) => {
-        if (err) return reply.status(400).json({ errors: err })
-        user.roles = roles
-        const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
-
-        // sameSite: 'Lax' ?
-        return reply
-          .status(200)
-          .cookie(CONSOLE_TOKEN_NAME, consoleToken, consoleCookieOpts(exp))
-          .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, pmFrontCookieOpts(exp))
-          .json({ username, roles })
-      })
+      login(req, reply, user)
     } catch (er) {
-      log.e(mod, fun, er)
-      this.logout()
+      logE(mod, fun, er)
+      logout()
       return reply.status(er?.statusCode || 501).send(er)
     }
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, reply, next)
 }
 
-exports.postRegister = async (req, reply) => {
+export async function postRegister(req, reply) {
   const fun = 'postRegister'
   try {
     const { username, email, password, confirmPassword } = req.body
@@ -91,61 +66,61 @@ exports.postRegister = async (req, reply) => {
     const user = await dbRegisterUser(null, { username, email, password })
     reply.status(200).send(user)
   } catch (err) {
-    log.e(mod, fun, err)
+    logE(mod, fun, err)
     try {
       reply.status(err.code || 400).send(err.message)
     } catch (e) {
-      log.e(mod, fun, e)
+      logE(mod, fun, e)
       return
     }
   }
 }
-exports.postForgot = (req, reply, next) => {
+export function postForgot(req, reply, next) {
   const fun = 'postForgot'
   try {
     // TODO
   } catch (err) {
-    log.e(mod, fun, err)
+    logE(mod, fun, err)
     throw err
   }
 }
 
 const INIT_PWD = initPwdSecret()
 
-exports.putPassword = async (req, reply, next) => {
+export async function putPassword(req, reply, next) {
   const fun = 'changePwd'
   try {
     const { username, password, newPassword, confirmNewPassword } = req.body
     if (!username || !password || !newPassword || newPassword === password || newPassword !== confirmNewPassword) {
       const errMsg = 'Prerequisites not met'
-      log.w(mod, fun, errMsg)
+      logW(mod, fun, errMsg)
       reply.status(401).send(errMsg)
     }
     const db = dbOpen()
     const dbUserInfo = await dbGetHashedPassword(db, username)
     const dbUserHash = dbUserInfo?.password
 
-    passport.authenticate('local', (err, user, info) => {
+    passportAuthenticate('local', (err, user, info) => {
       if (err) return reply.status(400).send(err)
       if (!user && !matchPassword(INIT_PWD, dbUserHash)) {
         const errMsg = info.message || 'User not found'
-        log.w(mod, fun, errMsg)
+        logW(mod, fun, errMsg)
         return reply.status(401).send(errMsg)
       }
       return dbHashAndUpdatePassword(db, username, newPassword)
         .then((userInfo) => reply.json(userInfo))
         .catch((err) => {
-          log.e(mod, fun, err)
+          logE(mod, fun, err)
           reply.status(400).send(err.message)
         })
     })(req, reply, next)
   } catch (err) {
-    log.e(mod, fun, err)
+    logE(mod, fun, err)
     reply.status(400).send(err)
   }
 }
 
-exports.resetPassword = async (req, reply, next) => {
+export async function resetPassword(req, reply, next) {
   try {
     // ONLY ADMIN !
     const { id } = req.params
@@ -153,21 +128,14 @@ exports.resetPassword = async (req, reply, next) => {
     await dbUpdatePasswordWithField(null, 'id', id, hashPassword(INIT_PWD))
     reply.status(200).send(`Password reinitialized for user ${id}`)
   } catch (err) {
-    const error = errorHandler.error(err, req, { opType: 'reset_pwd' })
+    const error = formatError(err, req, { opType: 'reset_pwd' })
     try {
       return reply.status(err.statusCode).json(new RudiError(error.message))
     } catch (e) {
-      log.e(mod, 'resetPassword', e)
+      logE(mod, 'resetPassword', e)
     }
   }
 }
-
-exports.logout = (req, reply) =>
-  reply
-    .status(200)
-    .cookie(CONSOLE_TOKEN_NAME, '', consoleCookieOpts(0))
-    .cookie(PM_FRONT_TOKEN_NAME, '', pmFrontCookieOpts(0))
-    .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '', message: 'logout' })
 
 /**
  *
@@ -176,7 +144,7 @@ exports.logout = (req, reply) =>
  * @param {String} encoding input encoding of both username and password
  * @returns if usr was defined: a base64 encoded string with colon-separated <username>:<hashed password>. Otherwise : the hashed password (not encoded)
  */
-exports.hashCredentials = (pwd, usr, encoding) => {
+export function hashCredentials(pwd, usr, encoding) {
   if (!pwd) throw new BadRequestError('Input password should be defined')
   let decode
   switch (encoding?.toLowerCase()) {
@@ -196,7 +164,7 @@ exports.hashCredentials = (pwd, usr, encoding) => {
   return hashPassword(decode(pwd))
 }
 
-exports.decodeCredentials = (b64Credentials) => {
+export function decodeCredentials(b64Credentials) {
   let creds
   try {
     creds = decodeBase64(b64Credentials)

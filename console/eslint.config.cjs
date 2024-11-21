@@ -2,7 +2,6 @@
 const globals = require('globals')
 
 const js = require('@eslint/js')
-const cypress = require('eslint-plugin-cypress')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
 const unusedImports = require('eslint-plugin-unused-imports')
 
@@ -40,10 +39,7 @@ module.exports = [
       quotes: ['error', 'single', { allowTemplateLiterals: true }],
       'prefer-arrow-callback': 'warn',
       'prettier/prettier': 'warn',
-      'space-before-function-paren': [
-        'error',
-        { anonymous: 'always', named: 'never', asyncArrow: 'always' },
-      ],
+      'space-before-function-paren': ['error', { anonymous: 'always', named: 'never', asyncArrow: 'always' }],
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',

@@ -13,7 +13,7 @@ const material_icons_font = new FontFace('Material Icons', 'url(./font/material_
 document.fonts.add(material_icons_font)
 
 function createStyleElement(...styles) {
-  let style = document.createElement('style')
+  const style = document.createElement('style')
   style.textContent = styles.join('')
   return style
 }
@@ -1321,8 +1321,7 @@ export const SelectListMixin = (superclass) =>
     hide(value) {
       let option = this.getOption(value)
       option.toggleAttribute('hidden', true)
-      if (option == this.focusedElement)
-        this.focusedElement = this.focusNext() || this.focusPrevious()
+      if (option == this.focusedElement) this.focusedElement = this.focusNext() || this.focusPrevious()
     }
 
     show(value) {
@@ -1449,11 +1448,7 @@ export class ActionIcon extends HTMLElement {
    */
   #updateFocusable(noFocus) {
     if (noFocus) this.icon.toggleAttribute('tabindex', false)
-    else if (
-      !this.hasAttribute('readonly') &&
-      !this.hasAttribute('disabled') &&
-      !this.hasAttribute('tabindex')
-    ) {
+    else if (!this.hasAttribute('readonly') && !this.hasAttribute('disabled') && !this.hasAttribute('tabindex')) {
       this.icon.setAttribute('tabindex', 0)
     }
   }
@@ -1524,9 +1519,7 @@ export class MatFormElement extends HTMLElement {
     })
 
     // Append elements
-    this.shadowRoot.appendChild(
-      createStyleElement(theme, iconStyle, matFormElementStyle, ...styles)
-    )
+    this.shadowRoot.appendChild(createStyleElement(theme, iconStyle, matFormElementStyle, ...styles))
     this.shadowRoot.appendChild(this.wrapper)
   }
 
@@ -1659,8 +1652,7 @@ export class TextInput extends BaseTextInput {
   }
 
   #emailValidation() {
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.input.value))
-      this.setAttribute('error', 'Email invalide')
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.input.value)) this.setAttribute('error', 'Email invalide')
     else this.toggleAttribute('error', false)
   }
 
@@ -1929,9 +1921,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
 
   /** @inheritdoc */
   focusNext() {
-    let nextFocused = this.focusedElement
-      ? this.focusedElement.nextElementSibling
-      : this.listWrapper.firstElementChild
+    let nextFocused = this.focusedElement ? this.focusedElement.nextElementSibling : this.listWrapper.firstElementChild
 
     while (nextFocused && !nextFocused.hasAttribute('show')) {
       nextFocused = nextFocused.nextElementSibling
@@ -1962,18 +1952,9 @@ export class DataListInput extends ListMixin(BaseTextInput) {
 
     // Scrolling
     let twoOffsetHeight = 2 * this.focusedElement.offsetHeight
-    if (
-      this.focusedElement.offsetTop + twoOffsetHeight >
-      this.listWrapper.offsetHeight + this.listWrapper.scrollTop
-    ) {
-      this.listWrapper.scroll(
-        0,
-        this.focusedElement.offsetTop - this.listWrapper.offsetHeight + twoOffsetHeight
-      )
-    } else if (
-      this.focusedElement.offsetTop - this.focusedElement.offsetHeight <
-      this.listWrapper.scrollTop
-    ) {
+    if (this.focusedElement.offsetTop + twoOffsetHeight > this.listWrapper.offsetHeight + this.listWrapper.scrollTop) {
+      this.listWrapper.scroll(0, this.focusedElement.offsetTop - this.listWrapper.offsetHeight + twoOffsetHeight)
+    } else if (this.focusedElement.offsetTop - this.focusedElement.offsetHeight < this.listWrapper.scrollTop) {
       this.listWrapper.scroll(0, this.focusedElement.offsetTop - this.focusedElement.offsetHeight)
     }
     return this.focusedElement
@@ -2503,18 +2484,13 @@ export class FileCard extends ActionCard {
   set value(file) {
     if (file instanceof ForeignFile) this.toggleAttribute('cornered', true)
     else if (!(file instanceof File))
-      throw new SetValueError(
-        this,
-        file,
-        new TypeError('Value should be a File or ForeignFile instance')
-      )
+      throw new SetValueError(this, file, new TypeError('Value should be a File or ForeignFile instance'))
     console.debug('T [MatIn.FileCard]', 'file.size', file.size)
     this.#value = file
     this.name.textContent = file?.name
     this.type.textContent = file?.type
     this.size.textContent = file?.size ? this.humanReadableByteCountSI(file.size) : ''
-    if (file.file_storage_status === 'missing')
-      this.size.innerHTML = "<span class='alert'>indisponible</span>"
+    if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"
   }
 
   get value() {
@@ -2665,8 +2641,7 @@ export class MapInput extends BaseInput {
 
     this.map = L.map(this.map, { scrollWheelZoom: false })
     L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="http://osm.org/copyright" tabindex="-1">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="http://osm.org/copyright" tabindex="-1">OpenStreetMap</a> contributors',
     }).addTo(this.map)
 
     // Initialise the FeatureGroup to store editable layers
@@ -2744,8 +2719,7 @@ export class MapInput extends BaseInput {
     this.currentLayer = undefined
 
     if (geography) {
-      geography.geographic_distribution.properties =
-        geography.geographic_distribution.properties || {}
+      geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
       let geoJsonLayers = L.geoJson(geography.geographic_distribution)
       this.currentLayer = geoJsonLayers.getLayers()[0]
       this.drawnItems.addLayer(this.currentLayer)
@@ -2830,10 +2804,7 @@ export class MapInput extends BaseInput {
     })
 
     // Remove tabindex on a element
-    this.map._controlContainer.lastElementChild.lastElementChild.firstElementChild.setAttribute(
-      'tabindex',
-      -1
-    )
+    this.map._controlContainer.lastElementChild.lastElementChild.firstElementChild.setAttribute('tabindex', -1)
     this.fullScreenBtn.setAttribute('tabindex', -1)
     let control = this.map._controlContainer.firstElementChild.children[0].children
     for (let c of control) c.setAttribute('tabindex', -1)

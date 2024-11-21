@@ -1,40 +1,48 @@
-const express = require('express')
-const router = new express.Router()
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import express from 'express'
 
-const passport = require('../utils/passportSetup')
-const { getUserInfo, getNodeUrls } = require('../controllers/consoleController')
-const { getCatalogPublicUrl, getPortalUrl, getInitData } = require('../controllers/dataController')
-const { logout, postLogin, postRegister, putPassword } = require('../controllers/authControllerPassport')
-const { makeRequestable } = require('../utils/utils')
-const { FORM_PREFIX } = require('../config/config.js')
-const { expressErrorHandler } = require('../controllers/errorHandler.js')
-const { getStoragePublicUrl } = require('../controllers/mediaController.js')
-const { getNodeEnv } = require('../config/backOptions.js')
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { getNodeEnv } from '../config/backOptions.js'
+import { FORM_PREFIX } from '../config/config.js'
+import { postLogin, postRegister, putPassword } from '../controllers/authControllerPassport.js'
+import { getNodeUrls, getUserInfo } from '../controllers/consoleController.js'
+import { getCatalogPublicUrl, getInitData, getPortalUrl } from '../controllers/dataController.js'
+import { expressErrorHandler } from '../controllers/errorHandler.js'
+import { getStoragePublicUrl } from '../controllers/mediaController.js'
+import { passportAuthenticate } from '../utils/passportSetup.js'
+import { logout } from '../utils/secu.js'
+import { makeRequestable } from '../utils/utils.js'
 
-const authenticate = passport.authenticate('jwt', { session: false })
+// -------------------------------------------------------------------------------------------------
+// Routing
+// -------------------------------------------------------------------------------------------------
+export const frontApi = new express.Router()
+const authenticate = passportAuthenticate('jwt', { session: false })
 
-router.post('/register', postRegister)
-router.put('/change-password', putPassword) // Delayed auth
-router.post('/login', postLogin)
-router.get('/logout', logout)
+frontApi.post('/register', postRegister)
+frontApi.put('/change-password', putPassword) // Delayed auth
+frontApi.post('/login', postLogin)
+frontApi.get('/logout', logout)
 
 // Routes to get all the data necessary for the UI to start
-router.get('/init-data', authenticate, getInitData)
+frontApi.get('/init-data', authenticate, getInitData)
 
-router.get('/user-info', authenticate, getUserInfo)
-router.get('/node-urls', authenticate, getNodeUrls)
+frontApi.get('/user-info', authenticate, getUserInfo)
+frontApi.get('/node-urls', authenticate, getNodeUrls)
 
 // Get modules public URLs
-router.get('/env', authenticate, (req, reply) => reply.status(200).send(getNodeEnv()))
-router.get('/form-url', authenticate, (req, reply) => reply.status(200).send(FORM_PREFIX))
-router.get('/storage-url', authenticate, getStoragePublicUrl)
-router.get('/catalog-url', authenticate, makeRequestable(getCatalogPublicUrl))
-router.get('/portal-url', authenticate, makeRequestable(getPortalUrl))
+frontApi.get('/env', authenticate, (req, reply) => reply.status(200).send(getNodeEnv()))
+frontApi.get('/form-url', authenticate, (req, reply) => reply.status(200).send(FORM_PREFIX))
+frontApi.get('/storage-url', authenticate, getStoragePublicUrl)
+frontApi.get('/catalog-url', authenticate, makeRequestable(getCatalogPublicUrl))
+frontApi.get('/portal-url', authenticate, makeRequestable(getPortalUrl))
 
 // Legacy routes:
-router.get('/media-url', authenticate, getStoragePublicUrl) // legacy: media => RUDI node Storage
-router.get('/ext-api-url', authenticate, makeRequestable(getCatalogPublicUrl)) // legacy: API => RUDI node Catalog
+frontApi.get('/media-url', authenticate, getStoragePublicUrl) // legacy: media => RUDI node Storage
+frontApi.get('/ext-api-url', authenticate, makeRequestable(getCatalogPublicUrl)) // legacy: API => RUDI node Catalog
 
-router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
-
-module.exports = router
+frontApi.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))

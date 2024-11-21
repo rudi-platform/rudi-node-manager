@@ -1,38 +1,49 @@
-const express = require('express')
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import express from 'express'
 
-const router = new express.Router()
-const { getEnum, getThemeByLang, getLicences, getVersion } = require('../controllers/dataController')
-const {
-  getObjectList,
-  postObject,
-  putObject,
-  getObjectById,
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { uuidv4 } from '../utils/utils.js'
+
+import { getEnum, getLicences, getThemeByLang, getVersion } from '../controllers/dataController.js'
+import { expressErrorHandler } from '../controllers/errorHandler.js'
+import {
   deleteObject,
   deleteObjects,
   getCounts,
+  getObjectById,
+  getObjectList,
+  postObject,
+  putObject,
   searchObjects,
-} = require('../controllers/genericController')
-const { ROLE_ADMIN, ROLE_EDIT } = require('../database/scripts/initDatabase')
-const { checkRolePerm } = require('../utils/roleCheck')
-const { expressErrorHandler } = require('../controllers/errorHandler.js')
-const { uuidv4 } = require('../utils/utils.js')
+} from '../controllers/genericController.js'
+import { ROLE_ADMIN, ROLE_EDIT } from '../database/scripts/initDatabase.js'
+import { checkRolePerm } from '../utils/roleCheck.js'
 
-router.get('/uuid', (req, reply) => reply.status(200).send(uuidv4(req.query?.nb)))
-router.get('/version', getVersion)
-router.get('/enum', getEnum)
-router.get('/enum/themes/:lang', getThemeByLang)
-router.get('/enum/themes', getThemeByLang)
-router.get('/licences', getLicences)
+// -------------------------------------------------------------------------------------------------
+// Routing
+// -------------------------------------------------------------------------------------------------
+
+// Proxy for the Catalog API
+export const catalogApi = new express.Router()
+
+catalogApi.get('/uuid', (req, reply) => reply.status(200).send(uuidv4(req.query?.nb)))
+catalogApi.get('/version', getVersion)
+catalogApi.get('/enum', getEnum)
+catalogApi.get('/enum/themes/:lang', getThemeByLang)
+catalogApi.get('/enum/themes', getThemeByLang)
+catalogApi.get('/licences', getLicences)
 
 // TODO : propagate res.status
-router.get(`/counts`, getCounts)
-router.get(`/:objectType`, getObjectList)
-router.get(`/:objectType/search`, searchObjects)
-router.post(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), postObject)
-router.put(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), putObject)
-router.get(`/:objectType/:id`, getObjectById)
-router.delete(`/:objectType/:id`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObject)
-router.delete(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObjects)
-router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
-
-module.exports = router
+catalogApi.get(`/counts`, getCounts)
+catalogApi.get(`/:objectType`, getObjectList)
+catalogApi.get(`/:objectType/search`, searchObjects)
+catalogApi.post(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), postObject)
+catalogApi.put(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), putObject)
+catalogApi.get(`/:objectType/:id`, getObjectById)
+catalogApi.delete(`/:objectType/:id`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObject)
+catalogApi.delete(`/:objectType`, checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), deleteObjects)
+catalogApi.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))

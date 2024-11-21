@@ -5,7 +5,8 @@
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
-  "main": "server.js",
+  "main": "run-rudinode-manager.js",
+  "type": "module",
   "scripts": {
     "prestart": "npm install",
     "test": "jest --config ./jest.config.json --coverage",

@@ -1,50 +1,56 @@
 const mod = 'passSetup'
 
+// -------------------------------------------------------------------------------------------------
 // External dependencies
-const passport = require('passport')
+// -------------------------------------------------------------------------------------------------
+
+import passport from 'passport'
+// const { authenticate, deserializeUser, initialize, serializeUser } = passport
 // const debug = require('debug')('passport')
 
-const LocalStrategy = require('passport-local').Strategy
-const { Strategy: JWTstrategy, ExtractJwt } = require('passport-jwt')
+import { ExtractJwt, Strategy as JWTstrategy } from 'passport-jwt'
+import { Strategy as LocalStrategy } from 'passport-local'
 
+import { matchPassword } from '@aqmo.org/jwt-lib'
+// -------------------------------------------------------------------------------------------------
 // Internal dependencies
-const log = require('./logger')
-const { ForbiddenError, statusOK, UnauthorizedError } = require('./errors')
-const {
-  dbGetUserById,
-  dbHashAndUpdatePassword,
-  dbGetHashedPassword,
-  dbGetUserRolesByUsername,
+// -------------------------------------------------------------------------------------------------
+import {
   dbClose,
+  dbGetHashedPassword,
+  dbGetUserById,
+  dbGetUserRolesByUsername,
+  dbHashAndUpdatePassword,
   dbOpen,
-} = require('../database/database')
-const { extractCookieFromReq, CONSOLE_TOKEN_NAME, jwtSecretKey, PM_FRONT_TOKEN_NAME } = require('./secu')
-const { matchPassword } = require('@aqmo.org/jwt-lib')
+} from '../database/database.js'
+import { ForbiddenError, statusOK, UnauthorizedError } from './errors.js'
+import { logE, logI, logW, sysWarn } from './logger.js'
+import { CONSOLE_TOKEN_NAME, extractCookieFromReq, jwtSecretKey, PM_FRONT_TOKEN_NAME } from './secu.js'
 
+// -------------------------------------------------------------------------------------------------
 // Passport configuration
-passport.serializeUser((user, done) => {
-  // debug('serializeUser', user)
-  done(null, user.id)
-})
+// -------------------------------------------------------------------------------------------------
+passport.serializeUser((user, done) => done(null, user.id))
 
-passport.deserializeUser((id, done) => {
-  // debug('deserializeUser', id)
+passport.deserializeUser((id, done) =>
   dbGetUserById(null, id)
     .then((user) => done(null, user))
     .catch((err) => {
-      log.e(mod, 'passport.deserializeUser', `User ID not found: ${id}`)
+      logE(mod, 'passport.deserializeUser', `User ID not found: ${id}`)
       return done(err, false, new UnauthorizedError('User not found'))
     })
-})
+)
 
+// -------------------------------------------------------------------------------------------------
 // Local Strategy
+// -------------------------------------------------------------------------------------------------
 passport.use(
   new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
     // Match User
     checkPassport(username, password)
       .then(() => done(null, { username }))
       .catch((err) => {
-        log.w(mod, 'LocalStrategy', `Error login: ${err}`)
+        logW(mod, 'LocalStrategy', `Error login: ${err}`)
         return done(null, false, err)
       })
   })
@@ -57,12 +63,12 @@ const checkPassport = async (username, password) => {
     const dbUserInfo = await dbGetHashedPassword(db, username)
     const dbUserHash = dbUserInfo.password
     if (!dbUserHash) {
-      log.e(mod, fun, `User not found: ${username}`)
+      logE(mod, fun, `User not found: ${username}`)
       throw new UnauthorizedError('No user found')
     }
 
     if (!matchPassword(password, dbUserHash)) {
-      log.e(mod, fun, `Password mismatch`)
+      logE(mod, fun, `Password mismatch`)
       throw new UnauthorizedError('Wrong password')
     }
 
@@ -71,10 +77,10 @@ const checkPassport = async (username, password) => {
     try {
       if (dbUserHash.startsWith('$2b$10$')) {
         await dbHashAndUpdatePassword(db, username, password)
-        log.i(mod, fun, `Password updated for user '${username}'`)
+        logI(mod, fun, `Password updated for user '${username}'`)
       }
     } catch (err) {
-      log.e(mod, fun, `Error while updating 2b10 password: ${err}`)
+      logE(mod, fun, `Error while updating 2b10 password: ${err}`)
     }
     try {
       const roles = await dbGetUserRolesByUsername(db, username)
@@ -113,11 +119,13 @@ passport.use(
       try {
         return done(null, token.user)
       } catch (error) {
-        log.e(mod, 'JWTstrategy', `ERR: ${error}`)
-        log.sysWarn(mod, 'JWTstrategy', error)
+        logE(mod, 'JWTstrategy', `ERR: ${error}`)
+        sysWarn(mod, 'JWTstrategy', error)
         return done(error)
       }
     }
   )
 )
-module.exports = passport
+
+export const passportAuthenticate = (...args) => passport.authenticate(...args)
+export const passportInitialize = (...args) => passport.initialize(...args)

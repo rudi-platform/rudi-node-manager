@@ -1,25 +1,35 @@
-const express = require('express')
-const router = new express.Router()
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
+import express from 'express'
 
-const {
-  getStorageToken,
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { expressErrorHandler } from '../controllers/errorHandler.js'
+import {
+  commitFileOnCatalog,
+  commitFileOnStorage,
   commitMediaFile,
   getDownloadById,
   getMediaInfoById,
-  commitFileOnStorage,
-  commitFileOnCatalog,
-} = require('../controllers/mediaController')
-const { ROLE_EDIT, ROLE_ADMIN } = require('../database/scripts/initDatabase')
-const { checkRolePerm } = require('../utils/roleCheck')
-const { expressErrorHandler } = require('../utils/errors.js')
+  getStorageToken,
+} from '../controllers/mediaController.js'
+import { ROLE_ADMIN, ROLE_EDIT } from '../database/scripts/initDatabase.js'
+import { checkRolePerm } from '../utils/roleCheck.js'
 
-router.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getStorageToken)
-router.post('/media-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnStorage)
-router.post('/api-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnCatalog)
-router.post('/commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitMediaFile)
+// -------------------------------------------------------------------------------------------------
+// Routing
+// -------------------------------------------------------------------------------------------------
 
-router.get('/:id', getMediaInfoById)
-router.get('/download/:id', getDownloadById)
-router.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+// API from the Storage proxy
+export const storageApi = new express.Router()
 
-module.exports = router
+storageApi.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getStorageToken)
+storageApi.post('/media-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnStorage)
+storageApi.post('/api-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnCatalog)
+storageApi.post('/commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitMediaFile)
+
+storageApi.get('/:id', getMediaInfoById)
+storageApi.get('/download/:id', getDownloadById)
+storageApi.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
