@@ -18,7 +18,7 @@ import {
 import { BadRequestError, RudiError, UnauthorizedError } from '../utils/errors.js'
 import { logE, logW } from '../utils/logger.js'
 import { passportAuthenticate } from '../utils/passportSetup.js'
-import { initPwdSecret, login, logout } from '../utils/secu.js'
+import { ERR_401_MSG, initPwdSecret, login, logout } from '../utils/secu.js'
 import { decodeBase64, decodeBase64url, toBase64 } from '../utils/utils.js'
 import { formatError } from './errorHandler.js'
 
@@ -43,7 +43,7 @@ export async function postLogin(req, reply, next) {
     if (!user) {
       const errMsg = info?.message || `User not found or incorrect password: '${req?.body?.username}'`
       logW(mod, fun, errMsg)
-      return reply.status(401).send(errMsg)
+      return reply.status(401).send(ERR_401_MSG)
     }
     try {
       login(req, reply, user)
@@ -105,7 +105,7 @@ export async function putPassword(req, reply, next) {
       if (!user && !matchPassword(INIT_PWD, dbUserHash)) {
         const errMsg = info.message || 'User not found'
         logW(mod, fun, errMsg)
-        return reply.status(401).send(errMsg)
+        return reply.status(401).send(ERR_401_MSG)
       }
       return dbHashAndUpdatePassword(db, username, newPassword)
         .then((userInfo) => reply.json(userInfo))

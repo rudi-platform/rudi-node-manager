@@ -31,6 +31,8 @@ const MEDIA_AUTH = getConf('rudi_media')
 export const CONSOLE_TOKEN_NAME = 'consoleToken'
 export const PM_FRONT_TOKEN_NAME = 'pmFrontToken'
 
+export const ERR_401_MSG = 'User not found or incorrect password'
+
 // -------------------------------------------------------------------------------------------------
 // Functions
 // -------------------------------------------------------------------------------------------------
@@ -117,7 +119,7 @@ function refreshTokens(req) {
 
 export const login = async (req, reply, user) => {
   const fun = 'login'
-  if (!user) return reply.status(401).send(`User not found or incorrect password`)
+  if (!user) return reply.status(401).send(ERR_401_MSG)
   try {
     const username = user.username
     const roles = await dbGetUserRolesByUsername(null, username) // NOSONAR
