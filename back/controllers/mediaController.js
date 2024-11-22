@@ -69,7 +69,7 @@ export async function getStorageToken(req, reply, next) {
     return reply.status(200).send({ token: mediaToken })
   } catch (err) {
     logE(mod, fun, `!! Liaison avec le module “${STORAGE}” incomplète, création de JWT impossible: ` + err)
-    if (err.code == 'ECONNREFUSED')
+    if (err.code === 'ECONNREFUSED')
       return reply.status(500).json({
         statusCode: 500,
         message: `“${STORAGE}” module is apparently down, contact the RUDI node admin`,
@@ -162,7 +162,7 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
   } catch (err) {
     logE(mod, fun + '.origErr', err)
     const moduleName = 'RUDI Media'
-    if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+    if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
       throw RudiError.createRudiHttpError(
         503,
         `La connection de “${MANAGER}” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`

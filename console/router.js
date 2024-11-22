@@ -1,27 +1,22 @@
-import child from 'child_process'
+// -------------------------------------------------------------------------------------------------
+// External dependencies
+// -------------------------------------------------------------------------------------------------
 import express from 'express'
 import { readFileSync } from 'fs'
 
-import { pathJoin } from '../back/utils/utils.js'
+// -------------------------------------------------------------------------------------------------
+// Internal dependencies
+// -------------------------------------------------------------------------------------------------
+import { getLib, getRoot } from '../back/utils/utils.js'
+
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
+const mod = 'consoleRouter'
 
 // -------------------------------------------------------------------------------------------------
 // Helper functions
 // -------------------------------------------------------------------------------------------------
-const root = process.cwd()
-
-const getRoot = (...path) => pathJoin(root, ...path)
-
-let libsPath
-const getLib = (...path) => {
-  try {
-    libsPath = libsPath || child.execSync('npm root', { encoding: 'utf-8' })
-  } catch (e) {
-    libsPath = root
-  }
-  if (libsPath.endsWith('\n')) libsPath = libsPath.slice(0, -1)
-  return pathJoin(libsPath, ...path)
-}
-
 const relative = (...path) => getRoot('console', ...path)
 const staticDependency = (dep) => express.static(getLib(dep, 'dist'))
 const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))

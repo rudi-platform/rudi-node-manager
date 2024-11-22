@@ -169,7 +169,7 @@ const dbRenameUserRoles = (openedDb) => {
     dbGetUserRoles(db).then((roleList) => {
       const found = roleList.find(
         (roleDescPair) =>
-          roleDescPair.role == 'Createur' || roleDescPair.role == 'Créateur' || roleDescPair.role == 'Gestionnaire'
+          roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
       )
       if (!found) {
         if (!openedDb) dbClose(db)
@@ -203,7 +203,7 @@ const dbRenameRoles = (openedDb) => {
       .then((roleList) => {
         const found = roleList.find(
           (roleDescPair) =>
-            roleDescPair.role == 'Createur' || roleDescPair.role == 'Créateur' || roleDescPair.role == 'Gestionnaire'
+            roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
         )
         if (!found) {
           if (!openedDb) dbClose(db)

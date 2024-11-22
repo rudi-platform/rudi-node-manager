@@ -4,6 +4,8 @@
 // External dependencies
 // -------------------------------------------------------------------------------------------------
 
+import { execSync } from 'child_process'
+import { existsSync } from 'fs'
 import _ from 'lodash'
 const { floor, isInteger } = _
 
@@ -140,5 +142,34 @@ export function uuidv4(nb) {
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // export const moduleDirname = (place = import.meta.url) => dirname(fileURLToPath(place))
+const ROOT = process.cwd()
+export const getRootDir = () => ROOT
+export const getRoot = (...path) => pathJoin(ROOT, ...path)
 
-export const getRootDir = () => process.cwd()
+export const getNodeModulesDir = () => {
+  const nm = 'node_modules'
+  const root = getRootDir()
+
+  let libsPath = process.env.NODE_PATH
+  if (libsPath?.endsWith(nm)) return libsPath
+  if (!libsPath) {
+    try {
+      libsPath = execSync('npm root', { encoding: 'utf-8' })
+      if (libsPath.endsWith('\n')) libsPath = libsPath.slice(0, -1)
+      console.debug('LIBS_PATH:', libsPath)
+      return libsPath
+    } catch (e) {
+      for (const lookupFolderLevel of ['', '..', '../..']) {
+        libsPath = pathJoin(root, lookupFolderLevel, nm)
+        if (existsSync(libsPath)) {
+          console.debug('LIBS_PATH:', libsPath)
+          return libsPath
+        }
+      }
+    }
+    console.debug('LIBS_PATH:', libsPath)
+  }
+  return root
+}
+const NODE_MODULES = getNodeModulesDir()
+export const getLib = (...path) => pathJoin(NODE_MODULES, ...path)

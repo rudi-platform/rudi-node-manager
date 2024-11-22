@@ -126,7 +126,7 @@ export async function createUser(req, reply) {
     const { username, email, password, roles } = userInfo
     if (!username) return reply.status(400).json(new BadRequestError('La requête doit comporter un username non null'))
     if (!email) return reply.status(400).json(new BadRequestError('La requête doit comporter un email non null'))
-    if (!roles || !Array.isArray(roles) || roles.length == 0)
+    if (!roles || !Array.isArray(roles) || roles.length === 0)
       return reply.status(400).json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
 
     const hashedPassword = hashPassword(password || INIT_PWD)

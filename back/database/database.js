@@ -58,7 +58,7 @@ export { _dbOpen as dbOpen }
 
 const dbClose = (db) => {
   db.close((err) => {
-    if (err && err.message != 'SQLITE_MISUSE: Database handle is closed') logE(mod, 'dbClose', err.message)
+    if (err && err.message !== 'SQLITE_MISUSE: Database handle is closed') logE(mod, 'dbClose', err.message)
   })
   return statusOK('DB closed')
 }
@@ -417,7 +417,7 @@ export function dbGetRoles(openedDb) {
       } else {
         const roles = []
         rows.map((roleInfo) => {
-          if (roleInfo.role != 'Moniteur' || roleInfo.role != 'SuperAdmin') roles.push(roleInfo)
+          if (roleInfo.role !== 'Moniteur' || roleInfo.role !== 'SuperAdmin') roles.push(roleInfo)
         })
         return resolve(roles)
       }
@@ -468,7 +468,7 @@ export async function dbGetUserRolesByUsername(openedDb, username) {
     if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await dbGetUserByUsername(db, username)
     const id = userInfo.id
-    if (!id && username != getSuName()) {
+    if (!id && username !== getSuName()) {
       logE(mod, fun, `${username} != ${getSuName()}`)
       dbClose(db)
       throw new UnauthorizedError(`User not found: ${username}`)
