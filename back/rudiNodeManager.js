@@ -38,7 +38,7 @@ import { getStoragePublicUrl } from './controllers/mediaController.js'
 import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatabase.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
-import { getDomain, getHost, pathJoin, sleep } from './utils/utils.js'
+import { getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
@@ -61,7 +61,10 @@ async function connectToRudiModules(attemptLeft = 20) {
       promises.push(
         new Promise((resolve, reject) =>
           getCatalogPublicUrl()
-            .then((res) => resolve((catalogUrl = res)))
+            .then((res) => {
+              catalogUrl = res
+              resolve(catalogUrl)
+            })
             .catch((err) => {
               logD(mod, fun, `attempt #${attemptLeft}: Catalog not responding`)
               reject(err)
@@ -72,7 +75,10 @@ async function connectToRudiModules(attemptLeft = 20) {
       promises.push(
         new Promise((resolve, reject) =>
           getStoragePublicUrl()
-            .then((res) => resolve((storageUrl = res)))
+            .then((res) => {
+              storageUrl = res
+              resolve(storageUrl)
+            })
             .catch((err) => {
               logD(mod, fun, `attempt #${attemptLeft}: Storage not responding`)
               reject(err)
@@ -215,6 +221,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   if (!isDevEnv()) {
     logI(mod, 'serve', 'Serving the built static page')
+    const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
     managerApp.get('/*', (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
   }

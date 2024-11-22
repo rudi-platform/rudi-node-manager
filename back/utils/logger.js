@@ -9,7 +9,7 @@ const { Transport } = rudiLogger
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { OPT_GIT_HASH, getBackOptions, isProdEnv } from '../config/backOptions.js'
+import { OPT_GIT_HASH, getBackOptions, isDevEnv } from '../config/backOptions.js'
 import { getConf } from '../config/config.js'
 import { beautify, nowFormatted } from './utils.js'
 
@@ -17,7 +17,7 @@ import { beautify, nowFormatted } from './utils.js'
 // Constants
 // -------------------------------------------------------------------------------------------------
 const APP_NAME = getConf('logging', 'app_name')
-const SHOULD_SYSLOG = getConf('logging', 'log_style') == 'syslog' || isProdEnv()
+const SHOULD_SYSLOG = getConf('logging', 'log_style') === 'syslog' || !isDevEnv()
 
 // Helper functions
 /**
@@ -44,7 +44,7 @@ function extractIpRedirections(req) {
  */
 function getRudiLoggerOptions() {
   let facility = 20
-  if (getConf('syslog', 'syslog_facility').slice(0, 5) == 'local') {
+  if (getConf('syslog', 'syslog_facility').slice(0, 5) === 'local') {
     facility = 16 + parseInt(getConf('syslog', 'syslog_facility').slice(5, 1))
   }
   let transports
@@ -102,8 +102,8 @@ const rplog = function (logLevel, srcMod, srcFun, msg, context) {
       severity = Severity.Debug
       break
   }
-  let ctx = undefined
-  if (!!context) {
+  let ctx
+  if (context) {
     ctx = {
       subject: context.subject,
       req_ip: context.ip,

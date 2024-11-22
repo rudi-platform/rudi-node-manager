@@ -19,11 +19,6 @@
     "lint": "eslint src/**.js",
     "cleanup": "rm -fR ./node_modules; rm -fR ./package-lock.json; rm -fR ./yarn.lock"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",

@@ -168,6 +168,7 @@ export function sendJsonAndTokens(req, reply, data) {
   }
 }
 
+// eslint-disable-next-line complexity
 export async function getTokenFromMediaForUser(user) {
   const fun = 'getTokenFromMediaForUser'
   const pmHeaders = getStorageHeaders()
@@ -189,7 +190,7 @@ export async function getTokenFromMediaForUser(user) {
       throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`)
     else return mediaRes.data.token
   } catch (err) {
-    if (err.code == 'ECONNREFUSED')
+    if (err.code === 'ECONNREFUSED')
       throw RudiError.createRudiHttpError(
         500,
         `Connection from “${MANAGER}” to “${STORAGE}” module failed: ` +

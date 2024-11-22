@@ -35,7 +35,7 @@ export const removeTrailingSlash = (path) => removeTrailingChar(path, '/')
  */
 export function mergeStrings(sep, ...args) {
   const argNb = args.length
-  if (argNb == 0 || args[0] === undefined || args[0] === null) return ''
+  if (argNb === 0 || args[0] === undefined || args[0] === null) return ''
   let accumulatedStr = `${args[0]}`
   for (let i = 1; i < argNb; i++) {
     if (args[i] === undefined || args[i] === null) break
@@ -138,3 +138,7 @@ export function uuidv4(nb) {
 }
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+// export const moduleDirname = (place = import.meta.url) => dirname(fileURLToPath(place))
+
+export const getRootDir = () => process.cwd()
