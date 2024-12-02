@@ -18,7 +18,7 @@ export const STYLE_BLD = 'banner-bold'
 export const STYLE_END = 'banner-end'
 export const STYLE_THN = 'banner-light'
 
-const BACK_URL_PREFIX = 'back'
+const BACK_URL_PREFIX = 'api'
 
 // ---- Lifecycle ----
 

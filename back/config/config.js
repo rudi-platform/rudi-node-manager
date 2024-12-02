@@ -109,5 +109,5 @@ export function setSuName(userDefinedSuName) {
 }
 export const getSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
 
-const BACK_PREFIX = getConf('server', 'backend_prefix') || 'back'
+const BACK_PREFIX = getConf('server', 'backend_prefix') || 'api'
 export const getBackUrlPrefix = (urlBit) => pathJoin('/', BACK_PREFIX, urlBit)
