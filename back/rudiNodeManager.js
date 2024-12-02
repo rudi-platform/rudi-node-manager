@@ -13,11 +13,11 @@ import { join } from 'path'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-import { FORM_PREFIX, getConf } from './config/config.js'
+import { FORM_PREFIX, getBackUrlPrefix, getConf } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
 import { expressErrorHandler } from './controllers/errorHandler.js'
-import { getContext, logD, logE, logI, sysError, sysInfo } from './utils/logger.js'
+import { getContext, logD, logE, logI, logW, sysError, sysInfo } from './utils/logger.js'
 
 // -------------------------------------------------------------------------------------------------
 // External dependencies: routes
@@ -36,6 +36,7 @@ import { getStoragePublicUrl } from './controllers/mediaController.js'
 // External dependencies: security
 // -------------------------------------------------------------------------------------------------
 import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatabase.js'
+import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
 import { getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
@@ -43,50 +44,42 @@ import { getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.j
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
 // -------------------------------------------------------------------------------------------------
+const moduleUrls = { catalog: undefined, storage: undefined }
+
 function checkUrls() {
-  if (!catalogUrl && !storageUrl) throw new Error('Could not reach RUDI Catalog nor RUDI Storage')
-  if (!storageUrl) throw new Error('Could not reach RUDI Storage')
-  if (!catalogUrl) throw new Error('Could not reach RUDI Catalog')
-  return [catalogUrl, storageUrl]
+  if (!moduleUrls.catalog && !moduleUrls.storage)
+    throw new ConnectionError('Could not reach RUDI Catalog nor RUDI Storage')
+  if (!moduleUrls.storage) throw new ConnectionError('Could not reach RUDI Storage')
+  if (!moduleUrls.catalog) throw new ConnectionError('Could not reach RUDI Catalog')
+  return moduleUrls
 }
 
-let catalogUrl, storageUrl
+const connectToModule = (moduleCall, moduleName, errMsg) =>
+  new Promise((resolve, reject) =>
+    moduleCall()
+      .then((res) => {
+        moduleUrls[moduleName] = res
+        // logD(mod, 'connectToModule', res)
+        return resolve(res)
+      })
+      .catch((err) => {
+        logW(mod, 'connectToModule', errMsg)
+        return reject(err)
+      })
+  )
+
 async function connectToRudiModules(attemptLeft = 20) {
   const fun = 'connectToRudiModules'
   if (attemptLeft === 0) return checkUrls()
 
   try {
     const promises = []
-    if (!catalogUrl)
-      promises.push(
-        new Promise((resolve, reject) =>
-          getCatalogPublicUrl()
-            .then((res) => {
-              catalogUrl = res
-              resolve(catalogUrl)
-            })
-            .catch((err) => {
-              logD(mod, fun, `attempt #${attemptLeft}: Catalog not responding`)
-              reject(err)
-            })
-        )
-      )
-    if (!storageUrl)
-      promises.push(
-        new Promise((resolve, reject) =>
-          getStoragePublicUrl()
-            .then((res) => {
-              storageUrl = res
-              resolve(storageUrl)
-            })
-            .catch((err) => {
-              logD(mod, fun, `attempt #${attemptLeft}: Storage not responding`)
-              reject(err)
-            })
-        )
-      )
+    if (!moduleUrls.catalog)
+      promises.push(connectToModule(getCatalogPublicUrl, 'catalog', `attempt #${attemptLeft}: Catalog not responding`))
+    if (!moduleUrls.storage)
+      promises.push(connectToModule(getStoragePublicUrl, 'storage', `attempt #${attemptLeft}: Storage not responding`))
     await Promise.all(promises)
-    return [catalogUrl, storageUrl]
+    return [moduleUrls.catalog, moduleUrls.storage]
   } catch {
     await sleep(1000)
     // log.d(mod, fun, `attempt ${attemptLeft}`)
@@ -208,11 +201,11 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   const authenticate = passportAuthenticate('jwt', { session: false })
 
   // Configure app to use routes
-  managerApp.use('/api/open', openApi)
-  managerApp.use('/api/front', frontApi)
-  managerApp.use('/api/data', authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
-  managerApp.use('/api/media', authenticate, checkRolePerm([ROLE_ALL]), storageApi)
-  managerApp.use('/api/secu', authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
+  managerApp.use(getBackUrlPrefix('open'), openApi)
+  managerApp.use(getBackUrlPrefix('front'), frontApi)
+  managerApp.use(getBackUrlPrefix('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getBackUrlPrefix('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackUrlPrefix('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // Serving the console frontend
   managerApp.use(pathJoin('', FORM_PREFIX), consoleRouter)
@@ -242,9 +235,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
     logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
   )
-  managerServer.on('error', (err) => {
-    console.error('This error was uncaught:', err)
-  })
+  managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 
   managerApp.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
   return managerServer
@@ -265,7 +256,7 @@ async function shutDown(managerServer, signal) {
 
 export async function runRudiManagerBackend() {
   const fun = 'runManagerBackend'
-  const [catalogUrl, storageUrl] = await connectToRudiModules(15)
+  const [catalogUrl, storageUrl] = await connectToRudiModules(20)
   logD(mod, fun, `catalogUrl: ${catalogUrl}`)
   logD(mod, fun, `storageUrl: ${storageUrl}`)
   const managerServer = await launchExpressApp({ catalogUrl, storageUrl })

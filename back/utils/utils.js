@@ -112,11 +112,13 @@ export function makeRequestable(func) {
 }
 
 export function getDomain(url) {
+  if (!url) return
   if (!url.startsWith('http')) url = 'http://' + url
   return checkIsURL(url)?.hostname
 }
 
 export function getHost(url) {
+  if (!url) return
   if (!url.startsWith('http')) url = 'http://' + url
   return checkIsURL(url)?.host
 }
@@ -142,10 +144,17 @@ export function uuidv4(nb) {
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // export const moduleDirname = (place = import.meta.url) => dirname(fileURLToPath(place))
+
+/**
+ * Gives the folder of the application
+ */
 const ROOT = process.cwd()
 export const getRootDir = () => ROOT
 export const getRoot = (...path) => pathJoin(ROOT, ...path)
 
+/**
+ * Gives the folder where the libraries are installed
+ */
 export const getNodeModulesDir = () => {
   const nm = 'node_modules'
   const root = getRootDir()
@@ -158,7 +167,7 @@ export const getNodeModulesDir = () => {
       if (libsPath.endsWith('\n')) libsPath = libsPath.slice(0, -1)
       console.debug('LIBS_PATH:', libsPath)
       return libsPath
-    } catch (e) {
+    } catch {
       for (const lookupFolderLevel of ['', '..', '../..']) {
         libsPath = pathJoin(root, lookupFolderLevel, nm)
         if (existsSync(libsPath)) {

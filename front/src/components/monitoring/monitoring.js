@@ -1,38 +1,39 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
+import { getApiData } from '../../utils/frontOptions.js'
+
 /**
  * Composant : Monitoring
  * @return {ReactNode}
  */
 function Monitoring({}) {
-  return
   const [generalMonitoring, setGeneralMonitoring] = useState({}) // NOSONAR
 
   useEffect(() => {
     Promise.all([
-      axios.get(`api/data/resources`, { params: { count_by: 'metadata_info.api_version' } }).catch(() => {
+      axios.get(getApiData('resources'), { params: { count_by: 'metadata_info.api_version' } }).catch(() => {
         return { data: [] }
       }),
-      axios.get(`api/data/resources`, { params: { count_by: 'storage_status' } }).catch(() => {
+      axios.get(getApiData('resources'), { params: { count_by: 'storage_status' } }).catch(() => {
         return { data: [] }
       }),
       axios
-        .get(`api/data/resources`, {
+        .get(getApiData('resources'), {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
         .catch(() => {
           return { data: [] }
         }),
       axios
-        .get(`api/data/resources`, {
+        .get(getApiData('resources'), {
           params: { count_by: 'producer' },
         })
         .catch(() => {
           return { data: [] }
         }),
       axios
-        .get(`api/data/reports`, {
+        .get(getApiData('reports'), {
           params: { count_by: 'integration_status' },
         })
         .catch(() => {

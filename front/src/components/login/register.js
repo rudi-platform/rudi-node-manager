@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 
+import { getApiFront } from '../../utils/frontOptions.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 import './login.css'
 
@@ -59,7 +60,7 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const registerUser = (credentials) =>
-    axios.post(`api/front/register`, JSON.stringify(credentials), {
+    axios.post(getApiFront('register'), JSON.stringify(credentials), {
       headers: { 'Content-Type': 'application/json' },
     })
 

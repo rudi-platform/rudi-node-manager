@@ -44,7 +44,7 @@ export async function safeAxiosGet(rudiModuleCalled, url, opts) {
         // message = axiosErr.response.message
       }
     }
-    if (code == 'ECONNREFUSED' || code == 'ERR_BAD_RESPONSE') {
+    if (code === 'ECONNREFUSED' || code === 'ERR_BAD_RESPONSE') {
       const errMsg = `La connection de “${MANAGER}” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`
       throw RudiError.createRudiHttpError(503, errMsg)
     }

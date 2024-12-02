@@ -48,9 +48,10 @@ export const getFrontOptions = (opt, altValue = '') => {
 }
 export const getPublicUrl = (...suffix) => pathJoin(getFrontOptions(PUBLIC_URL), ...suffix)
 
-const getBackApi = (backPath, ...suffix) => (!suffix ? 'incorrect' : pathJoin('api', backPath, ...suffix))
+const getBackApi = (backPath, ...suffix) => (!suffix ? 'incorrect' : pathJoin('back', backPath, ...suffix))
 export const getApiFront = (...suffix) => getBackApi('front', ...suffix)
 export const getApiOpen = (...suffix) => getBackApi('open', ...suffix)
+export const getApiSecu = (...suffix) => getBackApi('secu', ...suffix)
 export const getApiData = (...suffix) => getBackApi('data', ...suffix)
 export const getApiMedia = (...suffix) => getBackApi('media', ...suffix)
 export const getForm = (formUrl, suffix, query) => mergeStrings('?', getPublicUrl(formUrl, suffix), query)

@@ -218,13 +218,12 @@ function Visualisation({ logout }) {
    * get the doc
    */
   async function handleOnClick() {
-    // First: let's get the media metadata from the "RUDI API" module
+    // First: let's get the media metadata from the "RUDI Catalog" module
     const { mediaUrl, mediaMime, mediaCharset } = await getMediaInfo(mediaId)
     try {
       // Let's then get the media data from the "RUDI Media" module
       await showContent(mediaUrl, mediaMime, mediaCharset)
     } catch (err) {
-      // console.error('T (visu) getMediaInfo url:', getBackUrl(`api/media/${mediaId}`))
       if (err.msg === 'media uuid not found') {
         err.msg = `Aucun media n'a été trouvé pour l'id ${mediaId}`
         err.statusCode = 404

@@ -73,7 +73,7 @@ export function getConf(section, subSection) {
 }
 
 // Shortcuts to access popular conf values
-const RUDI_CATALOG_API_ADMIN = config.rudi_api?.admin_api || 'api/admin'
+const RUDI_CATALOG_API_ADMIN = getConf('rudi_api', 'admin_api') || 'api/admin'
 export const getCatalogUrl = (...args) => pathJoin(RUDI_CATALOG_URL, ...args)
 export const getCatalogAdminUrl = (...args) => pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
 export const getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...args)
@@ -108,3 +108,6 @@ export function setSuName(userDefinedSuName) {
   config.database.db_su_usr = userDefinedSuName
 }
 export const getSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
+
+const BACK_PREFIX = getConf('server', 'backend_prefix') || 'back'
+export const getBackUrlPrefix = (urlBit) => pathJoin('/', BACK_PREFIX, urlBit)

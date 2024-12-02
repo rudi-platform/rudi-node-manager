@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { getApiSecu } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
 
 const propId = 'id'
-const urlUsers = `api/secu/users`
-const urlRoles = `api/secu/roles`
+const urlUsers = getApiSecu('users')
+const urlRoles = getApiSecu('roles')
 
 CatalogueUser.propTypes = {
   editMode: PropTypes.bool,

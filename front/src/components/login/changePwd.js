@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import './login.css'
 
+import { getApiFront } from '../../utils/frontOptions.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'secondary'
@@ -62,7 +63,7 @@ export default function ChangePwd({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const putPassword = (credentials) =>
-    axios.put(`api/front/change-password`, JSON.stringify(credentials), {
+    axios.put(getApiFront('change-password'), JSON.stringify(credentials), {
       headers: { 'Content-Type': 'application/json' },
     })
 

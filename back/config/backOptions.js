@@ -3,7 +3,7 @@
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import child from 'child_process'
+import { execSync } from 'child_process'
 import minimist from 'minimist'
 
 const _argv = minimist(process.argv.slice(2), { string: ['hash', 'tag', 'su'] })
@@ -139,7 +139,7 @@ export function getHash() {
   let gitHash = getBackOptions(OPT_GIT_HASH)
   if (!gitHash) {
     try {
-      gitHash = child.execSync('git rev-parse --short HEAD')
+      gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' })
     } catch {
       console.error('WARNING: no --hash option provided + giv rev parse does not work')
       return 'v0_0;'
@@ -155,18 +155,12 @@ export function getTags() {
   return tags
 }
 
+const nodeEnv = getBackOptions(OPT_NODE_ENV)
 export const getNodeEnv = () => getBackOptions(OPT_NODE_ENV)
-export const isDevEnv = () => getNodeEnv() === 'development'
-export const isProdEnv = () => getNodeEnv() === 'production'
+export const isDevEnv = () => nodeEnv === 'development'
+export const isStageEnv = () => nodeEnv === 'staging'
+export const isProdEnv = () => nodeEnv === 'production'
 
-const backDomain = () => {
-  const backPath = getBackOptions(OPT_BACK_PATH)
-  try {
-    return getDomain(backPath)
-  } catch {
-    return backPath
-  }
-}
-
-const BACK_DOMAIN = backDomain()
+const BACK_PATH = getBackOptions(OPT_BACK_PATH)
+const BACK_DOMAIN = getDomain(BACK_PATH) || BACK_PATH
 export const getBackDomain = () => BACK_DOMAIN

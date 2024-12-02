@@ -18,6 +18,8 @@ export const STYLE_BLD = 'banner-bold'
 export const STYLE_END = 'banner-end'
 export const STYLE_THN = 'banner-light'
 
+const BACK_URL_PREFIX = 'back'
+
 // ---- Lifecycle ----
 
 /**
@@ -30,10 +32,8 @@ function keepNotInTemplate(template, outputValue, originalValue) {
   if (!originalValue || !template || originalValue instanceof Array) return
   else if (originalValue instanceof Object) {
     for (let key in originalValue) {
-      if (!Object.hasOwn(outputValue, key) && !Object.hasOwn(template, key))
-        outputValue[key] = originalValue[key]
-      else if (outputValue instanceof Object)
-        keepNotInTemplate(template[key], outputValue[key], originalValue[key])
+      if (!Object.hasOwn(outputValue, key) && !Object.hasOwn(template, key)) outputValue[key] = originalValue[key]
+      else if (outputValue instanceof Object) keepNotInTemplate(template[key], outputValue[key], originalValue[key])
     }
   }
 }
@@ -138,7 +138,7 @@ export class RudiForm {
   get formUrl() {
     return pathJoin(this.baseUrl, this.nodeUrls?.form_url || this.nodeUrls?.console_url)
   }
-  pmUrl = pathJoin(this.baseUrl, 'api')
+  pmUrl = pathJoin(this.baseUrl, BACK_URL_PREFIX)
 
   getUrlPm = (...args) => pathJoin(this.pmUrl, ...args)
   getUrlLocal = (...args) => pathJoin(this.formUrl, ...args)
@@ -237,19 +237,13 @@ export class RudiForm {
   addHeaderActions() {
     this.headerActions = this.customForm.htmlController.header_actions
 
-    const showBtn = icon_flat_btn('code', this.lexR['btn/show_value'], () =>
-      this.showResultOverlay()
-    )
+    const showBtn = icon_flat_btn('code', this.lexR['btn/show_value'], () => this.showResultOverlay())
     this.headerActions.appendChild(showBtn)
 
-    const reduceBtn = icon_flat_btn('keyboard_arrow_down', this.lexR['btn/show_required'], () =>
-      this.reduce()
-    )
+    const reduceBtn = icon_flat_btn('keyboard_arrow_down', this.lexR['btn/show_required'], () => this.reduce())
     this.headerActions.appendChild(reduceBtn)
 
-    const showDisabledBtn = icon_flat_btn('visibility_off', this.lexR['btn/show_disabled'], () =>
-      this.showDisabled()
-    )
+    const showDisabledBtn = icon_flat_btn('visibility_off', this.lexR['btn/show_disabled'], () => this.showDisabled())
     this.headerActions.appendChild(showDisabledBtn)
 
     const clearBtn = icon_flat_btn('delete', this.lexR['btn/clear_form'], () => this.clear())
@@ -303,10 +297,9 @@ export class RudiForm {
     if (!this.template) return
     propagateAttribute(this.template.htmlJsonTemplate)
 
-    let fragmentSets = [
-      this.template?.fragmentSet?.[this.language],
-      this.template?.fragmentSet?.enums,
-    ].filter((v) => v != undefined)
+    let fragmentSets = [this.template?.fragmentSet?.[this.language], this.template?.fragmentSet?.enums].filter(
+      (v) => v != undefined
+    )
     this.customForm.setTemplate(this.template, fragmentSets?.length ? fragmentSets : undefined)
     this.actions = this.addHeaderActions()
     this.state = 'create'
@@ -347,14 +340,7 @@ export class RudiForm {
       else if (Symbol.iterator in Object(e)) {
         for (const err of e) {
           if (err instanceof SetValueError) {
-            console.error(
-              'Error :',
-              err.message,
-              '\nwith value : ',
-              err.value,
-              '\nin field :',
-              err.target
-            )
+            console.error('Error :', err.message, '\nwith value : ', err.value, '\nin field :', err.target)
             err.target.setAttribute('error', 'Error with value: ' + JSON.stringify(err.value))
           } else {
             console.error(err)
@@ -384,8 +370,7 @@ export class RudiForm {
       console.error('getValue', e)
       throw new Error('Error in parseUserInput', { cause: e })
     }
-    if (this.originalValue && keep)
-      keepNotInTemplate(this.customForm.submitTemplate, parsedValue, this.originalValue)
+    if (this.originalValue && keep) keepNotInTemplate(this.customForm.submitTemplate, parsedValue, this.originalValue)
     return parsedValue
   }
 
@@ -493,18 +478,14 @@ export class RudiForm {
         return this.msgNode
       }
       if (this.state == 'fail' || this.state == 'critic') {
-        console.error(
-          'ERR11 already failed before this, will not display new error message:',
-          message
-        )
+        console.error('ERR11 already failed before this, will not display new error message:', message)
         return this.msgNode
       }
       if (style == STYLE_ERR) console.error(`E [${here}] An error occurred:`, message)
       else console.log('Action:', message)
 
       // else console.debug(message);
-      if (style != STYLE_ERR)
-        this.msgNode.innerHTML = !style ? message : `<span class="${style}">${message}</span>`
+      if (style != STYLE_ERR) this.msgNode.innerHTML = !style ? message : `<span class="${style}">${message}</span>`
       else this.msgNode.innerHTML += `<br/><span class="${style}">${message}</span>`
       return this.msgNode
     } catch (err) {
@@ -520,10 +501,7 @@ export class RudiForm {
       return this.msgNode
     }
     if (this.state == 'fail' || this.state == 'critic') {
-      console.error(
-        'ERR11 already failed before this, will not display new error message:',
-        message
-      )
+      console.error('ERR11 already failed before this, will not display new error message:', message)
       return this.msgNode
     }
     console.error(`E [${here}] An error occurred:`, message)
@@ -560,8 +538,7 @@ export class RudiForm {
  * @param {Object|Array} htmlJsonTemplate
  */
 export function propagateAttribute(htmlJsonTemplate) {
-  if (htmlJsonTemplate instanceof Array)
-    for (let child of htmlJsonTemplate) propagateRecursively(child)
+  if (htmlJsonTemplate instanceof Array) for (let child of htmlJsonTemplate) propagateRecursively(child)
   else propagateRecursively(htmlJsonTemplate)
 }
 

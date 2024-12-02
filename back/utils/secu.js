@@ -13,7 +13,7 @@ const { sign } = _jwt
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { getBackDomain, isProdEnv } from '../config/backOptions.js'
-import { getConf, MANAGER, STORAGE } from '../config/config.js'
+import { getBackUrlPrefix, getConf, MANAGER, STORAGE } from '../config/config.js'
 import { dbGetUserRolesByUsername } from '../database/database.js'
 import { ForbiddenError, RudiError } from './errors.js'
 import { logE, logW } from './logger.js'
@@ -87,8 +87,8 @@ export function createFrontUserTokens(userInfo) {
     delete userInfo?.password
     const { username, roles } = { ...userInfo }
     return {
-      [CONSOLE_TOKEN_NAME]: sign({ user: userInfo, roles, exp }, JWT_SECRET),
-      [PM_FRONT_TOKEN_NAME]: sign({ username, roles, exp }, JWT_SECRET),
+      [CONSOLE_TOKEN_NAME]: sign({ user: userInfo, roles, exp, back: getBackUrlPrefix() }, JWT_SECRET),
+      [PM_FRONT_TOKEN_NAME]: sign({ username, roles, exp, back: getBackUrlPrefix() }, JWT_SECRET),
       exp,
     }
   } catch (err) {
@@ -302,6 +302,10 @@ const getKeyPath = (name) => {
       return getConf('rudi_api', 'pm_api_key') || getConf('auth', 'pm_prv_key')
     case 'media':
       return getConf('rudi_media', 'pm_media_key') || getConf('auth', 'pm_prv_key')
+    case 'catalog':
+      return getConf('rudi_catalog', 'pm_catalog_key') || getConf('auth', 'pm_prv_key')
+    case 'storage':
+      return getConf('rudi_storage', 'pm_storage_key') || getConf('auth', 'pm_prv_key')
     default:
       return getConf('auth', 'pm_prv_key')
   }
@@ -327,6 +331,10 @@ const getPrvKey = (name) => {
     case 'pm_media_key':
       name = 'media'
       break
+    case 'catalog':
+      name = 'catalog'
+    case 'storage':
+      name = 'storage'
     default:
       name = 'auth'
   }

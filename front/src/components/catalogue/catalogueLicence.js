@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { getApiData } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import LicenceCard from './licenceCard'
 
@@ -31,7 +32,7 @@ export default function CatalogueLicence({ editMode, logout }) {
    */
   function getInitialData() {
     axios
-      .get(`api/data/licences`)
+      .get(getApiData('licences'))
       .then((res) => setLicences(res.data))
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
