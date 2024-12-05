@@ -13,7 +13,18 @@ const { sign } = _jwt
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { getBackDomain, isProdEnv } from '../config/backOptions.js'
-import { getBackUrlPrefix, getConf, MANAGER, STORAGE } from '../config/config.js'
+import {
+  getBackUrlPrefix,
+  getConf,
+  getDefaultKey,
+  getIdForCatalog,
+  getIdForStorage,
+  getKeyForCatalog,
+  getKeyForStorage,
+  getStorageUrl,
+  MANAGER,
+  STORAGE,
+} from '../config/config.js'
 import { dbGetUserRolesByUsername } from '../database/database.js'
 import { ForbiddenError, RudiError } from './errors.js'
 import { logE, logW } from './logger.js'
@@ -26,7 +37,6 @@ const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
 const OFFSET_USR_ID = 5000
 const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
-const MEDIA_AUTH = getConf('rudi_media')
 
 export const CONSOLE_TOKEN_NAME = 'consoleToken'
 export const PM_FRONT_TOKEN_NAME = 'pmFrontToken'
@@ -184,7 +194,7 @@ export async function getTokenFromMediaForUser(user) {
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
   // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
-  const mediaForgeJwtUrl = `${MEDIA_AUTH.rudi_media_url}/jwt/forge`
+  const mediaForgeJwtUrl = getStorageUrl('jwt/forge')
   try {
     const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
     if (!mediaRes) throw Error(`No answer received from Media module`)
@@ -214,14 +224,14 @@ export async function getTokenFromMediaForUser(user) {
 
 export function createPmJwtForMedia(body) {
   return forgeToken(
-    getPrvKey('media'),
+    getPrvKey('storage'),
     {},
     {
       jti: body?.jti || uuidv4(),
       iat: timeEpochS(),
       exp: body?.exp || timeEpochS(body?.exp_time || DEFAULT_EXP),
       sub: body?.sub || 'auth',
-      client_id: body?.client_id || getConf('rudi_media', 'pm_media_id'),
+      client_id: body?.client_id || getIdForStorage(),
     }
   )
 }
@@ -248,16 +258,15 @@ export function getStorageHeaders(body) {
   return _cachedStorageHeaders
 }
 
-const PM_API_ID = getConf('rudi_api', 'pm_api_id')
 let _cachedApiJwt
 export function getRudiApiToken() {
   if (!isJwtValid(_cachedApiJwt)) {
     _cachedApiJwt = forgeToken(
-      getPrvKey('api'),
+      getPrvKey('catalog'),
       {},
       {
         exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-        sub: PM_API_ID,
+        sub: getIdForCatalog(),
         req_mtd: 'all',
         req_url: 'all',
       }
@@ -279,11 +288,11 @@ let cachedUrlJwt = {}
 export function getRudiApiTokenPrecise(url, req) {
   if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]
   cachedUrlJwt[url] = forgeToken(
-    getPrvKey('api'),
+    getPrvKey('catalog'),
     {},
     {
       exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-      sub: getConf('rudi_api', 'pm_api_id'),
+      sub: getIdForCatalog(),
       req_mtd: req.method,
       req_url: axios.getUri({ url, params: req.query }),
     }
@@ -299,15 +308,13 @@ export function getRudiApiTokenPrecise(url, req) {
 const getKeyPath = (name) => {
   switch (name) {
     case 'api':
-      return getConf('rudi_api', 'pm_api_key') || getConf('auth', 'pm_prv_key')
-    case 'media':
-      return getConf('rudi_media', 'pm_media_key') || getConf('auth', 'pm_prv_key')
     case 'catalog':
-      return getConf('rudi_catalog', 'pm_catalog_key') || getConf('auth', 'pm_prv_key')
+      return getKeyForCatalog()
+    case 'media':
     case 'storage':
-      return getConf('rudi_storage', 'pm_storage_key') || getConf('auth', 'pm_prv_key')
+      return getKeyForStorage()
     default:
-      return getConf('auth', 'pm_prv_key')
+      return getDefaultKey()
   }
 }
 
@@ -321,20 +328,20 @@ const prvKeyCache = {}
 const getPrvKey = (name) => {
   // Shortcuts
   switch (name) {
+    case 'catalog':
+    case 'catalog_key':
     case 'api':
     case 'api_key':
     case 'pm_api_key':
-      name = 'api'
+      name = 'catalog'
       break
+    case 'storage':
+    case 'storage_key':
     case 'media':
     case 'media_key':
     case 'pm_media_key':
-      name = 'media'
-      break
-    case 'catalog':
-      name = 'catalog'
-    case 'storage':
       name = 'storage'
+      break
     default:
       name = 'auth'
   }

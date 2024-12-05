@@ -148,7 +148,7 @@ export async function createUser(req, reply) {
     // console.trace('T (createUser) id:', id)
     await dbUpdateUserRoles(db, { userId: id, username, roles })
 
-    const updatedUser = await dbGetUserById(db, id)
+    const updatedUser = await dbGetUserById(db, id) // NOSONAR
     dbClose(db)
     return reply.status(200).json(updatedUser)
   } catch (err) {

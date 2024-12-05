@@ -13,7 +13,14 @@ import { join } from 'path'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
-import { FORM_PREFIX, getBackUrlPrefix, getConf } from './config/config.js'
+import {
+  getBackendListeningAddress,
+  getBackendListeningPort,
+  getBackUrlPrefix,
+  getConf,
+  getConsoleUrlPrefix,
+  getFrontUrlPrefix,
+} from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
 import { expressErrorHandler } from './controllers/errorHandler.js'
@@ -39,7 +46,7 @@ import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatab
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
-import { getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
+import { getDomain, getHost, getRootDir, sleep } from './utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
@@ -127,9 +134,8 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 // -------------------------------------------------------------------------------------------------
 const managerApp = express()
 const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
-  // Set our backend port to be either an environment variable or port 5000
-  const listeningPort = getConf('server', 'listening_port') || 5000
-  const listeningAddress = getConf('server', 'listening_address') || '0.0.0.0'
+  const listeningPort = getBackendListeningPort()
+  const listeningAddress = getBackendListeningAddress()
 
   managerApp.use(
     helmet({
@@ -208,7 +214,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   managerApp.use(getBackUrlPrefix('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // Serving the console frontend
-  managerApp.use(pathJoin('', FORM_PREFIX), consoleRouter)
+  managerApp.use(getConsoleUrlPrefix(), consoleRouter)
 
   // This middleware informs the express application to serve our compiled React files
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
@@ -216,7 +222,7 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
     logI(mod, 'serve', 'Serving the built static page')
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
-    managerApp.get('/*', (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
+    managerApp.get(getFrontUrlPrefix('*'), (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
   }
 
   // Init database on startup

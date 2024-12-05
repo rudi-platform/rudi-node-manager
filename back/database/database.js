@@ -13,7 +13,7 @@ const { Database, OPEN_READWRITE } = verbose()
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getDbPath, getSuName } from '../config/config.js'
+import { getConfSuName, getDbPath } from '../config/config.js'
 import { beautify } from '../utils/utils.js'
 
 import {
@@ -468,8 +468,8 @@ export async function dbGetUserRolesByUsername(openedDb, username) {
     if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await dbGetUserByUsername(db, username)
     const id = userInfo.id
-    if (!id && username !== getSuName()) {
-      logE(mod, fun, `${username} != ${getSuName()}`)
+    if (!id && username !== getConfSuName()) {
+      logE(mod, fun, `${username} != ${getConfSuName()}`)
       dbClose(db)
       throw new UnauthorizedError(`User not found: ${username}`)
     }

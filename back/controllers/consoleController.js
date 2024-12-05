@@ -1,7 +1,7 @@
 const mod = 'consoleCtrl'
 
 // Internal dependencies
-import { FORM_PREFIX } from '../config/config.js'
+import { getConsoleUrlPrefix } from '../config/config.js'
 import { UnauthorizedError } from '../utils/errors.js'
 import { getContext, logW, sysError } from '../utils/logger.js'
 import { getCatalogPublicUrl, getPortalUrl } from './dataController.js'
@@ -17,9 +17,9 @@ export async function getNodeUrls(req, reply) {
       catalog_url: urls[0],
       media_url: urls[1],
       storage_url: urls[1],
-      form_url: FORM_PREFIX,
+      form_url: getConsoleUrlPrefix(),
     }
-    if (urls[2] != 'No portal connected') nodeUrls.portal_url = urls[2]
+    if (urls[2] !== 'No portal connected') nodeUrls.portal_url = urls[2]
 
     return reply.status(200).send(nodeUrls)
   } catch (err) {

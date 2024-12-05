@@ -55,6 +55,8 @@ export const toBase64 = (data) => convertEncoding(data, 'utf-8', 'base64')
 export const toBase64url = (str) => convertEncoding(str, 'utf-8', 'base64url')
 export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
 export const decodeBase64url = (data) => convertEncoding(data, 'base64url', 'utf-8')
+export const encodeBase64 = (data) => convertEncoding(data, 'utf-8', 'base64')
+export const encodeBase64url = (data) => convertEncoding(data, 'utf-8', 'base64url')
 
 export function convertEncoding(data, fromEncoding, toEncoding) {
   try {

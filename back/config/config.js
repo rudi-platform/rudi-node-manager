@@ -12,13 +12,29 @@ import { parse } from 'ini'
 import { jsonToString, pathJoin } from '../utils/utils.js'
 import { getBackDomain, getBackOptions, OPT_DB_PATH, OPT_USER_CONF } from './backOptions.js'
 
-export const FORM_PREFIX = 'form'
+// -------------------------------------------------------------------------------------------------
+// Constants
+// -------------------------------------------------------------------------------------------------
 export const CATALOG = 'rudi-catalog'
 export const STORAGE = 'rudi-storage'
 export const MANAGER = 'rudi-manager'
 
+// These cannot seem to be set as options unfortunately
+const BACKEND_PREFIX = 'api'
+// const FRONTEND_PREFIX = 'front'
+const CONSOLE_PREFIX = 'form'
+
+export const getBackUrlPrefix = (urlPiece) => pathJoin('', BACKEND_PREFIX, urlPiece)
+export const getFrontUrlPrefix = (urlPiece) => pathJoin('', urlPiece)
+export const getConsoleUrlPrefix = (urlPiece) => pathJoin('', CONSOLE_PREFIX, urlPiece)
+
+// -------------------------------------------------------------------------------------------------
+// Helper functions
+// -------------------------------------------------------------------------------------------------
+
 // -------------------------------------------------------------------------------------------------
 // Load default conf
+// -------------------------------------------------------------------------------------------------
 const defaultConfigFile = './prodmanager-conf-default.ini'
 const defaultCustomConfigFile = './prodmanager-conf-custom.ini' // if not set
 
@@ -31,6 +47,7 @@ try {
 
 // -------------------------------------------------------------------------------------------------
 // Load custom conf
+// -------------------------------------------------------------------------------------------------
 const customConfigFile = getBackOptions(OPT_USER_CONF, defaultCustomConfigFile)
 let customConfFileContent
 try {
@@ -52,8 +69,8 @@ for (const section in customConfig) {
 
 if (config.logging.display_conf) jsonToString(config)
 
-const RUDI_CATALOG_URL = config?.rudi_api?.rudi_api_url
-const RUDI_STORAGE_URL = config?.rudi_media?.rudi_media_url
+const RUDI_CATALOG_URL = config?.rudi_catalog?.rudi_catalog_url || config?.rudi_api?.rudi_api_url
+const RUDI_STORAGE_URL = config?.rudi_storage?.rudi_storage_url || config?.rudi_media?.rudi_media_url
 
 console.debug(`[CONF] ${CATALOG} url:`, RUDI_CATALOG_URL)
 console.debug(`[CONF] ${STORAGE} url:`, RUDI_STORAGE_URL)
@@ -64,7 +81,9 @@ if (!RUDI_STORAGE_URL) throw new Error(`Configuration error: ${STORAGE} URL shou
 
 console.debug()
 
+// -------------------------------------------------------------------------------------------------
 // Access conf values
+// -------------------------------------------------------------------------------------------------
 export function getConf(section, subSection) {
   if (!section) return config
   const sect = config[section]
@@ -72,8 +91,17 @@ export function getConf(section, subSection) {
   return sect[subSection]
 }
 
+// -------------------------------------------------------------------------------------------------
 // Shortcuts to access popular conf values
-const RUDI_CATALOG_API_ADMIN = getConf('rudi_api', 'admin_api') || 'api/admin'
+// -------------------------------------------------------------------------------------------------
+const LISTENING_PORT = getConf('server', 'listening_port') || 5000
+const LISTENING_ADDRESS = getConf('server', 'listening_address') || '0.0.0.0'
+
+export const getBackendListeningPort = () => LISTENING_PORT
+export const getBackendListeningAddress = () => LISTENING_ADDRESS
+export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${LISTENING_PORT}`
+
+const RUDI_CATALOG_API_ADMIN = getConf('rudi_api', 'admin_api') || getConf('rudi_catalog', 'admin_api') || 'api/admin'
 export const getCatalogUrl = (...args) => pathJoin(RUDI_CATALOG_URL, ...args)
 export const getCatalogAdminUrl = (...args) => pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
 export const getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...args)
@@ -92,22 +120,32 @@ export function getCatalogUrlAndParams(url, req) {
 export const getStorageUrl = (...args) => pathJoin(RUDI_STORAGE_URL, ...args)
 export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 
-// const CONSOLE_FORM_URL = removeTrailingSlash(config.rudi_console.console_form_url)
-
 const getDbConf = (subSection) => (config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false)
 
 const DB_PATH = getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 
 export const getDbPath = () => DB_PATH
 
-export const getSuId = () => getDbConf('db_su_id') || 0
-export const getSuPwd = () => getDbConf('db_su_pwd')
-export const isSuPwdHashed = () => getDbConf('is_su_pwd_hashed')
-export const getSuName = () => getDbConf('db_su_usr')
-export function setSuName(userDefinedSuName) {
+export const getConfSuId = () => getDbConf('db_su_id') || 0
+export const getConfSuPwd = () => getDbConf('db_su_pwd')
+export const isConfSuPwdHashed = () => getDbConf('is_su_pwd_hashed')
+export const getConfSuName = () => getDbConf('db_su_usr')
+export function setConfSuName(userDefinedSuName) {
   config.database.db_su_usr = userDefinedSuName
 }
-export const getSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
+export const getConfSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
 
-const BACK_PREFIX = getConf('server', 'backend_prefix') || 'api'
-export const getBackUrlPrefix = (urlBit) => pathJoin('/', BACK_PREFIX, urlBit)
+const DEFAULT_MANAGER_KEY = getConf('auth', 'pm_prv_key')
+const KEY_FOR_CATALOG =
+  getConf('rudi_api', 'pm_api_key') || getConf('rudi_catalog', 'pm_catalog_key') || DEFAULT_MANAGER_KEY
+const KEY_FOR_STORAGE =
+  getConf('rudi_media', 'pm_media_key') || getConf('rudi_storage', 'pm_storage_key') || DEFAULT_MANAGER_KEY
+
+export const getDefaultKey = () => DEFAULT_MANAGER_KEY
+export const getKeyForCatalog = () => KEY_FOR_CATALOG
+export const getKeyForStorage = () => KEY_FOR_STORAGE
+
+const ID_FOR_CATALOG = getConf('rudi_api', 'pm_api_id') || getConf('rudi_catalog', 'pm_catalog_id')
+const ID_FOR_STORAGE = getConf('rudi_media', 'pm_media_id') || getConf('rudi_storage', 'pm_storage_id')
+export const getIdForCatalog = () => ID_FOR_CATALOG
+export const getIdForStorage = () => ID_FOR_STORAGE

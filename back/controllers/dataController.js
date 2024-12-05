@@ -8,7 +8,7 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { CATALOG, FORM_PREFIX, getCatalogAdminPath, getCatalogUrlAndParams } from '../config/config.js'
+import { CATALOG, getCatalogAdminPath, getCatalogUrlAndParams, getConsoleUrlPrefix } from '../config/config.js'
 
 import { getTags } from '../config/backOptions.js'
 
@@ -76,7 +76,7 @@ export async function getInitData(req, reply) {
       themeLabels: data[0],
       apiExtUrl: data[1],
       mediaExtUrl: data[2],
-      formUrl: FORM_PREFIX,
+      formUrl: getConsoleUrlPrefix(),
       portalConnected: !!data[3],
     }
     return reply ? reply.status(200).json(initData) : initData

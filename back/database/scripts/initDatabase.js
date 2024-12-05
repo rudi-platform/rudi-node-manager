@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const mod = 'initDb'
 
 // -------------------------------------------------------------------------------------------------
@@ -9,30 +10,20 @@ import { dirname } from 'path'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getBackOptions, OPT_SU_CREDS } from '../../config/backOptions.js'
-import {
-  getDbPath,
-  getSuId,
-  getSuMail,
-  getSuName,
-  getSuPwd,
-  isSuPwdHashed as isSuPwdB64,
-  setSuName,
-} from '../../config/config.js'
+import { hashPassword } from '@aqmo.org/jwt-lib'
+import { getSuCreds } from '../../config/backOptions.js'
+import { getConfSuId, getConfSuMail, getConfSuName, getDbPath, setConfSuName } from '../../config/config.js'
 import { decodeCredentials } from '../../controllers/authControllerPassport.js'
 import { RudiError, statusOK } from '../../utils/errors.js'
-import { getContext, logD, logE, logI, logW, sysInfo } from '../../utils/logger.js'
-import { beautify, decodeBase64 } from '../../utils/utils.js'
+import { getContext, logD, logE, logV, logW, sysInfo } from '../../utils/logger.js'
+import { uuidv4 } from '../../utils/utils.js'
 import {
   dbClose,
   dbCreateRoles,
   dbCreateUserCheckExists,
-  dbCreateUserRole,
   dbDeleteUserWithId,
-  dbExistsUser,
   dbGetRoles,
   dbGetUserById,
-  dbGetUserByUsername,
   dbGetUserRoles,
   dbGetUsers,
   dbOpen,
@@ -302,55 +293,38 @@ const dbNormalizeUserTableId = async (db) => {
   }
 }
 
-const dbInitSuperUser = async (db, b64SuCreds) => {
-  const fun = 'dbInitSuperUser'
+/**
+ * Super User credentials were specified by the admin, we create or update the Super User in user DB
+ * @param {*} db
+ * @param {*} b64SuCreds
+ * @returns
+ */
+const dbInitSuperUserWithCreds = async (db, b64SuCreds) => {
+  const fun = 'dbInitSuperUserWithCreds'
   try {
     const [username, password] = decodeCredentials(b64SuCreds)
-    setSuName(username)
+    setConfSuName(username)
 
-    const dbUsrInfo = await dbGetUserByUsername(db, username)
+    const id = getConfSuId()
+    const email = getConfSuMail()
+    const roles = [ROLE_SU]
+
+    const suInfo = { id, username, password, email }
+    const suRoleInfo = { userId: id, username, roles }
+
+    const dbUsrInfo = await dbGetUserById(db, id) // NOSONAR
     if (dbUsrInfo) {
-      // Super user already exists, updating the password
-      await dbUpdateUser(db, {
-        ...dbUsrInfo,
-        password,
-        isSuPwdHashed: true,
-      })
-      await dbUpdateUserRoles(db, {
-        userId: dbUsrInfo.id,
-        username,
-        roles: [ROLE_SU],
-      })
-      logW(mod, fun, `Super user updated: '${username}' (id ${dbUsrInfo.id}, role ${ROLE_SU})`)
-    } else {
-      // Super user doesn't exists, creating the user
-      const id = getSuId()
-      const testUserExist = await dbGetUserById(db, id) // NOSONAR
-      if (testUserExist) {
-        logW(
-          mod,
-          fun,
-          `User already exists for id ${id} (username: '${testUserExist.username}', role: ${testUserExist.roles}), skipping creation of a new super user`
-        )
-        return
-      }
-      logW(mod, fun, `Creating super user: '${username}' (id ${id})`)
-      const suUsrInfo = {
-        id,
-        username,
-        password,
-        email: getSuMail(),
-        role: [ROLE_SU],
-      }
-      const { id: checkId, username: checkUsr } = await dbCreateUserCheckExists(db, suUsrInfo)
-      logW(mod, fun, `Super user created: '${checkUsr}' (id ${checkId})`)
-
-      await dbUpdateUserRoles(db, {
-        userId: id,
-        username,
-        roles: [ROLE_SU],
-      })
+      // Super User already exists
+      const msg = `Super User already exists for id ${id} (username: '${dbUsrInfo.username}', role: ${dbUsrInfo.roles}) => overwriting the Super User in user DB`
+      logW(mod, fun, msg)
+      await Promise.all([dbUpdateUser(db, suInfo), dbUpdateUserRoles(db, suRoleInfo)])
       logW(mod, fun, `Super user updated: '${username}' (id ${id}, role ${ROLE_SU})`)
+    } else {
+      // Super User does not exist
+      logW(mod, fun, `Creating super user: '${username}' (id ${id})`)
+      await dbCreateUserCheckExists(db, suInfo)
+      await dbUpdateUserRoles(db, suRoleInfo)
+      logW(mod, fun, `Super user created: '${username}' (id ${id}, role ${ROLE_SU})`)
     }
     return username
   } catch (error) {
@@ -362,44 +336,35 @@ const dbInitSuperUser = async (db, b64SuCreds) => {
 const dbCreateSuperUser = async (db) => {
   const fun = 'dbCreateSuperUser'
   try {
-    const encodedSuPwd = getSuPwd()
-    const isSuPwdHashed = isSuPwdB64()
-
-    if (!getSuName() || !encodedSuPwd) {
-      logE(mod, fun, 'No super user config was found')
-      throw new RudiError('Conf needed: database.db_su_usr + database.db_su_pwd')
-    }
-
-    if (await dbExistsUser(db, getSuName)) return // NOSONAR
-
-    const suId = getSuId()
-    const suInfo = await dbGetUserById(db, suId) // NOSONAR
-    if (suInfo) {
-      logI(mod, fun, `Super user exists: ${beautify(suInfo)}`)
+    const id = getConfSuId()
+    const dbSuInfo = await dbGetUserById(db, id) // NOSONAR
+    if (dbSuInfo) {
+      logV(mod, fun, `Super User '${dbSuInfo.username}' exists in DB, no action required`)
       return
-    } // NOSONAR
-
-    const suPwd = !isSuPwdHashed ? decodeBase64(encodedSuPwd) : encodedSuPwd
-
-    const superUser = {
-      id: suId,
-      username: getSuName(),
-      password: suPwd,
-      isSuPwdHashed,
-      email: getSuMail(),
-      role: ROLE_SU,
     }
+    const username = getConfSuName()
+    const email = getConfSuMail()
+    const roles = [ROLE_SU]
 
-    const res = await dbRegisterUser(db, superUser)
-    const { id, username } = res
-    try {
-      await dbCreateUserRole(db, { userId: id, role: superUser.role })
-      const msg = `Super user role created: '${username}' (id ${id}, role ${superUser.role})`
-      logI(mod, fun, msg)
-      return statusOK(msg)
-    } catch (err) {
-      logE(mod, fun, `Error: ${err}`)
-    }
+    const clearPassword = uuidv4()
+    const password = hashPassword(clearPassword)
+    // const b64Password = encodeBase64url(clearPassword)
+
+    const suInfo = { id, username, password, email }
+    const suRoleInfo = { userId: id, username, roles }
+
+    await dbCreateUserCheckExists(db, suInfo)
+    await dbUpdateUserRoles(db, suRoleInfo)
+    logW(mod, fun, `Super user created: '${username}' (id ${id}, role ${ROLE_SU})`)
+    console.error('')
+    console.error('=============================================================================')
+    console.error(`==                                                                         ==`)
+    console.error(`==             A PASSWORD WAS GENERATED FOR THE SUPER USER:                ==`)
+    console.error(`==                                                                         ==`)
+    console.error(`==                 ${clearPassword}                    ==`)
+    console.error(`==                                                                         ==`)
+    console.error('=============================================================================')
+    console.error('')
   } catch (err) {
     logE(mod, fun, `Error: ${err}`)
   }
@@ -430,15 +395,7 @@ export async function dbInitialize() {
     await dbNormalizeUserTableId(db)
     logD(mod, fun, 'Table initialized: Users')
 
-    const suCreds = getBackOptions(OPT_SU_CREDS)
-    if (suCreds) {
-      // log.i(mod, fun, `suCreds: ${suCreds}`)
-      const suName = await dbInitSuperUser(db, suCreds)
-      logW(mod, fun, `User created/updated: SU (${suName})`)
-    } else {
-      await dbCreateSuperUser(db)
-      logD(mod, fun, `User created: SU (${getSuName()})`)
-    }
+    await checkSuperUser(db)
 
     await dbGetUsers(db)
     await dbGetUserRoles(db)
@@ -448,5 +405,26 @@ export async function dbInitialize() {
   } catch (error) {
     logE(mod, fun, error)
     throw error
+  }
+}
+
+/**
+ * If Super User credentials were given through the CLI argument --su or an environment variable MANAGER_SU,
+ * the Super User credentials will be (over)written in the user database.
+ * Otherwise, if no Super User is found in the DB, the credentials given in the custom configuration file will be used.
+ * If no CLI/var env are given and a super user already exists in DB, we leave things as they are.
+ * @param {*} db an sqlite3 database (possibly null)
+ */
+const checkSuperUser = async (db) => {
+  const fun = 'checkSuperUser'
+  const suCreds = getSuCreds()
+  if (suCreds) {
+    // Super User credentials were given through the CLI argument --su or an environment variable MANAGER_SU
+    // => the Super User credentials will be (over)written in the user database.
+    const suName = await dbInitSuperUserWithCreds(db, suCreds)
+    logW(mod, fun, `User created/updated: SU (${suName})`)
+  } else {
+    // No Super User credentials were given
+    await dbCreateSuperUser(db)
   }
 }

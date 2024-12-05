@@ -9,7 +9,7 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import { createBrowserHistory } from 'history'
 
-import { PUBLIC_URL, getApiFront, getFrontOptions, getPublicUrl } from './utils/frontOptions'
+import { getApiFront, getPublicUrl } from './utils/frontOptions'
 
 import { UserContext } from './context/authContext'
 import { BackDataContext } from './context/backDataContext'
@@ -118,10 +118,7 @@ export default function App() {
   const logout = () => {
     axios
       .get(getApiFront('logout'))
-      .then((res) => {
-        // console.debug('T (logout.ok)')
-        exit()
-      })
+      .then(() => exit())
       .catch((err) => {
         console.error('T (logout.ko)', err)
         exit()
@@ -140,7 +137,7 @@ export default function App() {
       </div>
     </div>
   ) : (
-    <Router basename={getFrontOptions(PUBLIC_URL)}>
+    <Router basename={getPublicUrl()}>
       <ModalProvider>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="modal-test"></div>

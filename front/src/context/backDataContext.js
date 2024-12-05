@@ -16,7 +16,7 @@ const getCachedBackData = async (token) => {
     if (cachedBackValues?.formUrl) return cachedBackValues
 
     cachedBackValues = (await axios.get(getApiFront('init-data?lang=fr')))?.data
-    // console.info('Back vals:', cachedBackValues)
+    console.info('Back vals:', cachedBackValues)
     return cachedBackValues
   } catch (err) {
     console.error('E (callBackend)', err.code, err.message)

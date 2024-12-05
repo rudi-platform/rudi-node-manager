@@ -12,7 +12,7 @@ console.log('_argv:', _argv)
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getDomain } from '../utils/utils.js'
+import { getDomain, mergeStrings } from '../utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -34,32 +34,32 @@ export const OPTIONS = {
   [OPT_USER_CONF]: {
     text: 'Path for user conf file',
     cli: 'conf',
-    env: 'RUDI_PROD_MANAGER_USER_CONF',
+    env: 'MANAGER_USER_CONF',
   },
   [OPT_GIT_HASH]: {
     text: 'Git hash',
     cli: 'hash',
-    env: 'RUDI_PROD_MANAGER_GIT_REV',
+    env: 'MANAGER_GIT_REV',
   },
   [OPT_APP_TAG]: {
     text: 'Version tag displayed',
     cli: 'tag',
-    env: 'RUDI_PROD_MANAGER_APP_TAG',
+    env: 'MANAGER_APP_TAG',
   },
   [OPT_BACK_PATH]: {
     text: 'Back-end path',
     cli: 'url',
-    env: 'RUDI_MANAGER_URL',
+    env: 'MANAGER_URL',
   },
   [OPT_DB_PATH]: {
     text: 'Full path for the usr db file',
     cli: 'db',
-    env: 'RUDI_MANAGER_DB',
+    env: 'MANAGER_DB',
   },
   [OPT_SU_CREDS]: {
     text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',
     cli: 'su',
-    env: 'RUDI_PROD_MANAGER_SU_CREDS',
+    env: 'MANAGER_SU_CREDS',
   },
 }
 // if (argv.indexOf('--opts') > -1) {
@@ -79,50 +79,67 @@ console.log('--------------------------------------------------------------')
 // ------------------------------------------------------------------------------------------------
 // console.log('= Extract command line arguments =');
 // console.log(process.argv);
-const cliOptionsValues = {}
+const extractCliOptions = () => {
+  const cliOptionsValues = {}
 
-Object.keys(_argv).forEach((cliOption) => {
-  if (cliOption === '_') {
-    if (_argv[cliOption].length > 0)
-      console.error(
-        '!!! ERR Command Line option not recognized. You might have used --opt = "value" with value ',
-        _argv[cliOption]
-      )
-    return
-  }
-  let found = false
-  for (const appOpt of Object.keys(OPTIONS)) {
-    if (OPTIONS[appOpt]?.cli === cliOption) {
-      cliOptionsValues[appOpt] = _argv[cliOption]
-      found = true
-      // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
-      break
+  Object.keys(_argv).forEach((cliOption) => {
+    if (cliOption === '_') {
+      if (_argv[cliOption].length > 0)
+        console.error(
+          '!!! ERR Command Line option not recognized. You might have used --opt = "value" with value ',
+          _argv[cliOption]
+        )
+      return
     }
-  }
-  if (!found) {
-    console.error('!!! ERR Command Line option not recognized:', `--${cliOption}`, _argv[cliOption])
-    console.log('--------------------------------------------------------------')
-  }
-})
+    let found = false
+    for (const appOpt of Object.keys(OPTIONS)) {
+      if (OPTIONS[appOpt]?.cli === cliOption) {
+        cliOptionsValues[appOpt] = _argv[cliOption]
+        found = true
+        // console.log('Command Line option recognized:', cliOption, '=', _argv[cliOption])
+        break
+      }
+    }
+    if (!found) {
+      console.error('!!! ERR Command Line option not recognized:', `--${cliOption}`, _argv[cliOption])
+      console.log('--------------------------------------------------------------')
+    }
+  })
+  return cliOptionsValues
+}
+
+const CLI_OPTIONS = extractCliOptions()
+const getCliOption = (opt) => CLI_OPTIONS[opt]
 
 // ------------------------------------------------------------------------------------------------
 // Extracted conf values
 // ------------------------------------------------------------------------------------------------
-console.log('Extracted conf values:')
-const backOptionsValues = {}
-Object.keys(OPTIONS).forEach((opt) => {
-  if (cliOptionsValues[opt] !== undefined) {
-    backOptionsValues[opt] = cliOptionsValues[opt]
-    console.log('    (cli) ' + opt + ' => ' + backOptionsValues[opt])
-  } else {
-    const envVar = OPTIONS[opt].env
-    if (process.env[envVar]) {
-      backOptionsValues[opt] = process.env[envVar]
-      console.log('    (env) ' + opt + ' => ' + backOptionsValues[opt])
-    }
+const getEnvVar = (opt) => {
+  const envVarBaseName = OPTIONS[opt].env
+  for (const prefix of ['', 'RUDI_NODE', 'RUDI', 'RUDI_PROD']) {
+    const envVar = process.env[mergeStrings('_', prefix, envVarBaseName)]
+    if (envVar) return envVar
   }
-})
-
+}
+const getUserOptions = () => {
+  const backOptionsValues = {}
+  console.log('Extracted conf values:')
+  Object.keys(OPTIONS).forEach((opt) => {
+    const cliOpt = getCliOption(opt)
+    if (cliOpt !== undefined) {
+      backOptionsValues[opt] = cliOpt
+      console.log('    (cli) ' + opt + ' => ' + cliOpt)
+    } else {
+      const envVar = getEnvVar(opt)
+      if (envVar !== undefined) {
+        backOptionsValues[opt] = envVar
+        console.log('    (env) ' + opt + ' => ' + envVar)
+      }
+    }
+  })
+  return backOptionsValues
+}
+const BACK_OPTIONS = getUserOptions()
 console.log('--------------------------------------------------------------')
 
 /**
@@ -131,7 +148,7 @@ console.log('--------------------------------------------------------------')
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-export const getBackOptions = (opt, altValue) => (opt ? backOptionsValues[opt] || altValue : backOptionsValues)
+export const getBackOptions = (opt, altValue) => (opt ? BACK_OPTIONS[opt] || altValue : BACK_OPTIONS)
 
 export const getAppTag = () => getBackOptions(OPT_APP_TAG) || ''
 
@@ -164,3 +181,6 @@ export const isProdEnv = () => nodeEnv === 'production'
 const BACK_PATH = getBackOptions(OPT_BACK_PATH)
 const BACK_DOMAIN = getDomain(BACK_PATH) || BACK_PATH
 export const getBackDomain = () => BACK_DOMAIN
+
+// If the --su CLI option or MANAGER_SU_CREDS env var is defined, the SU creds in the DB will be overwritten.
+export const getSuCreds = () => getBackOptions(OPT_SU_CREDS)
