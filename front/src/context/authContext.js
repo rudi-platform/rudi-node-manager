@@ -2,7 +2,7 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-import { getApiFront } from '../utils/frontOptions'
+import { BackConfContext } from './backConfContext.js'
 import { JwtContext } from './jwtContext'
 
 const hasRoleAdmin = (userInfo) =>
@@ -11,14 +11,6 @@ const hasRoleAdmin = (userInfo) =>
 const hasRoleEditor = (userInfo) =>
   userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1 || false
 
-const callAuthBackend = async (token) => {
-  try {
-    return !token ? {} : (await axios.get(getApiFront('user-info')))?.data
-  } catch (err) {
-    console.error('E (callAuthBackend)', err.code, err.status, err.message)
-    return {}
-  }
-}
 /**
  * We use this context to memorize
  * - the user info (username + roles)
@@ -41,10 +33,22 @@ UserContextProvider.propTypes = { children: PropTypes.object }
  */
 export function UserContextProvider({ children }) {
   const { token } = useContext(JwtContext)
+  const { getBackFront } = useContext(BackConfContext)
 
   const [userInfo, setUserInfo] = useState({})
   const [isAdmin, setIsAdmin] = useState(false)
   const [isEditor, setIsEditor] = useState(false)
+
+  const callAuthBackend = async (token) => {
+    try {
+      if (!token) return {}
+      const url = await getBackFront('user-info')
+      await axios.get(url)?.data
+    } catch (err) {
+      console.error('E (callAuthBackend)', err.code, err.status, err.message)
+      return {}
+    }
+  }
 
   useEffect(() => {
     setIsAdmin(hasRoleAdmin(userInfo))

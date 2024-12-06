@@ -1,13 +1,13 @@
 const mod = 'consoleCtrl'
 
-import { getOptBackDomain } from '../config/backOptions.js'
+import { getOptBackDomain, isDevEnv } from '../config/backOptions.js'
 // Internal dependencies
 import {
-  getAppUrlPrefix,
   getBackendListeningAddressAndPort,
-  getBackUrlPrefix,
-  getConsoleUrlPrefix,
-  getFrontUrlPrefix,
+  getBackPath,
+  getConsolePath,
+  getFrontPath,
+  getManagerPath,
 } from '../config/config.js'
 import { UnauthorizedError } from '../utils/errors.js'
 import { getContext, logE, logW, sysError } from '../utils/logger.js'
@@ -22,10 +22,10 @@ export const getNodeUrls = async () => {
     const nodeUrls = {
       catalog_url: urls[0],
       storage_url: urls[1],
-      console_path: getConsoleUrlPrefix(),
-      front_path: getFrontUrlPrefix(),
-      back_path: getBackUrlPrefix(),
-      manager_path: getAppUrlPrefix(),
+      console_path: getConsolePath(),
+      front_path: getFrontPath(),
+      back_path: getBackPath(),
+      manager_path: getManagerPath(),
       host_url: getOptBackDomain() || getBackendListeningAddressAndPort(),
     }
     if (urls[2] !== 'No portal connected') nodeUrls.portal_url = urls[2]
@@ -44,6 +44,11 @@ export async function sendNodeUrls(req, reply) {
     sysError(mod, fun, err, getContext(req, { opType: 'get_node_urls' }))
     handleError(req, reply, err, 404, fun)
   }
+}
+
+export async function sendConf(req, reply) {
+  const nodeUrls = await getNodeUrls()
+  return reply.status(200).json({ ...nodeUrls, is_dev: isDevEnv() })
 }
 
 // Controllers

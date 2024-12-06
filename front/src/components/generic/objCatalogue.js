@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { getApiData } from '../../utils/frontOptions'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard, ObjCard } from '../generic/objCard'
+import { BackConfContext } from '../../context/backConfContext.js'
 
 const PAGE_SIZE = 20
 
@@ -47,6 +47,7 @@ export default function ObjCatalogue({
   deleteConfirmMsg,
   deleteMsg,
 }) {
+  const { getBackCatalog } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setIsEdit] = useState(!!editMode)
@@ -57,7 +58,7 @@ export default function ObjCatalogue({
   const [currentOffset, setCurrentOffset] = useState(-1)
   const initialRender = useRef(true)
 
-  const getApiUrlObj = (suffix) => getApiData(objType, suffix)
+  const getApiUrlObj = (suffix) => getBackCatalog(objType, suffix)
   const deleteUrl = (id) => getApiUrlObj(id)
 
   const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')

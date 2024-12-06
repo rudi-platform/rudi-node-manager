@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { getApiData } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import LicenceCard from './licenceCard'
 
@@ -18,6 +18,8 @@ CatalogueLicence.propTypes = {
  * @return {ReactNode}
  */
 export default function CatalogueLicence({ editMode, logout }) {
+  const { getBackCatalog } = useContext(BackConfContext)
+
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setEdit] = useState(!!editMode)
@@ -32,7 +34,7 @@ export default function CatalogueLicence({ editMode, logout }) {
    */
   function getInitialData() {
     axios
-      .get(getApiData('licences'))
+      .get(getBackCatalog('licences'))
       .then((res) => setLicences(res.data))
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }

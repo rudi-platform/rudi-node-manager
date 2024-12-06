@@ -1,12 +1,12 @@
 import axios from 'axios'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import PropTypes from 'prop-types'
 import { Search, XCircle } from 'react-bootstrap-icons'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { getApiData } from '../../utils/frontOptions'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard } from '../generic/objCard'
 import ThemeDisplay from '../other/themeDisplay'
@@ -14,7 +14,7 @@ import MetadataCard, { displayStatus } from './metadataCard'
 
 const idField = 'global_id'
 
-const deleteUrl = (id) => getApiData('resources', id)
+const deleteUrl = (id) => getBackCatalog('resources', id)
 const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`
 const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`
 
@@ -32,6 +32,7 @@ CatalogueMetadata.propTypes = {
  * @return {ReactNode}
  */
 export default function CatalogueMetadata({ editMode, logout }) {
+  const { getBackCatalog } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   // console.log('-- Catalogue')
@@ -247,7 +248,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   function getInitialData() {
     Promise.all(
       filterConf.map((count) =>
-        axios.get(getApiData(`resources${searchMode()}`), {
+        axios.get(getBackCatalog(`resources${searchMode()}`), {
           params: createParams({ count_by: count.name }),
         })
       )
@@ -267,7 +268,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
    */
   function fetchMoreData() {
     axios
-      .get(getApiData(`resources${searchMode()}`), {
+      .get(getBackCatalog(`resources${searchMode()}`), {
         params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
       })
       .then((res) => {

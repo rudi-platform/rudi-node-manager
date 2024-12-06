@@ -3,14 +3,14 @@ import './login.css'
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 import Button from 'react-bootstrap/esm/Button'
 
-import { getApiFront } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 
 export const btnColor = 'success'
@@ -36,6 +36,8 @@ Login.propTypes = { updateToken: PropTypes.func.isRequired }
  * @return {ReactNode} Login html component
  */
 export default function Login({ updateToken }) {
+  const { backConf, getBackFront } = useContext(BackConfContext)
+  getBackFront().then((url) => console.log(`Backend endpoint:${url}`))
   // const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [username, setUsername] = useState('')
@@ -60,9 +62,11 @@ export default function Login({ updateToken }) {
    * @return {Promise} login promise
    */
   const loginUser = (credentials) =>
-    axios.post(getApiFront('login'), JSON.stringify(credentials), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    getBackFront('login').then((url) =>
+      axios.post(url, JSON.stringify(credentials), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
 
   /**
    * handle submit login form

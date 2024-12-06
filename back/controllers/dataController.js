@@ -8,9 +8,16 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { CATALOG, getCatalogAdminPath, getCatalogUrlAndParams, getConsoleUrlPrefix } from '../config/config.js'
+import {
+  CATALOG,
+  getBackendListeningAddressAndPort,
+  getBackPath,
+  getCatalogAdminPath,
+  getCatalogUrlAndParams,
+  getConsolePath,
+} from '../config/config.js'
 
-import { getTags } from '../config/backOptions.js'
+import { getOptBackDomain, getTags } from '../config/backOptions.js'
 
 import { getCatalogHeaders } from '../utils/secu.js'
 import { handleError, treatAxiosError } from './errorHandler.js'
@@ -74,9 +81,11 @@ export async function getInitData(req, reply) {
       appTag: tags?.tag,
       gitHash: tags?.hash,
       themeLabels: data[0],
-      apiExtUrl: data[1],
-      mediaExtUrl: data[2],
-      formUrl: getConsoleUrlPrefix(),
+      catalogPubUrl: data[1],
+      storagePubUrl: data[2],
+      consolePath: getConsolePath(),
+      backPath: getBackPath(),
+      hostUrl: getOptBackDomain() || getBackendListeningAddressAndPort(),
       portalConnected: !!data[3],
     }
     return reply ? reply.status(200).json(initData) : initData

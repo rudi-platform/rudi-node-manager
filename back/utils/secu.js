@@ -189,16 +189,16 @@ export async function getTokenFromMediaForUser(user) {
     user_name: user.username || 'rudi_console',
     group_name: getConf('rudi_console', 'default_client_group'),
   }
-  // Let's offset the user id to not mess with Media ids
+  // Let's offset the user id to not mess with Storage ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
   // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
   const mediaForgeJwtUrl = getStorageUrl('jwt/forge')
   try {
     const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
-    if (!mediaRes) throw Error(`No answer received from Media module`)
+    if (!mediaRes) throw Error(`No answer received from ${STORAGE} module`)
     if (!mediaRes?.data?.token)
-      throw new Error(`Unexpected response from Media while forging a token: ${mediaRes.data}`)
+      throw new Error(`Unexpected response from ${STORAGE} while forging a token: ${mediaRes.data}`)
     else return mediaRes.data.token
   } catch (err) {
     if (err.code === 'ECONNREFUSED')
@@ -209,14 +209,14 @@ export async function getTokenFromMediaForUser(user) {
       )
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
-      `Could not forge a token for user '${user.username}' on Media: ${cleanErrMsg(
+      `Could not forge a token for user '${user.username}' on ${STORAGE}: ${cleanErrMsg(
         err.response?.data?.message || err.response?.data?.msg || err.message || err.response?.data
       )}`,
       mod,
       fun
     )
 
-    logE(mod, fun, `Could not forge a token on Media: ${rudiError}`)
+    logE(mod, fun, `Could not forge a token on ${STORAGE}: ${rudiError}`)
     throw rudiError
   }
 }

@@ -1,14 +1,14 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
 
-import { getApiFront } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import GenericModal, { useGenericModal, useGenericModalOptions } from '../modals/genericModal'
 import './login.css'
 
@@ -34,6 +34,8 @@ Register.propTypes = {
  * @return {ReactNode} Register html component
  */
 export default function Register({ backToLogin }) {
+  const { getBackFront } = useContext(BackConfContext)
+
   // const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [username, setUsername] = useState('')
@@ -60,9 +62,11 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const registerUser = (credentials) =>
-    axios.post(getApiFront('register'), JSON.stringify(credentials), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    getBackFront('register').then((url) =>
+      axios.post(url, JSON.stringify(credentials), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
 
   const displayMsgForAccountCreated = () => {
     changeOptions({

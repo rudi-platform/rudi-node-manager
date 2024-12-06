@@ -9,8 +9,6 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
 import { createBrowserHistory } from 'history'
 
-import { getApiFront, getPublicUrl } from './utils/frontOptions'
-
 import { UserContext } from './context/authContext'
 import { BackDataContext } from './context/backDataContext'
 
@@ -28,10 +26,10 @@ import ModalProvider from './components/modals/genericModalContext'
 import Monitoring from './components/monitoring/monitoring'
 import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
+import { BackConfContext } from './context/backConfContext.js'
 import { JwtContext } from './context/jwtContext'
 
-export const history = createBrowserHistory({ basename: getPublicUrl() })
-
+export const history = createBrowserHistory({ basename: window.location.pathname })
 /*
 TODO :
 - sticky filtre
@@ -48,8 +46,11 @@ export default function App() {
   // ---------------- Loading context
   const { token, updateToken } = useContext(JwtContext)
   const { isEditor, isAdmin } = useContext(UserContext)
+  const { backConf } = useContext(BackConfContext)
   const { appInfo } = useContext(BackDataContext)
 
+  const { conf, setConf } = useState(backConf)
+  useEffect(() => setConf(backConf))[backConf]
   // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
@@ -115,15 +116,16 @@ export default function App() {
    * logout
    * @return {void}
    */
-  const logout = () => {
-    axios
-      .get(getApiFront('logout'))
-      .then(() => exit())
-      .catch((err) => {
-        console.error('T (logout.ko)', err)
-        exit()
-      })
-  }
+  const logout = () =>
+    conf.getBackFront('logout').then((url) =>
+      axios
+        .get(url)
+        .then(exit)
+        .catch((err) => {
+          console.error('T (logout.ko)', err)
+          exit()
+        })
+    )
 
   return !token ? (
     <div>
@@ -137,7 +139,7 @@ export default function App() {
       </div>
     </div>
   ) : (
-    <Router basename={getPublicUrl()}>
+    <Router basename={window.location.pathname}>
       <ModalProvider>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="modal-test"></div>

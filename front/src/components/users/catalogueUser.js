@@ -1,16 +1,14 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-import { getApiSecu } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
 
 const propId = 'id'
-const urlUsers = getApiSecu('users')
-const urlRoles = getApiSecu('roles')
 
 CatalogueUser.propTypes = {
   editMode: PropTypes.bool,
@@ -22,6 +20,10 @@ CatalogueUser.propTypes = {
  * @return {ReactNode}
  */
 export default function CatalogueUser({ editMode, logout }) {
+  const { getBackSecu } = useContext(BackConfContext)
+  const urlUsers = getBackSecu('users')
+  const urlRoles = getBackSecu('roles')
+
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const [isEdit, setIsEdit] = useState(!!editMode)

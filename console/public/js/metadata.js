@@ -39,10 +39,10 @@ export class MetadataForm extends RudiForm {
       let data
       try {
         data = await Promise.all([
-          this.getPmJson('data/enum?lang=fr'),
-          this.getPmJson('data/contacts'),
-          this.getPmJson('data/organizations'),
-          this.getPmJson('data/pub_keys?type=rsa'),
+          this.getPmJson('catalog/enum?lang=fr'),
+          this.getPmJson('catalog/contacts'),
+          this.getPmJson('catalog/organizations'),
+          this.getPmJson('catalog/pub_keys?type=rsa'),
         ])
       } catch (err) {
         this.ko(here, err)
@@ -98,7 +98,7 @@ export class MetadataForm extends RudiForm {
       htmlCtrl.custom_licence_label.value = [{ lang: 'fr', text: '' }]
       htmlCtrl.resource_languages.value = ['fr']
       htmlCtrl.storage_status.value = 'pending'
-      htmlCtrl.metadata_api_version.value = await this.getPmStr('data/version')
+      htmlCtrl.metadata_api_version.value = await this.getPmStr('catalog/version')
       htmlCtrl.created.value = new Date().toISOString() //.slice(0, 10)
 
       await this.getEditModeAndFillData('resources')
@@ -206,7 +206,7 @@ export class MetadataForm extends RudiForm {
   async getMediaHeaders(initialHeaders = {}) {
     try {
       if (!this.mediaHeaders) {
-        const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlPm('media/jwt'), this.pmHeaders).send()
+        const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlBack('media/jwt'), this.pmHeaders).send()
         const mediaToken = pmMediaJwtRes.token
         this.mediaHeaders = Object.assign(initialHeaders, { Authorization: `Bearer ${mediaToken}` })
       }
@@ -238,7 +238,7 @@ export class MetadataForm extends RudiForm {
       if (!postMediaOpts) return
 
       const mediaId = mediaFile.media_id
-      const req = HttpRequest.post(this.getUrlMedia('post'), postMediaOpts)
+      const req = HttpRequest.post(this.getUrlStorage('post'), postMediaOpts)
 
       req.upload.addEventListener('progress', (event) =>
         this.updateGlobalProgress(mediaId, mediaFile.media_name, event.total, event.loaded)
@@ -286,7 +286,7 @@ export class MetadataForm extends RudiForm {
     // TODO: check si tous les fichiers sont bien uploadés, sinon supprimer la métadonnée ou mettre son état à WIP
     try {
       // Sending the metadata to PM => API
-      const res = await submitFunction(this.getUrlPm('data/resources'), this.pmHeaders).sendJson(data)
+      const res = await submitFunction(this.getUrlBack('catalog/resources'), this.pmHeaders).sendJson(data)
       this.ok(here, 'metadata sent', res)
     } catch (e) {
       console.error(`ERR01 Couldn't send the metadata to the API, aborting. Cause:`, e)
@@ -384,7 +384,7 @@ export class MetadataForm extends RudiForm {
       }
       if (metadataId) commitInfo.global_id = metadataId
       try {
-        await JsonHttpRequest.post(this.getUrlPm('media/commit'), this.pmHeaders).sendJson(commitInfo)
+        await JsonHttpRequest.post(this.getUrlBack('media/commit'), this.pmHeaders).sendJson(commitInfo)
         this.ok(here, 'Commit succeeded for media', mediaId)
       } catch (error) {
         console.error(`E [${here}.post] Committing failed for media ${mediaId}`, error)

@@ -1,39 +1,41 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
-import { getApiData } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 
 /**
  * Composant : Monitoring
  * @return {ReactNode}
  */
 function Monitoring({}) {
+  const { getBackCatalog } = useContext(BackConfContext)
+
   const [generalMonitoring, setGeneralMonitoring] = useState({}) // NOSONAR
 
   useEffect(() => {
     Promise.all([
-      axios.get(getApiData('resources'), { params: { count_by: 'metadata_info.api_version' } }).catch(() => {
+      axios.get(getBackCatalog('resources'), { params: { count_by: 'metadata_info.api_version' } }).catch(() => {
         return { data: [] }
       }),
-      axios.get(getApiData('resources'), { params: { count_by: 'storage_status' } }).catch(() => {
+      axios.get(getBackCatalog('resources'), { params: { count_by: 'storage_status' } }).catch(() => {
         return { data: [] }
       }),
       axios
-        .get(getApiData('resources'), {
+        .get(getBackCatalog('resources'), {
           params: { count_by: 'metadata_info.api_version', updated_after: '2021-10-01' },
         })
         .catch(() => {
           return { data: [] }
         }),
       axios
-        .get(getApiData('resources'), {
+        .get(getBackCatalog('resources'), {
           params: { count_by: 'producer' },
         })
         .catch(() => {
           return { data: [] }
         }),
       axios
-        .get(getApiData('reports'), {
+        .get(getBackCatalog('reports'), {
           params: { count_by: 'integration_status' },
         })
         .catch(() => {

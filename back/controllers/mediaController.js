@@ -126,7 +126,7 @@ export async function commitMediaFile(req, reply, next) {
   const fun = 'commitMediaFile'
   const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
 
-  // Let's commit the media on Media module
+  // Let's commit the media on Storage module
   try {
     await commitOnStorage(mediaId, commitId, zoneName)
   } catch (err) {
@@ -161,11 +161,10 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
     return { status: 'OK', place: 'rudi-media', media_id: mediaId, commit_id: commitId }
   } catch (err) {
     logE(mod, fun + '.origErr', err)
-    const moduleName = 'RUDI Media'
     if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
       throw RudiError.createRudiHttpError(
         503,
-        `La connection de “${MANAGER}” vers le module “${moduleName}” a échoué: “${moduleName}” semble injoignable, contactez l‘admin du noeud RUDI`
+        `La connection de “${MANAGER}” vers le module “${STORAGE}” a échoué: “${STORAGE}” semble injoignable, contactez l‘admin du noeud RUDI`
       )
     }
 
@@ -173,7 +172,7 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
     logE(mod, fun, errMsg)
     const e = {
       statusCode: err.response?.status,
-      place: moduleName,
+      place: STORAGE,
       message: err.response?.data?.msg,
     }
     logE(mod, fun + '.test', e)

@@ -143,7 +143,7 @@ export const uuidv4 = () =>
         (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
       )
 
-export const getDocumentInfo = (field) => {
+export const getPageInfo = (field) => {
   const url = window.location.pathname
   const lastSlashIndex = url.lastIndexOf('/')
   const path = url.slice(0, lastSlashIndex)
@@ -153,7 +153,7 @@ export const getDocumentInfo = (field) => {
   return field ? docInfo[field] : docInfo
 }
 
-export const fetchConf = async () =>
-  fetch(pathJoin(getDocumentInfo('path'), 'conf'))
+export const fetchConf = () =>
+  fetch(pathJoin(getPageInfo('path'), 'conf'))
     .then((response) => response.json())
     .catch((error) => console.error('Error fetching config:', error))

@@ -11,11 +11,7 @@ import '../lib/MaterialInputs.js'
 
 import { JsonHttpRequest } from './Http.js'
 import { RudiForm, STYLE_NRM, STYLE_THN } from './Rudi.js'
-import {
-  generateRsaOaepKeyPair,
-  privateCryptoKeyToPem,
-  publicCryptoKeyToPem,
-} from './RudiCrypto.js'
+import { generateRsaOaepKeyPair, privateCryptoKeyToPem, publicCryptoKeyToPem } from './RudiCrypto.js'
 import { uuidv4 } from './utils.js'
 
 export class RudiObjForm extends RudiForm {
@@ -24,8 +20,7 @@ export class RudiObjForm extends RudiForm {
     super(language)
 
     this.objType = objType
-    this.idField =
-      idField || `${this.objType.endsWith('s') ? this.objType.slice(0, -1) : this.objType}_id`
+    this.idField = idField || `${this.objType.endsWith('s') ? this.objType.slice(0, -1) : this.objType}_id`
     this.templatePath = templatePath || `templates/${this.objType}.json`
   }
 
@@ -103,10 +98,7 @@ export class RudiObjForm extends RudiForm {
     const isUpdate = this.state == 'edit'
     const submitFunction = isUpdate ? JsonHttpRequest.put : JsonHttpRequest.post
     try {
-      const response = await submitFunction(
-        this.getUrlPm('data', this.objType),
-        this.pmHeaders
-      ).sendJson(data)
+      const response = await submitFunction(this.getCatalogData(this.objType), this.pmHeaders).sendJson(data)
       console.log(this.objType, 'sent. Response:', response)
 
       this.end()
@@ -187,11 +179,7 @@ export class RudiKeyForm extends RudiObjForm {
    */
   async updateKeyDisplay() {
     const here = 'updateKeyDisplay'
-    if (
-      this.customForm.hasAttribute('readonly') ||
-      this.customForm.htmlController.switch.value != 'URL'
-    )
-      return
+    if (this.customForm.hasAttribute('readonly') || this.customForm.htmlController.switch.value != 'URL') return
 
     // Clear display
     this.customForm.htmlController.pem.value = ''
@@ -245,8 +233,7 @@ export class RudiKeyForm extends RudiObjForm {
     }
     return outputValue
   }
-  submitListener = () =>
-    super.submitListener(async (outputvalue) => this.treatOutputValue(outputvalue))
+  submitListener = () => super.submitListener(async (outputvalue) => this.treatOutputValue(outputvalue))
 
   // Function to download data to a file
   download(data, filename, type) {
@@ -274,12 +261,8 @@ export class RudiKeyForm extends RudiObjForm {
       rudiObj.customForm.htmlController.pem.value = ''
       rudiObj.updateKeyDisplay()
     })
-    rudiObj.customForm.htmlController.url.addEventListener('change', () =>
-      rudiObj.updateKeyDisplay()
-    )
-    rudiObj.customForm.htmlController.prop.addEventListener('change', () =>
-      rudiObj.updateKeyDisplay()
-    )
+    rudiObj.customForm.htmlController.url.addEventListener('change', () => rudiObj.updateKeyDisplay())
+    rudiObj.customForm.htmlController.prop.addEventListener('change', () => rudiObj.updateKeyDisplay())
   }
 }
 
@@ -294,8 +277,5 @@ switch (document.title) {
     RudiKeyForm.loadForm()
     break
   default:
-    console.log(
-      'document title should be "Rudi Contact", "Rudi Producer" or "Rudi Public Key", got:',
-      document.title
-    )
+    console.log('document title should be "Rudi Contact", "Rudi Producer" or "Rudi Public Key", got:', document.title)
 }

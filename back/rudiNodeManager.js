@@ -14,14 +14,13 @@ import { join } from 'path'
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
 import {
-  getAppUrlPrefix,
   getBackendListeningAddress,
   getBackendListeningPort,
-  getBackUrlInHeaders,
-  getBackUrlPrefix,
+  getBackPath,
   getConf,
-  getConsoleUrlPrefix,
-  getFrontUrlPrefix,
+  getConsolePath,
+  getFrontPath,
+  getManagerPath,
 } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
@@ -44,6 +43,7 @@ import { getStoragePublicUrl } from './controllers/mediaController.js'
 // -------------------------------------------------------------------------------------------------
 // External dependencies: security
 // -------------------------------------------------------------------------------------------------
+import { sendConf } from './controllers/consoleController.js'
 import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatabase.js'
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
@@ -211,18 +211,26 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   const authenticate = passportAuthenticate('jwt', { session: false })
 
   // -----------------------------------------------------------------------------------------------
+  // Get conf (this module URLs)
+  // -----------------------------------------------------------------------------------------------
+  // Get the manager conf in any frontend path
+  managerApp.get(/.*\/conf$/, (req, reply) => sendConf(req, reply))
+
+  // -----------------------------------------------------------------------------------------------
   // Backend routes
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getBackUrlPrefix('open'), openApi)
-  managerApp.use(getBackUrlPrefix('front'), frontApi)
-  managerApp.use(getBackUrlPrefix('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
-  managerApp.use(getBackUrlPrefix('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
-  managerApp.use(getBackUrlPrefix('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
+  managerApp.use(getBackPath('open'), openApi)
+  managerApp.use(getBackPath('front'), frontApi)
+  managerApp.use(getBackPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getBackPath('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getBackPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackPath('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackPath('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getConsoleUrlPrefix(), consoleRouter)
+  managerApp.use(getConsolePath(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!
@@ -233,9 +241,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     logI(mod, 'serve', 'Serving the built static page')
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
-    managerApp.get(getFrontUrlPrefix('*'), (req, reply) =>
-      reply.sendFile(join(__dirname, 'front/build/index.html'), getBackUrlInHeaders())
-    )
+    managerApp.get(getFrontPath('*'), (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -258,7 +264,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Configure our server to listen on the port defiend by our port variable
   // -----------------------------------------------------------------------------------------------
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
-    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getAppUrlPrefix()}`)
+    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getManagerPath()}`)
   )
   managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 

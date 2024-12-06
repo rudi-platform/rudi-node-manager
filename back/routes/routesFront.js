@@ -7,7 +7,7 @@ import express from 'express'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { getNodeEnv } from '../config/backOptions.js'
-import { getConsoleUrlPrefix } from '../config/config.js'
+import { getConsolePath } from '../config/config.js'
 import { postLogin, postRegister, putPassword } from '../controllers/authControllerPassport.js'
 import { getUserInfo, sendNodeUrls } from '../controllers/consoleController.js'
 import { getCatalogPublicUrl, getInitData, getPortalUrl } from '../controllers/dataController.js'
@@ -36,7 +36,7 @@ frontApi.get('/node-urls', authenticate, sendNodeUrls)
 
 // Get modules public URLs
 frontApi.get('/env', authenticate, (req, reply) => reply.status(200).send(getNodeEnv()))
-frontApi.get('/form-url', authenticate, (req, reply) => reply.status(200).send(getConsoleUrlPrefix()))
+frontApi.get('/form-url', authenticate, (req, reply) => reply.status(200).send(getConsolePath()))
 frontApi.get('/storage-url', authenticate, getStoragePublicUrl)
 frontApi.get('/catalog-url', authenticate, makeRequestable(getCatalogPublicUrl))
 frontApi.get('/portal-url', authenticate, makeRequestable(getPortalUrl))

@@ -181,9 +181,9 @@ export const logD = (srcMod, srcFun, ...msg) =>
     ? sysDebug(srcMod, srcFun, beautify(msg))
     : console.debug(createLogLine('debug', srcMod, srcFun, ...msg))
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Syslog functions
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // System-related "panic" conditions
 export const sysEmerg = (srcMod, srcFun, msg, context) => rplog('emergency', srcMod, srcFun, msg, context)
@@ -195,9 +195,9 @@ export const sysCrit = (srcMod, srcFun, msg, context) => rplog('critical', srcMo
 // or admins to spot potential problems - no immediate action required.
 export const sysNotice = (srcMod, srcFun, msg, context) => rplog('notice', srcMod, srcFun, msg, context)
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 // Syslog functions: app level
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // Something bad happened, deal with it NOW!
 export const sysAlert = (srcMod, srcFun, msg, context) => rplog('alert', srcMod, srcFun, msg, context)

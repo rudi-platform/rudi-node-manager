@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Check } from 'react-bootstrap-icons'
 import { useParams } from 'react-router-dom'
 
@@ -9,7 +9,7 @@ import { JsonViewer } from '@textea/json-viewer'
 import jspreadsheet from 'jspreadsheet-ce'
 import 'jspreadsheet-ce/dist/jspreadsheet.css'
 
-import { getApiMedia } from '../../utils/frontOptions.js'
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 
 Visualisation.propTypes = {
@@ -20,6 +20,7 @@ Visualisation.propTypes = {
  * @return {ReactNode}
  */
 function Visualisation({ logout }) {
+  const { getBackStorage } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { id } = useParams()
@@ -118,7 +119,7 @@ function Visualisation({ logout }) {
   }
 
   const getMediaInfo = async (mediaId) => {
-    const resApi = await axios.get(getApiMedia(mediaId))
+    const resApi = await axios.get(getBackStorage(mediaId))
     const mediaInfo = resApi?.data
     // console.debug('T (visu) getMediaInfo', mediaInfo)
     if (!mediaInfo)
@@ -221,7 +222,7 @@ function Visualisation({ logout }) {
     // First: let's get the media metadata from the "RUDI Catalog" module
     const { mediaUrl, mediaMime, mediaCharset } = await getMediaInfo(mediaId)
     try {
-      // Let's then get the media data from the "RUDI Media" module
+      // Let's then get the media data from the "RUDI Storage" module
       await showContent(mediaUrl, mediaMime, mediaCharset)
     } catch (err) {
       if (err.msg === 'media uuid not found') {

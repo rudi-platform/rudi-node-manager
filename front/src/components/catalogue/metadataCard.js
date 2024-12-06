@@ -5,8 +5,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import { BackDataContext } from '../../context/backDataContext'
-import { getForm } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { getLocaleFormatted, pathJoin } from '../../utils/utils'
 import { DefaultConfirmOption, DefaultOkOption, useModalContext } from '../modals/genericModalContext'
@@ -110,6 +110,7 @@ export const displayMetadataStatus = (metadata) =>
  * @return {ReactNode}
  */
 export default function MetadataCard({ editMode, metadata, refresh, logout }) {
+  const { getConsole, getBackCatalog } = useContext(BackConfContext)
   const { appInfo } = useContext(BackDataContext)
   const { changeOptions, toggle } = useModalContext()
 
@@ -117,9 +118,9 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const [appData, setAppData] = useState(appInfo)
   useEffect(() => setAppData(appInfo), [appInfo])
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || 'form'), [appInfo])
-  const getFormMeta = (query) => getForm(formUrl, 'metadata', query)
+  const [consolePath, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.consolePath || 'form'), [appInfo])
+  const getFormMeta = (query) => getConsole(consolePath, 'metadata', query)
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
@@ -129,7 +130,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    */
   function deleteRessource() {
     axios
-      .delete(`api/data/resources/${metadata.global_id}`)
+      .delete(getBackCatalog('resources', metadata.global_id))
       .then((res) => {
         const options = DefaultOkOption
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`]
@@ -225,7 +226,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     media.file_storage_status === 'missing' ? displayMissingMedia(media) : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(pathJoin(appData.apiExtUrl, 'api/v1/resources', metadata.global_id)),
+    share: shareButton(pathJoin(appData.catalogPubUrl, 'api/v1/resources', metadata.global_id)),
     edit: editButton(getFormMeta(`update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),

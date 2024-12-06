@@ -98,12 +98,10 @@ const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
 const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 
-export const getAppUrlPrefix = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
-export const getBackUrlPrefix = (...args) => getAppUrlPrefix(BACKEND_PREFIX, ...args)
-export const getFrontUrlPrefix = (...args) => getAppUrlPrefix(FRONTEND_PREFIX, ...args)
-export const getConsoleUrlPrefix = (...args) => getAppUrlPrefix(CONSOLE_PREFIX, ...args)
-
-export const getBackUrlInHeaders = () => ({ headers: { 'X-API-PREFIX': getBackUrlPrefix() } })
+export const getManagerPath = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
+export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
+export const getFrontPath = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
+export const getConsolePath = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
 
 // -------------------------------------------------------------------------------------------------
 // Catalog

@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import { BackDataContext } from '../../context/backDataContext'
-import { getForm } from '../../utils/frontOptions.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { ModalContext, getOptConfirm, getOptOk } from '../modals/genericModalContext'
 
@@ -40,14 +40,15 @@ export function ObjCard({
   deleteMsg,
   refresh,
 }) {
+  const { getConsole } = useContext(BackConfContext)
   const { appInfo } = useContext(BackDataContext)
   const { changeOptions, toggle } = useContext(ModalContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
+  const [consolePath, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.consolePath || ''), [appInfo])
 
-  const getFormObj = (obj, query) => getForm(formUrl, obj, query)
+  const getFormObj = (obj, query) => getConsole(consolePath, obj, query)
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
@@ -146,9 +147,9 @@ export function EditObjCard({
   const { appInfo } = useContext(BackDataContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [formUrl, setFormUrl] = useState('')
-  useEffect(() => setFormUrl(appInfo?.formUrl || ''), [appInfo])
-  const getFormObj = (obj, query) => getForm(formUrl, obj, query)
+  const [consolePath, setFormUrl] = useState('')
+  useEffect(() => setFormUrl(appInfo?.consolePath || ''), [appInfo])
+  const getFormObj = (obj, query) => getConsole(consolePath, obj, query)
 
   const [editID, setEditID] = useState('')
   const { changeOptions, toggle } = useContext(ModalContext)

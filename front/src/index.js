@@ -7,19 +7,25 @@ import App from './App'
 import reportWebVitals from './reportWebVitals'
 
 import 'bootstrap'
-import { UserContextProvider } from './context/authContext.js'
-import { BackDataContextProvider } from './context/backDataContext.js'
+
 import { JwtContextProvider } from './context/jwtContext.js'
+
+import { BackConfContextProvider } from './context/backConfContext.js'
+import { BackDataContextProvider } from './context/backDataContext.js'
+
+import { UserContextProvider } from './context/authContext.js'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <JwtContextProvider>
-      <UserContextProvider>
+      <BackConfContextProvider>
         <BackDataContextProvider>
-          <App />
+          <UserContextProvider>
+            <App />
+          </UserContextProvider>
         </BackDataContextProvider>
-      </UserContextProvider>
+      </BackConfContextProvider>
     </JwtContextProvider>
   </React.StrictMode>
 )
