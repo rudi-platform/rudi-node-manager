@@ -12,9 +12,8 @@ const { sign } = _jwt
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getBackDomain, isProdEnv } from '../config/backOptions.js'
+import { getOptBackDomain, isProdEnv } from '../config/backOptions.js'
 import {
-  getBackUrlPrefix,
   getConf,
   getDefaultKey,
   getIdForCatalog,
@@ -64,10 +63,10 @@ export function readJwtBody(jwt) {
 const SHOULD_SECURE = isProdEnv()
 
 // Helper functions
-export const getFormCookieOpts = (exp, overwrite) => ({
+export const getConsoleCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: SHOULD_SECURE,
-  domain: getBackDomain(),
+  domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
@@ -77,7 +76,7 @@ export const getFormCookieOpts = (exp, overwrite) => ({
 export const getFrontCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: false,
-  domain: getBackDomain(),
+  domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
@@ -97,8 +96,8 @@ export function createFrontUserTokens(userInfo) {
     delete userInfo?.password
     const { username, roles } = { ...userInfo }
     return {
-      [CONSOLE_TOKEN_NAME]: sign({ user: userInfo, roles, exp, back: getBackUrlPrefix() }, JWT_SECRET),
-      [PM_FRONT_TOKEN_NAME]: sign({ username, roles, exp, back: getBackUrlPrefix() }, JWT_SECRET),
+      [CONSOLE_TOKEN_NAME]: sign({ user: userInfo, roles, exp }, JWT_SECRET),
+      [PM_FRONT_TOKEN_NAME]: sign({ username, roles, exp }, JWT_SECRET),
       exp,
     }
   } catch (err) {
@@ -118,7 +117,7 @@ function refreshTokens(req) {
   try {
     const { consoleToken, pmFrontToken, exp } = createFrontUserTokens(user)
     return {
-      [CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: getFormCookieOpts(exp, true) },
+      [CONSOLE_TOKEN_NAME]: { jwt: consoleToken, opts: getConsoleCookieOpts(exp, true) },
       [PM_FRONT_TOKEN_NAME]: { jwt: pmFrontToken, opts: getFrontCookieOpts(exp, true) },
     }
   } catch (err) {
@@ -147,7 +146,7 @@ export const login = async (req, reply, user) => {
       // sameSite: 'Lax' ?
       return reply
         .status(200)
-        .cookie(CONSOLE_TOKEN_NAME, consoleToken, getFormCookieOpts(exp))
+        .cookie(CONSOLE_TOKEN_NAME, consoleToken, getConsoleCookieOpts(exp))
         .cookie(PM_FRONT_TOKEN_NAME, pmFrontToken, getFrontCookieOpts(exp))
         .json({ username, roles })
     })
@@ -161,7 +160,7 @@ export const login = async (req, reply, user) => {
 export const logout = (req, reply, msg) =>
   reply
     .status(msg ? 401 : 200)
-    .cookie(CONSOLE_TOKEN_NAME, '', getFormCookieOpts(0))
+    .cookie(CONSOLE_TOKEN_NAME, '', getConsoleCookieOpts(0))
     .cookie(PM_FRONT_TOKEN_NAME, '', getFrontCookieOpts(0))
     .json({ [CONSOLE_TOKEN_NAME]: '', [PM_FRONT_TOKEN_NAME]: '', message: msg || 'logout' })
 

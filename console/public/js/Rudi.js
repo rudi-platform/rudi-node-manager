@@ -9,7 +9,7 @@ import { ActionMixin, BaseCardsBlock, SetValueError } from '../lib/MaterialInput
 
 import { HttpRequest, JsonHttpRequest } from './Http.js'
 import OverlayManager from './OverlayManager.js'
-import { getCookie, pathJoin } from './utils.js'
+import { fetchConf, getCookie, pathJoin } from './utils.js'
 
 export const STYLE_ERR = 'banner-error'
 export const STYLE_WRN = 'banner-warning'
@@ -17,8 +17,6 @@ export const STYLE_NRM = 'banner-normal'
 export const STYLE_BLD = 'banner-bold'
 export const STYLE_END = 'banner-end'
 export const STYLE_THN = 'banner-light'
-
-const BACK_URL_PREFIX = 'api'
 
 // ---- Lifecycle ----
 
@@ -66,7 +64,6 @@ export class RudiForm {
       throw new Error(error_msg, { cause: err })
     }
   }
-
   // getConf = (param) => {
   //   if (!this.conf)
   //     throw new Error('Configuration has not been defined yet, please call init() beforehand')
@@ -80,69 +77,53 @@ export class RudiForm {
   //   return this.conf?.dev || this.conf?.env == 'dev'
   // }
 
+  async _initNodeUrls() {
+    const here = 'initNodeUrls'
+    try {
+      if (this.state == 'fail') throw new Error(`Aborting (${here})`)
+      this.ok(here)
+
+      this.conf = await fetchConf()
+      this.hostUrl = this.conf.host_url
+      this.pmUrl = this.conf.back_path
+      this.formUrl = this.conf.console_path
+      this.storageUrl = this.conf.storage_url
+      this.catalogUrl = this.conf.catalog_url
+      console.debug(
+        here,
+        `\n   - pmUrl: ${this.pmUrl}`,
+        `\n   - consoleUrl: ${this.formUrl}`,
+        `\n   - storageUrl: ${this.storageUrl}`,
+        `\n   - catalogUrl: ${this.catalogUrl}`
+      )
+      this.isDev = this.conf.is_dev == 'development'
+    } catch (err) {
+      this.ko(here, err)
+      console.error(`La conf n'a pas été trouvée à l'adresse: ${'/conf'}`, err)
+      return this.fail('reach_pm')
+    }
+  }
+
   async init() {
     const here = 'init'
     const lexR = await this.importJSON('./js/LexicalResources.json', 'No lexical resources')
     this.lexR = lexR[this.language]
     this.ok(here, 'lexR')
 
+    await this._initNodeUrls()
+    this.ok(here, 'node urls:', this.conf)
+
     this.ok(here, 'pmUrl:', this.pmUrl)
     this._initPmHeaders()
     this.ok(here, 'pmHeaders')
 
-    await this._initNodeUrls()
-    this.ok(here, 'node urls:', this.nodeUrls)
     this._initForm()
-
-    this.isDev = (await this._getPm(false, '/front/env')) == 'development'
     this.initialized = true
   }
 
-  async _initNodeUrls() {
-    const here = 'initNodeUrls'
-    try {
-      if (this.state == 'fail') throw new Error(`Aborting (${here})`)
-      this.ok(here)
-      if (!this._nodeUrls) {
-        this._nodeUrls = await this.getPmJson('front/node-urls')
-      }
-      console.debug(
-        here,
-        `\n   - consoleUrl: ${this.formUrl}`,
-        `\n   - mediaUrl: ${this.mediaUrl}`,
-        `\n   - apiUrl: ${this.apiUrl}`
-      )
-      return this._nodeUrls
-    } catch (err) {
-      this.ko(here, err)
-      console.error(`Prod manager ne peut être joint à l'adresse: ${'front/node-urls'}`)
-      return this.fail('reach_pm')
-    }
-  }
-  get nodeUrls() {
-    if (!this._nodeUrls) this._initNodeUrls()
-    return this._nodeUrls
-  }
-  get mediaUrl() {
-    return this.nodeUrls?.media_url
-  }
-  get apiUrl() {
-    return this.nodeUrls?.api_url
-  }
-
-  _baseUrl = ''
-  get baseUrl() {
-    if (!this._baseUrl) this._baseUrl = document.baseURI.split('/form/')[0]
-    return this._baseUrl
-  }
-  get formUrl() {
-    return pathJoin(this.baseUrl, this.nodeUrls?.form_url || this.nodeUrls?.console_url)
-  }
-  pmUrl = pathJoin(this.baseUrl, BACK_URL_PREFIX)
-
   getUrlPm = (...args) => pathJoin(this.pmUrl, ...args)
   getUrlLocal = (...args) => pathJoin(this.formUrl, ...args)
-  getUrlMedia = (...args) => pathJoin(this.mediaUrl, ...args)
+  getUrlMedia = (...args) => pathJoin(this.storageUrl, ...args)
 
   async _getPm(isJson, ...urlBits) {
     const here = 'getPm'

@@ -7,6 +7,9 @@ import { readFileSync } from 'fs'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { isDevEnv } from '../back/config/backOptions.js'
+import { getBackUrlInHeaders } from '../back/config/config.js'
+import { getNodeUrls } from '../back/controllers/consoleController.js'
 import { getLib, getRoot } from '../back/utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -19,7 +22,7 @@ const mod = 'consoleRouter'
 // -------------------------------------------------------------------------------------------------
 const relative = (...path) => getRoot('console', ...path)
 const staticDependency = (dep) => express.static(getLib(dep, 'dist'))
-const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))
+const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath), getBackUrlInHeaders())
 
 // -------------------------------------------------------------------------------------------------
 // Console router
@@ -35,7 +38,11 @@ consoleRouter.use('/dependencies/leaflet.draw', staticDependency('leaflet-draw')
 // -------------------------------------------------------------------------------------------------
 // Main routes
 // -------------------------------------------------------------------------------------------------
-consoleRouter.get('/(metadata)?', staticPublicFile('metadata.html'))
+consoleRouter.get('/conf', async (req, reply) => {
+  const nodeUrls = await getNodeUrls()
+  return reply.status(200).json({ ...nodeUrls, is_dev: isDevEnv() })
+})
+consoleRouter.get('/?(metadata)?', staticPublicFile('metadata.html'))
 consoleRouter.get('/contacts', staticPublicFile('contact.html'))
 consoleRouter.get('/organizations', staticPublicFile('organization.html'))
 consoleRouter.get('/pub_keys', staticPublicFile('publicKey.html'))

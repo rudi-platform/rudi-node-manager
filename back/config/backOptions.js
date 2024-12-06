@@ -20,6 +20,7 @@ import { getDomain, mergeStrings } from '../utils/utils.js'
 export const OPT_USER_CONF = 'conf'
 export const OPT_GIT_HASH = 'hash'
 export const OPT_APP_TAG = 'tag'
+export const OPT_APP_PREFIX = 'appPrefix'
 export const OPT_NODE_ENV = 'nodeEnv'
 export const OPT_BACK_PATH = 'backPath'
 export const OPT_SU_CREDS = 'suCreds'
@@ -46,6 +47,11 @@ export const OPTIONS = {
     cli: 'tag',
     env: 'MANAGER_APP_TAG',
   },
+  [OPT_APP_PREFIX]: {
+    text: 'Prefix used for the manager app',
+    cli: 'pre',
+    env: 'MANAGER_PREFIX',
+  },
   [OPT_BACK_PATH]: {
     text: 'Back-end path',
     cli: 'url',
@@ -59,7 +65,7 @@ export const OPTIONS = {
   [OPT_SU_CREDS]: {
     text: 'Base64 colon separated super-user credentials: <name>:<hashed pwd>',
     cli: 'su',
-    env: 'MANAGER_SU_CREDS',
+    env: 'MANAGER_SU',
   },
 }
 // if (argv.indexOf('--opts') > -1) {
@@ -116,9 +122,12 @@ const getCliOption = (opt) => CLI_OPTIONS[opt]
 // ------------------------------------------------------------------------------------------------
 const getEnvVar = (opt) => {
   const envVarBaseName = OPTIONS[opt].env
-  for (const prefix of ['', 'RUDI_NODE', 'RUDI', 'RUDI_PROD']) {
+  if (process.env[envVarBaseName] !== undefined) return process.env[envVarBaseName]
+  // legacy
+  for (const prefix of ['RUDI_NODE', 'RUDI', 'RUDI_PROD']) {
+    // console.log(`checking env var ${mergeStrings('_', prefix, envVarBaseName)}`)
     const envVar = process.env[mergeStrings('_', prefix, envVarBaseName)]
-    if (envVar) return envVar
+    if (envVar !== undefined) return envVar
   }
 }
 const getUserOptions = () => {
@@ -148,7 +157,11 @@ console.log('--------------------------------------------------------------')
  * @param {String} altValue Value to be used if both CLI option and ENV option are not defined
  * @return {String} Value for the option
  */
-export const getBackOptions = (opt, altValue) => (opt ? BACK_OPTIONS[opt] || altValue : BACK_OPTIONS)
+export const getBackOptions = (opt, altValue) => {
+  if (!opt) return BACK_OPTIONS
+  if (BACK_OPTIONS[opt] !== undefined) return BACK_OPTIONS[opt]
+  return altValue
+}
 
 export const getAppTag = () => getBackOptions(OPT_APP_TAG) || ''
 
@@ -180,7 +193,11 @@ export const isProdEnv = () => nodeEnv === 'production'
 
 const BACK_PATH = getBackOptions(OPT_BACK_PATH)
 const BACK_DOMAIN = getDomain(BACK_PATH) || BACK_PATH
-export const getBackDomain = () => BACK_DOMAIN
+export const getOptBackPath = () => BACK_PATH
+export const getOptBackDomain = () => BACK_DOMAIN
 
 // If the --su CLI option or MANAGER_SU_CREDS env var is defined, the SU creds in the DB will be overwritten.
-export const getSuCreds = () => getBackOptions(OPT_SU_CREDS)
+export const getOptSuCreds = () => getBackOptions(OPT_SU_CREDS)
+
+const APP_PREFIX = getBackOptions(OPT_APP_PREFIX)
+export const getOptAppPrefix = () => APP_PREFIX

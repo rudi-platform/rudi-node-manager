@@ -1,26 +1,44 @@
 const mod = 'consoleCtrl'
 
+import { getOptBackDomain } from '../config/backOptions.js'
 // Internal dependencies
-import { getConsoleUrlPrefix } from '../config/config.js'
+import {
+  getAppUrlPrefix,
+  getBackendListeningAddressAndPort,
+  getBackUrlPrefix,
+  getConsoleUrlPrefix,
+  getFrontUrlPrefix,
+} from '../config/config.js'
 import { UnauthorizedError } from '../utils/errors.js'
-import { getContext, logW, sysError } from '../utils/logger.js'
+import { getContext, logE, logW, sysError } from '../utils/logger.js'
 import { getCatalogPublicUrl, getPortalUrl } from './dataController.js'
 import { handleError } from './errorHandler.js'
 import { getStoragePublicUrl } from './mediaController.js'
 
-export async function getNodeUrls(req, reply) {
+export const getNodeUrls = async () => {
   const fun = 'getNodeUrls'
   try {
     const urls = await Promise.all([getCatalogPublicUrl(), getStoragePublicUrl(), getPortalUrl()])
     const nodeUrls = {
-      api_url: urls[0],
       catalog_url: urls[0],
-      media_url: urls[1],
       storage_url: urls[1],
-      form_url: getConsoleUrlPrefix(),
+      console_path: getConsoleUrlPrefix(),
+      front_path: getFrontUrlPrefix(),
+      back_path: getBackUrlPrefix(),
+      manager_path: getAppUrlPrefix(),
+      host_url: getOptBackDomain() || getBackendListeningAddressAndPort(),
     }
     if (urls[2] !== 'No portal connected') nodeUrls.portal_url = urls[2]
+    return nodeUrls
+  } catch (err) {
+    logE(mod, fun, err)
+  }
+}
 
+export async function sendNodeUrls(req, reply) {
+  const fun = 'sendNodeUrls'
+  try {
+    const nodeUrls = await getNodeUrls()
     return reply.status(200).send(nodeUrls)
   } catch (err) {
     sysError(mod, fun, err, getContext(req, { opType: 'get_node_urls' }))

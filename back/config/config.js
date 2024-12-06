@@ -10,7 +10,7 @@ import { parse } from 'ini'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { jsonToString, pathJoin } from '../utils/utils.js'
-import { getBackDomain, getBackOptions, OPT_DB_PATH, OPT_USER_CONF } from './backOptions.js'
+import { getBackOptions, getOptAppPrefix, getOptBackDomain, OPT_DB_PATH, OPT_USER_CONF } from './backOptions.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -18,19 +18,6 @@ import { getBackDomain, getBackOptions, OPT_DB_PATH, OPT_USER_CONF } from './bac
 export const CATALOG = 'rudi-catalog'
 export const STORAGE = 'rudi-storage'
 export const MANAGER = 'rudi-manager'
-
-// These cannot seem to be set as options unfortunately
-const BACKEND_PREFIX = 'api'
-// const FRONTEND_PREFIX = 'front'
-const CONSOLE_PREFIX = 'form'
-
-export const getBackUrlPrefix = (urlPiece) => pathJoin('', BACKEND_PREFIX, urlPiece)
-export const getFrontUrlPrefix = (urlPiece) => pathJoin('', urlPiece)
-export const getConsoleUrlPrefix = (urlPiece) => pathJoin('', CONSOLE_PREFIX, urlPiece)
-
-// -------------------------------------------------------------------------------------------------
-// Helper functions
-// -------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------
 // Load default conf
@@ -74,7 +61,7 @@ const RUDI_STORAGE_URL = config?.rudi_storage?.rudi_storage_url || config?.rudi_
 
 console.debug(`[CONF] ${CATALOG} url:`, RUDI_CATALOG_URL)
 console.debug(`[CONF] ${STORAGE} url:`, RUDI_STORAGE_URL)
-console.debug(`[CONF] ${MANAGER} domain:`, getBackDomain())
+console.debug(`[CONF] ${MANAGER} domain:`, getOptBackDomain())
 
 if (!RUDI_CATALOG_URL) throw new Error(`Configuration error: ${CATALOG} URL should be defined`)
 if (!RUDI_STORAGE_URL) throw new Error(`Configuration error: ${STORAGE} URL should be defined`)
@@ -84,24 +71,44 @@ console.debug()
 // -------------------------------------------------------------------------------------------------
 // Access conf values
 // -------------------------------------------------------------------------------------------------
-export function getConf(section, subSection) {
+export function getConf(section, subSection, defaultVal) {
   if (!section) return config
   const sect = config[section]
   if (!sect || !subSection) return sect
-  return sect[subSection]
+  if (sect[subSection] !== undefined) return sect[subSection]
+  return defaultVal
 }
 
 // -------------------------------------------------------------------------------------------------
 // Shortcuts to access popular conf values
 // -------------------------------------------------------------------------------------------------
-const LISTENING_PORT = getConf('server', 'listening_port') || 5000
-const LISTENING_ADDRESS = getConf('server', 'listening_address') || '0.0.0.0'
+
+// -------------------------------------------------------------------------------------------------
+// Manager app server
+// -------------------------------------------------------------------------------------------------
+const LISTENING_PORT = getConf('server', 'listening_port', 5000)
+const LISTENING_ADDRESS = getConf('server', 'listening_address', '0.0.0.0')
 
 export const getBackendListeningPort = () => LISTENING_PORT
 export const getBackendListeningAddress = () => LISTENING_ADDRESS
 export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${LISTENING_PORT}`
 
-const RUDI_CATALOG_API_ADMIN = getConf('rudi_api', 'admin_api') || getConf('rudi_catalog', 'admin_api') || 'api/admin'
+const MANAGER_PREFIX = getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
+const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
+const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
+const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
+
+export const getAppUrlPrefix = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
+export const getBackUrlPrefix = (...args) => getAppUrlPrefix(BACKEND_PREFIX, ...args)
+export const getFrontUrlPrefix = (...args) => getAppUrlPrefix(FRONTEND_PREFIX, ...args)
+export const getConsoleUrlPrefix = (...args) => getAppUrlPrefix(CONSOLE_PREFIX, ...args)
+
+export const getBackUrlInHeaders = () => ({ headers: { 'X-API-PREFIX': getBackUrlPrefix() } })
+
+// -------------------------------------------------------------------------------------------------
+// Catalog
+// -------------------------------------------------------------------------------------------------
+const RUDI_CATALOG_API_ADMIN = getConf('rudi_api', 'admin_api') || getConf('rudi_catalog', 'admin_api', 'api/admin')
 export const getCatalogUrl = (...args) => pathJoin(RUDI_CATALOG_URL, ...args)
 export const getCatalogAdminUrl = (...args) => pathJoin(RUDI_CATALOG_URL, RUDI_CATALOG_API_ADMIN, ...args)
 export const getCatalogAdminPath = (...args) => pathJoin(RUDI_CATALOG_API_ADMIN, ...args)
@@ -117,16 +124,25 @@ export function getCatalogUrlAndParams(url, req) {
   return finalUrl.href
 }
 
+// -------------------------------------------------------------------------------------------------
+// Storage
+// -------------------------------------------------------------------------------------------------
 export const getStorageUrl = (...args) => pathJoin(RUDI_STORAGE_URL, ...args)
 export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 
+// -------------------------------------------------------------------------------------------------
+// DB
+// -------------------------------------------------------------------------------------------------
 const getDbConf = (subSection) => (config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false)
 
 const DB_PATH = getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 
 export const getDbPath = () => DB_PATH
 
-export const getConfSuId = () => getDbConf('db_su_id') || 0
+// -------------------------------------------------------------------------------------------------
+// Super user
+// -------------------------------------------------------------------------------------------------
+export const getConfSuId = () => getDbConf('db_su_id', 0)
 export const getConfSuPwd = () => getDbConf('db_su_pwd')
 export const isConfSuPwdHashed = () => getDbConf('is_su_pwd_hashed')
 export const getConfSuName = () => getDbConf('db_su_usr')
@@ -135,11 +151,14 @@ export function setConfSuName(userDefinedSuName) {
 }
 export const getConfSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
 
+// -------------------------------------------------------------------------------------------------
+// Keys
+// -------------------------------------------------------------------------------------------------
 const DEFAULT_MANAGER_KEY = getConf('auth', 'pm_prv_key')
 const KEY_FOR_CATALOG =
-  getConf('rudi_api', 'pm_api_key') || getConf('rudi_catalog', 'pm_catalog_key') || DEFAULT_MANAGER_KEY
+  getConf('rudi_api', 'pm_api_key') || getConf('rudi_catalog', 'pm_catalog_key', DEFAULT_MANAGER_KEY)
 const KEY_FOR_STORAGE =
-  getConf('rudi_media', 'pm_media_key') || getConf('rudi_storage', 'pm_storage_key') || DEFAULT_MANAGER_KEY
+  getConf('rudi_media', 'pm_media_key') || getConf('rudi_storage', 'pm_storage_key', DEFAULT_MANAGER_KEY)
 
 export const getDefaultKey = () => DEFAULT_MANAGER_KEY
 export const getKeyForCatalog = () => KEY_FOR_CATALOG

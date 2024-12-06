@@ -14,8 +14,10 @@ import { join } from 'path'
 // Internal dependencies: conf
 // -------------------------------------------------------------------------------------------------
 import {
+  getAppUrlPrefix,
   getBackendListeningAddress,
   getBackendListeningPort,
+  getBackUrlInHeaders,
   getBackUrlPrefix,
   getConf,
   getConsoleUrlPrefix,
@@ -35,7 +37,7 @@ import { storageApi } from './routes/routesMedia.js'
 import { openApi } from './routes/routesOpen.js'
 import { secuApi } from './routes/routesSecu.js'
 
-import { consoleRouter } from '../console/router.js'
+import { consoleRouter } from '../console/consoleRouter.js'
 import { getCatalogPublicUrl } from './controllers/dataController.js'
 import { getStoragePublicUrl } from './controllers/mediaController.js'
 
@@ -133,7 +135,9 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 // Launching express app
 // -------------------------------------------------------------------------------------------------
 const managerApp = express()
-const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
+
+const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
+  const fun = 'launchManagerRouter'
   const listeningPort = getBackendListeningPort()
   const listeningAddress = getBackendListeningAddress()
 
@@ -145,6 +149,11 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
       },
     })
   )
+
+  // Note: bodyParser middleware has been replace with express bodyParser
+  managerApp.use(express.json())
+  managerApp.use(express.urlencoded({ extended: true }))
+  managerApp.use(cookieParser())
 
   // This application level middleware prints incoming requests to the servers console, useful to see incoming requests
   managerApp.use((req, reply, next) => {
@@ -171,11 +180,6 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
       }
     })
   })
-
-  // Note: bodyParser middleware has been replace with express bodyParser
-  managerApp.use(express.json())
-  managerApp.use(express.urlencoded({ extended: true }))
-  managerApp.use(cookieParser())
 
   // const WHITE_LIST = [
   //   'self',
@@ -206,26 +210,37 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
 
   const authenticate = passportAuthenticate('jwt', { session: false })
 
-  // Configure app to use routes
+  // -----------------------------------------------------------------------------------------------
+  // Backend routes
+  // -----------------------------------------------------------------------------------------------
   managerApp.use(getBackUrlPrefix('open'), openApi)
   managerApp.use(getBackUrlPrefix('front'), frontApi)
   managerApp.use(getBackUrlPrefix('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
   managerApp.use(getBackUrlPrefix('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
   managerApp.use(getBackUrlPrefix('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
-  // Serving the console frontend
+  // -----------------------------------------------------------------------------------------------
+  // Serving the console frontend                                                                 !!
+  // -----------------------------------------------------------------------------------------------
   managerApp.use(getConsoleUrlPrefix(), consoleRouter)
 
+  // -----------------------------------------------------------------------------------------------
+  // Serving the React frontend                                                                   !!
+  // -----------------------------------------------------------------------------------------------
   // This middleware informs the express application to serve our compiled React files
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   if (!isDevEnv()) {
     logI(mod, 'serve', 'Serving the built static page')
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
-    managerApp.get(getFrontUrlPrefix('*'), (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
+    managerApp.get(getFrontUrlPrefix('*'), (req, reply) =>
+      reply.sendFile(join(__dirname, 'front/build/index.html'), getBackUrlInHeaders())
+    )
   }
 
+  // -----------------------------------------------------------------------------------------------
   // Init database on startup
+  // -----------------------------------------------------------------------------------------------
   try {
     await dbInitialize()
     logD(mod, 'initDatabase', 'SQL DB init OK')
@@ -234,12 +249,16 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
     throw new Error(`SQL DB init ERR: ${err}`)
   }
 
+  // -----------------------------------------------------------------------------------------------
   // Catch any bad requests
+  // -----------------------------------------------------------------------------------------------
   managerApp.get('*', (req, reply) => reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`))
 
+  // -----------------------------------------------------------------------------------------------
   // Configure our server to listen on the port defiend by our port variable
+  // -----------------------------------------------------------------------------------------------
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
-    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}`)
+    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getAppUrlPrefix()}`)
   )
   managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 
@@ -247,6 +266,9 @@ const launchExpressApp = async ({ catalogUrl, storageUrl }) => {
   return managerServer
 }
 
+// -------------------------------------------------------------------------------------------------
+// Manager app launch
+// -------------------------------------------------------------------------------------------------
 async function shutDown(managerServer, signal) {
   logD(mod, 'shutDown', `Closing session on signal ${signal}`)
   managerServer.close(() => {
@@ -261,11 +283,11 @@ async function shutDown(managerServer, signal) {
 }
 
 export async function runRudiManagerBackend() {
-  const fun = 'runManagerBackend'
+  const fun = 'runRudiManagerBackend'
   const [catalogUrl, storageUrl] = await connectToRudiModules(20)
   logD(mod, fun, `catalogUrl: ${catalogUrl}`)
   logD(mod, fun, `storageUrl: ${storageUrl}`)
-  const managerServer = await launchExpressApp({ catalogUrl, storageUrl })
+  const managerServer = await launchManagerRouter({ catalogUrl, storageUrl })
 
   process.on('SIGINT', () => shutDown(managerServer, 'SIGINT'))
   process.on('SIGTERM', () => shutDown(managerServer, 'SIGTERM'))

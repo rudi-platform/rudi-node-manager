@@ -16,16 +16,13 @@ const mergeStrings = (sep, ...args) => {
     if (args[i] === undefined || args[i] === null) break
     const newChunk = `${args[i]}`
     const cleanChunk = newChunk.startsWith(sep) ? newChunk.slice(1) : newChunk
-    accumulatedStr = accumulatedStr.endsWith(sep)
-      ? accumulatedStr + cleanChunk
-      : accumulatedStr + sep + cleanChunk
+    accumulatedStr = accumulatedStr.endsWith(sep) ? accumulatedStr + cleanChunk : accumulatedStr + sep + cleanChunk
   }
   return accumulatedStr
 }
 export const pathJoin = (...args) => mergeStrings('/', ...args)
 
-export const lastElementOfArray = (anArray) =>
-  !Array.isArray(anArray) ? null : anArray[anArray.length - 1]
+export const lastElementOfArray = (anArray) => (!Array.isArray(anArray) ? null : anArray[anArray.length - 1])
 
 /**
  * Get the extension of a file name
@@ -123,9 +120,7 @@ export const nowEpochS = () => Math.floor(new Date().getTime() / 1000)
 
 export const padEndModulo = (str, base, padSign) => {
   const modulo = str.length % base
-  return modulo === 0
-    ? str
-    : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1) || '=')
+  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1) || '=')
 }
 export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4, '=')
 
@@ -147,3 +142,18 @@ export const uuidv4 = () =>
     : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
         (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
       )
+
+export const getDocumentInfo = (field) => {
+  const url = window.location.pathname
+  const lastSlashIndex = url.lastIndexOf('/')
+  const path = url.slice(0, lastSlashIndex)
+  const name = url.slice(lastSlashIndex + 1)
+  const docInfo = { url, path, name }
+  // console.log('docInfo:', JSON.stringify(docInfo))
+  return field ? docInfo[field] : docInfo
+}
+
+export const fetchConf = async () =>
+  fetch(pathJoin(getDocumentInfo('path'), 'conf'))
+    .then((response) => response.json())
+    .catch((error) => console.error('Error fetching config:', error))

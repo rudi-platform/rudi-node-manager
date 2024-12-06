@@ -11,7 +11,7 @@ import { dirname } from 'path'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { hashPassword } from '@aqmo.org/jwt-lib'
-import { getSuCreds } from '../../config/backOptions.js'
+import { getOptSuCreds } from '../../config/backOptions.js'
 import { getConfSuId, getConfSuMail, getConfSuName, getDbPath, setConfSuName } from '../../config/config.js'
 import { decodeCredentials } from '../../controllers/authControllerPassport.js'
 import { RudiError, statusOK } from '../../utils/errors.js'
@@ -417,7 +417,7 @@ export async function dbInitialize() {
  */
 const checkSuperUser = async (db) => {
   const fun = 'checkSuperUser'
-  const suCreds = getSuCreds()
+  const suCreds = getOptSuCreds()
   if (suCreds) {
     // Super User credentials were given through the CLI argument --su or an environment variable MANAGER_SU
     // => the Super User credentials will be (over)written in the user database.

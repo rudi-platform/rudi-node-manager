@@ -9,7 +9,7 @@ import express from 'express'
 import { getNodeEnv } from '../config/backOptions.js'
 import { getConsoleUrlPrefix } from '../config/config.js'
 import { postLogin, postRegister, putPassword } from '../controllers/authControllerPassport.js'
-import { getNodeUrls, getUserInfo } from '../controllers/consoleController.js'
+import { getUserInfo, sendNodeUrls } from '../controllers/consoleController.js'
 import { getCatalogPublicUrl, getInitData, getPortalUrl } from '../controllers/dataController.js'
 import { expressErrorHandler } from '../controllers/errorHandler.js'
 import { getStoragePublicUrl } from '../controllers/mediaController.js'
@@ -32,7 +32,7 @@ frontApi.get('/logout', logout)
 frontApi.get('/init-data', authenticate, getInitData)
 
 frontApi.get('/user-info', authenticate, getUserInfo)
-frontApi.get('/node-urls', authenticate, getNodeUrls)
+frontApi.get('/node-urls', authenticate, sendNodeUrls)
 
 // Get modules public URLs
 frontApi.get('/env', authenticate, (req, reply) => reply.status(200).send(getNodeEnv()))
