@@ -18,26 +18,30 @@ CatalogueLicence.propTypes = {
  * @return {ReactNode}
  */
 export default function CatalogueLicence({ editMode, logout }) {
-  const { getBackCatalog } = useContext(BackConfContext)
-
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   const [licences, setLicences] = useState([])
   const [hasMore] = useState(false)
 
-  useEffect(() => getInitialData(), [])
+  useEffect(() => {
+    getInitialData()
+  }, [])
   /**
    * recup la 1er page des métadonnéees
    */
-  function getInitialData() {
+  const getInitialData = () =>
+    back?.isLoaded &&
     axios
-      .get(getBackCatalog('licences'))
+      .get(back.getBackCatalog('licences'))
       .then((res) => setLicences(res.data))
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
-  }
 
   return (
     <div className="tempPaddingTop">

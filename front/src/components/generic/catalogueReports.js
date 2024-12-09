@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Trash } from 'react-bootstrap-icons'
 
 import { BackConfContext } from '../../context/backConfContext.js'
@@ -20,18 +20,22 @@ CatalogueReports.propTypes = {
  * @return {void}
  */
 export default function CatalogueReports({ editMode, logout }) {
-  const { getBackCatalog } = useContext(BackConfContext)
+  const { backConf } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const { changeOptions, toggle } = useModalContext()
   const [refreshState, setRefreshState] = useState(editMode)
 
-  const getApiUrlReports = (suffix) => getBackCatalog('reports', suffix)
   /**
    * call for confirmation before object deletion
    */
-  const deleteOldReports = () => {
+  const deleteOldReports = () =>
+    back?.isLoaded &&
     axios
-      .delete(getApiUrlReports(`?submitted_before=${lastMonth().toISOString()}`))
+      .delete(back.getBackCatalog('reports', `?submitted_before=${lastMonth().toISOString()}`))
       .then((res) => {
         const deletedCount = res?.data?.deletedCount
         const msg = !deletedCount
@@ -44,7 +48,6 @@ export default function CatalogueReports({ editMode, logout }) {
         setRefreshState(!refreshState)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
-  }
 
   /**
    * call for confirmation before organization deletion

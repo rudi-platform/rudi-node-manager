@@ -11,8 +11,8 @@ CatalogueContact.propTypes = {
  * @return {void}
  */
 export default function CatalogueContact({ editMode }) {
-  const [isEdit, setEdit] = useState(!!editMode)
-  useEffect(() => setEdit(!!editMode), [editMode])
+  const [isEdit, setIsEdit] = useState(!!editMode)
+  useEffect(() => setIsEdit(!!editMode), [editMode])
 
   return (
     <ObjCatalogue

@@ -8,7 +8,7 @@ import express from 'express'
 // -------------------------------------------------------------------------------------------------
 import { uuidv4 } from '../utils/utils.js'
 
-import { getEnum, getLicences, getThemeByLang, getVersion } from '../controllers/dataController.js'
+import { getCatalogVersion, getEnum, getLicences, getThemeByLang } from '../controllers/dataController.js'
 import { expressErrorHandler } from '../controllers/errorHandler.js'
 import {
   deleteObject,
@@ -31,7 +31,7 @@ import { checkRolePerm } from '../utils/roleCheck.js'
 export const catalogApi = new express.Router()
 
 catalogApi.get('/uuid', (req, reply) => reply.status(200).send(uuidv4(req.query?.nb)))
-catalogApi.get('/version', getVersion)
+catalogApi.get('/version', getCatalogVersion)
 catalogApi.get('/enum', getEnum)
 catalogApi.get('/enum/themes/:lang', getThemeByLang)
 catalogApi.get('/enum/themes', getThemeByLang)

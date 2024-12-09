@@ -15,6 +15,8 @@ import {
   getCatalogAdminPath,
   getCatalogUrlAndParams,
   getConsolePath,
+  getFrontPath,
+  getManagerPath,
 } from '../config/config.js'
 
 import { getOptBackDomain, getTags } from '../config/backOptions.js'
@@ -55,7 +57,7 @@ const callCatalog = async (url, req, reply) => {
 }
 
 // Controllers
-export const getVersion = (req, reply) => callCatalog('/api/version', req, reply)
+export const getCatalogVersion = (req, reply) => callCatalog('/api/version', req, reply)
 export function getEnum(req, reply) {
   const lang = req.params?.lang || req.query?.lang || 'fr'
   return callCatalog(getCatalogAdminPath(`enum?lang=${lang}`), req, reply)
@@ -84,7 +86,9 @@ export async function getInitData(req, reply) {
       catalogPubUrl: data[1],
       storagePubUrl: data[2],
       consolePath: getConsolePath(),
+      frontPath: getFrontPath(),
       backPath: getBackPath(),
+      managerPath: getManagerPath(),
       hostUrl: getOptBackDomain() || getBackendListeningAddressAndPort(),
       portalConnected: !!data[3],
     }

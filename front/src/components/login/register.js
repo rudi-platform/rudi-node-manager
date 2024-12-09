@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Button from 'react-bootstrap/Button'
@@ -34,9 +34,10 @@ Register.propTypes = {
  * @return {ReactNode} Register html component
  */
 export default function Register({ backToLogin }) {
-  const { getBackFront } = useContext(BackConfContext)
+  const { backConf } = useContext(BackConfContext)
 
-  // const { defaultErrorHandler } = useDefaultErrorHandler()
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -62,11 +63,10 @@ export default function Register({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const registerUser = (credentials) =>
-    getBackFront('register').then((url) =>
-      axios.post(url, JSON.stringify(credentials), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-    )
+    back?.isLoaded &&
+    axios.post(back.getBackFront('register'), JSON.stringify(credentials), {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
   const displayMsgForAccountCreated = () => {
     changeOptions({

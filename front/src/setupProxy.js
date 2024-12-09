@@ -3,42 +3,66 @@ const here = '[proxy]'
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const { pathJoin } = require('./utils/utils.js')
 
-// const BACK_PREFIX = 'api'
-// const CONSOLE_PREFIX = 'form'
-const MANAGER_URL = 'http://localhost:5005/manager'
+const PUBLIC_URL = process.env.PUBLIC_URL
 
-// const getCallUrl = (suffix) => pathJoin('', process.env.PUBLIC_URL, suffix)
-// const getTargetUrl = (suffix) => pathJoin(MANAGER_URL, suffix)
+const HOST_URL = `http://localhost:5005`
+const BACK_CALL = `/${PUBLIC_URL}/api`
+const getBackUrl = (...url) => pathJoin(HOST_URL, BACK_CALL, ...url)
+const CONF_URL = getBackUrl('conf')
 
-// const BACK_URL_CALL = getCallUrl(BACK_PREFIX)
-// const BACK_URL_TARGET = getTargetUrl(BACK_PREFIX)
-// const FORM_URL_CALL = getCallUrl(CONSOLE_PREFIX)
-// const FORM_URL_TARGET = getTargetUrl(CONSOLE_PREFIX)
+const REGEX_LOCAL_CONF = new RegExp(`^(?!${HOST_URL}).*/conf$`)
 
-const addRedirectProxy = (app, call, target) =>
+const FORM_CALL = `/${PUBLIC_URL}/form`
+const getFormUrl = (...url) => pathJoin(HOST_URL, FORM_CALL, ...url)
+
+const pathRewrite = (path, req) => {
+  const pathReplaced = path.replace(new RegExp(`^${BACK_URL_CALL}`), BACK_URL_TARGET)
+  console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
+  console.log('path:', path, ' =>', `(^${BACK_URL_CALL})`, pathReplaced)
+  return pathReplaced
+}
+// pathRewrite: (path, req) => {
+//   const pathReplaced = path.replace(new RegExp(rewriteBackPathKey), '/${BACK_PREFIX}')
+//   console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
+//   // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
+//   return pathReplaced
+// },
+
+module.exports = (app) => {
   app.use(
-    call,
+    REGEX_LOCAL_CONF,
     createProxyMiddleware({
-      target,
+      target: CONF_URL,
       changeOrigin: true,
       pathRewrite: (path, req) => {
-        const pathReplaced = path.replace(new RegExp(`^${call}`), target)
-        // console.log(
-        //   here,
-        //   req.url,
-        //   '=>',
-        //   pathReplaced,
-        //   req.params && ` | params= ${JSON.stringify(req.params)}`,
-        //   req.query && ` | query= ${JSON.stringify(req.query)}`
-        // )
-        // console.log('path:', path, ' =>', `(^${call})`, pathReplaced)
+        console.log('path:', path, ' =>', REGEX_LOCAL_CONF, CONF_URL)
+        return CONF_URL
+      },
+    })
+  )
+  app.use(
+    BACK_CALL,
+    createProxyMiddleware({
+      target: getBackUrl(),
+      changeOrigin: true,
+      pathRewrite: (path, req) => {
+        const pathReplaced = path.replace(new RegExp(`$${BACK_CALL}`), `${BACK_CALL}`)
+        console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
         return pathReplaced
       },
     })
   )
-
-module.exports = (app) => {
-  addRedirectProxy(app, process.env.PUBLIC_URL, MANAGER_URL)
-  // addRedirectProxy(app, BACK_URL_CALL, BACK_URL_TARGET)
+  app.use(
+    FORM_CALL,
+    createProxyMiddleware({
+      target: getFormUrl(),
+      changeOrigin: true,
+      pathRewrite: (path, req) => {
+        const pathReplaced = path.replace(new RegExp(`$${FORM_CALL}`), `${FORM_CALL}`)
+        console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
+        return pathReplaced
+      },
+    })
+  )
 }
 console.log('')

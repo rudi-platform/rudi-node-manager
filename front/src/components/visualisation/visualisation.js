@@ -20,7 +20,11 @@ Visualisation.propTypes = {
  * @return {ReactNode}
  */
 function Visualisation({ logout }) {
-  const { getBackStorage } = useContext(BackConfContext)
+  const { backConf } = useContext(BackConfContext)
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { id } = useParams()
@@ -31,34 +35,20 @@ function Visualisation({ logout }) {
   const [el, setEl] = useState(null)
 
   useEffect(() => {
-    if (visuOption.displayType === 'CSV')
-      setEl(
-        jspreadsheet(wrapper.current, {
-          data: [[]],
-          minDimensions: [10, 10],
-        })
-      )
-    if (mediaId.length) {
-      handleOnClick()
-    }
+    if (visuOption.displayType === 'CSV') setEl(jspreadsheet(wrapper.current, { data: [[]], minDimensions: [10, 10] }))
+    if (mediaId.length) handleOnClick()
   }, [])
 
   useEffect(() => {
-    if (el) {
-      el.destroy(wrapper.current, false)
-    }
-    if (visuOption.displayType === 'CSV') {
-      setJSpreadsheet()
-    }
+    el?.destroy(wrapper.current, false)
+    if (visuOption.displayType === 'CSV') setJSpreadsheet()
   }, [visuOption])
 
   /**
    * met a jour le state lors de la modification de l'input du mediaId
    * @param {*} event event
    */
-  function handleChange(event) {
-    setMediaId(event.target.value)
-  }
+  const handleChange = (event) => setMediaId(event.target.value)
 
   /**
    * convert CSV string to array
@@ -119,7 +109,8 @@ function Visualisation({ logout }) {
   }
 
   const getMediaInfo = async (mediaId) => {
-    const resApi = await axios.get(getBackStorage(mediaId))
+    if (!back?.isLoaded) return
+    const resApi = await axios.get(back.getBackStorage(mediaId))
     const mediaInfo = resApi?.data
     // console.debug('T (visu) getMediaInfo', mediaInfo)
     if (!mediaInfo)

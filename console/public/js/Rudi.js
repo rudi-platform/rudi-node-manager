@@ -84,15 +84,15 @@ export class RudiForm {
       this.ok(here)
 
       this.conf = await fetchConf()
-      this.hostUrl = this.conf.host_url
-      this.backPath = this.conf.back_path
-      this.consolePath = this.conf.console_path
-      this.storageUrl = this.conf.storage_url
-      this.catalogUrl = this.conf.catalog_url
+      this.hostUrl = this.conf.hostUrl
+      this.backPath = this.conf.backPath
+      this.consolePath = this.conf.consolePath
+      this.storageUrl = this.conf.storagePubUrl
+      this.catalogUrl = this.conf.catalogPubUrl
       console.debug(
         here,
         `\n   - backPath: ${this.backPath}`,
-        `\n   - consoleUrl: ${this.consolePath}`,
+        `\n   - consolePath: ${this.consolePath}`,
         `\n   - storageUrl: ${this.storageUrl}`,
         `\n   - catalogUrl: ${this.catalogUrl}`
       )

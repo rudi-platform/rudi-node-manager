@@ -26,7 +26,7 @@ const authenticate = passportAuthenticate('jwt', { session: false })
 frontApi.post('/register', postRegister)
 frontApi.put('/change-password', putPassword) // Delayed auth
 frontApi.post('/login', postLogin)
-frontApi.get('/logout', logout)
+frontApi.get('/logout', (req, reply) => logout(req, reply))
 
 // Routes to get all the data necessary for the UI to start
 frontApi.get('/init-data', authenticate, getInitData)

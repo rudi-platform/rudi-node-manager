@@ -37,13 +37,12 @@ import { openApi } from './routes/routesOpen.js'
 import { secuApi } from './routes/routesSecu.js'
 
 import { consoleRouter } from '../console/consoleRouter.js'
-import { getCatalogPublicUrl } from './controllers/dataController.js'
+import { getCatalogPublicUrl, getInitData } from './controllers/dataController.js'
 import { getStoragePublicUrl } from './controllers/mediaController.js'
 
 // -------------------------------------------------------------------------------------------------
 // External dependencies: security
 // -------------------------------------------------------------------------------------------------
-import { sendConf } from './controllers/consoleController.js'
 import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatabase.js'
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
@@ -93,6 +92,20 @@ async function connectToRudiModules(attemptLeft = 20) {
     await sleep(1000)
     // log.d(mod, fun, `attempt ${attemptLeft}`)
     return connectToRudiModules(attemptLeft - 1)
+  }
+}
+
+/**
+ * Redirection for trailing slashes
+ * Source: https://stackoverflow.com/a/15773824/1563072
+ */
+const redirectTrailingSlashes = (req, reply, next) => {
+  if (req.path.length > 1 && req.path.slice(-1) === '/') {
+    const query = req.url.slice(req.path.length)
+    const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
+    reply.redirect(301, safepath + query)
+  } else {
+    next()
   }
 }
 
@@ -161,14 +174,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     sysInfo('req.in <', '', logReqMsg, getContext(req, {})) // <= IN
 
     // Redirection for trailing slashes
-    // https://stackoverflow.com/a/15773824/1563072
-    if (req.path.length > 1 && req.path.slice(-1) === '/') {
-      const query = req.url.slice(req.path.length)
-      const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
-      reply.redirect(301, safepath + query)
-    } else {
-      next()
-    }
+    redirectTrailingSlashes(req, reply, next)
 
     reply.on('finish', () => {
       if (reply.statusCode < 400) {
@@ -214,17 +220,17 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Get conf (this module URLs)
   // -----------------------------------------------------------------------------------------------
   // Get the manager conf in any frontend path
-  managerApp.get(/.*\/conf$/, (req, reply) => sendConf(req, reply))
+  managerApp.get(/.*\/conf$/, (req, reply) => getInitData(req, reply))
 
   // -----------------------------------------------------------------------------------------------
   // Backend routes
   // -----------------------------------------------------------------------------------------------
   managerApp.use(getBackPath('open'), openApi)
   managerApp.use(getBackPath('front'), frontApi)
-  managerApp.use(getBackPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
   managerApp.use(getBackPath('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
-  managerApp.use(getBackPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
   managerApp.use(getBackPath('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
   managerApp.use(getBackPath('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // -----------------------------------------------------------------------------------------------
@@ -238,10 +244,12 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // This middleware informs the express application to serve our compiled React files
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   if (!isDevEnv()) {
-    logI(mod, 'serve', 'Serving the built static page')
+    logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
-    managerApp.get(getFrontPath('*'), (req, reply) => reply.sendFile(join(__dirname, 'front/build/index.html')))
+    managerApp.get(new RegExp(`${getFrontPath()}/?`), (req, reply) =>
+      reply.sendFile(join(__dirname, 'front/build/index.html'))
+    )
   }
 
   // -----------------------------------------------------------------------------------------------

@@ -20,9 +20,13 @@ CatalogueUser.propTypes = {
  * @return {ReactNode}
  */
 export default function CatalogueUser({ editMode, logout }) {
-  const { getBackSecu } = useContext(BackConfContext)
-  const urlUsers = getBackSecu('users')
-  const urlRoles = getBackSecu('roles')
+  const { backConf } = useContext(BackConfContext)
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const urlUsers = back?.getBackSecu('users')
+  const urlRoles = back?.getBackSecu('roles')
 
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
@@ -35,25 +39,29 @@ export default function CatalogueUser({ editMode, logout }) {
   const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
 
-  useEffect(() => fetchInitialData(), [])
+  useEffect(() => {
+    fetchInitialData()
+  }, [])
 
   const refresh = () => fetchInitialData()
 
   /**
    * recup la 1er page des métadonnéees et les countBy
    */
-  function fetchInitialData() {
-    axios
-      .get(urlRoles)
-      .then((res) => setRoleList(res.data))
-      .catch((err) => defaultErrorHandler(err))
-    axios
-      .get(urlUsers)
-      .then((res) => {
-        setCurrentOffset(PAGE_SIZE)
-        setUserList(res.data)
-      })
-      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
+  async function fetchInitialData() {
+    await Promise.all([
+      axios
+        .get(urlRoles)
+        .then((res) => setRoleList(res.data))
+        .catch((err) => defaultErrorHandler(err)),
+      axios
+        .get(urlUsers)
+        .then((res) => {
+          setCurrentOffset(PAGE_SIZE)
+          setUserList(res.data)
+        })
+        .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err))),
+    ])
   }
 
   /**

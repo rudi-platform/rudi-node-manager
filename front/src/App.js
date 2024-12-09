@@ -10,7 +10,6 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import { createBrowserHistory } from 'history'
 
 import { UserContext } from './context/authContext'
-import { BackDataContext } from './context/backDataContext'
 
 import ChangePwd, { showPill as showPillChgPwd } from './components/login/changePwd'
 import Login, { showPill as showPillLogin } from './components/login/login'
@@ -46,11 +45,10 @@ export default function App() {
   // ---------------- Loading context
   const { token, updateToken } = useContext(JwtContext)
   const { isEditor, isAdmin } = useContext(UserContext)
-  const { backConf } = useContext(BackConfContext)
-  const { appInfo } = useContext(BackDataContext)
 
-  const { conf, setConf } = useState(backConf)
-  useEffect(() => setConf(backConf))[backConf]
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
   // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
   const [isChgPwdOpen, setIsChgPwdOpen] = useState(false)
@@ -83,15 +81,14 @@ export default function App() {
    */
   const displayVersion = () => (
     <div id="displayTags">
-      <div className="appTag">{appInfo.appTag}</div>
-      <div className="gitTag">{appInfo.gitHash}</div>
+      <div className="appTag">{back?.appTag}</div>
+      <div className="gitTag">{back?.gitHash}</div>
     </div>
   )
 
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
-  useEffect(() => setDisplayTags(displayVersion()), [appInfo?.appTag, appInfo?.gitHash])
-  // useEffect(() => console.trace('T (displayAppInfo) appInfo', appInfo), [appInfo])
+  useEffect(() => setDisplayTags(displayVersion()), [back.appTag, back.gitHash])
 
   /**
    *
@@ -117,15 +114,14 @@ export default function App() {
    * @return {void}
    */
   const logout = () =>
-    conf.getBackFront('logout').then((url) =>
-      axios
-        .get(url)
-        .then(exit)
-        .catch((err) => {
-          console.error('T (logout.ko)', err)
-          exit()
-        })
-    )
+    back?.isLoaded &&
+    axios
+      .get(back.getBackFront('logout'))
+      .then(exit)
+      .catch((err) => {
+        console.error('T (logout.ko)', err)
+        exit()
+      })
 
   return !token ? (
     <div>

@@ -9,7 +9,7 @@ import { parse } from 'ini'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { jsonToString, pathJoin } from '../utils/utils.js'
+import { jsonToString, pathJoin, removeTrailingSlash } from '../utils/utils.js'
 import { getBackOptions, getOptAppPrefix, getOptBackDomain, OPT_DB_PATH, OPT_USER_CONF } from './backOptions.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -93,14 +93,17 @@ export const getBackendListeningPort = () => LISTENING_PORT
 export const getBackendListeningAddress = () => LISTENING_ADDRESS
 export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${LISTENING_PORT}`
 
-const MANAGER_PREFIX = getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
-const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
-const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
-const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
+const MANAGER_PREFIX = removeTrailingSlash(
+  getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
+)
+const BACKEND_PREFIX = removeTrailingSlash(getConf('server', 'backend_prefix', 'api'))
+const FRONTEND_PREFIX = removeTrailingSlash(getConf('server', 'frontend_prefix', ''))
+const CONSOLE_PREFIX = removeTrailingSlash(getConf('server', 'console_prefix', 'form'))
 
 export const getManagerPath = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
 export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
-export const getFrontPath = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
+export const getFrontPath = (...args) =>
+  FRONTEND_PREFIX ? getManagerPath(FRONTEND_PREFIX, ...args) : getManagerPath(...args)
 export const getConsolePath = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
 
 // -------------------------------------------------------------------------------------------------
@@ -131,7 +134,7 @@ export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 // -------------------------------------------------------------------------------------------------
 // DB
 // -------------------------------------------------------------------------------------------------
-const getDbConf = (subSection) => (config.database?.[subSection] ? `${config.database[subSection]}`.trim() : false)
+const getDbConf = (subSection, altVal) => getConf('database', subSection, altVal).trim()
 
 const DB_PATH = getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 

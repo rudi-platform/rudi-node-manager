@@ -11,22 +11,19 @@ import 'bootstrap'
 import { JwtContextProvider } from './context/jwtContext.js'
 
 import { BackConfContextProvider } from './context/backConfContext.js'
-import { BackDataContextProvider } from './context/backDataContext.js'
 
 import { UserContextProvider } from './context/authContext.js'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
-    <JwtContextProvider>
-      <BackConfContextProvider>
-        <BackDataContextProvider>
-          <UserContextProvider>
-            <App />
-          </UserContextProvider>
-        </BackDataContextProvider>
-      </BackConfContextProvider>
-    </JwtContextProvider>
+    <BackConfContextProvider>
+      <JwtContextProvider>
+        <UserContextProvider>
+          <App />
+        </UserContextProvider>
+      </JwtContextProvider>
+    </BackConfContextProvider>
   </React.StrictMode>
 )
 

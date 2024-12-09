@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { EditObjCard, ObjCard } from '../generic/objCard'
-import { BackConfContext } from '../../context/backConfContext.js'
 
 const PAGE_SIZE = 20
 
@@ -47,8 +47,12 @@ export default function ObjCatalogue({
   deleteConfirmMsg,
   deleteMsg,
 }) {
-  const { getBackCatalog } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const { backConf } = useContext(BackConfContext)
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
 
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
@@ -58,7 +62,7 @@ export default function ObjCatalogue({
   const [currentOffset, setCurrentOffset] = useState(-1)
   const initialRender = useRef(true)
 
-  const getApiUrlObj = (suffix) => getBackCatalog(objType, suffix)
+  const getApiUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog(objType, suffix)
   const deleteUrl = (id) => getApiUrlObj(id)
 
   const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')

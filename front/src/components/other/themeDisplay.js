@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import { BackDataContext } from '../../context/backDataContext'
+import { BackConfContext } from '../../context/backConfContext.js'
 
 ThemeDisplay.propTypes = { value: PropTypes.string }
 
@@ -9,14 +9,12 @@ ThemeDisplay.propTypes = { value: PropTypes.string }
  * @return {ReactNode}
  */
 export default function ThemeDisplay({ value }) {
-  const { appInfo } = useContext(BackDataContext)
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const [themeLabel, setThemeLabel] = useState(value)
 
-  useEffect(() => setThemeLabel(appInfo.themeLabels?.[value] || value), [appInfo])
-  // console.trace('T ThemeDisplay.value:', value)
-  // console.trace('T ThemeDisplay.themeLabel:', themeLabel)
-  // console.trace('T themeLabels:', value, appInfo.themeLabels)
-  // console.trace('T themeLabels:', appInfo.themeLabels?.[value])
-
+  useEffect(() => setThemeLabel(back.themeLabels?.[value] || value), [back])
   return <span>{themeLabel}</span>
 }

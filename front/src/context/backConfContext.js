@@ -1,68 +1,50 @@
-import PropTypes from 'prop-types'
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
 import axios from 'axios'
-import { pathJoin } from '../utils/utils.js'
-import { JwtContext } from './jwtContext'
+import PropTypes from 'prop-types'
+import React, { createContext, useEffect, useState } from 'react'
+
+import { mergeStrings, pathJoin } from '../utils/utils.js'
+
+export class InitData {
+  constructor(data) {
+    this.conf = data || {}
+
+    this.backPath = this.conf.backPath
+    this.consolePath = this.conf.consolePath
+
+    this.catalogPubUrl = this.conf.catalogPubUrl
+    this.storagePubUrl = this.confstoragePubUrl
+
+    this.portalConnected = this.conf.portalConnected
+
+    this.appTag = this.conf.appTag
+    this.gitHash = this.conf.gitHash
+
+    this.themeLabels = this.conf.themeLabels
+
+    this.isLoaded = this.catalogPubUrl !== '' && this.catalogPubUrl !== undefined
+  }
+
+  getBackApi = (...url) => pathJoin(this.backPath, ...url)
+
+  getBackFront = (...url) => this.getBackApi('front', ...url)
+  getBackSecu = (...url) => this.getBackApi('secu', ...url)
+  getBackCatalog = (...url) => this.getBackApi('catalog', ...url)
+  getBackStorage = (...url) => this.getBackApi('storage', ...url)
+
+  getConsole = (suffix, query) => mergeStrings('?', pathJoin(this.consolePath, suffix), query)
+
+  getCatalogPub = (...url) => pathJoin(this.catalogPubUrl, ...url)
+  getStoragePub = (...url) => pathJoin(this.storagePubUrl, ...url)
+
+  toString = () => JSON.stringify({ back_path: this.conf?.back_path })
+}
 
 /**
  * We use this context to memorize the URLs that were set for this Manager module
  */
-const DEFAULT_CONF = {
-  catalog_url: '', // the public URL of the RUDI Catalog module
-  storage_url: '', // the public URL of the RUDI Storage module
-  console_path: '', // the path to the Console formular
-  front_path: '', // the path to this front
-  back_path: '', // the path to the RUDI Manager backend api
-  manager_path: '', // the path to the RUDI Manager app
-  host_url: '', // the host URL
-  portal_url: '', // the URL to the RUDI portal
-}
+const DEFAULT_CONF = new InitData()
 
-let _cachedConf
-const getCachedConf = async (token) => {
-  try {
-    // User not logged in: default values
-    if (!token) {
-      _cachedConf = null
-      return DEFAULT_CONF
-    }
-    if (!_cachedConf?.host_url) {
-      const confUrl = pathJoin(window.location.pathname, 'conf')
-      try {
-        _cachedConf = (await axios.get(confUrl))?.data
-      } catch (e) {
-        console.info(`Error initializing conf while reaching ${confUrl}:`, e.message)
-        return DEFAULT_CONF
-      }
-      console.info('Back conf:', _cachedConf)
-    }
-    return _cachedConf
-  } catch (err) {
-    console.error('E (getCachedConf)', err.code, err.message)
-    _cachedConf = null
-    return DEFAULT_CONF
-  }
-}
 export const BackConfContext = createContext(DEFAULT_CONF)
-
-export class BackConf {
-  constructor(conf) {
-    this.conf = conf
-  }
-  getBackApi = (...url) => pathJoin(this.conf?.host_url, this.conf?.back_path, ...url)
-
-  getBackFront = (...url) => getBackApi('front', ...url)
-  getBackSecu = (...url) => getBackApi('secu', ...url)
-  getBackCatalog = (...url) => getBackApi('catalog', ...url)
-  getBackStorage = (...url) => getBackApi('storage', ...url)
-
-  getConsole = (suffix, query) => mergeStrings('?', pathJoin(backConf?.host_url, backConf?.console_path, suffix), query)
-}
-
-// -------------------------------------------------------------------------------------------------
-// Reach the backend
-// -------------------------------------------------------------------------------------------------
 
 BackConfContextProvider.propTypes = { children: PropTypes.object }
 /**
@@ -70,15 +52,34 @@ BackConfContextProvider.propTypes = { children: PropTypes.object }
  * @param {Object} children
  * @return {React.Context.Provider}
  */
-export async function BackConfContextProvider({ children }) {
-  const { token } = useContext(JwtContext)
+export function BackConfContextProvider({ children }) {
+  const [backConf, setBackConf] = useState(DEFAULT_CONF)
 
-  const [backConf, setBackConf] = useState(new BackConf(DEFAULT_CONF))
-
+  let _cachedData
+  const getCachedConf = async () => {
+    try {
+      if (!_cachedData?.isLoaded) {
+        const confUrl = pathJoin(window.location, 'conf')
+        try {
+          const conf = (await axios.get(confUrl))?.data
+          _cachedData = new InitData(conf)
+          // console.info(`T (${here}) New conf:`, _cachedConf.isLoaded)
+        } catch (e) {
+          console.error(`Error initializing conf while reaching ${confUrl}:`, e.message)
+          return DEFAULT_CONF
+        }
+      }
+      return _cachedData
+    } catch (err) {
+      console.error('E (getCachedConf)', err.code, err.message)
+      _cachedData = null
+      return DEFAULT_CONF
+    }
+  }
+  const getBackConf = async () => setBackConf(await getCachedConf())
   useEffect(() => {
-    const getBackConf = async () => setBackConf(new BackConf(await getCachedConf(token)))
     getBackConf()
-  }, [token])
+  }, [])
 
   return <BackConfContext.Provider value={{ backConf }}>{children}</BackConfContext.Provider>
 }

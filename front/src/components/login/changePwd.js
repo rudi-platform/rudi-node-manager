@@ -1,6 +1,6 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Button from 'react-bootstrap/Button'
@@ -33,7 +33,10 @@ ChangePwd.propTypes = {
  * @return {ReactNode} Register html component
  */
 export default function ChangePwd({ backToLogin }) {
-  const { getBackFront } = useContext(BackConfContext)
+  const { backConf } = useContext(BackConfContext)
+
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -65,11 +68,10 @@ export default function ChangePwd({ backToLogin }) {
    * @return {Promise} Register promise
    */
   const putPassword = (credentials) =>
-    getBackFront('change-password').then((url) =>
-      axios.put(url, JSON.stringify(credentials), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-    )
+    back?.isLoaded &&
+    axios.put(back.getBackFront('change-password'), JSON.stringify(credentials), {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
   /**
    * handle submit Register form

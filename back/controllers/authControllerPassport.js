@@ -46,7 +46,7 @@ export async function postLogin(req, reply, next) {
       return reply.status(401).send(ERR_401_MSG)
     }
     try {
-      login(req, reply, user)
+      await login(req, reply, user)
     } catch (er) {
       logE(mod, fun, er)
       logout()
