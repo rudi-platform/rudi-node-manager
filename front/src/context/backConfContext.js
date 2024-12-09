@@ -10,9 +10,10 @@ export class InitData {
 
     this.backPath = this.conf.backPath
     this.consolePath = this.conf.consolePath
+    this.frontPath = this.conf.frontPath
 
     this.catalogPubUrl = this.conf.catalogPubUrl
-    this.storagePubUrl = this.confstoragePubUrl
+    this.storagePubUrl = this.conf.storagePubUrl
 
     this.portalConnected = this.conf.portalConnected
 

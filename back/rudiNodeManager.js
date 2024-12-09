@@ -247,7 +247,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
-    managerApp.get(new RegExp(`${getFrontPath()}/?`), (req, reply) =>
+    managerApp.get(new RegExp(`${getFrontPath()}(/*)?`), (req, reply) =>
       reply.sendFile(join(__dirname, 'front/build/index.html'))
     )
   }
