@@ -30,12 +30,12 @@
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.13",
     "@aqmo.org/rudi_logger": "^1.1.6",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "body-parser": "^1.20.3",
     "crypto-js": "^4.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "helmet": "^8.0.0",
     "ini": "^5.0.0",
     "jsonwebtoken": "^9.0.2",
@@ -54,7 +54,7 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/preset-env": "^7.26.0",
     "braces": "^3.0.3",
-    "eslint": "^9.15.0",
+    "eslint": "^9.16.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-only-warn": "^1.1.0",
@@ -65,7 +65,7 @@
     "jest-junit": "^16.0.0",
     "nodemon": "^3.1.7",
     "postcss": "^8.4.49",
-    "prettier": "^3.3.3"
+    "prettier": "^3.4.2"
   },
   "overrides": {
     "braces": "$braces",

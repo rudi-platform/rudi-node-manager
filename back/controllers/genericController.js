@@ -52,7 +52,7 @@ export async function searchObjects(req, reply) {
 export async function getObjectList(req, reply) {
   const opType = 'get_objects'
   const { objectType } = req.params
-  logD(mod, opType + '.params', beautify(req.params))
+  // logD(mod, opType + '.params', beautify(req.params))
 
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
