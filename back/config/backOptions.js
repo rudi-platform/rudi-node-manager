@@ -55,7 +55,7 @@ export const OPTIONS = {
   [OPT_BACK_PATH]: {
     text: 'Back-end path',
     cli: 'url',
-    env: 'MANAGER_URL',
+    env: 'MANAGER_PUBLIC_URL',
   },
   [OPT_DB_PATH]: {
     text: 'Full path for the usr db file',
