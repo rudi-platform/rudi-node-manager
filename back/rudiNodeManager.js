@@ -103,7 +103,7 @@ const redirectTrailingSlashes = (req, reply, next) => {
   if (req.path.length > 1 && req.path.slice(-1) === '/') {
     const query = req.url.slice(req.path.length)
     const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
-    reply.redirect(301, safepath + query)
+    reply.redirect(308, safepath + query)
   } else {
     next()
   }
@@ -221,7 +221,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Get the manager conf in any frontend path
   managerApp.get(/.*\/conf$/, (req, reply) => getInitData(req, reply))
-  managerApp.get('/', (req, reply) => reply.redirect(301, getFrontPath()))
+  managerApp.get('/', (req, reply) => reply.redirect(308, getFrontPath()))
 
   // -----------------------------------------------------------------------------------------------
   // Backend routes
