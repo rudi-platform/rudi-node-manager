@@ -131,7 +131,7 @@ export const login = async (req, reply, user) => {
   if (!user) return reply.status(401).send(ERR_401_MSG)
   try {
     const username = user.username
-    const roles = await dbGetUserRolesByUsername(null, username) // NOSONAR
+    const roles = await dbGetUserRolesByUsername(null, username) // NO SONAR
     if (!roles?.length) {
       const errMsg = `Admin validation is required for this user: '${user.username}'`
       logW(mod, fun, errMsg)

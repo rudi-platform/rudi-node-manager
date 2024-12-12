@@ -103,7 +103,7 @@ const redirectTrailingSlashes = (req, reply, next) => {
   if (req.path.length > 1 && req.path.slice(-1) === '/') {
     const query = req.url.slice(req.path.length)
     const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
-    reply.redirect(301, safepath + query)
+    reply.code(301).redirect(safepath + query)
   } else {
     next()
   }
@@ -150,7 +150,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 const managerApp = express()
 
 const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
-  const fun = 'launchManagerRouter'
+  // const here = 'launchManagerRouter'
   const listeningPort = getBackendListeningPort()
   const listeningAddress = getBackendListeningAddress()
 
@@ -221,6 +221,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Get the manager conf in any frontend path
   managerApp.get(/.*\/conf$/, (req, reply) => getInitData(req, reply))
+  managerApp.get('/', (req, reply) => reply.redirect(301, getFrontPath()))
 
   // -----------------------------------------------------------------------------------------------
   // Backend routes
@@ -247,9 +248,14 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
     const __dirname = getRootDir()
     managerApp.use(express.static(join(__dirname, 'front/build')))
+
     managerApp.get(new RegExp(`${getFrontPath()}(/*)?`), (req, reply) =>
       reply.sendFile(join(__dirname, 'front/build/index.html'))
     )
+    managerApp.get('*', (req, reply) => {
+      logW(mod, 'get /', `Someone tries to access Manager from ${req.url}`)
+      reply.statusCode(308).redirect(getFrontPath('metadata'))
+    })
   }
 
   // -----------------------------------------------------------------------------------------------

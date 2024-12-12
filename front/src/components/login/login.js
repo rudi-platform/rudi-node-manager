@@ -39,10 +39,7 @@ export default function Login({ updateToken }) {
   const { backConf } = useContext(BackConfContext)
 
   const [back, setBack] = useState(backConf)
-  useEffect(() => {
-    setBack(backConf)
-    console.log(`back/front endpoint: ${back?.getBackFront()}`)
-  }, [backConf])
+  useEffect(() => setBack(backConf), [backConf])
 
   // const { defaultErrorHandler } = useDefaultErrorHandler()
 

@@ -1,9 +1,8 @@
 // -------------------------------------------------------------------------------------------------
 // Extract command line arguments
 
-import { pathJoin } from '../utils/utils'
-
 // -------------------------------------------------------------------------------------------------
+// This has been rendered obsolete: now the frontend will reach the backend to know its own URL.
 export const PUBLIC_URL = 'PUBLIC_URL'
 // export const OPT_BACK_URL = 'REACT_APP_BACK_URL';
 // export const OPT_TAG = 'REACT_APP_TAG'

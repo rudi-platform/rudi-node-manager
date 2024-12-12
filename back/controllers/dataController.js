@@ -10,16 +10,16 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 import {
   CATALOG,
-  getBackendListeningAddressAndPort,
   getBackPath,
   getCatalogAdminPath,
   getCatalogUrlAndParams,
   getConsolePath,
   getFrontPath,
+  getHostDomain,
   getManagerPath,
 } from '../config/config.js'
 
-import { getOptBackDomain, getTags } from '../config/backOptions.js'
+import { getTags } from '../config/backOptions.js'
 
 import { getCatalogHeaders } from '../utils/secu.js'
 import { handleError, treatAxiosError } from './errorHandler.js'
@@ -89,7 +89,7 @@ export async function getInitData(req, reply) {
       frontPath: getFrontPath(),
       backPath: getBackPath(),
       managerPath: getManagerPath(),
-      hostUrl: getOptBackDomain() || getBackendListeningAddressAndPort(),
+      hostUrl: getHostDomain(),
       portalConnected: !!data[3],
     }
     return reply ? reply.status(200).json(initData) : initData
