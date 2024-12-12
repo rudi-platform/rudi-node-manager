@@ -1,24 +1,11 @@
 import axios from 'axios'
-import React from 'react'
 import PropTypes from 'prop-types'
+import React from 'react'
 import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
 
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { getOptOk, getOptConfirm, useModalContext } from '../modals/genericModalContext'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
-
-const resetPwdConfirmMsg = (id) => `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
-const resetPwdCaption =
-  `L'utilisateur devra utiliser l'invite "Modifier le mot de passe" pour changer son mot de passe. ` +
-  `Le champ "mot de passe actuel" pourra être un simple espace`
-
-const resetPwdMsg = (id) => `Le mot de passe de l'utilisateur ${id} a été réinitialisé.`
-
-const resetPasswordUrl = (id) => `api/secu/users/${id}/reset-password`
-
-const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
-const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
-const deleteUrl = (id) => `api/secu/users/${id}`
+import { getOptConfirm, getOptOk, useModalContext } from '../modals/genericModalContext'
 
 UserCard.propTypes = {
   user: PropTypes.object,
@@ -33,11 +20,22 @@ UserCard.propTypes = {
  * @return {ReactNode}
  */
 export default function UserCard({ user, roleList, refresh }) {
-  const { changeOptions, toggle } = useModalContext()
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
+  const { changeOptions, toggle } = useModalContext()
   const { isVisibleEditModal, toggleEditModal } = useEditUserModal()
-  // const { editModalOptions, changeEditModalOptions } = useEditUserModalOptions()
+
+  const resetPwdConfirmMsg = (id) => `Confirmez vous la réinitialisation du mot de passe de l'utilisateur ${id}?`
+  const resetPwdCaption =
+    `L'utilisateur devra utiliser l'invite "Modifier le mot de passe" pour changer son mot de passe. ` +
+    `Le champ "mot de passe actuel" pourra être un simple espace`
+  const resetPwdMsg = (id) => `Le mot de passe de l'utilisateur ${id} a été réinitialisé.`
+  const deleteConfirmMsg = (id) => `Confirmez vous la suppression de l'utilisateur ${id}?`
+  const deleteMsg = (id) => `L'utilisateur ${id} a été supprimé`
 
   /**
    * call for user deletion
@@ -45,8 +43,9 @@ export default function UserCard({ user, roleList, refresh }) {
    * @return {void}
    */
   const deleteUser = () =>
+    back?.isLoaded &&
     axios
-      .delete(deleteUrl(user.id))
+      .delete(back.getBackSecu('users', user.id))
       .then((res) => {
         changeOptions(getOptOk(deleteMsg(user.username), () => refresh()))
         toggle()
@@ -67,9 +66,10 @@ export default function UserCard({ user, roleList, refresh }) {
    * @return {void}
    */
   const resetPassword = () =>
+    back?.isLoaded &&
     axios
-      .put(resetPasswordUrl(user.id))
-      .then((res) => {
+      .put(back.getBackSecu('users', user.id, 'reset-password'))
+      .then(() => {
         changeOptions(getOptOk(resetPwdMsg(user.username), () => refresh(), resetPwdCaption))
         toggle()
       })

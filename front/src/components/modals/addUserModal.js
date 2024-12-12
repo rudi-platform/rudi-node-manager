@@ -13,15 +13,6 @@ import Row from 'react-bootstrap/Row'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
 
-const urlUser = 'api/secu/users'
-const modalTitle = 'Ajouter un nouvel utilisateur'
-const modalSubmitBtnTxt = 'Sauver'
-
-const validation = {
-  username: [VALID_NOT_EMPTY_USERNAME],
-  email: [VALID_EMAIL],
-}
-
 AddUserModal.propTypes = {
   roleList: PropTypes.array.isRequired,
   visible: PropTypes.bool.isRequired,
@@ -37,6 +28,14 @@ AddUserModal.propTypes = {
 export default function AddUserModal({ roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
   const [userInfo, setUserInfo] = useState({})
+
+  const modalTitle = 'Ajouter un nouvel utilisateur'
+  const modalSubmitBtnTxt = 'Sauver'
+
+  const validation = {
+    username: [VALID_NOT_EMPTY_USERNAME],
+    email: [VALID_EMAIL],
+  }
 
   const hasErrors = (prop, val) => {
     if (!userInfo) {
@@ -117,20 +116,9 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
    * @param {*} role role
    * @param {*} user utilisateur
    */
-  const sendUserInfo = async () => {
-    try {
-      if (!userInfo) {
-        console.error('T (sendUserInfo) No user info!')
-        return
-      }
-      await axios.post(`${urlUser}`, userInfo)
-      // console.trace('T (add.sendingUserInfo)', userInfo)
-      // const res = await axios.post(`${urlUser}`, userInfo)
-      // console.trace('T (add.sendUserInfo)', res.data)
-    } catch (err) {
-      defaultErrorHandler(err)
-    }
-  }
+  const sendUserInfo = () =>
+    (!userInfo && console.error('T (sendUserInfo) No user info!')) ||
+    (back?.isLoaded && axios.put(back.getBackSecu('users'), userInfo).catch((err) => defaultErrorHandler(err)))
 
   return (
     <Modal show={visible} onHide={toggleEdit} animation={false}>
