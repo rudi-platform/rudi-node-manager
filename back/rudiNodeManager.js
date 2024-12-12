@@ -254,7 +254,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     )
     managerApp.get('*', (req, reply) => {
       logW(mod, 'get /', `Someone tries to access Manager from ${req.url}`)
-      reply.statusCode(308).redirect(getFrontPath('metadata'))
+      reply.redirect(308, getFrontPath('metadata'))
     })
   }
 
