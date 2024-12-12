@@ -103,7 +103,7 @@ const redirectTrailingSlashes = (req, reply, next) => {
   if (req.path.length > 1 && req.path.slice(-1) === '/') {
     const query = req.url.slice(req.path.length)
     const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
-    reply.code(301).redirect(safepath + query)
+    reply.redirect(301, safepath + query)
   } else {
     next()
   }
