@@ -206,7 +206,7 @@ export class MetadataForm extends RudiForm {
   async getMediaHeaders(initialHeaders = {}) {
     try {
       if (!this.mediaHeaders) {
-        const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlBack('media/jwt'), this.pmHeaders).send()
+        const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlBackStorage('jwt'), this.pmHeaders).send()
         const mediaToken = pmMediaJwtRes.token
         this.mediaHeaders = Object.assign(initialHeaders, { Authorization: `Bearer ${mediaToken}` })
       }
@@ -286,7 +286,7 @@ export class MetadataForm extends RudiForm {
     // TODO: check si tous les fichiers sont bien uploadés, sinon supprimer la métadonnée ou mettre son état à WIP
     try {
       // Sending the metadata to PM => API
-      const res = await submitFunction(this.getUrlBack('catalog/resources'), this.pmHeaders).sendJson(data)
+      const res = await submitFunction(this.getUrlBackCatalog('resources'), this.pmHeaders).sendJson(data)
       this.ok(here, 'metadata sent', res)
     } catch (e) {
       console.error(`ERR01 Couldn't send the metadata to the API, aborting. Cause:`, e)
@@ -384,7 +384,7 @@ export class MetadataForm extends RudiForm {
       }
       if (metadataId) commitInfo.global_id = metadataId
       try {
-        await JsonHttpRequest.post(this.getUrlBack('media/commit'), this.pmHeaders).sendJson(commitInfo)
+        await JsonHttpRequest.post(this.getUrlBackStorage('commit'), this.pmHeaders).sendJson(commitInfo)
         this.ok(here, 'Commit succeeded for media', mediaId)
       } catch (error) {
         console.error(`E [${here}.post] Committing failed for media ${mediaId}`, error)

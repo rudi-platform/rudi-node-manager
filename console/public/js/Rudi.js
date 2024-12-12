@@ -125,6 +125,9 @@ export class RudiForm {
   getUrlLocal = (...args) => pathJoin(this.consolePath, ...args)
   getUrlStorage = (...args) => pathJoin(this.storageUrl, ...args)
 
+  getUrlBackCatalog = (...args) => this.getUrlBack('catalog', ...args)
+  getUrlBackStorage = (...args) => this.getUrlBack('storage', ...args)
+
   async _getPm(isJson, ...urlBits) {
     const here = 'getPm'
     if (!this.backPath) throw new Error('Init PM URL first')

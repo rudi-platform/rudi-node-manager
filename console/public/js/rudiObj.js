@@ -98,7 +98,7 @@ export class RudiObjForm extends RudiForm {
     const isUpdate = this.state == 'edit'
     const submitFunction = isUpdate ? JsonHttpRequest.put : JsonHttpRequest.post
     try {
-      const response = await submitFunction(this.getCatalogData(this.objType), this.pmHeaders).sendJson(data)
+      const response = await submitFunction(this.getUrlBackCatalog(this.objType), this.pmHeaders).sendJson(data)
       console.log(this.objType, 'sent. Response:', response)
 
       this.end()
