@@ -4,11 +4,11 @@ const mod = 'manager.app'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import express from 'express'
+import { readFileSync } from 'fs'
 
 import cookieParser from 'cookie-parser'
+import express from 'express'
 import helmet from 'helmet'
-import { join } from 'path'
 
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies: conf
@@ -47,7 +47,7 @@ import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatab
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
-import { getDomain, getHost, getRootDir, sleep } from './utils/utils.js'
+import { getAllFiles, getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
@@ -77,7 +77,6 @@ const connectToModule = (moduleCall, moduleName, errMsg) =>
   )
 
 async function connectToRudiModules(attemptLeft = 20) {
-  const fun = 'connectToRudiModules'
   if (attemptLeft === 0) return checkUrls()
 
   try {
@@ -103,6 +102,7 @@ const redirectTrailingSlashes = (req, reply, next) => {
   if (req.path.length > 1 && req.path.slice(-1) === '/') {
     const query = req.url.slice(req.path.length)
     const safepath = req.path.slice(0, -1).replace(/\/+/g, '/')
+    logI(mod, 'redirect', req.url, '=>', safepath + query)
     reply.redirect(308, safepath + query)
   } else {
     next()
@@ -150,7 +150,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 const managerApp = express()
 
 const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
-  // const here = 'launchManagerRouter'
+  const here = 'managerRouter'
   const listeningPort = getBackendListeningPort()
   const listeningAddress = getBackendListeningAddress()
 
@@ -220,8 +220,10 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Get conf (this module URLs)
   // -----------------------------------------------------------------------------------------------
   // Get the manager conf in any frontend path
-  managerApp.get(/.*\/conf$/, (req, reply) => getInitData(req, reply))
-  managerApp.get('/', (req, reply) => reply.redirect(308, getFrontPath()))
+  managerApp.get(/.*\/conf$/, (req, reply) => {
+    logD(mod, here, 'serving conf')
+    getInitData(req, reply)
+  })
 
   // -----------------------------------------------------------------------------------------------
   // Backend routes
@@ -247,13 +249,33 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   if (!isDevEnv()) {
     logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
     const __dirname = getRootDir()
-    managerApp.use(express.static(join(__dirname, 'front/build')))
+    const frontDir = pathJoin(__dirname, 'front/build')
 
-    managerApp.get(new RegExp(`${getFrontPath()}(/*)?`), (req, reply) =>
-      reply.sendFile(join(__dirname, 'front/build/index.html'))
-    )
+    // Special treatment: some frontend static files should be parsed
+    const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
+    const staticFiles = {}
+    filesToParse.forEach((filePath) => {
+      const fileContent = readFileSync(filePath, 'utf-8')
+      const parsedFileContent = fileContent.replaceAll('f7689a5a-0ed6-4f4b-97da-df690903ef4f', getFrontPath())
+      const fileCall = filePath.split('front/build')[1]
+      staticFiles[fileCall] = parsedFileContent
+    })
+    for (const file in staticFiles) managerApp.get(getFrontPath(file), (req, reply) => reply.send(staticFiles[file]))
+
+    // Access the static ressources
+    managerApp.use(getFrontPath(), express.static(frontDir))
+    managerApp.get('*/favicon.ico', express.static(pathJoin('frontDir', 'favicon.ico')))
+
+    // React front router
+    const indexFileContent = staticFiles['index.html']
+    managerApp.get(new RegExp(`${getFrontPath()}(/*)?`), (req, reply) => {
+      logD(mod, 'get front', `Manager Front accessed from ${req.url}`)
+      reply.send(indexFileContent)
+    })
+
+    // Redirecting everything to the front
     managerApp.get('*', (req, reply) => {
-      logW(mod, 'get /', `Someone tries to access Manager from ${req.url}`)
+      logW(mod, 'get *', `Redirecting this URL to /metadata: ${req.url}`)
       reply.redirect(308, getFrontPath('metadata'))
     })
   }

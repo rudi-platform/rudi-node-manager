@@ -25,14 +25,6 @@ import Visualisation from './components/visualisation/visualisation'
 import { BackConfContext } from './context/backConfContext.js'
 import { JwtContext } from './context/jwtContext'
 
-/*
-TODO :
-- sticky filtre
-- responsive
-- filtre/sort/search
-- remove key={...+i} when possible
-*/
-
 /**
  * Main App component
  * @return {ReactNode} main html or login component
@@ -48,7 +40,9 @@ export default function App() {
 
   const [rootUrl, setRootUrl] = useState(window.location.pathname)
   useEffect(() => {
-    back.isLoaded && setRootUrl(back.frontPath)
+    if (!back.isLoaded) return
+    console.debug('Setting root to', back.frontPath)
+    setRootUrl(back.frontPath)
   }, [back])
 
   // ---------------- Login modals
@@ -216,7 +210,7 @@ export default function App() {
           <Route path="show/:id" element={<Visualisation logout={logout} />} />
           <Route path="show" element={<Visualisation logout={logout} />} />
           <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/metadata" replace />} />
         </Routes>
       </ModalProvider>
     </Router>

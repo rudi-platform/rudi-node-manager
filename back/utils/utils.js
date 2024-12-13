@@ -5,8 +5,9 @@
 // -------------------------------------------------------------------------------------------------
 
 import { execSync } from 'child_process'
-import { existsSync } from 'fs'
+import { existsSync, readdirSync, statSync } from 'fs'
 import _ from 'lodash'
+import { normalize } from 'path'
 const { floor, isInteger } = _
 
 import { inspect } from 'util'
@@ -49,8 +50,12 @@ export function mergeStrings(sep, ...args) {
 }
 
 export const pathJoin = (...args) => mergeStrings('/', ...args)
+export const lastElementOfArray = (anArray) => anArray.slice(-1)[0]
+export const getFileExtension = (fileName) => lastElementOfArray(`${fileName}`.split('.'))
 
-// ---- String encodings
+// -------------------------------------------------------------------------------------------------
+// Strings encoding
+// -------------------------------------------------------------------------------------------------
 export const toBase64 = (data) => convertEncoding(data, 'utf-8', 'base64')
 export const toBase64url = (str) => convertEncoding(str, 'utf-8', 'base64url')
 export const decodeBase64 = (data) => convertEncoding(data, 'base64', 'utf-8')
@@ -72,6 +77,9 @@ export function toInt(str) {
   return Number.isNaN(i) || `${i}` !== str ? str : i
 }
 
+// -------------------------------------------------------------------------------------------------
+// Custom JSON stringify
+// -------------------------------------------------------------------------------------------------
 /**
  * Custom JSON beautifying function
  * @param {JSON} jsonObject: a JSON object
@@ -89,6 +97,9 @@ export function beautify(jsonObject, option) {
 
 export const jsonToString = (jsonObject) => inspect(jsonObject, false, 5, true)
 
+// -------------------------------------------------------------------------------------------------
+// HTTP
+// -------------------------------------------------------------------------------------------------
 /**
  * Cleans a headers string from the "Autorization: <whatever>" information
  */
@@ -145,6 +156,9 @@ export function uuidv4(nb) {
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// -------------------------------------------------------------------------------------------------
+// Files
+// -------------------------------------------------------------------------------------------------
 // export const moduleDirname = (place = import.meta.url) => dirname(fileURLToPath(place))
 
 /**
@@ -184,3 +198,21 @@ export const getNodeModulesDir = () => {
 }
 const NODE_MODULES = getNodeModulesDir()
 export const getLib = (...path) => pathJoin(NODE_MODULES, ...path)
+
+/**
+ * Recursively list all files in a folder
+ */
+export const getAllFiles = (folder, { extensionFilter = ['*'], excludeFolders = [] }, arrayOfFiles = []) => {
+  const files = readdirSync(folder)
+  files.forEach((fileName) => {
+    const filePath = pathJoin(folder, fileName)
+    if (statSync(filePath).isDirectory()) {
+      if (!excludeFolders.includes(fileName))
+        arrayOfFiles = getAllFiles(filePath, { extensionFilter, excludeFolders }, arrayOfFiles)
+    } else {
+      if (extensionFilter[0] === '*' || extensionFilter.includes(getFileExtension(fileName)))
+        arrayOfFiles.push(normalize(filePath))
+    }
+  })
+  return arrayOfFiles
+}

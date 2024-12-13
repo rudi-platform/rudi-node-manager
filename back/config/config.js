@@ -71,8 +71,6 @@ console.debug(`[CONF] ${MANAGER} domain:`, getOptBackDomain())
 if (!RUDI_CATALOG_URL) throw new Error(`Configuration error: ${CATALOG} URL should be defined`)
 if (!RUDI_STORAGE_URL) throw new Error(`Configuration error: ${STORAGE} URL should be defined`)
 
-console.debug()
-
 // -------------------------------------------------------------------------------------------------
 // Access conf values
 // -------------------------------------------------------------------------------------------------
@@ -108,7 +106,6 @@ export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${L
 
 const HOST_DOMAIN = getOptBackDomain() || getBackendListeningAddressAndPort()
 export const getHostDomain = () => {
-  console.debug('T', 'domain:', HOST_DOMAIN)
   return HOST_DOMAIN
 }
 
@@ -116,6 +113,7 @@ const MANAGER_PREFIX = removeTrailingSlash(
   getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
 )
 console.debug(`[CONF] ${MANAGER} domain:`, HOST_DOMAIN)
+console.debug()
 
 const BACKEND_PREFIX = removeTrailingSlash(getConf('server', 'backend_prefix', 'api'))
 const FRONTEND_PREFIX = removeTrailingSlash(getConf('server', 'frontend_prefix', ''))
@@ -126,6 +124,12 @@ export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
 export const getFrontPath = (...args) =>
   FRONTEND_PREFIX ? getManagerPath(FRONTEND_PREFIX, ...args) : getManagerPath(...args)
 export const getConsolePath = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
+
+console.debug('[CONF] Manager prefix:', getManagerPath())
+console.debug('[CONF] Back prefix:', getBackPath())
+console.debug('[CONF] Front prefix:', getFrontPath())
+console.debug('[CONF] Console prefix:', getConsolePath())
+console.debug()
 
 // -------------------------------------------------------------------------------------------------
 // Catalog

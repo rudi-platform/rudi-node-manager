@@ -22,7 +22,7 @@ const mergeStrings = (sep, ...args) => {
 }
 export const pathJoin = (...args) => mergeStrings('/', ...args)
 
-export const lastElementOfArray = (anArray) => (!Array.isArray(anArray) ? null : anArray[anArray.length - 1])
+export const lastElementOfArray = (anArray) => anArray.slice(-1)[0]
 
 /**
  * Get the extension of a file name

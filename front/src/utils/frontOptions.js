@@ -1,6 +1,8 @@
 // -------------------------------------------------------------------------------------------------
 // Extract command line arguments
 
+import { pathJoin } from './utils.js'
+
 // -------------------------------------------------------------------------------------------------
 // This has been rendered obsolete: now the frontend will reach the backend to know its own URL.
 export const PUBLIC_URL = 'PUBLIC_URL'
@@ -46,4 +48,6 @@ export const getFrontOptions = (opt, altValue = '') => {
   return frontOptions[opt]
 }
 
-// export const getPublicUrl = (...suffix) => pathJoin(getFrontOptions(PUBLIC_URL), ...suffix)
+// export const getPublicUrl = (...url) => pathJoin(getFrontOptions(PUBLIC_URL), ...url)
+const FRONT_PREFIX = 'f7689a5a-0ed6-4f4b-97da-df690903ef4f'
+export const getPublicUrl = () => pathJoin(FRONT_PREFIX)
