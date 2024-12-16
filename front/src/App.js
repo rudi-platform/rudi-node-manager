@@ -200,6 +200,7 @@ export default function App() {
         <div id="root"></div>
 
         <Routes>
+          <Route path="/" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="metadata" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="producer" element={<CatalogueProducer editMode={isEditor} logout={logout} />} />
           <Route path="contact" element={<CatalogueContact editMode={isEditor} logout={logout} />} />
@@ -209,7 +210,7 @@ export default function App() {
           <Route path="show/:id" element={<Visualisation logout={logout} />} />
           <Route path="show" element={<Visualisation logout={logout} />} />
           <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
-          <Route path="*" element={<Navigate to="/metadata" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </ModalProvider>
     </Router>

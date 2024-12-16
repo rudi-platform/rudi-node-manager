@@ -12,9 +12,29 @@ import Modal from 'react-bootstrap/Modal'
 import Row from 'react-bootstrap/Row'
 
 import { BackConfContext } from '../../context/backConfContext.js'
-import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
-import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
-// import { showObj } from '../../utils/utils'
+import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler.js'
+import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation.js'
+
+export const useEditUserModal = () => {
+  const [isVisibleEditModal, setIsVisibleEditModal] = useState(false)
+  /**
+   * toggle l'affichage de la modal
+   * @return {void}
+   */
+  const toggleIsVisibleEditModal = () => setIsVisibleEditModal(!isVisibleEditModal)
+  return { isVisibleEditModal, toggleEditModal: toggleIsVisibleEditModal }
+}
+
+export const useEditUserModalOptions = () => {
+  const [editModalOptions, setEditModalOptions] = useState({})
+  /**
+   * change la valeur des options
+   * @param {*} param nouvelles options
+   * @return {void}
+   */
+  const changeEditModalOptions = (param) => setEditModalOptions(param)
+  return { editModalOptions, changeEditModalOptions }
+}
 
 EditUserModal.propTypes = {
   user: PropTypes.object.isRequired,
@@ -216,25 +236,4 @@ export default function EditUserModal({ user, roleList, visible, toggleEdit, ref
       </Form>
     </Modal>
   )
-}
-
-export const useEditUserModal = () => {
-  const [isVisibleEditModal, setIsVisibleEditModal] = useState(false)
-  /**
-   * toggle l'affichage de la modal
-   * @return {void}
-   */
-  const toggleIsVisibleEditModal = () => setIsVisibleEditModal(!isVisibleEditModal)
-  return { isVisibleEditModal, toggleEditModal: toggleIsVisibleEditModal }
-}
-
-export const useEditUserModalOptions = () => {
-  const [editModalOptions, setEditModalOptions] = useState({})
-  /**
-   * change la valeur des options
-   * @param {*} param nouvelles options
-   * @return {void}
-   */
-  const changeEditModalOptions = (param) => setEditModalOptions(param)
-  return { editModalOptions, changeEditModalOptions }
 }

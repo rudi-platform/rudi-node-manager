@@ -3,7 +3,7 @@ import React from 'react'
 import { Plus } from 'react-bootstrap-icons'
 // import { Plus, Pencil, Trash } from 'react-bootstrap-icons'
 
-import AddUserModal, { useAddUserModal } from '../modals/addUserModal'
+import AddUserModal, { useAddUserModal } from '../modals/addUserModal.js'
 
 ActOnUserCard.propTypes = {
   roleList: PropTypes.array.isRequired,
@@ -30,7 +30,6 @@ export default function ActOnUserCard({ roleList, refresh }) {
               Ajouter un utilisateur <Plus />
             </a>
           </div>
-
           <div className="inline card-text on-right">
             <AddUserModal
               roleList={roleList}
