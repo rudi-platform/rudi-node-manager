@@ -1,8 +1,9 @@
 import axios from 'axios'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ArrowCounterclockwise, Pencil, Trash } from 'react-bootstrap-icons'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import EditUserModal, { useEditUserModal } from '../modals/editUserModal'
 import { getOptConfirm, getOptOk, useModalContext } from '../modals/genericModalContext'
@@ -24,7 +25,7 @@ export default function UserCard({ user, roleList, refresh }) {
 
   const { backConf } = useContext(BackConfContext)
   const [back, setBack] = useState(backConf)
-  useEffect(() => setBack(backConf), [backConf])
+  useEffect(() => setBack(back), [backConf])
 
   const { changeOptions, toggle } = useModalContext()
   const { isVisibleEditModal, toggleEditModal } = useEditUserModal()

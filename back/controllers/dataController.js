@@ -82,7 +82,6 @@ export async function getInitData(req, reply) {
     const initData = {
       appTag: tags?.tag,
       gitHash: tags?.hash,
-      themeLabels: data[0],
       catalogPubUrl: data[1],
       storagePubUrl: data[2],
       consolePath: getConsolePath(),
@@ -91,6 +90,7 @@ export async function getInitData(req, reply) {
       managerPath: getManagerPath(),
       hostUrl: getHostDomain(),
       portalConnected: !!data[3],
+      themeLabels: data[0],
     }
     return reply ? reply.status(200).json(initData) : initData
   } catch (e) {

@@ -17,19 +17,6 @@ const REGEX_LOCAL_CONF = new RegExp(`^(?!${HOST_URL}).*/conf$`)
 const FORM_CALL = pathJoin(PUBLIC_URL, FORM_PREFIX)
 const getFormUrl = (...url) => pathJoin(HOST_URL, FORM_CALL, ...url)
 
-const pathRewrite = (path, req) => {
-  const pathReplaced = path.replace(new RegExp(`^${BACK_URL_CALL}`), BACK_URL_TARGET)
-  console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
-  console.log('path:', path, ' =>', `(^${BACK_URL_CALL})`, pathReplaced)
-  return pathReplaced
-}
-// pathRewrite: (path, req) => {
-//   const pathReplaced = path.replace(new RegExp(rewriteBackPathKey), '/${BACK_PREFIX}')
-//   console.log(here, req.url, '=>', pathReplaced, ' | ', req.params, ' | ', req.query)
-//   // console.log('path:', path, ' =>', `(${rewriteBackPathKey})`, pathReplaced);
-//   return pathReplaced
-// },
-
 module.exports = (app) => {
   app.use(
     BACK_CALL,

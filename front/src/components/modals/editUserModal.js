@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import PropTypes from 'prop-types'
 
@@ -11,6 +11,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import Modal from 'react-bootstrap/Modal'
 import Row from 'react-bootstrap/Row'
 
+import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { VALID_EMAIL, VALID_NOT_EMPTY_USERNAME } from './validation'
 // import { showObj } from '../../utils/utils'
@@ -30,6 +31,11 @@ EditUserModal.propTypes = {
  */
 export default function EditUserModal({ user, roleList, visible, toggleEdit, refresh }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
+
+  const { backConf } = useContext(BackConfContext)
+  const [back, setBack] = useState(backConf)
+  useEffect(() => setBack(backConf), [backConf])
+
   const [userInfo, setUserInfo] = useState(user)
 
   const modalTitle = 'Modifier l‘utilisateur'

@@ -105,16 +105,14 @@ export const getBackendListeningAddress = () => LISTENING_ADDRESS
 export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${LISTENING_PORT}`
 
 const HOST_DOMAIN = getOptBackDomain() || getBackendListeningAddressAndPort()
-export const getHostDomain = () => {
-  return HOST_DOMAIN
-}
+export const getHostDomain = () => HOST_DOMAIN
+
+console.debug(`[CONF] ${MANAGER} host:`, HOST_DOMAIN)
+console.debug()
 
 const MANAGER_PREFIX = removeTrailingSlash(
   getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
 )
-console.debug(`[CONF] ${MANAGER} domain:`, HOST_DOMAIN)
-console.debug()
-
 const BACKEND_PREFIX = removeTrailingSlash(getConf('server', 'backend_prefix', 'api'))
 const FRONTEND_PREFIX = removeTrailingSlash(getConf('server', 'frontend_prefix', ''))
 const CONSOLE_PREFIX = removeTrailingSlash(getConf('server', 'console_prefix', 'form'))

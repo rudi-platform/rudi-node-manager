@@ -50,7 +50,6 @@ export default function ObjCatalogue({
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
   const { backConf } = useContext(BackConfContext)
-
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 

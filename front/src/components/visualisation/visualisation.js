@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Check } from 'react-bootstrap-icons'
 import { useParams } from 'react-router-dom'
 
@@ -31,7 +31,7 @@ function Visualisation({ logout }) {
   const [mediaId, setMediaId] = useState(id || '')
   const [visuOption, setVisuOption] = useState({ displayType: 'TXT', data: '- Aucune donnée -' })
 
-  const wrapper = React.useRef()
+  const wrapper = useRef()
   const [el, setEl] = useState(null)
 
   useEffect(() => {

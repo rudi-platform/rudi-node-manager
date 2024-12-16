@@ -8,7 +8,7 @@ import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import ActOnUserCard from './actOnUserCard'
 import UserCard from './userCard'
 
-const propId = 'id'
+const PAGE_SIZE = 20
 
 CatalogueUser.propTypes = {
   editMode: PropTypes.bool,
@@ -36,33 +36,25 @@ export default function CatalogueUser({ editMode, logout }) {
   const [roleList, setRoleList] = useState([])
   const [userList, setUserList] = useState([])
   const [hasMore, setHasMore] = useState(false)
-  const PAGE_SIZE = 20
   const [currentOffset, setCurrentOffset] = useState(0)
 
   useEffect(() => {
-    fetchInitialData()
-  }, [])
+    fetchUserData()
+  }, [backConf])
 
-  const refresh = () => fetchInitialData()
+  const refresh = () => fetchUserData()
 
   /**
    * recup la 1er page des métadonnéees et les countBy
    */
-  async function fetchInitialData() {
-    await Promise.all([
-      axios
-        .get(urlRoles)
-        .then((res) => setRoleList(res.data))
-        .catch((err) => defaultErrorHandler(err)),
-      axios
-        .get(urlUsers)
-        .then((res) => {
-          setCurrentOffset(PAGE_SIZE)
-          setUserList(res.data)
-        })
-        .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err))),
-    ])
-  }
+  const fetchUserData = () =>
+    back?.isLoaded &&
+    Promise.all([axios.get(urlRoles), axios.get(urlUsers)])
+      .then((res) => {
+        setRoleList(res[0].data)
+        setUserList(res[1].data)
+      })
+      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
 
   /**
    * Fonction utilisée par InfiniteScroll
@@ -95,7 +87,7 @@ export default function CatalogueUser({ editMode, logout }) {
                 endMessage={<i>Aucune donnée supplémentaire</i>}
               >
                 {userList.map((user) => (
-                  <UserCard roleList={roleList} user={user} key={user[propId]} refresh={refresh}></UserCard>
+                  <UserCard roleList={roleList} user={user} key={user.id} refresh={refresh}></UserCard>
                 ))}
               </InfiniteScroll>
             ) : (

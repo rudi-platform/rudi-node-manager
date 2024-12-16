@@ -14,7 +14,7 @@ export default function ThemeDisplay({ value }) {
   useEffect(() => setBack(backConf), [backConf])
 
   const [themeLabel, setThemeLabel] = useState(value)
+  useEffect(() => setThemeLabel(back.themeLabels?.[value] || value), [backConf])
 
-  useEffect(() => setThemeLabel(back.themeLabels?.[value] || value), [back])
   return <span>{themeLabel}</span>
 }

@@ -43,7 +43,7 @@ export default function App() {
     if (!back.isLoaded) return
     console.debug('Setting root to', back.frontPath)
     setRootUrl(back.frontPath)
-  }, [back])
+  }, [backConf])
 
   // ---------------- Login modals
   const [isLoginOpen, setIsLoginOpen] = useState(true)
@@ -84,7 +84,7 @@ export default function App() {
 
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
-  useEffect(() => setDisplayTags(displayVersion()), [back.appTag, back.gitHash])
+  useEffect(() => setDisplayTags(displayVersion()), [backConf])
 
   /**
    *
@@ -200,7 +200,6 @@ export default function App() {
         <div id="root"></div>
 
         <Routes>
-          <Route path="/" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="metadata" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="producer" element={<CatalogueProducer editMode={isEditor} logout={logout} />} />
           <Route path="contact" element={<CatalogueContact editMode={isEditor} logout={logout} />} />

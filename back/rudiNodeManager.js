@@ -47,7 +47,7 @@ import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatab
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
-import { getAllFiles, getDomain, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
+import { getAllFiles, getDomain, getFileExtension, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
@@ -174,7 +174,8 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     sysInfo('req.in <', '', logReqMsg, getContext(req, {})) // <= IN
 
     // Redirection for trailing slashes
-    redirectTrailingSlashes(req, reply, next)
+    // redirectTrailingSlashes(req, reply, next)
+    next()
 
     reply.on('finish', () => {
       if (reply.statusCode < 400) {
@@ -246,37 +247,60 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // This middleware informs the express application to serve our compiled React files
   // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+
   if (!isDevEnv()) {
+    const trace = 'route front'
     logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
     const __dirname = getRootDir()
     const frontDir = pathJoin(__dirname, 'front/build')
+    // Access the favicon
+    managerApp.use(/.*favicon.ico/, express.static(pathJoin(frontDir, 'favicon.ico')))
 
-    // Special treatment: some frontend static files should be parsed
+    // Special treatment: some frontend static files should be parsed (because they cannot be dynamically updated)
     const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
-    const staticFiles = {}
+    const mimeTypes = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
+    const modifiedStaticFiles = {}
     filesToParse.forEach((filePath) => {
       const fileContent = readFileSync(filePath, 'utf-8')
-      const parsedFileContent = fileContent.replaceAll('f7689a5a-0ed6-4f4b-97da-df690903ef4f', getFrontPath())
+      const content = fileContent.replaceAll('http://f7689a5a-0ed6-4f4b-97da-df690903ef4f', getFrontPath())
+      const fileExtension = getFileExtension(filePath)
+      const mime = mimeTypes[fileExtension]
       const fileCall = filePath.split('front/build')[1]
-      staticFiles[fileCall] = parsedFileContent
-    })
-    for (const file in staticFiles) managerApp.get(getFrontPath(file), (req, reply) => reply.send(staticFiles[file]))
-
-    // Access the static ressources
-    managerApp.use(getFrontPath(), express.static(frontDir))
-    managerApp.get('*/favicon.ico', express.static(pathJoin('frontDir', 'favicon.ico')))
-
-    // React front router
-    const indexFileContent = staticFiles['index.html']
-    managerApp.get(new RegExp(`${getFrontPath()}(/*)?`), (req, reply) => {
-      logD(mod, 'get front', `Manager Front accessed from ${req.url}`)
-      reply.send(indexFileContent)
+      modifiedStaticFiles[fileCall] = { content, mime }
+      logD(mod, here, 'modifed file:', fileCall)
     })
 
-    // Redirecting everything to the front
+    // Serving modified static files
+    for (const file in modifiedStaticFiles) {
+      managerApp.get(getFrontPath(file), (req, reply) => {
+        const fileInfo = modifiedStaticFiles[file]
+        logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
+        // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
+        reply.contentType(fileInfo.mime).send(String(fileInfo.content))
+      })
+    }
+
+    // Additionaly serving index.html for /
+    const homePage = modifiedStaticFiles['/index.html']
+    managerApp.get(getFrontPath(), (req, reply) => {
+      logD(mod, trace, `Manager Front accessed from ${req.url}`)
+      reply.send(homePage.content)
+    })
+    managerApp.get(getFrontPath(''), (req, reply) => {
+      logD(mod, trace, `Manager Front accessed from ${req.url}`)
+      reply.send(homePage.content)
+    })
+
+    // Accessing the static ressources
+    managerApp.use(getFrontPath(), (req, res, next) => {
+      logD(mod, trace, `Accessing unmodified static file ${req.url}`)
+      express.static(frontDir)(req, res, next)
+    })
+
+    // Redirecting everything else to the React front
     managerApp.get('*', (req, reply) => {
-      logW(mod, 'get *', `Redirecting this URL to /metadata: ${req.url}`)
-      reply.redirect(308, getFrontPath('metadata'))
+      logW(mod, trace, `Redirecting this URL to /metadata: ${req.url}`)
+      reply.redirect(308, getFrontPath())
     })
   }
 

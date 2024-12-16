@@ -1,4 +1,4 @@
-import React from 'react'
+import { useContext } from 'react'
 
 import { DefaultErrorOption, ModalContext } from '../components/modals/genericModalContext'
 
@@ -7,7 +7,7 @@ import { DefaultErrorOption, ModalContext } from '../components/modals/genericMo
  * @return {*} defaultErrorHandler hooks
  */
 export default function useDefaultErrorHandler() {
-  const { changeOptions, toggle } = React.useContext(ModalContext)
+  const { changeOptions, toggle } = useContext(ModalContext)
   const errorHandler = (err) => {
     // console.error(err)
     const options = DefaultErrorOption
