@@ -169,7 +169,7 @@ export function getHash() {
   let gitHash = getBackOptions(OPT_GIT_HASH)
   if (!gitHash) {
     try {
-      gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' })
+      gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim().slice(0, 7)
     } catch {
       console.error('WARNING: no --hash option provided + giv rev parse does not work')
       return 'v0_0;'
