@@ -9,7 +9,7 @@ const { Transport } = rudiLogger
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { OPT_GIT_HASH, getBackOptions, isDevEnv } from '../config/backOptions.js'
+import { getHash, isDevEnv } from '../config/backOptions.js'
 import { getConf } from '../config/config.js'
 import { beautify, nowFormatted } from './utils.js'
 
@@ -47,28 +47,21 @@ function getRudiLoggerOptions() {
   if (getConf('syslog', 'syslog_facility').slice(0, 5) === 'local') {
     facility = 16 + parseInt(getConf('syslog', 'syslog_facility').slice(5, 1))
   }
-  let transports
+  let transport
   let path = getConf('syslog', 'syslog_host')
   switch (getConf('syslog', 'syslog_protocol')) {
     case 'tcp':
-      transports = Transport.Tcp
+      transport = Transport.Tcp
       break
     case 'udp':
-      transports = Transport.Udp
+      transport = Transport.Udp
       break
     case 'unix':
-      transports = Transport.Unix
+      transport = Transport.Unix
       path = getConf('syslog', 'syslog_socket')
       break
   }
-  const rudiLoggerOpts = {
-    log_server: {
-      path: path,
-      port: getConf('syslog', 'syslog_port'),
-      facility: facility,
-      transport: transports,
-    },
-  }
+  const rudiLoggerOpts = { log_server: { path, port: getConf('syslog', 'syslog_port'), facility, transport } }
 
   rudiLoggerOpts.log_local = {
     console: true,
@@ -79,28 +72,25 @@ function getRudiLoggerOptions() {
   return rudiLoggerOpts
 }
 
-const syslog = new RudiLogger(APP_NAME, getBackOptions(OPT_GIT_HASH), getRudiLoggerOptions())
+const syslog = new RudiLogger(APP_NAME, getHash(), getRudiLoggerOptions())
 
 const rplog = function (logLevel, srcMod, srcFun, msg, context) {
   const Severity = _Severity
   let severity = Severity.Critical
+
   const message = displayStr(srcMod, srcFun, msg)
   switch (logLevel) {
-    case 'error':
-      severity = Severity.Error
-      break
-    case 'warn':
-      severity = Severity.Warning
-      break
-    case 'info':
-      severity = Severity.Info
-      break
     case 'verbose':
-      severity = Severity.Notice
+      severity = 'notice'
       break
+    case 'error':
+    case 'warn':
+    case 'info':
     case 'debug':
-      severity = Severity.Debug
+      severity = logLevel
       break
+    default:
+      severity = 'debug'
   }
   let ctx
   if (context) {
@@ -110,27 +100,25 @@ const rplog = function (logLevel, srcMod, srcFun, msg, context) {
       client_id: context.id,
     }
   }
-  syslog.log(severity, message, '', ctx)
+  syslog[severity](message, logWhere(srcMod, srcFun), ctx)
 }
 
 // END RUDILOGGER configuration
 
-const noCycle = () => {
-  const seen = new WeakSet()
-  return (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        return
-      }
-      seen.add(value)
-    }
-    return value
-  }
-}
-const logWhere = (srcMod, srcFun) => (srcMod && srcFun ? `${srcMod} . ${srcFun}` : srcMod || srcFun)
+const logWhere = (srcMod, srcFun) => (srcMod && srcFun ? `${srcMod}/${srcFun}` : srcMod || srcFun)
 
-const displayStr = (srcMod, srcFun, ...msg) =>
-  `[ ${logWhere(srcMod, srcFun)} ] ${msg.length > 0 ? msg.map((m) => JSON.stringify(m, noCycle())) : '<-'}`
+const toString = (...msg) => {
+  if (!msg) return '<-'
+  let str = ''
+  for (let m of msg) {
+    let mStr = `${m}`
+    if (mStr === '[Object]: Object' || mStr === '[object Object]') mStr = beautify(m)
+    str = str ? `${str} ${mStr}` : mStr
+  }
+  return str
+}
+
+const displayStr = (srcMod, srcFun, ...msg) => `${`[${logWhere(srcMod, srcFun)}]`} ${toString(...msg)}`
 
 const createLogLine = (level, srcMod, srcFun, ...msg) =>
   `${nowFormatted()} ${level} ${displayStr(srcMod, srcFun, ...msg)}`
@@ -162,23 +150,23 @@ export function getContext(req, options = {}) {
 
 export const logE = (srcMod, srcFun, ...msg) =>
   SHOULD_SYSLOG
-    ? sysError(srcMod, srcFun, beautify(msg))
+    ? sysError(srcMod, srcFun, toString(msg))
     : console.error(createLogLine('error', srcMod, srcFun, ...msg))
 
 export const logW = (srcMod, srcFun, ...msg) =>
-  SHOULD_SYSLOG ? sysWarn(srcMod, srcFun, beautify(msg)) : console.warn(createLogLine('warn', srcMod, srcFun, ...msg))
+  SHOULD_SYSLOG ? sysWarn(srcMod, srcFun, toString(msg)) : console.warn(createLogLine('warn', srcMod, srcFun, ...msg))
 
 export const logI = (srcMod, srcFun, ...msg) =>
-  SHOULD_SYSLOG ? sysInfo(srcMod, srcFun, beautify(msg)) : console.info(createLogLine('info', srcMod, srcFun, ...msg))
+  SHOULD_SYSLOG ? sysInfo(srcMod, srcFun, toString(msg)) : console.info(createLogLine('info', srcMod, srcFun, ...msg))
 
 export const logV = (srcMod, srcFun, ...msg) =>
   SHOULD_SYSLOG
-    ? sysVerbose(srcMod, srcFun, beautify(msg))
+    ? sysVerbose(srcMod, srcFun, toString(msg))
     : console.log(createLogLine('verbose', srcMod, srcFun, ...msg))
 
 export const logD = (srcMod, srcFun, ...msg) =>
   SHOULD_SYSLOG
-    ? sysDebug(srcMod, srcFun, beautify(msg))
+    ? sysDebug(srcMod, srcFun, toString(msg))
     : console.debug(createLogLine('debug', srcMod, srcFun, ...msg))
 
 // -------------------------------------------------------------------------------------------------
