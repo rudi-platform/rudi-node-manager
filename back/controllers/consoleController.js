@@ -19,8 +19,8 @@ export const getNodeUrls = async () => {
       frontPath: getFrontPath(),
       backPath: getBackPath(),
       managerPath: getManagerPath(),
+      portalUrl: urls[2],
     }
-    if (urls[2] !== 'No portal connected') nodeUrls.portal_url = urls[2]
     return nodeUrls
   } catch (err) {
     logE(mod, fun, err)
