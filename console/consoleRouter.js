@@ -24,7 +24,7 @@ const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('publ
 // -------------------------------------------------------------------------------------------------
 // Console router
 // -------------------------------------------------------------------------------------------------
-export const consoleRouter = express.Router()
+export const consoleRouter = new express.Router()
 
 // -------------------------------------------------------------------------------------------------
 // Package dependencies

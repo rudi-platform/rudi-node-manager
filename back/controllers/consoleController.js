@@ -14,12 +14,15 @@ export const getNodeUrls = async () => {
     const urls = await Promise.all([getCatalogPublicUrl(), getStoragePublicUrl(), getPortalUrl()])
     const nodeUrls = {
       catalogUrl: urls[0],
+      catalog_url: urls[0],
       storageUrl: urls[1],
+      media_url: urls[1],
       consolePath: getConsolePath(),
       frontPath: getFrontPath(),
       backPath: getBackPath(),
       managerPath: getManagerPath(),
       portalUrl: urls[2],
+      portal_url: urls[2],
     }
     return nodeUrls
   } catch (err) {
