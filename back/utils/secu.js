@@ -274,11 +274,13 @@ export function getRudiApiToken() {
   return _cachedApiJwt
 }
 
-export function getCatalogHeaders() {
+export function getCatalogHeaders(headersEntries) {
   return {
     headers: {
-      Accept: 'application/json, text/plain, */*',
       Authorization: `Bearer ${getRudiApiToken()}`,
+      'Content-Type': 'application/json',
+      Accept: 'text/plain, */*',
+      ...headersEntries,
     },
   }
 }

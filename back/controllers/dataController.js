@@ -52,7 +52,7 @@ const callCatalog = async (url, req, reply) => {
   } catch (err) {
     // log.w(mod, fun, cleanErrMsg(err))
     // if (reply) reply.status(err.statusCode).send(err.message)
-    treatAxiosError(err, CATALOG, req, reply)
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 

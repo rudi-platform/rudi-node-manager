@@ -321,6 +321,11 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   managerApp.get('*', (req, reply) => reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`))
 
   // -----------------------------------------------------------------------------------------------
+  // Catch any error
+  // -----------------------------------------------------------------------------------------------
+  managerApp.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
+
+  // -----------------------------------------------------------------------------------------------
   // Configure our server to listen on the port defiend by our port variable
   // -----------------------------------------------------------------------------------------------
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
@@ -328,7 +333,6 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   )
   managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 
-  managerApp.use((err, req, reply, next) => expressErrorHandler(err, req, reply, next))
   return managerServer
 }
 

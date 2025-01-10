@@ -19,7 +19,7 @@ import {
 } from '../config/config.js'
 import { dbGetUserByUsername } from '../database/database.js'
 import { NotFoundError, RudiError, UnauthorizedError } from '../utils/errors.js'
-import { logE, logW } from '../utils/logger.js'
+import { logD, logE, logW } from '../utils/logger.js'
 import {
   CONSOLE_TOKEN_NAME,
   extractCookieFromReq,
@@ -109,17 +109,23 @@ export function getDownloadById(req, reply, next) {
 }
 
 export async function commitFileOnStorage(req, reply) {
-  const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
   try {
-    return await commitOnStorage(mediaId, commitId, zoneName)
+    const { media_id: mediaId, commit_uuid: commitId, zone_name: zoneName } = req.body
+    const res = await commitOnStorage(mediaId, commitId, zoneName)
+    reply.send(res)
   } catch (err) {
-    return reply.status(err.response?.status || 500).send(err)
+    return treatAxiosError(err, STORAGE, req, reply)
   }
 }
 
 export async function commitFileOnCatalog(req, reply) {
-  const { media_id: mediaId, commit_uuid: commitId } = req.body
-  return await commitOnRudiApi(mediaId, commitId)
+  try {
+    const { media_id: mediaId, commit_uuid: commitId } = req.body
+    const res = await commitOnCatalog(mediaId, commitId)
+    reply.send(res)
+  } catch (err) {
+    return treatAxiosError(err, CATALOG, req, reply)
+  }
 }
 
 export async function commitMediaFile(req, reply, next) {
@@ -128,18 +134,18 @@ export async function commitMediaFile(req, reply, next) {
 
   // Let's commit the media on Storage module
   try {
-    await commitOnStorage(mediaId, commitId, zoneName)
+    const resStorageCommit = await commitOnStorage(mediaId, commitId, zoneName)
   } catch (err) {
     logE(mod, fun, err)
-    return reply.status(err.code).json(err || err?.message)
+    return treatAxiosError(err, STORAGE, req, reply)
   }
   try {
-    const apiCommitReply = await commitOnRudiApi(mediaId, commitId)
+    const resCatalogCommit = await commitOnCatalog(mediaId, commitId)
     const res = {
       status: 'OK',
       media_id: mediaId,
       commit_id: commitId,
-      metadata_list: apiCommitReply?.metadata_list,
+      metadata_list: resCatalogCommit?.metadata_list,
     }
     return reply.status(200).send(res)
   } catch (err) {
@@ -154,7 +160,7 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
   try {
     const commitMediaRes = await axios.post(
       getStorageUrl('commit'),
-      JSON.stringify({ commit_uuid: commitId, zone_name: zoneName }),
+      { commit_uuid: commitId, zone_name: zoneName },
       getStorageHeaders()
     )
     // log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
@@ -187,22 +193,24 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
   }
 }
 
-const commitOnRudiApi = async (mediaId, commitId) => {
-  const fun = 'commitOnRudiApi'
+const commitOnCatalog = async (mediaId, commitId) => {
+  const fun = 'commitOnCatalog'
   try {
+    logD(mod, fun, getCatalogAdminApiUrl('media', mediaId, 'commit'))
     const res = await axios.post(
       getCatalogAdminApiUrl('media', mediaId, 'commit'),
       { commit_id: commitId },
       getCatalogHeaders()
     )
     const commitInfo = res.data
-    // log.d(mod, fun, `T (${fun}) commit API OK:`, commitInfo)
+    logD(mod, fun, `T commit API OK:`, beautify(commitInfo))
     return { place: CATALOG, ...commitInfo }
   } catch (err) {
-    // console.error(
-    //   `T (${fun}) ERR${err.response?.status || err.statusCode || ''} Api commit:`,
-    //   err.response?.data || err.response?.statusText || err.response
-    // )
+    logE(
+      fun,
+      `T ERR${err.response?.status || err.statusCode || ''} Api commit:`,
+      err.response?.data || err.response?.statusText || err.response
+    )
     throw err
   }
 }

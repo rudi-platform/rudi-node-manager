@@ -26,8 +26,10 @@ import { checkRolePerm } from '../utils/roleCheck.js'
 export const storageApi = new express.Router()
 
 storageApi.get('/jwt', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), getStorageToken)
+storageApi.post('/storage-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnStorage)
 storageApi.post('/media-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnStorage)
 storageApi.post('/api-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnCatalog)
+storageApi.post('/catalog-commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitFileOnCatalog)
 storageApi.post('/commit', checkRolePerm([ROLE_EDIT, ROLE_ADMIN]), commitMediaFile)
 
 storageApi.get('/:id', getMediaInfoById)

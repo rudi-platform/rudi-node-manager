@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable no-console */
 const mod = 'errHandler'
 
@@ -105,12 +106,12 @@ export function handleError(req, reply, initialError, errCode, srcFun, objectTyp
   }
 }
 
-const isAxiosError = (err) => err?.name == 'AxiosError'
+const isAxiosError = (err) => err?.name === 'AxiosError'
 
 export function treatAxiosError(err, rudiModuleCalled, req, reply) {
   const fun = 'treatAxiosError'
   let statusCode, error
-  if (err.code == 'ECONNREFUSED' || err.code == 'ERR_BAD_RESPONSE') {
+  if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
     statusCode = 503
     error = {
       statusCode,
@@ -138,9 +139,9 @@ export function treatAxiosError(err, rudiModuleCalled, req, reply) {
     // err.message
     const { message, status, code } = err
     const errMsg = (rudiModuleCalled ? `[${rudiModuleCalled}] ` : '') + cleanErrMsg(message || err)
-    const logMsg = 'ERR (axios) ' + (status ? `${status} ` : '') + (code ? `(${code}):` : ':') + errMsg
+    const logMsg = 'ERR (axios) ' + status ? `(${status}) ` : '' + (code ? `(${code}):` : ':') + errMsg
     logW(mod, fun, logMsg)
-    if (reply) return reply.status(status).send(errMsg)
+    if (reply) return reply.status(code || 500).send(errMsg)
     throw RudiError.createRudiHttpError(status, errMsg)
   }
 }
