@@ -57,7 +57,7 @@ const callCatalog = async (url, req, reply) => {
 }
 
 // Controllers
-export const getCatalogVersion = (req, reply) => callCatalog('/api/version', req, reply)
+export const getCatalogVersion = (req, reply) => callCatalog(getCatalogAdminPath('version'), req, reply)
 export function getEnum(req, reply) {
   const lang = req.params?.lang || req.query?.lang || 'fr'
   return callCatalog(getCatalogAdminPath(`enum?lang=${lang}`), req, reply)
