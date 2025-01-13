@@ -223,7 +223,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     media.file_storage_status === 'missing' ? displayMissingMedia(media) : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(back?.isLoaded && back.getCatalogPub('api/v1/resources', metadata.global_id)),
+    share: shareButton(back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id)),
     edit: editButton(getFormMeta(`update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
