@@ -278,8 +278,7 @@ export function getCatalogHeaders(headersEntries) {
   return {
     headers: {
       Authorization: `Bearer ${getRudiApiToken()}`,
-      'Content-Type': 'application/json',
-      Accept: 'text/plain, */*',
+      Accept: 'application/json, text/plain, */*',
       ...headersEntries,
     },
   }
