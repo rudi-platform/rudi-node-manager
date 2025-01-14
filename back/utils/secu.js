@@ -241,15 +241,9 @@ export function getStorageJwt(body) {
   return _cachedStorageJwt
 }
 
-export function createPmHeadersForMedia(body) {
-  const pmHeadersJwt = createPmJwtForMedia(body)
-  return {
-    headers: {
-      Authorization: `Bearer ${pmHeadersJwt}`,
-      Accept: 'application/json, text/plain, */*',
-    },
-  }
-}
+export const createPmHeadersForMedia = (body) => ({
+  headers: { Authorization: `Bearer ${createPmJwtForMedia(body)}`, Accept: 'application/json, text/plain, */*' },
+})
 
 let _cachedStorageHeaders
 export function getStorageHeaders(body) {
@@ -274,15 +268,13 @@ export function getRudiApiToken() {
   return _cachedApiJwt
 }
 
-export function getCatalogHeaders(headersEntries) {
-  return {
-    headers: {
-      Authorization: `Bearer ${getRudiApiToken()}`,
-      Accept: 'application/json, text/plain, */*',
-      ...headersEntries,
-    },
-  }
-}
+export const getCatalogHeaders = (headersEntries) => ({
+  headers: {
+    Authorization: `Bearer ${getRudiApiToken()}`,
+    Accept: 'application/json, text/plain, */*',
+    ...headersEntries,
+  },
+})
 
 let cachedUrlJwt = {}
 export function getRudiApiTokenPrecise(url, req) {
