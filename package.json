@@ -48,21 +48,21 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.7",
-    "uuid": "^11.0.4"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
-    "@babel/eslint-parser": "^7.25.9",
+    "@babel/eslint-parser": "^7.26.5",
     "@babel/preset-env": "^7.26.0",
     "braces": "^3.0.3",
-    "eslint": "^9.17.0",
+    "eslint": "^9.18.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "nodemon": "^3.1.9",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.0",
     "prettier": "^3.4.2"
   },
   "overrides": {
