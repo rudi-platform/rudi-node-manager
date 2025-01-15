@@ -203,7 +203,7 @@ export class MetadataForm extends RudiForm {
   }
 
   mediaHeaders = null
-  async getMediaHeaders(initialHeaders = {}) {
+  async getStorageHeaders(initialHeaders = {}) {
     try {
       if (!this.mediaHeaders) {
         const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlBackStorage('jwt'), this.pmHeaders).send()
@@ -219,7 +219,7 @@ export class MetadataForm extends RudiForm {
           `\x1b[31mFailed GET media token: ERR ${err.response?.status} ` +
             `(${err.response?.statusText}) ${err.response?.data?.message} \x1b[0m`
         )
-      return this.fail('reach_media_auth')
+      return this.fail('reach_storage_auth')
     }
   }
 
@@ -234,7 +234,7 @@ export class MetadataForm extends RudiForm {
     try {
       const mediaInfo = JSON.parse(JSON.stringify(mediaFile))
       mediaInfo.media_name = encodeURI(mediaFile.media_name)
-      const postMediaOpts = await this.getMediaHeaders({ file_metadata: JSON.stringify(mediaInfo) })
+      const postMediaOpts = await this.getStorageHeaders({ file_metadata: JSON.stringify(mediaInfo) })
       if (!postMediaOpts) return
 
       const mediaId = mediaFile.media_id

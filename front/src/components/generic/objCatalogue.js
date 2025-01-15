@@ -61,8 +61,8 @@ export default function ObjCatalogue({
   const [currentOffset, setCurrentOffset] = useState(-1)
   const initialRender = useRef(true)
 
-  const getApiUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog(objType, suffix)
-  const deleteUrl = (id) => getApiUrlObj(id)
+  const getCatalogUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog(objType, suffix)
+  const deleteUrl = (id) => getCatalogUrlObj(id)
 
   const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')
   useEffect(() => setSortBy(propSortBy || '-updatedAt'), [propSortBy])
@@ -99,7 +99,7 @@ export default function ObjCatalogue({
    */
   function getInitialData() {
     axios
-      .get(getApiUrlObj(), {
+      .get(getCatalogUrlObj(), {
         params: { sort_by: sortBy, limit: PAGE_SIZE, offset: 0 },
       })
       .then((res) => {
@@ -114,7 +114,7 @@ export default function ObjCatalogue({
    */
   const fetchMoreData = () => {
     axios
-      .get(getApiUrlObj(), {
+      .get(getCatalogUrlObj(), {
         params: { sort_by: sortBy, limit: PAGE_SIZE, offset: currentOffset },
       })
       .then((res) => {

@@ -25,7 +25,7 @@ import {
   extractCookieFromReq,
   getCatalogHeaders,
   getStorageHeaders,
-  getTokenFromMediaForUser,
+  getTokenFromMediaForUser as getTokenFromStorageForUser,
   readJwtBody,
 } from '../utils/secu.js'
 import { beautify, cleanErrMsg } from '../utils/utils.js'
@@ -47,14 +47,11 @@ export async function getStoragePublicUrl(req, reply) {
 
 // Controllers
 export async function getStorageToken(req, reply, next) {
-  const fun = 'getMediaToken'
+  const fun = 'getStorageToken'
   try {
     // We extract
     const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwt(req)
-    if (!jwt) {
-      // console.error('T (getMediaToken) req:', req)
-      throw new UnauthorizedError('No JWT was found in the request')
-    }
+    if (!jwt) throw new UnauthorizedError('No JWT was found in the request')
 
     const jwtPayload = readJwtBody(jwt)
     const payloadUser = jwtPayload.user
@@ -64,7 +61,7 @@ export async function getStorageToken(req, reply, next) {
     const user = await dbGetUserByUsername(null, payloadUser.username) // NOSONAR
     if (!user) return reply.status(404).json(new NotFoundError(`User not found: ${payloadUser.username}`))
 
-    const mediaToken = await getTokenFromMediaForUser(user)
+    const mediaToken = await getTokenFromStorageForUser(user)
 
     return reply.status(200).send({ token: mediaToken })
   } catch (err) {

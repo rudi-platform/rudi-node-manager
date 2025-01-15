@@ -11,7 +11,7 @@ import { default as axios } from 'axios'
 import { MANAGER } from '../config/config.js'
 import { logD, logE } from '../utils/logger'
 import { RudiError } from './errors.js'
-import { getRudiApiHeaders } from './secu.js'
+import { getCatalogHeaders } from './secu.js'
 import { cleanErrMsg, toInt } from './utils.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ const rudiErrMsg = (rudiModuleCalled, message, status = '') =>
     ? `ERR ${status} while calling ${rudiModuleCalled}: ${cleanErrMsg(message)}`
     : `ERR ${status}: ${message}`
 
-export const rudiApiGet = (url, opts) => safeAxiosGet('RUDI API', url, { ...opts, ...getRudiApiHeaders() })
+export const rudiCatalogGet = (url, opts) => safeAxiosGet('RUDI API', url, { ...opts, ...getCatalogHeaders() })
 
 export async function safeAxiosGet(rudiModuleCalled, url, opts) {
   const fun = 'safeAxiosGet'

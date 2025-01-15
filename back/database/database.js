@@ -300,7 +300,7 @@ export function dbUpdateUser(openedDb, userInfo) {
         logE(mod, fun + ' insert', err.message)
         return reject(err)
       }
-      logI(mod, fun, `(${TBL_USERS}) user updated: '${username}'`, getContext(null, { opType: 'post_user' }))
+      logI(mod, fun, `(${TBL_USERS}) user updated: '${username}'`)
       db.get(`SELECT * FROM ${TBL_USERS} where username = ?`, [username], (err, row) => {
         if (!openedDb) dbClose(db)
         if (err) {

@@ -252,7 +252,7 @@ export function getStorageHeaders(body) {
 }
 
 let _cachedApiJwt
-export function getRudiApiToken() {
+export function getCatalogJwt() {
   if (!isJwtValid(_cachedApiJwt)) {
     _cachedApiJwt = forgeToken(
       getPrvKey('catalog'),
@@ -270,14 +270,14 @@ export function getRudiApiToken() {
 
 export const getCatalogHeaders = (headersEntries) => ({
   headers: {
-    Authorization: `Bearer ${getRudiApiToken()}`,
+    Authorization: `Bearer ${getCatalogJwt()}`,
     Accept: 'application/json, text/plain, */*',
     ...headersEntries,
   },
 })
 
 let cachedUrlJwt = {}
-export function getRudiApiTokenPrecise(url, req) {
+export function getCatalogJwtPrecise(url, req) {
   if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]
   cachedUrlJwt[url] = forgeToken(
     getPrvKey('catalog'),
