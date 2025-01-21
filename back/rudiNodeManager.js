@@ -120,9 +120,17 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
     if (url) {
       const domain = getDomain(url)
       const host = getHost(url)
-      // log.d(mod, fun + '.domains', `${url} -> ${domain}`)
+      logD(mod, fun + '.domains', `${url} -> ${domain}`)
       if (!moduleHosts.includes(host)) moduleHosts.push(host)
       if (!moduleDomains.includes(domain)) moduleDomains.push(domain)
+      for (const locals of [
+        ['localhost', '127.0.0.1'],
+        ['127.0.0.1', '127.0.0.1'],
+      ])
+        if (domain.startsWith(locals[0])) {
+          const altDomain = domain.replace(locals[0], locals[1])
+          if (!moduleDomains.includes(altDomain)) moduleDomains.push(altDomain)
+        }
     }
   }
   // log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
@@ -163,7 +171,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     })
   )
 
-  // Note: bodyParser middleware has been replace with express bodyParser
+  // Note: bodyParser middleware has been replaced with express bodyParser
   managerApp.use(express.json())
   managerApp.use(express.urlencoded({ extended: true }))
   managerApp.use(cookieParser())

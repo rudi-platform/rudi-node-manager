@@ -206,8 +206,8 @@ export class MetadataForm extends RudiForm {
   async getStorageHeaders(initialHeaders = {}) {
     try {
       if (!this.mediaHeaders) {
-        const pmMediaJwtRes = await JsonHttpRequest.get(this.getUrlBackStorage('jwt'), this.pmHeaders).send()
-        const mediaToken = pmMediaJwtRes.token
+        const pmStorageJwtRes = await JsonHttpRequest.get(this.getUrlBackStorage('jwt'), this.pmHeaders).send()
+        const mediaToken = pmStorageJwtRes.token
         this.mediaHeaders = Object.assign(initialHeaders, { Authorization: `Bearer ${mediaToken}` })
       }
       return this.mediaHeaders

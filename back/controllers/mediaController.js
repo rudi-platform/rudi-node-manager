@@ -25,7 +25,7 @@ import {
   extractCookieFromReq,
   getCatalogHeaders,
   getStorageHeaders,
-  getTokenFromMediaForUser as getTokenFromStorageForUser,
+  getTokenFromStorageForUser,
   readJwtBody,
 } from '../utils/secu.js'
 import { beautify, cleanErrMsg } from '../utils/utils.js'

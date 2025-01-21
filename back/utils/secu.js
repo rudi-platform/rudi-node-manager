@@ -180,32 +180,32 @@ export function sendJsonAndTokens(req, reply, data) {
 }
 
 // eslint-disable-next-line complexity
-export async function getTokenFromMediaForUser(user) {
-  const fun = 'getTokenFromMediaForUser'
+export async function getTokenFromStorageForUser(user) {
+  const fun = 'getTokenFromStorageForUser'
   const pmHeaders = getStorageHeaders()
 
   const delegationBody = {
     user_id: user.id,
     user_name: user.username || 'rudi_console',
-    group_name: getConf('rudi_console', 'default_client_group'),
+    group_name: getConf('rudi_console', 'default_client_group', 'producer'),
   }
   // Let's offset the user id to not mess with Storage ids
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
   // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
-  const mediaForgeJwtUrl = getStorageUrl('jwt/forge')
+  const storageForgeJwtUrl = getStorageUrl('jwt/forge')
   try {
-    const mediaRes = await axios.post(mediaForgeJwtUrl, delegationBody, pmHeaders)
-    if (!mediaRes) throw Error(`No answer received from ${STORAGE} module`)
-    if (!mediaRes?.data?.token)
-      throw new Error(`Unexpected response from ${STORAGE} while forging a token: ${mediaRes.data}`)
-    else return mediaRes.data.token
+    const storageRes = await axios.post(storageForgeJwtUrl, delegationBody, pmHeaders)
+    if (!storageRes) throw Error(`No answer received from ${STORAGE} module`)
+    if (!storageRes?.data?.token)
+      throw new Error(`Unexpected response from ${STORAGE} while forging a token: ${storageRes.data}`)
+    else return storageRes.data.token
   } catch (err) {
     if (err.code === 'ECONNREFUSED')
       throw RudiError.createRudiHttpError(
         500,
         `Connection from “${MANAGER}” to “${STORAGE}” module failed: ` +
-          '“RUDI Media” module is apparently down, contact the RUDI node admin'
+          `“${STORAGE}” module is apparently down, contact the RUDI node admin`
       )
     const rudiError = RudiError.createRudiHttpError(
       err.response?.data?.statusCode || err.response?.status,
@@ -221,8 +221,8 @@ export async function getTokenFromMediaForUser(user) {
   }
 }
 
-export function createPmJwtForMedia(body) {
-  return forgeToken(
+export const createPmJwtForStorage = (body) =>
+  forgeToken(
     getPrvKey('storage'),
     {},
     {
@@ -233,16 +233,15 @@ export function createPmJwtForMedia(body) {
       client_id: body?.client_id || getIdForStorage(),
     }
   )
-}
 
 let _cachedStorageJwt
 export function getStorageJwt(body) {
-  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = createPmJwtForMedia(body)
+  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = createPmJwtForStorage(body)
   return _cachedStorageJwt
 }
 
 export const createPmHeadersForMedia = (body) => ({
-  headers: { Authorization: `Bearer ${createPmJwtForMedia(body)}`, Accept: 'application/json, text/plain, */*' },
+  headers: { Authorization: `Bearer ${createPmJwtForStorage(body)}`, Accept: 'application/json, text/plain, */*' },
 })
 
 let _cachedStorageHeaders
