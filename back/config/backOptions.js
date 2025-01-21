@@ -192,7 +192,7 @@ export const isStageEnv = () => nodeEnv === 'staging'
 export const isProdEnv = () => nodeEnv === 'production'
 
 const BACK_PATH = getBackOptions(OPT_BACK_PATH)
-const BACK_DOMAIN = getDomain(BACK_PATH) || BACK_PATH
+const BACK_DOMAIN = getDomain(BACK_PATH)
 export const getOptBackPath = () => BACK_PATH
 export const getOptBackDomain = () => BACK_DOMAIN
 
