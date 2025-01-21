@@ -12,7 +12,7 @@ const { sign } = _jwt
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getOptBackDomain, isProdEnv } from '../config/backOptions.js'
+import { isProdEnv } from '../config/backOptions.js'
 import {
   getConf,
   getDefaultKey,
@@ -66,7 +66,7 @@ const SHOULD_SECURE = isProdEnv()
 export const getConsoleCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: SHOULD_SECURE,
-  domain: getOptBackDomain(),
+  // domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
@@ -76,7 +76,7 @@ export const getConsoleCookieOpts = (exp, overwrite) => ({
 export const getFrontCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: false,
-  domain: getOptBackDomain(),
+  // domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
