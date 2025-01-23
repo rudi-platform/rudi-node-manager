@@ -47,11 +47,8 @@ const customConfig = parse(customConfFileContent)
 const config = parse(defaultConfFileContent)
 
 for (const section in customConfig) {
-  const customParams = customConfig[section]
-  if (customParams) {
-    if (!config[section]) config[section] = {}
-    for (const param in customParams) if (customParams[param]) config[section][param] = customParams[param]
-  }
+  if (!config[section]) config[section] = customConfig[section]
+  else config[section] = { ...config[section], ...customConfig[section] }
 }
 
 if (config.logging.display_conf) jsonToString(config)
