@@ -310,11 +310,11 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
     // Additionaly serving index.html for /
     const homePage = modifiedStaticFiles['/index.html']
-    managerApp.get(getFrontPath(), (req, reply) => {
+    managerApp.get(getFrontPath('/'), (req, reply) => {
       logD(mod, trace, `Manager Front accessed from ${req.url}`)
       reply.send(homePage.content)
     })
-    managerApp.get(getFrontPath(''), (req, reply) => {
+    managerApp.get(getFrontPath(), (req, reply) => {
       logD(mod, trace, `Manager Front accessed from ${req.url}`)
       reply.send(homePage.content)
     })

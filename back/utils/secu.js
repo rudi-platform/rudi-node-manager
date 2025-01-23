@@ -26,7 +26,7 @@ import {
 } from '../config/config.js'
 import { dbGetUserRolesByUsername } from '../database/database.js'
 import { ForbiddenError, RudiError } from './errors.js'
-import { logD, logE, logW } from './logger.js'
+import { logE, logW } from './logger.js'
 import { cleanErrMsg, timeEpochS, toInt } from './utils.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -222,8 +222,7 @@ export async function getTokenFromStorageForUser(user) {
 
 let _cachedStorageJwt
 export function getStorageJwt() {
-  if (!isJwtValid(_cachedStorageJwt)) {
-    logD(mod, 'getStorageJwt', 'Crafting a new JWT')
+  if (!isJwtValid(_cachedStorageJwt))
     _cachedStorageJwt = forgeToken(
       getPrvKey('storage'),
       {},
@@ -235,7 +234,6 @@ export function getStorageJwt() {
         client_id: getIdForStorage(),
       }
     )
-  }
   return _cachedStorageJwt
 }
 
