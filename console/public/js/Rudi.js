@@ -507,7 +507,7 @@ export class RudiForm {
 
   fail(state = this.state, cleanPreviousMessages = false) {
     this.customForm.textContent = ''
-    let message = this.lexR[state + '/fail'] || state
+    let message = this.lexR[state + '/fail'] ?? state
     this.addErrorMsg(message, cleanPreviousMessages) // .scrollIntoView({ block: 'center' });
     this.state = 'fail'
   }

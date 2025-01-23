@@ -82,7 +82,7 @@ export function dbOpenOrCreate() {
 // ---- Controllers -----
 export async function dbGetHashedPassword(openedDb, username) {
   const fun = 'dbGetHashedPassword'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT  password FROM ${TBL_USERS} WHERE username = ?`, [username], (err, row) => {
       if (!openedDb) dbClose(db)
@@ -106,7 +106,7 @@ export async function dbGetHashedPassword(openedDb, username) {
  */
 export function dbGetUserByField(openedDb, field, val) {
   const fun = 'dbGetUserByField'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(
       `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email,` +
@@ -170,7 +170,7 @@ export async function dbExistsUser(openedDb, username) {
 
 export function dbGetUsers(openedDb) {
   const fun = 'getUsers'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.all(
       `SELECT ${TBL_USERS}.id, ${TBL_USERS}.username, ${TBL_USERS}.email, GROUP_CONCAT(${TBL_USER_ROLES}.role)` +
@@ -202,7 +202,7 @@ export function dbGetUsers(openedDb) {
 export function dbCreateUserCheckExists(openedDb, user, silent = false) {
   const fun = 'safeCreateUser'
   const { username, password, email, id } = user
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM ${TBL_USERS} WHERE username = ?`, [username], (err, row) => {
       if (err) {
@@ -265,7 +265,7 @@ export function dbCreateUser(openedDb, userInfo) {
   const fun = 'dbCreateUser'
   const { username, password, email } = userInfo
 
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`INSERT INTO ${TBL_USERS}(username,password,email) VALUES(?,?,?)`, [username, password, email], (err) => {
       if (err) {
@@ -290,7 +290,7 @@ export function dbUpdateUser(openedDb, userInfo) {
   const fun = 'dbUpdateUser'
   const { id, username, password, email } = userInfo
   logD(mod, fun, `userInfo: ${beautify({ ...userInfo, password: '***' })}`)
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   const sqlReq =
     `UPDATE ${TBL_USERS} SET username = ?, email = ?` + (password ? `, password = '${password}'` : '') + ` WHERE id = ?`
   return new Promise((resolve, reject) => {
@@ -324,7 +324,7 @@ export async function dbHashAndUpdatePassword(openedDb, username, password) {
 
 export function dbUpdatePasswordWithField(openedDb, key, val, password) {
   const fun = 'dbUpdatePasswordWithField'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   logI(mod, fun, `Password reset for user '${val}'`)
   return new Promise((resolve, reject) => {
     db.run(`UPDATE ${TBL_USERS} SET password = ? WHERE ${key} = ?`, [password, val], (err) => {
@@ -341,7 +341,7 @@ export function dbUpdatePasswordWithField(openedDb, key, val, password) {
 
 export function dbDeleteUserWithId(openedDb, id, silent = false) {
   const fun = 'dbDeleteUserWithId'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USERS} WHERE id = ?`, [id], (err) => {
       if (!openedDb) dbClose(db)
@@ -358,7 +358,7 @@ export function dbDeleteUserWithId(openedDb, id, silent = false) {
 
 export function dbDeleteUserWithName(openedDb, name, silent = false) {
   const fun = 'dbDeleteUserWithName'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USERS} WHERE name = ?`, [name], (err) => {
       if (!openedDb) dbClose(db)
@@ -381,7 +381,7 @@ export function dbDeleteUserWithName(openedDb, name, silent = false) {
 // ROLES
 export function dbCreateRoles(openedDb, roles) {
   const fun = 'createRoles'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       roles.forEach((role) => {
@@ -407,7 +407,7 @@ export function dbCreateRoles(openedDb, roles) {
 
 export function dbGetRoles(openedDb) {
   const fun = 'getRoles'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.all(`SELECT * FROM ${TBL_ROLES}`, (err, rows) => {
       if (!openedDb) dbClose(db)
@@ -426,7 +426,7 @@ export function dbGetRoles(openedDb) {
 }
 export function dbGetUserRoles(openedDb) {
   const fun = 'getRoles'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.all(`SELECT * FROM ${TBL_USER_ROLES}`, (err, rows) => {
       if (!openedDb) dbClose(db)
@@ -441,7 +441,7 @@ export function dbGetUserRoles(openedDb) {
 }
 export function dbGetRoleById(openedDb, role) {
   const fun = 'dbGetRoleById'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM ${TBL_ROLES} WHERE role = ?`, [role], function (err, row) {
       if (!openedDb) dbClose(db)
@@ -463,7 +463,7 @@ export function dbGetRoleById(openedDb, role) {
  */
 export async function dbGetUserRolesByUsername(openedDb, username) {
   const fun = 'dbGetUserRolesByUsername'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   try {
     if (!username) throw new BadRequestError('The username should be provided')
     const userInfo = await dbGetUserByUsername(db, username)
@@ -485,12 +485,12 @@ export async function dbGetUserRolesByUsername(openedDb, username) {
 }
 
 export async function isValidatedUser(openedDb, userInfo) {
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   try {
     let roles
     if (userInfo.id) roles = await dbGetUserRolesByUserId(db, userInfo.id)
     else if (userInfo.username) roles = await dbGetUserRolesByUsername(db, userInfo.username)
-    else throw new UnauthorizedError(`User not found: ${userInfo.username || userInfo.id}`)
+    else throw new UnauthorizedError(`User not found: ${userInfo.username ?? userInfo.id}`)
     if (!openedDb) dbClose(db)
     // console.debug('T (isValidatedUser) yes:', userInfo.username || userInfo.id, roles)
     return roles
@@ -511,7 +511,7 @@ export function dbGetUserRolesByUserId(openedDb, userId) {
   const fun = 'dbGetUserRolesByUserId'
   return new Promise((resolve, reject) => {
     if (userId !== 0 && !userId) return reject(new BadRequestError(`User id not provided`))
-    const db = openedDb || dbOpen()
+    const db = openedDb ?? dbOpen()
     dbGetUserById(db, userId)
       .then((userInfo) => {
         if (!userInfo) {
@@ -538,7 +538,7 @@ export function dbGetUserRolesByUserId(openedDb, userId) {
 }
 
 export async function dbGetUserInfoByUsername(openedDb, username) {
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   const userInfo = await dbGetUserByUsername(db, username)
   userInfo.roles = await dbGetUserRolesByUserId(db, userInfo.id)
   if (!openedDb) dbClose(db)
@@ -547,7 +547,7 @@ export async function dbGetUserInfoByUsername(openedDb, username) {
 
 export function dbDeleteUserRole(openedDb, userId, role) {
   const fun = 'deleteUserRole'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.run(`DELETE FROM ${TBL_USER_ROLES} WHERE userId = ? AND role = ?`, [userId, role], (err) => {
       if (!openedDb) dbClose(db)
@@ -571,7 +571,7 @@ export function dbCreateUserRole(openedDb, { userId, username, role }) {
   if (userId !== 0 && !userId) Promise.reject(new BadRequestError('Input parameter userId must be defined'))
   if (!role) Promise.reject(new BadRequestError('Input parameter role must be defined'))
   // console.trace(`T (${fun})`, { userId, username, role })
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     try {
       db.run(`INSERT INTO ${TBL_USER_ROLES}(userId,role) VALUES(?,?)`, [userId, role], (err) => {
@@ -598,7 +598,7 @@ export function dbCreateUserRole(openedDb, { userId, username, role }) {
     } catch (e) {
       reject(
         new InternalServerError(
-          `Role '${role}' could not be added to user '${username || userId}'. An error occured: ${e}`
+          `Role '${role}' could not be added to user '${username ?? userId}'. An error occured: ${e}`
         )
       )
     }
@@ -612,7 +612,7 @@ export async function dbUpdateUserRoles(openedDb, userInfo) {
     if (userId !== 0 && !userId) Promise.reject(new BadRequestError(`Input parameter 'userId' must be defined`))
     if (!targetRoles) Promise.reject(new BadRequestError(`Input parameter 'roles' must be defined`))
     if (!Array.isArray(targetRoles)) throw new BadRequestError(`Parameter 'roles' should be an array`)
-    const db = openedDb || dbOpen()
+    const db = openedDb ?? dbOpen()
     let origRoles = await dbGetUserRolesByUserId(db, userId)
     await Promise.all(
       targetRoles.map((newRole) => {
@@ -621,13 +621,13 @@ export async function dbUpdateUserRoles(openedDb, userInfo) {
           if (i === -1) {
             dbCreateUserRole(db, { userId, role: newRole, username })
               .then((res) => {
-                logI(mod, fun, `Role added to  user '${username || userId}': ${newRole}`)
-                return resolve(`Role added to user '${username || userId}': ${newRole}`)
+                logI(mod, fun, `Role added to  user '${username ?? userId}': ${newRole}`)
+                return resolve(`Role added to user '${username ?? userId}': ${newRole}`)
               })
               .catch((err) => reject(new InternalServerError(`(dbUpdateUserRoles.addNew) ${err}`)))
           } else {
             origRoles.splice(i, 1)
-            resolve(`Role kept for user '${username || userId}': ${newRole}`)
+            resolve(`Role kept for user '${username ?? userId}': ${newRole}`)
           }
         })
       })
@@ -638,8 +638,8 @@ export async function dbUpdateUserRoles(openedDb, userInfo) {
           new Promise((resolve, reject) => {
             dbDeleteUserRole(db, userId, roleToRemove)
               .then((res) => {
-                logI(mod, fun, `Role removed to user '${username || userId}': ${roleToRemove}`)
-                return resolve(`Role removed to user '${username || userId}': ${roleToRemove}`)
+                logI(mod, fun, `Role removed to user '${username ?? userId}': ${roleToRemove}`)
+                return resolve(`Role removed to user '${username ?? userId}': ${roleToRemove}`)
               })
               .catch((err) => reject(new InternalServerError(`(dbUpdateUserRoles.delOld) ${err}`)))
           })

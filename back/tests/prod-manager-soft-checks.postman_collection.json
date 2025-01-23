@@ -323,7 +323,7 @@
           "response": []
         },
         {
-          "name": "Get RUDI Media token",
+          "name": "Get RUDI Storage token",
           "event": [
             {
               "listen": "test",

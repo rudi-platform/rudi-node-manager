@@ -22,7 +22,7 @@ const rudiErrMsg = (rudiModuleCalled, message, status = '') =>
     ? `ERR ${status} while calling ${rudiModuleCalled}: ${cleanErrMsg(message)}`
     : `ERR ${status}: ${message}`
 
-export const rudiCatalogGet = (url, opts) => safeAxiosGet('RUDI API', url, { ...opts, ...getCatalogHeaders() })
+export const rudiCatalogGet = (url, opts) => safeAxiosGet('RUDI node Catalog', url, { ...opts, ...getCatalogHeaders() })
 
 export async function safeAxiosGet(rudiModuleCalled, url, opts) {
   const fun = 'safeAxiosGet'

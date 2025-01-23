@@ -3,7 +3,7 @@ export const STATUS_CODE = 'statusCode'
 export class RudiError extends Error {
   constructor(message, code, name, desc, ctxMod, ctxFun) {
     super(message)
-    this[STATUS_CODE] = code || 500
+    this[STATUS_CODE] = code ?? 500
     this.name = name
     this.description = desc
     this.ctxMod = ctxMod

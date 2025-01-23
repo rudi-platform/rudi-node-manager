@@ -163,7 +163,7 @@ export const getBackOptions = (opt, altValue) => {
   return altValue
 }
 
-export const getAppTag = () => getBackOptions(OPT_APP_TAG) || ''
+export const getAppTag = () => getBackOptions(OPT_APP_TAG) ?? ''
 
 export function getHash() {
   let gitHash = getBackOptions(OPT_GIT_HASH)

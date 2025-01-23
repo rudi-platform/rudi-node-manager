@@ -53,7 +53,7 @@ export async function getUserByUsername(req, reply, next) {
   } catch (err) {
     const error = formatError(err, req, { opType: 'get_user' })
     try {
-      reply.status(error.statusCode || 500).json(new RudiError(error.message))
+      reply.status(error.statusCode ?? 500).json(new RudiError(error.message))
     } catch (e) {
       logW(mod, 'getUserByUsername', e)
     }
@@ -70,7 +70,7 @@ export async function getUserInfoByUsername(req, reply, next) {
   } catch (err) {
     const error = formatError(err, req, { opType: 'get_user' })
     try {
-      reply.status(error.statusCode || 500).json(new RudiError(error.message))
+      reply.status(error.statusCode ?? 500).json(new RudiError(error.message))
     } catch (e) {
       logW(mod, 'getUserInfoByUsername', e)
     }
@@ -129,7 +129,7 @@ export async function createUser(req, reply) {
     if (!roles || !Array.isArray(roles) || roles.length === 0)
       return reply.status(400).json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
 
-    const hashedPassword = hashPassword(password || INIT_PWD)
+    const hashedPassword = hashPassword(password ?? INIT_PWD)
 
     const db = dbOpen()
 

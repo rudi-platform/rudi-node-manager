@@ -17,8 +17,7 @@ import HtmlJsonTemplate from './HtmlJsonTemplate.js'
 function setBindings(formBindings, controller) {
   for (let [targetId, bindings] of Object.entries(formBindings)) {
     let target = controller[targetId]
-    if (!target)
-      throw `Error : [HtmlFormTemplate, formBindings] No element '${targetId}' in controller. Binding fail`
+    if (!target) throw `Error : [HtmlFormTemplate, formBindings] No element '${targetId}' in controller. Binding fail`
     target.addEventListener('change', () => execBinding(bindings, controller, target, targetId))
     // Play binding the first time
     target.dispatchEvent(new Event('change'))
@@ -36,8 +35,7 @@ const execBinding = (bindings, controller, target, targetId) => {
   // console.debug('T [execBinding] target:', targetId);
   for (let [relatedTargetId, valueBinding] of Object.entries(bindings)) {
     let relatedTarget = controller[relatedTargetId]
-    if (!target)
-      throw `Error : [HtmlFormTemplate, formBindings] No element '${targetId}' in controller. Binding fail`
+    if (!target) throw `Error : [HtmlFormTemplate, formBindings] No element '${targetId}' in controller. Binding fail`
 
     for (let [value, newState] of Object.entries(valueBinding)) {
       let hasValue = new RegExp(value).test(target.value)
@@ -260,7 +258,7 @@ class CustomForm extends HTMLElement {
       let input = this.htmlController[elementId]
       if (!input) continue
       try {
-        input.value = value || ''
+        input.value = value ?? ''
       } catch (e) {
         errors = errors.concat(e)
       }
@@ -285,9 +283,7 @@ class CustomForm extends HTMLElement {
         result = formElement.getAttribute('hidden') == null ? formElement.value : null
         if (!result && formElement.getAttribute('required') != null) {
           if (
-            this.dispatchEvent(
-              new CustomEvent('required', { cancelable: true, bubbles: false, detail: formElement })
-            )
+            this.dispatchEvent(new CustomEvent('required', { cancelable: true, bubbles: false, detail: formElement }))
           ) {
             error = true
           }
@@ -310,12 +306,12 @@ class CustomForm extends HTMLElement {
   /** Build the display according to the displayTemplate in the form template */
   getDisplay(value) {
     if (!this.displayTemplate) return document.createDocumentFragment()
-    let displayFragmentSet = this.displayFragmentSet || {}
+    let displayFragmentSet = this.displayFragmentSet ?? {}
     displayFragmentSet = JSON.parse(JSON.stringify(displayFragmentSet))
     displayFragmentSet.$ = {}
 
     for (let [id, subValue] of templateIterator(this.submitTemplate, value)) {
-      displayFragmentSet[id] = displayFragmentSet[id] || { textContent: subValue }
+      displayFragmentSet[id] = displayFragmentSet[id] ?? { textContent: subValue }
       displayFragmentSet.$[id] = subValue
     }
 

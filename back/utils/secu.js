@@ -12,7 +12,7 @@ const { sign } = _jwt
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { isProdEnv } from '../config/backOptions.js'
+import { getOptBackDomain, isProdEnv } from '../config/backOptions.js'
 import {
   getConf,
   getDefaultKey,
@@ -26,7 +26,7 @@ import {
 } from '../config/config.js'
 import { dbGetUserRolesByUsername } from '../database/database.js'
 import { ForbiddenError, RudiError } from './errors.js'
-import { logE, logW } from './logger.js'
+import { logD, logE, logW } from './logger.js'
 import { cleanErrMsg, timeEpochS, toInt } from './utils.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ import { cleanErrMsg, timeEpochS, toInt } from './utils.js'
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
 const OFFSET_USR_ID = 5000
-const DEFAULT_EXP = getConf('auth', 'exp_time_s') || 600
+const DEFAULT_EXP = getConf('auth', 'exp_time_s', 600)
 
 export const CONSOLE_TOKEN_NAME = 'consoleToken'
 export const PM_FRONT_TOKEN_NAME = 'pmFrontToken'
@@ -48,6 +48,7 @@ export const ERR_401_MSG = 'User not found or incorrect password'
 function isJwtValid(jwt) {
   if (!jwt) return false
   const jwtParts = tokenStringToJwtObject(jwt)
+  // logD(mod, 'isJwtValid', 'exp > now:', jwtParts?.payload?.exp > timeEpochS())
   return jwtParts?.payload?.exp > timeEpochS()
 }
 
@@ -66,7 +67,7 @@ const SHOULD_SECURE = isProdEnv()
 export const getConsoleCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: SHOULD_SECURE,
-  // domain: getOptBackDomain(),
+  domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
@@ -76,7 +77,7 @@ export const getConsoleCookieOpts = (exp, overwrite) => ({
 export const getFrontCookieOpts = (exp, overwrite) => ({
   secure: SHOULD_SECURE,
   httpOnly: false,
-  // domain: getOptBackDomain(),
+  domain: getOptBackDomain(),
   path: '/', // Ensure the path covers all routes
   sameSite: 'Strict',
   expires: new Date(exp * 1000),
@@ -182,7 +183,6 @@ export function sendJsonAndTokens(req, reply, data) {
 // eslint-disable-next-line complexity
 export async function getTokenFromStorageForUser(user) {
   const fun = 'getTokenFromStorageForUser'
-  const pmHeaders = getStorageHeaders()
 
   const delegationBody = {
     user_id: user.id,
@@ -193,13 +193,12 @@ export async function getTokenFromStorageForUser(user) {
   if (delegationBody.user_id < OFFSET_USR_ID) delegationBody.user_id += OFFSET_USR_ID
   // console.trace(`T (${fun})`, 'delegationBody', delegationBody)
 
-  const storageForgeJwtUrl = getStorageUrl('jwt/forge')
   try {
-    const storageRes = await axios.post(storageForgeJwtUrl, delegationBody, pmHeaders)
+    const storageRes = await axios.post(getStorageUrl('jwt/forge'), delegationBody, getStorageHeaders())
     if (!storageRes) throw Error(`No answer received from ${STORAGE} module`)
-    if (!storageRes?.data?.token)
-      throw new Error(`Unexpected response from ${STORAGE} while forging a token: ${storageRes.data}`)
-    else return storageRes.data.token
+    const storageJwt = storageRes?.data?.token
+    if (!storageJwt) throw new Error(`Unexpected response from ${STORAGE} while forging a token: ${storageRes.data}`)
+    else return storageJwt
   } catch (err) {
     if (err.code === 'ECONNREFUSED')
       throw RudiError.createRudiHttpError(
@@ -221,74 +220,54 @@ export async function getTokenFromStorageForUser(user) {
   }
 }
 
-export const createPmJwtForStorage = (body) =>
-  forgeToken(
-    getPrvKey('storage'),
-    {},
-    {
-      jti: body?.jti || uuidv4(),
-      iat: timeEpochS(),
-      exp: body?.exp || timeEpochS(body?.exp_time || DEFAULT_EXP),
-      sub: body?.sub || 'auth',
-      client_id: body?.client_id || getIdForStorage(),
-    }
-  )
-
 let _cachedStorageJwt
-export function getStorageJwt(body) {
-  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageJwt = createPmJwtForStorage(body)
-  return _cachedStorageJwt
-}
-
-export const createPmHeadersForMedia = (body) => ({
-  headers: { Authorization: `Bearer ${createPmJwtForStorage(body)}`, Accept: 'application/json, text/plain, */*' },
-})
-
-let _cachedStorageHeaders
-export function getStorageHeaders(body) {
-  if (!isJwtValid(_cachedStorageJwt)) _cachedStorageHeaders = createPmHeadersForMedia(body)
-  return _cachedStorageHeaders
-}
-
-let _cachedApiJwt
-export function getCatalogJwt() {
-  if (!isJwtValid(_cachedApiJwt)) {
-    _cachedApiJwt = forgeToken(
-      getPrvKey('catalog'),
+export function getStorageJwt() {
+  if (!isJwtValid(_cachedStorageJwt)) {
+    logD(mod, 'getStorageJwt', 'Crafting a new JWT')
+    _cachedStorageJwt = forgeToken(
+      getPrvKey('storage'),
       {},
       {
-        exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-        sub: getIdForCatalog(),
-        req_mtd: 'all',
-        req_url: 'all',
+        jti: uuidv4(),
+        iat: timeEpochS(),
+        exp: timeEpochS(toInt(DEFAULT_EXP)),
+        sub: 'auth',
+        client_id: getIdForStorage(),
       }
     )
   }
-  return _cachedApiJwt
+  return _cachedStorageJwt
 }
 
-export const getCatalogHeaders = (headersEntries) => ({
-  headers: {
-    Authorization: `Bearer ${getCatalogJwt()}`,
-    Accept: 'application/json, text/plain, */*',
-    ...headersEntries,
-  },
-})
-
-let cachedUrlJwt = {}
-export function getCatalogJwtPrecise(url, req) {
-  if (isJwtValid(cachedUrlJwt?.[url])) return cachedUrlJwt[url]
-  cachedUrlJwt[url] = forgeToken(
-    getPrvKey('catalog'),
-    {},
-    {
-      exp: timeEpochS(60), // 1 minute to reach the API should be plenty enough
-      sub: getIdForCatalog(),
-      req_mtd: req.method,
-      req_url: axios.getUri({ url, params: req.query }),
+let _cachedStorageHeaders
+export function getStorageHeaders(additionalHeaders) {
+  if (!isJwtValid(_cachedStorageJwt))
+    _cachedStorageHeaders = {
+      Authorization: `Bearer ${getStorageJwt()}`,
+      Accept: 'application/json, text/plain, */*',
     }
-  )
-  return cachedUrlJwt[url]
+  return additionalHeaders
+    ? { headers: { ..._cachedStorageHeaders, ...additionalHeaders } }
+    : { headers: _cachedStorageHeaders }
+}
+
+let _cachedCatalogJwt
+export function getCatalogJwt() {
+  if (!isJwtValid(_cachedCatalogJwt))
+    _cachedCatalogJwt = forgeToken(
+      getPrvKey('catalog'),
+      {},
+      { exp: timeEpochS(60), sub: getIdForCatalog(), req_mtd: 'all', req_url: 'all' }
+    )
+  return _cachedCatalogJwt
+}
+
+let _cachedCatalogHeaders = {}
+export const getCatalogHeaders = (headersEntries) => {
+  if (!isJwtValid(_cachedCatalogJwt))
+    _cachedCatalogHeaders = { Authorization: `Bearer ${getCatalogJwt()}`, Accept: 'application/json, text/plain, */*' }
+
+  return headersEntries ? { headers: { ..._cachedCatalogHeaders, headersEntries } } : { headers: _cachedCatalogHeaders }
 }
 
 /**

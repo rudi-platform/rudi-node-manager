@@ -287,7 +287,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
     try {
       // console.trace('T getFilterLabel.filterValue:', filterValue)
       // console.trace('T getFilterLabel.filterObject:', filterObject)
-      let result = filterValue[filterObject?.name] || 'ERR: "name" not found'
+      let result = filterValue[filterObject?.name] ?? 'ERR: "name" not found'
       if (filterObject?.displayName && result[filterObject?.displayName]) {
         result = result[filterObject.displayName]
       }
@@ -403,7 +403,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
                       <div className={i ? 'col border rounded' : 'border rounded'} key={filterObject.name}>
                         <div className="label-lv2">{filterObject.text}</div>
                         <ul className="list-group">
-                          {(filterObject.values?.items || filterObject.values)?.map((filterValue, i) => {
+                          {(filterObject.values?.items ?? filterObject.values)?.map((filterValue, i) => {
                             const filterLabel = getFilterLabel(filterValue, filterObject)
                             const key = filterLabel + i
                             return (

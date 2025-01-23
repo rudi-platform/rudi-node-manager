@@ -64,8 +64,8 @@ export default function ObjCatalogue({
   const getCatalogUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog(objType, suffix)
   const deleteUrl = (id) => getCatalogUrlObj(id)
 
-  const [sortBy, setSortBy] = useState(propSortBy || '-updatedAt')
-  useEffect(() => setSortBy(propSortBy || '-updatedAt'), [propSortBy])
+  const [sortBy, setSortBy] = useState(propSortBy ?? '-updatedAt')
+  useEffect(() => setSortBy(propSortBy ?? '-updatedAt'), [propSortBy])
 
   const refresh = () => {
     setHasMore(true)

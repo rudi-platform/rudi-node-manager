@@ -118,11 +118,11 @@ export const checkCookieExp = (cookieStr) => {
 
 export const nowEpochS = () => Math.floor(new Date().getTime() / 1000)
 
-export const padEndModulo = (str, base, padSign) => {
+export const padEndModulo = (str, base, padSign = '=') => {
   const modulo = str.length % base
-  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1) || '=')
+  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1))
 }
-export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4, '=')
+export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4)
 
 export const base64urlToBase64 = (b64urlStr) => b64urlStr.replace(/\+/g, '-').replace(/\//g, '_')
 

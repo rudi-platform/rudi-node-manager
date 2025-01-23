@@ -41,7 +41,7 @@ export async function postLogin(req, reply, next) {
       return reply.status(400).send(err)
     }
     if (!user) {
-      const errMsg = info?.message || `User not found or incorrect password: '${req?.body?.username}'`
+      const errMsg = info?.message ?? `User not found or incorrect password: '${req?.body?.username}'`
       logW(mod, fun, errMsg)
       return reply.status(401).send(ERR_401_MSG)
     }
@@ -50,7 +50,7 @@ export async function postLogin(req, reply, next) {
     } catch (er) {
       logE(mod, fun, er)
       logout()
-      return reply.status(er?.statusCode || 501).send(er)
+      return reply.status(er?.statusCode ?? 501).send(er)
     }
     // TODO : remove .json() for cookie only? or give refresh token instead
   })(req, reply, next)
@@ -68,7 +68,7 @@ export async function postRegister(req, reply) {
   } catch (err) {
     logE(mod, fun, err)
     try {
-      reply.status(err.code || 400).send(err.message)
+      reply.status(err.code ?? 400).send(err.message)
     } catch (e) {
       logE(mod, fun, e)
       return
@@ -103,7 +103,7 @@ export async function putPassword(req, reply, next) {
     passportAuthenticate('local', (err, user, info) => {
       if (err) return reply.status(400).send(err)
       if (!user && !matchPassword(INIT_PWD, dbUserHash)) {
-        const errMsg = info.message || 'User not found'
+        const errMsg = info.message ?? 'User not found'
         logW(mod, fun, errMsg)
         return reply.status(401).send(ERR_401_MSG)
       }

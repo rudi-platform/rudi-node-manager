@@ -20,8 +20,8 @@ export class RudiObjForm extends RudiForm {
     super(language)
 
     this.objType = objType
-    this.idField = idField || `${this.objType.endsWith('s') ? this.objType.slice(0, -1) : this.objType}_id`
-    this.templatePath = templatePath || `templates/${this.objType}.json`
+    this.idField = idField ?? `${this.objType.endsWith('s') ? this.objType.slice(0, -1) : this.objType}_id`
+    this.templatePath = templatePath ?? `templates/${this.objType}.json`
   }
 
   async getTemplate() {

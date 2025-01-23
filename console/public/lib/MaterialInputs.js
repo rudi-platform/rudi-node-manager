@@ -1321,7 +1321,7 @@ export const SelectListMixin = (superclass) =>
     hide(value) {
       let option = this.getOption(value)
       option.toggleAttribute('hidden', true)
-      if (option == this.focusedElement) this.focusedElement = this.focusNext() || this.focusPrevious()
+      if (option == this.focusedElement) this.focusedElement = this.focusNext() ?? this.focusPrevious()
     }
 
     show(value) {
@@ -1605,7 +1605,7 @@ export class BaseTextInput extends BaseInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.value = newValue || ''
+    this.input.value = newValue ?? ''
   }
   get value() {
     return this.input.value
@@ -1691,7 +1691,7 @@ export class DateInput extends BaseTextInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.value = newValue?.substring(0, 10) || ''
+    this.input.value = newValue?.substring(0, 10) ?? ''
   }
   get value() {
     return super.value
@@ -2327,7 +2327,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
     this.currentTab = this.tabsWrapper.firstChild
     this.currentTab.toggleAttribute('selected', true)
     // this.currentTab.setAttribute('tabindex', 1);
-    this.textarea.value = this.currentTab.text || ''
+    this.textarea.value = this.currentTab.text ?? ''
     this.dispatchEvent(new Event('change'))
   }
 
@@ -2378,7 +2378,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
 
   removeTab(tab) {
     if (!tab) return
-    if (tab == this.currentTab) this.currentTab = this.tabNext() || this.tabPrevious()
+    if (tab == this.currentTab) this.currentTab = this.tabNext() ?? this.tabPrevious()
     tab.remove()
     this.action.show(tab.tabValue)
     if (!this.currentTab) {
@@ -2405,7 +2405,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
     this.currentTab.toggleAttribute('selected', true)
     // this.currentTab.setAttribute('tabindex', 1);
     this.currentTab.focus()
-    this.textarea.value = this.currentTab.text || ''
+    this.textarea.value = this.currentTab.text ?? ''
 
     // Scrolling
     let scrollZone = 0.2 * this.tabsWrapper.offsetWidth
@@ -2719,7 +2719,7 @@ export class MapInput extends BaseInput {
     this.currentLayer = undefined
 
     if (geography) {
-      geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
+      geography.geographic_distribution.properties = geography.geographic_distribution.properties ?? {}
       let geoJsonLayers = L.geoJson(geography.geographic_distribution)
       this.currentLayer = geoJsonLayers.getLayers()[0]
       this.drawnItems.addLayer(this.currentLayer)
@@ -2793,9 +2793,9 @@ export class MapInput extends BaseInput {
   // Lifecycle
   connectedCallback() {
     this.appendChild(this.map._container)
-    let lat = this.getAttribute('lat') || 0
-    let lng = this.getAttribute('lng') || 0
-    let zoom = this.getAttribute('zoom') || 2
+    let lat = this.getAttribute('lat') ?? 0
+    let lng = this.getAttribute('lng') ?? 0
+    let zoom = this.getAttribute('zoom') ?? 2
 
     // Hack to Wait for childrens to be connected
     setTimeout(() => {

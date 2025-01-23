@@ -6,7 +6,7 @@ import { mergeStrings, pathJoin } from '../utils/utils.js'
 
 export class InitData {
   constructor(data) {
-    this.conf = data || {}
+    this.conf = data ?? {}
 
     this.backPath = this.conf.backPath
     this.consolePath = this.conf.consolePath

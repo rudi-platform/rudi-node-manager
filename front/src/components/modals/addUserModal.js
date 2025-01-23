@@ -97,7 +97,7 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
     const toggledRole = event.target.id
     const userRoles = userInfo?.roles
     let nextUserRoles
-    if (!userRoles || userRoles.length == 0) {
+    if (!userRoles?.length == 0) {
       nextUserRoles = [toggledRole]
     } else {
       nextUserRoles = []

@@ -84,7 +84,7 @@ const sqlCreateUserRoleTable =
 // -------------------------------------------------------------------------------------------------
 const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
   const fun = 'initTable'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(sqlGet, [tableName], (err, row) => {
       if (err) {
@@ -114,7 +114,7 @@ const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
 }
 
 const dbNormalizeRoleTable = async (openedDb) => {
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   await dbNormalizeRoleTableAddHide(db)
   await dbRenameRoles(db)
   await dbRenameUserRoles(db)
@@ -122,7 +122,7 @@ const dbNormalizeRoleTable = async (openedDb) => {
 }
 const dbNormalizeRoleTableAddHide = (openedDb) => {
   const fun = 'dbNormalizeRoleTableAddHide'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.all(`PRAGMA table_info(${TBL_ROLES})`, (err, rows) => {
       if (err) {
@@ -155,7 +155,7 @@ const dbNormalizeRoleTableAddHide = (openedDb) => {
 }
 const dbRenameUserRoles = (openedDb) => {
   const fun = 'dbRenameUserRoles'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     dbGetUserRoles(db).then((roleList) => {
       const found = roleList.find(
@@ -188,7 +188,7 @@ const dbRenameUserRoles = (openedDb) => {
 }
 const dbRenameRoles = (openedDb) => {
   const fun = 'dbRenameRoles'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     dbGetRoles(db)
       .then((roleList) => {
@@ -234,7 +234,7 @@ const dbRenameRoles = (openedDb) => {
 const dbNormalizeUserTableName = (openedDb, oldTblName) => {
   const fun = 'dbNormalizeUsersTableName'
   const tempName = `x${oldTblName}x`
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`, [], (err, row) => {
       if (err) {

@@ -23,7 +23,7 @@ const sqlCreateDefaultFormTable =
 // -------------------------------------------------------------------------------------------------
 export function dbInitDefaultFormTable(openedDb) {
   const fun = 'dbInitDefaultFormTable'
-  const db = openedDb || dbOpen()
+  const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.get(`SELECT name FROM sqlite_master WHERE type=? AND name=?`, ['table', DEFAULT_VAL_FORM], (err, row) => {
       if (err) {

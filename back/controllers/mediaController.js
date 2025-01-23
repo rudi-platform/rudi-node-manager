@@ -50,7 +50,7 @@ export async function getStorageToken(req, reply, next) {
   const fun = 'getStorageToken'
   try {
     // We extract
-    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) || extractJwt(req)
+    const jwt = extractCookieFromReq(req, CONSOLE_TOKEN_NAME) ?? extractJwt(req)
     if (!jwt) throw new UnauthorizedError('No JWT was found in the request')
 
     const jwtPayload = readJwtBody(jwt)
@@ -73,7 +73,7 @@ export async function getStorageToken(req, reply, next) {
         error: `Connection from “${MANAGER}” to “${STORAGE}” module failed`,
       })
 
-    reply.status(err.statusCode || 500).json(err)
+    reply.status(err.statusCode ?? 500).json(err)
   }
 }
 
@@ -131,9 +131,9 @@ export async function commitMediaFile(req, reply, next) {
 
   // Let's commit the media on Storage module
   try {
-    const resStorageCommit = await commitOnStorage(mediaId, commitId, zoneName)
+    await commitOnStorage(mediaId, commitId, zoneName)
   } catch (err) {
-    logE(mod, fun, err)
+    logE(mod, fun, err + ` for media_id ${mediaId}`)
     return treatAxiosError(err, STORAGE, req, reply)
   }
   try {
@@ -153,17 +153,13 @@ export async function commitMediaFile(req, reply, next) {
 
 const commitOnStorage = async (mediaId, commitId, zoneName) => {
   const fun = 'commitOnStorage'
-
   try {
-    const commitMediaRes = await axios.post(
-      getStorageUrl('commit'),
-      { commit_uuid: commitId, zone_name: zoneName },
-      getStorageHeaders()
-    )
-    // log.d(mod, fun, commitMediaRes?.statusText || commitMediaRes?.data || commitMediaRes)
-    return { status: 'OK', place: 'rudi-media', media_id: mediaId, commit_id: commitId }
+    // logD(mod, fun, 'commitUrl:', getStorageUrl('commit'))
+    await axios.post(getStorageUrl('commit'), { commit_uuid: commitId, zone_name: zoneName }, getStorageHeaders())
+    // logD(mod, fun, 'commit OK for', mediaId)
+    return { status: 'OK', place: STORAGE, media_id: mediaId, commit_id: commitId }
   } catch (err) {
-    logE(mod, fun + '.origErr', err)
+    // logE(mod, fun + '.origErr', err)
     if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
       throw RudiError.createRudiHttpError(
         503,
@@ -171,22 +167,12 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
       )
     }
 
-    const errMsg = `ERR${err.response?.status || ''} Media commit: ${beautify(err.response?.data) || err.response?.statusTex || err}`
+    const errMsg = `ERR ${err.response?.status ?? ''} Storage commit: ${beautify(err.response?.data) || err.response?.statusText || err}`
     logE(mod, fun, errMsg)
-    const e = {
-      statusCode: err.response?.status,
-      place: STORAGE,
-      message: err.response?.data?.msg,
-    }
-    logE(mod, fun + '.test', e)
+    // const e = { statusCode: err.response?.status, place: STORAGE, message: err.response?.data?.msg }
+    // logE(mod, fun + '.test', e)
 
     throw RudiError.createRudiHttpError(err.response?.status, err.response?.data?.msg)
-    // RudiError.createRudiHttpError(
-    //   err.statusCode || err.code || 500,
-    //   `ERR${err.response?.status} Api commit:`,
-    //   err.response?.data || err.response?.statusText || err.response
-    // )
-    // // throw new InternalServerError(errMsg)
   }
 }
 
@@ -205,8 +191,8 @@ const commitOnCatalog = async (mediaId, commitId) => {
   } catch (err) {
     logE(
       fun,
-      `T ERR${err.response?.status || err.statusCode || ''} Api commit:`,
-      err.response?.data || err.response?.statusText || err.response
+      `T ERR ${err.response?.status ?? err.statusCode ?? ''} Api commit:`,
+      err.response?.data ?? err.response?.statusText ?? err.response
     )
     throw err
   }

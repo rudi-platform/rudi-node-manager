@@ -28,7 +28,7 @@ const SHOULD_SYSLOG = getConf('logging', 'log_style') === 'syslog' || !isDevEnv(
 function extractIpRedirections(req) {
   const headers = req.headers
   if (!headers) return []
-  const redirections = headers['x-forwarded-for'] || headers['X-Forwarded-For']
+  const redirections = headers['x-forwarded-for'] ?? headers['X-Forwarded-For']
   let result = []
   if (Array.isArray(redirections)) {
     result = redirections
@@ -105,7 +105,7 @@ const rplog = function (logLevel, srcMod, srcFun, msg, context) {
 
 // END RUDILOGGER configuration
 
-const logWhere = (srcMod, srcFun) => (srcMod && srcFun ? `${srcMod}/${srcFun}` : srcMod || srcFun)
+const logWhere = (srcMod, srcFun) => (srcMod && srcFun ? `${srcMod}/${srcFun}` : (srcMod ?? srcFun))
 
 const toString = (...msg) => {
   if (!msg) return '<-'
@@ -141,9 +141,9 @@ export function getContext(req, options = {}) {
   }
 
   ctx.operation = {
-    opType: options.opType || 'other',
-    statusCode: options.statusCode || '',
-    id: options.id || '',
+    opType: options.opType ?? 'other',
+    statusCode: options.statusCode ?? '',
+    id: options.id ?? '',
   }
   return ctx
 }

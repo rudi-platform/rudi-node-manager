@@ -101,10 +101,7 @@ export async function putObject(req, reply) {
   const opType = 'post_object'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-  const opts = {
-    params: req?.query,
-    ...getCatalogHeaders(),
-  }
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
     const res = await axios.put(getCatalogAdminApiUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
@@ -118,10 +115,7 @@ export async function deleteObject(req, reply) {
   const opType = 'del_object'
   const { objectType, id } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-  const opts = {
-    params: req?.query,
-    ...getCatalogHeaders(),
-  }
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
     const res = await axios.delete(getCatalogAdminApiUrl(objectType, id), opts)
     return sendJsonAndTokens(req, reply, res.data)
@@ -135,10 +129,7 @@ export async function deleteObjects(req, reply) {
   const opType = 'del_objects'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-  const opts = {
-    params: req?.query,
-    ...getCatalogHeaders(),
-  }
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
     const res = await axios.delete(getCatalogAdminApiUrl(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
@@ -172,6 +163,6 @@ export async function getCounts(req, reply) {
     reply.status(200).json(counts)
   } catch (err) {
     logE(mod, fun, 'Could not get counts -> ERR ', err)
-    reply.status(500).json({ statusCode: err.statusCode || 500, message: err.message })
+    reply.status(500).json({ statusCode: err.statusCode ?? 500, message: err.message })
   }
 }

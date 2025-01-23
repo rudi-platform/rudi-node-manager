@@ -78,16 +78,13 @@ export function getConf(section, subSection, defaultVal) {
   if (!section) return config
   const sect = config[section]
   if (!sect || !subSection) return sect
-  if (sect[subSection] !== undefined) return sect[subSection]
-  return defaultVal
+  return sect[subSection] ?? defaultVal
 }
 export function getAltConf(section, altSection, subSection, altSubSection, defaultVal) {
   if (!section) return config
-  const sect = customConfig[section] || customConfig[altSection] || config[section] || config[altSection]
+  const sect = customConfig[section] ?? customConfig[altSection] ?? config[section] ?? config[altSection]
   if (!sect || !subSection) return sect
-  if (sect[subSection] !== undefined) return sect[subSection]
-  if (sect[altSubSection] !== undefined) return sect[altSubSection]
-  return defaultVal
+  return sect[subSection] ?? sect[altSubSection] ?? defaultVal
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -104,23 +101,20 @@ export const getBackendListeningPort = () => LISTENING_PORT
 export const getBackendListeningAddress = () => LISTENING_ADDRESS
 export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${LISTENING_PORT}`
 
-const HOST_DOMAIN = getOptBackDomain() || getBackendListeningAddressAndPort()
+const HOST_DOMAIN = getOptBackDomain() ?? getBackendListeningAddressAndPort()
 export const getHostDomain = () => HOST_DOMAIN
 
 console.debug(`[CONF] ${MANAGER} host:`, HOST_DOMAIN)
 console.debug()
 
-const MANAGER_PREFIX = removeTrailingSlash(
-  getOptAppPrefix() !== undefined ? getOptAppPrefix() : getConf('server', 'manager_prefix') || ''
-)
+const MANAGER_PREFIX = removeTrailingSlash(getOptAppPrefix() ?? getConf('server', 'manager_prefix', ''))
 const BACKEND_PREFIX = removeTrailingSlash(getConf('server', 'backend_prefix', 'api'))
 const FRONTEND_PREFIX = removeTrailingSlash(getConf('server', 'frontend_prefix', ''))
 const CONSOLE_PREFIX = removeTrailingSlash(getConf('server', 'console_prefix', 'form'))
 
 export const getManagerPath = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
 export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
-export const getFrontPath = (...args) =>
-  FRONTEND_PREFIX ? getManagerPath(FRONTEND_PREFIX, ...args) : getManagerPath(...args)
+export const getFrontPath = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
 export const getConsolePath = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
 
 console.debug('[CONF] Manager prefix:', getManagerPath())
@@ -159,7 +153,7 @@ export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 // -------------------------------------------------------------------------------------------------
 const getDbConf = (subSection, altVal) => getConf('database', subSection, altVal).trim()
 
-const DB_PATH = getBackOptions(OPT_DB_PATH) || pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
+const DB_PATH = getBackOptions(OPT_DB_PATH) ?? pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
 
 export const getDbPath = () => DB_PATH
 
@@ -169,11 +163,11 @@ export const getDbPath = () => DB_PATH
 export const getConfSuId = () => getDbConf('db_su_id', 0)
 export const getConfSuPwd = () => getDbConf('db_su_pwd')
 export const isConfSuPwdHashed = () => getDbConf('is_su_pwd_hashed')
+export const getConfSuMail = () => getDbConf('db_su_mail', 'node-admin@rudi-univ-rennes1.fr')
 export const getConfSuName = () => getDbConf('db_su_usr')
 export function setConfSuName(userDefinedSuName) {
   config.database.db_su_usr = userDefinedSuName
 }
-export const getConfSuMail = () => config?.database?.db_su_mail || 'node-admin@rudi-univ-rennes1.fr'
 
 // -------------------------------------------------------------------------------------------------
 // Keys

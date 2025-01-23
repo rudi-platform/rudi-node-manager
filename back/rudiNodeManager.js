@@ -254,7 +254,6 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Serving the React frontend                                                                   !!
   // -----------------------------------------------------------------------------------------------
   // This middleware informs the express application to serve our compiled React files
-  // if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
 
   if (!isDevEnv()) {
     const trace = 'route front'
@@ -270,7 +269,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     const modifiedStaticFiles = {}
     filesToParse.forEach((filePath) => {
       const fileContent = readFileSync(filePath, 'utf-8')
-      const content = fileContent.replaceAll('http://f7689a5a-0ed6-4f4b-97da-df690903ef4f', getFrontPath())
+      const content = fileContent.replaceAll('http://68064ef1-1e5c-4384-8c50-626f52b78c5c', getFrontPath())
       const fileExtension = getFileExtension(filePath)
       const mime = mimeTypes[fileExtension]
       const fileCall = filePath.split('front/build')[1]
