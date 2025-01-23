@@ -113,19 +113,23 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
   const fun = 'getHelmetDirectives'
   const backUrl = getBackOptions(OPT_BACK_PATH)
 
-  const trustedUrls = backUrl ? [backUrl, catalogUrl, storageUrl] : [catalogUrl, storageUrl]
   const moduleDomains = ["'self'"]
   const moduleHosts = ["'self'"]
+
+  const trustedDomains = getConf('security', 'trusted_domain') ?? []
+  const trustedUrls = [catalogUrl, storageUrl, ...trustedDomains]
+  if (backUrl) trustedUrls.push(backUrl)
+
   for (const url of trustedUrls) {
     if (url) {
       const domain = getDomain(url)
       const host = getHost(url)
-      logD(mod, fun + '.domains', `${url} -> ${domain}`)
+      // logD(mod, fun + '.domains', `${url} -> ${domain}`)
       if (!moduleHosts.includes(host)) moduleHosts.push(host)
       if (!moduleDomains.includes(domain)) moduleDomains.push(domain)
       for (const locals of [
         ['localhost', '127.0.0.1'],
-        ['127.0.0.1', '127.0.0.1'],
+        ['127.0.0.1', 'localhost'],
       ])
         if (domain.startsWith(locals[0])) {
           const altDomain = domain.replace(locals[0], locals[1])
@@ -133,22 +137,24 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
         }
     }
   }
-  // log.d(mod, fun + '.domains', `rudi module Domains: ${moduleDomains}`)
 
   /* Note about Content Security Policy:
    * - connect-src, media-src, worker-src: Allow full hosts (including ports).
    * - script-src, img-src, style-src, font-src: Only accept hostnames (domains); ports are not allowed.
    */
-  const connectSrc = [...moduleHosts, ...getConf('security', 'trusted_domain')]
-  logD(mod, fun, 'trustedUrls:', trustedUrls)
+  const connectSrc = moduleHosts
   const scriptSrc = moduleDomains
   const imgSrc = ['data:', ...moduleDomains, 'https://*.tile.osm.org']
-  const defaultSrc = [...moduleDomains]
+  const defaultSrc = moduleDomains
 
   const styleSrc = [...moduleDomains, "'unsafe-inline'"]
   const objectSrc = ["'none'"]
   const helmetDirectives = { scriptSrc, connectSrc, imgSrc, styleSrc, objectSrc, defaultSrc }
   if (!isProdEnv()) helmetDirectives.upgradeInsecureRequests = null
+
+  logD(mod, fun, `Trusted domains (script-src, img-src, style-src, font-src): ${moduleDomains}`)
+  logD(mod, fun, `Trusted hosts (connect-src, media-src, worker-src): ${moduleDomains}`)
+
   return helmetDirectives
 }
 

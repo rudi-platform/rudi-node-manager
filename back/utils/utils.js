@@ -140,7 +140,7 @@ export function checkIsURL(url) {
   try {
     return new URL(url)
   } catch {
-    return undefined
+    return
   }
 }
 
