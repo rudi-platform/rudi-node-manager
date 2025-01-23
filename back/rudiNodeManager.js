@@ -47,7 +47,16 @@ import { dbInitialize, ROLE_ADMIN, ROLE_ALL } from './database/scripts/initDatab
 import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
-import { getAllFiles, getDomain, getFileExtension, getHost, getRootDir, pathJoin, sleep } from './utils/utils.js'
+import {
+  getAllFiles,
+  getDomain,
+  getFileExtension,
+  getHost,
+  getRootDir,
+  pathJoin,
+  removeTrailingSlash,
+  sleep,
+} from './utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Check RUDI modules state
@@ -110,7 +119,7 @@ const redirectTrailingSlashes = (req, reply, next) => {
 }
 
 function getHelmetDirectives({ catalogUrl, storageUrl }) {
-  const fun = 'getHelmetDirectives'
+  const fun = 'helmet'
   const backUrl = getBackOptions(OPT_BACK_PATH)
 
   const moduleDomains = ["'self'"]
@@ -269,13 +278,19 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     // Access the favicon
     managerApp.use(/.*favicon.ico/, express.static(pathJoin(frontDir, 'favicon.ico')))
 
-    // Special treatment: some frontend static files should be parsed (because they cannot be dynamically updated)
+    // This is the dummy PUBLIC_URL the front has been built with
+    const STATIC_FRONT_BUILD_URL = removeTrailingSlash('http://68064ef1-1e5c-4384-8c50-626f52b78c5c')
+
+    // Special treatment: some frontend static files are be parsed (because they cannot be dynamically updated)
+    // The above STATIC_FRONT_BUILD_URL will be replaced with the right URL
     const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
     const mimeTypes = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
+
     const modifiedStaticFiles = {}
+    logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPath()}`)
     filesToParse.forEach((filePath) => {
       const fileContent = readFileSync(filePath, 'utf-8')
-      const content = fileContent.replaceAll('http://68064ef1-1e5c-4384-8c50-626f52b78c5c', getFrontPath())
+      const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPath()))
       const fileExtension = getFileExtension(filePath)
       const mime = mimeTypes[fileExtension]
       const fileCall = filePath.split('front/build')[1]
