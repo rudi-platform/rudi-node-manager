@@ -24,7 +24,6 @@ import CatalogueUser from './components/users/catalogueUser'
 import Visualisation from './components/visualisation/visualisation'
 import { BackConfContext } from './context/backConfContext.js'
 import { JwtContext } from './context/jwtContext'
-import { removeTrailingSlash } from './utils/utils.js'
 
 /**
  * Main App component
@@ -39,12 +38,12 @@ export default function App() {
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
-  const [rootUrl, setRootUrl] = useState(removeTrailingSlash(window.location.pathname))
+  const [rootUrl, setRootUrl] = useState(window.location.pathname)
 
   useEffect(() => {
     if (!back.isLoaded) return
     console.debug('Setting root to', back.frontPath)
-    setRootUrl(removeTrailingSlash(back.frontPath))
+    setRootUrl(back.frontPath)
   }, [backConf])
 
   // ---------------- Login modals
