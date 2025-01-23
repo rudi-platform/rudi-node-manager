@@ -161,13 +161,14 @@ function Visualisation({ logout }) {
         </video>
       ))
     } else {
-      const media = await axios.get(mediaUrl)
-      if (!media)
+      const res = await axios.get(mediaUrl)
+      if (!res?.data)
         return defaultErrorHandler({
           statusCode: 404,
           message: `Aucun media n'a été trouvé à l'adresse ${mediaUrl}`,
         })
-      // console.log(media)
+      const media = res.data
+      console.log(media)
       switch (mediaMime) {
         case 'application/geo+json':
         case 'application/json':
@@ -185,14 +186,14 @@ function Visualisation({ logout }) {
         case 'text/css':
         case 'text/markdown':
         case 'text/x-markdown':
-          if (!media.data)
+          if (!media)
             return defaultErrorHandler({
               statusCode: 404,
               message: `Le media n'a pu être récupéré à l'adresse ${mediaUrl}`,
             })
           return setHtmlSrc(
             <div className="body text-visu">
-              <pre>{media.data}</pre>
+              <pre>{media}</pre>
             </div>
           )
         default:

@@ -2489,8 +2489,12 @@ export class FileCard extends ActionCard {
     this.#value = file
     this.name.textContent = file?.name
     this.type.textContent = file?.type
-    this.size.textContent = file?.size ? this.humanReadableByteCountSI(file.size) : ''
-    if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"
+    if (file.size) {
+      this.size.textContent = this.humanReadableByteCountSI(file.size)
+      if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"
+    } else {
+      this.size.innerHTML = "<span class='alert'>0 Ko!!!</span>"
+    }
   }
 
   get value() {

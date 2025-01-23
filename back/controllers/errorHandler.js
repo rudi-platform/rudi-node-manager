@@ -113,13 +113,14 @@ export function treatAxiosError(err, rudiModuleCalled, req, reply) {
   let statusCode, error
   if (err.code === 'ECONNREFUSED' || err.code === 'ERR_BAD_RESPONSE') {
     statusCode = 503
-    error = {
-      statusCode,
-      message: `La connection de “${MANAGER}” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`,
-    }
-    // log.e(mod,fun,err. )
-    if (reply) return reply.status(statusCode).json(error)
+    const message = `La connection de “${MANAGER}” vers le module “${rudiModuleCalled}” a échoué: “${rudiModuleCalled}” semble injoignable, contactez l‘admin du noeud RUDI`
+    if (reply) return reply.status(statusCode).json({ statusCode, message })
     throw new ConnectionError(error.message)
+  }
+  if (err.code?.startsWith('E')) {
+    statusCode = err.status ?? 400
+    const message = err.message ?? 'Bad Request'
+    return reply.headerSent || reply.status(err.status ?? 400).json({ statusCode, message })
   }
   reply.headerSent || reply.status(err.code ?? 400).json(err)
 }

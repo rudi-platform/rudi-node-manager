@@ -576,7 +576,7 @@ class MediaFile extends ForeignFile {
   }
 
   /** @return true if has a file attached, false otherwise */
-  hasFileAttached = () => !!this.file
+  hasFileAttached = () => !!this.file?.size
 
   /**
    * Return a new File
