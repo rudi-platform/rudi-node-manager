@@ -38,12 +38,12 @@ export default function App() {
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
-  const [rootUrl, setRootUrl] = useState(window.location.pathname)
+  const [rootUrl, setRootUrl] = useState(ensureEndsWithSlash(window.location.pathname))
 
   useEffect(() => {
     if (!back.isLoaded) return
     console.debug('Setting root to', back.frontPath)
-    setRootUrl(back.frontPath)
+    setRootUrl(ensureEndsWithSlash(back.frontPath))
   }, [backConf])
 
   // ---------------- Login modals
