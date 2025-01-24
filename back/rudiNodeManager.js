@@ -312,10 +312,11 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     // Additionaly serving index.html for "/" and ""
     logD(mod, trace, `front path: ${getFrontPathSlash()}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
+    const homePageMime = modifiedStaticFiles['/index.html']?.mime
     for (const path of ['/', '', getFrontPathSlash(), removeTrailingSlash(getFrontPath())])
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
-        reply.send(homePageContent)
+        reply.contentType(homePageMime).send(homePageContent)
       })
 
     // Serving the static ressources
