@@ -159,11 +159,10 @@ console.log('--------------------------------------------------------------')
  */
 export const getBackOptions = (opt, altValue) => {
   if (!opt) return BACK_OPTIONS
-  if (BACK_OPTIONS[opt] !== undefined) return BACK_OPTIONS[opt]
-  return altValue
+  return BACK_OPTIONS[opt] ?? altValue
 }
 
-export const getAppTag = () => getBackOptions(OPT_APP_TAG) ?? ''
+export const getAppTag = () => getBackOptions(OPT_APP_TAG, '')
 
 export function getHash() {
   let gitHash = getBackOptions(OPT_GIT_HASH)

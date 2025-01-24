@@ -324,7 +324,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
     // Redirecting everything else to the React front
     managerApp.get('*', (req, reply) => {
-      logW(mod, trace, `Redirecting this URL to /metadata: ${req.url}`)
+      logW(mod, trace, `Redirecting this URL to the UI: ${req.url}`)
       reply.redirect(308, getFrontPath(''))
     })
   }

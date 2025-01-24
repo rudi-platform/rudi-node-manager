@@ -14,7 +14,7 @@
     "start": "nodemon      run-rudinode-manager.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf .env/prodmanager-conf-custom.ini --node_env development --db ./db/rudi_manager.db --ignore \"**/(front)/\"",
     "start:test": "nodemon run-rudinode-manager.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf .env/prodmanager-conf-custom.ini --node_env development --db ./db/manager.db --su PHVzZXI+OjxoYXNoZWRfcHdkPg== --ignore \"**/(front)/\"",
     "start:stg": "nodemon  run-rudinode-manager.js --hash $(git rev-parse --short HEAD) --tag dev0 --conf=.env/prodmanager-conf-custom.ini --node_env staging     --ignore \"**/(front)/\"",
-    "start:prod": "nodemon run-rudinode-manager.js --hash $(git rev-parse --short HEAD) --tag prod0 --conf=.env/prodmanager-conf-custom.ini --node_env production  --ignore \"**/(front)/\"",
+    "start:prod": "nodemon run-rudinode-manager.js --hash $(git rev-parse --short HEAD) --tag prd0 --conf=.env/prodmanager-conf-custom.ini --node_env production",
     "start:prod:win": "Set NODE_ENV=production&node run-rudinode-manager",
     "server:win": "nodemon   run-rudinode-manager.js --ignore './(front|console)/*' --exec \"Set RUDI_PROD_MANAGER_GIT_REV=git rev-parse --short HEAD& node\"",
     "server:linux": "nodemon run-rudinode-manager.js --ignore './(front|console)/*' --exec \"export RUDI_PROD_MANAGER_GIT_REV=$(git rev-parse --short HEAD) ; node \"",

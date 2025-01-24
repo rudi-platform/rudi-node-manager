@@ -9,7 +9,7 @@ import { parse } from 'ini'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { jsonToString, pathJoin } from '../utils/utils.js'
+import { jsonToString, pathJoin, removeTrailingSlash } from '../utils/utils.js'
 import { getBackOptions, getOptAppPrefix, getOptBackDomain, OPT_DB_PATH, OPT_USER_CONF } from './backOptions.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -109,10 +109,10 @@ const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
 const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 
-export const getManagerPath = (...args) => pathJoin('', MANAGER_PREFIX, ...args)
-export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
-export const getFrontPath = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
-export const getConsolePath = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
+export const getManagerPath = (...args) => removeTrailingSlash(pathJoin('', MANAGER_PREFIX, ...args))
+export const getBackPath = (...args) => removeTrailingSlash(getManagerPath(BACKEND_PREFIX, ...args))
+export const getFrontPath = (...args) => removeTrailingSlash(getManagerPath(FRONTEND_PREFIX, ...args))
+export const getConsolePath = (...args) => removeTrailingSlash(getManagerPath(CONSOLE_PREFIX, ...args))
 
 console.debug('[CONF] Manager prefix:', getManagerPath())
 console.debug('[CONF] Back prefix:', getBackPath())
@@ -150,8 +150,7 @@ export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 // -------------------------------------------------------------------------------------------------
 const getDbConf = (subSection, altVal) => getConf('database', subSection, altVal).trim()
 
-const DB_PATH = getBackOptions(OPT_DB_PATH) ?? pathJoin(getDbConf('db_directory'), getDbConf('db_filename'))
-
+const DB_PATH = getBackOptions(OPT_DB_PATH, pathJoin(getDbConf('db_directory'), getDbConf('db_filename')))
 export const getDbPath = () => DB_PATH
 
 // -------------------------------------------------------------------------------------------------
