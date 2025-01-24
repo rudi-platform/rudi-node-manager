@@ -10,11 +10,11 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 import {
   CATALOG,
-  getBackPath,
+  getBackPubPath,
   getCatalogAdminPath,
   getCatalogUrlAndParams,
-  getConsolePath,
-  getFrontPath,
+  getConsolePubPath,
+  getFrontPubPath,
   getHostDomain,
   getManagerPath,
 } from '../config/config.js'
@@ -84,9 +84,9 @@ export async function getInitData(req, reply) {
       gitHash: tags?.hash,
       catalogPubUrl: data[1],
       storagePubUrl: data[2],
-      consolePath: getConsolePath(),
-      frontPath: getFrontPath(),
-      backPath: getBackPath(),
+      consolePath: getConsolePubPath(),
+      frontPath: getFrontPubPath(),
+      backPath: getBackPubPath(),
       managerPath: getManagerPath(),
       hostUrl: getHostDomain(),
       portalConnected: !!data[3],

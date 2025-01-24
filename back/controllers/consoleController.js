@@ -1,7 +1,7 @@
 const mod = 'consoleCtrl'
 
 // Internal dependencies
-import { getBackPath, getConsolePath, getFrontPath, getManagerPath } from '../config/config.js'
+import { getBackPubPath, getConsolePubPath, getFrontPubPath, getManagerPath } from '../config/config.js'
 import { UnauthorizedError } from '../utils/errors.js'
 import { getContext, logE, logW, sysError } from '../utils/logger.js'
 import { getCatalogPublicUrl, getPortalUrl } from './dataController.js'
@@ -17,9 +17,9 @@ export const getNodeUrls = async () => {
       catalog_url: urls[0],
       storageUrl: urls[1],
       media_url: urls[1],
-      consolePath: getConsolePath(),
-      frontPath: getFrontPath(),
-      backPath: getBackPath(),
+      consolePath: getConsolePubPath(),
+      frontPath: getFrontPubPath(),
+      backPath: getBackPubPath(),
       managerPath: getManagerPath(),
       portalUrl: urls[2],
       portal_url: urls[2],

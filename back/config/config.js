@@ -108,18 +108,25 @@ const MANAGER_PREFIX = getOptAppPrefix() ?? getConf('server', 'manager_prefix', 
 const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
 const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
+const ROUTER_PREFIX = getConf('server', 'router_prefix', MANAGER_PREFIX)
 
 export const getManagerPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
+export const getBackPubPath = (...args) => getManagerPath(removeTrailingSlash(BACKEND_PREFIX), ...args)
+export const getFrontPubPath = (...args) => getManagerPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
+export const getConsolePubPath = (...args) => getManagerPath(removeTrailingSlash(CONSOLE_PREFIX), ...args)
+
 export const getManagerPathSlash = () => getManagerPath('/')
-export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
-export const getFrontPath = (...args) => getManagerPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
-export const getFrontPathSlash = () => getFrontPath('/')
-export const getConsolePath = (...args) => removeTrailingSlash(getManagerPath(CONSOLE_PREFIX, ...args))
+export const getFrontPathSlash = () => getFrontPubPath('/')
+
+export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(ROUTER_PREFIX, ...args))
+export const getBackPrvPath = (...args) => getRouterPath(removeTrailingSlash(BACKEND_PREFIX), ...args)
+export const getFrontPrvPath = (...args) => getRouterPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
+export const getConsolePrvPath = (...args) => getRouterPath(removeTrailingSlash(CONSOLE_PREFIX), ...args)
 
 console.debug('[CONF] Manager prefix:', getManagerPath())
-console.debug('[CONF] Back prefix:', getBackPath())
-console.debug('[CONF] Front prefix:', getFrontPath())
-console.debug('[CONF] Console prefix:', getConsolePath())
+console.debug('[CONF] Back prefix:', getBackPubPath())
+console.debug('[CONF] Front prefix:', getFrontPubPath())
+console.debug('[CONF] Console prefix:', getConsolePubPath())
 console.debug()
 
 // -------------------------------------------------------------------------------------------------

@@ -16,13 +16,13 @@ import helmet from 'helmet'
 import {
   getBackendListeningAddress,
   getBackendListeningPort,
-  getBackPath,
+  getBackPrvPath,
   getConf,
-  getConsolePath,
-  getFrontPath,
+  getConsolePubPath,
   getFrontPathSlash,
+  getFrontPrvPath,
+  getFrontPubPath,
   getManagerPath,
-  getManagerPathSlash,
 } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
@@ -254,18 +254,18 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Backend routes
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getBackPath('open'), openApi)
-  managerApp.use(getBackPath('front'), frontApi)
-  managerApp.use(getBackPath('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
-  managerApp.use(getBackPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
-  managerApp.use(getBackPath('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
-  managerApp.use(getBackPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
-  managerApp.use(getBackPath('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
+  managerApp.use(getBackPrvPath('open'), openApi)
+  managerApp.use(getBackPrvPath('front'), frontApi)
+  managerApp.use(getBackPrvPath('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getBackPrvPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
+  managerApp.use(getBackPrvPath('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getBackPrvPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
+  managerApp.use(getBackPrvPath('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getConsolePath(), authenticate, consoleRouter)
+  managerApp.use(getConsolePubPath(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!
@@ -274,7 +274,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
   if (!isDevEnv()) {
     const trace = 'route front'
-    logI(mod, 'serve', `Serving the built static page on ${getFrontPath()}`)
+    logI(mod, 'serve', `Serving the built static page on ${getFrontPubPath()}`)
     const __dirname = getRootDir()
     const frontDir = pathJoin(__dirname, 'front/build')
     // Access the favicon
@@ -289,10 +289,10 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     const mimeTypes = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
 
     const modifiedStaticFiles = {}
-    logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPath()}`)
+    logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPubPath()}`)
     filesToParse.forEach((filePath) => {
       const fileContent = readFileSync(filePath, 'utf-8')
-      const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPath()))
+      const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPubPath()))
       const fileExtension = getFileExtension(filePath)
       const mime = mimeTypes[fileExtension]
       const fileCall = filePath.split('front/build')[1]
@@ -302,13 +302,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
     // Serving modified static files
     for (const file in modifiedStaticFiles) {
-      managerApp.get(getManagerPath(file), (req, reply) => {
-        const fileInfo = modifiedStaticFiles[file]
-        // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
-        // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
-        reply.contentType(fileInfo.mime).send(String(fileInfo.content))
-      })
-      managerApp.get(file, (req, reply) => {
+      managerApp.get(getFrontPrvPath(file), (req, reply) => {
         const fileInfo = modifiedStaticFiles[file]
         // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
         // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
@@ -317,37 +311,25 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     }
 
     // Additionaly serving index.html for "/" and ""
-    logD(mod, trace, `front path: ${getFrontPathSlash()}`)
+    logD(mod, trace, `front path: ${getFrontPrvPath('/')}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
     const homePageMime = modifiedStaticFiles['/index.html']?.mime
-    const homePaths = [
-      getManagerPath(),
-      getManagerPathSlash(),
-      removeTrailingSlash(getFrontPath()),
-      getFrontPathSlash(),
-    ]
-    for (const path of homePaths)
+    for (const path of [getFrontPrvPath('/'), removeTrailingSlash(getFrontPrvPath())])
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
         reply.contentType(homePageMime).send(homePageContent)
       })
 
     // Serving the static ressources
-    for (const path of [getFrontPathSlash(), getManagerPathSlash()]) {
-      managerApp.use(path, (req, res, next) => {
-        // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
-        express.static(frontDir)(req, res, next)
-      })
-    }
+    managerApp.use(getFrontPrvPath('/'), (req, res, next) => {
+      // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
+      express.static(frontDir)(req, res, next)
+    })
 
     // Redirecting everything else to the React front
-    managerApp.get(getFrontPath('*'), (req, reply) => {
+    managerApp.get(getFrontPrvPath('*'), (req, reply) => {
       logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
       reply.redirect(308, getFrontPathSlash())
-    })
-    managerApp.get(getManagerPath('*'), (req, reply) => {
-      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getManagerPathSlash()}`)
-      reply.redirect(308, getManagerPathSlash())
     })
   }
 
