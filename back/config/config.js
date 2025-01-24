@@ -109,9 +109,10 @@ const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
 const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 
-export const getManagerPath = (...args) => removeTrailingSlash(pathJoin('', MANAGER_PREFIX, ...args))
-export const getBackPath = (...args) => removeTrailingSlash(getManagerPath(BACKEND_PREFIX, ...args))
-export const getFrontPath = (...args) => removeTrailingSlash(getManagerPath(FRONTEND_PREFIX, ...args))
+export const getManagerPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
+export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
+export const getFrontPath = (...args) => getManagerPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
+export const getFrontPathSlash = () => getFrontPath('/')
 export const getConsolePath = (...args) => removeTrailingSlash(getManagerPath(CONSOLE_PREFIX, ...args))
 
 console.debug('[CONF] Manager prefix:', getManagerPath())

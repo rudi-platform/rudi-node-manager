@@ -20,6 +20,7 @@ import {
   getConf,
   getConsolePath,
   getFrontPath,
+  getFrontPathSlash,
   getManagerPath,
 } from './config/config.js'
 
@@ -302,30 +303,37 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     for (const file in modifiedStaticFiles) {
       managerApp.get(getFrontPath(file), (req, reply) => {
         const fileInfo = modifiedStaticFiles[file]
-        logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
+        // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
         // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
         reply.contentType(fileInfo.mime).send(String(fileInfo.content))
       })
     }
 
     // Additionaly serving index.html for "/" and ""
+    logD(mod, trace, `front path: ${getFrontPathSlash()}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
-    for (const path of [getFrontPath('/'), removeTrailingSlash(getFrontPath())])
+    for (const path of ['/', '', getFrontPathSlash(), removeTrailingSlash(getFrontPath())])
       managerApp.get(path, (req, reply) => {
-        logD(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
+        logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
         reply.contentType('text/html').send(homePageContent)
       })
 
     // Serving the static ressources
-    managerApp.use(getFrontPath(), (req, res, next) => {
-      logD(mod, trace, `Accessing unmodified static file ${req.url}`)
+    managerApp.use(getFrontPathSlash(), (req, res, next) => {
+      // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
       express.static(frontDir)(req, res, next)
     })
 
     // Redirecting everything else to the React front
-    managerApp.get('/*', (req, reply) => {
-      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPath('/')}`)
-      reply.redirect(308, getFrontPath('/'))
+    managerApp.get(getFrontPath('*'), (req, reply) => {
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
+      reply.redirect(308, getFrontPathSlash())
+    })
+
+    // Redirecting everything else to the React front
+    managerApp.get('*', (req, reply) => {
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
+      reply.redirect(308, getFrontPathSlash())
     })
   }
 
@@ -380,8 +388,8 @@ async function shutDown(managerServer, signal) {
 export async function runRudiManagerBackend() {
   const fun = 'runRudiManagerBackend'
   const [catalogUrl, storageUrl] = await connectToRudiModules(20)
-  logD(mod, fun, `catalogUrl: ${catalogUrl}`)
-  logD(mod, fun, `storageUrl: ${storageUrl}`)
+  logD(mod, fun, `Public URL defined in Catalog module: ${catalogUrl}`)
+  logD(mod, fun, `Public URL defined in Storage module: ${storageUrl}`)
   const managerServer = await launchManagerRouter({ catalogUrl, storageUrl })
 
   process.on('SIGINT', () => shutDown(managerServer, 'SIGINT'))
