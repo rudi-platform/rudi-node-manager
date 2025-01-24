@@ -22,6 +22,7 @@ import {
   getFrontPath,
   getFrontPathSlash,
   getManagerPath,
+  getManagerPathSlash,
 } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
@@ -301,7 +302,13 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
     // Serving modified static files
     for (const file in modifiedStaticFiles) {
-      managerApp.get(getFrontPath(file), (req, reply) => {
+      managerApp.get(getManagerPath(file), (req, reply) => {
+        const fileInfo = modifiedStaticFiles[file]
+        // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
+        // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
+        reply.contentType(fileInfo.mime).send(String(fileInfo.content))
+      })
+      managerApp.get(file, (req, reply) => {
         const fileInfo = modifiedStaticFiles[file]
         // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
         // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
@@ -313,28 +320,34 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     logD(mod, trace, `front path: ${getFrontPathSlash()}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
     const homePageMime = modifiedStaticFiles['/index.html']?.mime
-    for (const path of ['/', '', getFrontPathSlash(), removeTrailingSlash(getFrontPath())])
+    const homePaths = [
+      getManagerPath(),
+      getManagerPathSlash(),
+      removeTrailingSlash(getFrontPath()),
+      getFrontPathSlash(),
+    ]
+    for (const path of homePaths)
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
         reply.contentType(homePageMime).send(homePageContent)
       })
 
     // Serving the static ressources
-    managerApp.use(getFrontPathSlash(), (req, res, next) => {
-      // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
-      express.static(frontDir)(req, res, next)
-    })
+    for (const path of [getFrontPathSlash(), getManagerPathSlash()]) {
+      managerApp.use(path, (req, res, next) => {
+        // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
+        express.static(frontDir)(req, res, next)
+      })
+    }
 
     // Redirecting everything else to the React front
     managerApp.get(getFrontPath('*'), (req, reply) => {
       logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
       reply.redirect(308, getFrontPathSlash())
     })
-
-    // Redirecting everything else to the React front
-    managerApp.get('*', (req, reply) => {
-      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
-      reply.redirect(308, getFrontPathSlash())
+    managerApp.get(getManagerPath('*'), (req, reply) => {
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getManagerPathSlash()}`)
+      reply.redirect(308, getManagerPathSlash())
     })
   }
 

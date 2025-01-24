@@ -110,6 +110,7 @@ const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 
 export const getManagerPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
+export const getManagerPathSlash = () => getManagerPath('/')
 export const getBackPath = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
 export const getFrontPath = (...args) => getManagerPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
 export const getFrontPathSlash = () => getFrontPath('/')
