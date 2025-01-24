@@ -213,7 +213,7 @@ export default function App() {
           <Route path="show/:id" element={<Visualisation logout={logout} />} />
           <Route path="show" element={<Visualisation logout={logout} />} />
           <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
-          <Route path="*" element={<Navigate replace to="" relative="path" />} />
+          <Route path="*" element={<Navigate replace to="/" relative="path" />} />
         </Routes>
       </ModalProvider>
     </Router>
