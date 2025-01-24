@@ -38,12 +38,12 @@ export default function App() {
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
-  const [rootUrl, setRootUrl] = useState(ensureEndsWithSlash(window.location.pathname))
+  const [rootUrl, setRootUrl] = useState(window.location.pathname)
 
   useEffect(() => {
     if (!back.isLoaded) return
     console.debug('Setting root to', back.frontPath)
-    setRootUrl(ensureEndsWithSlash(back.frontPath))
+    setRootUrl(back.frontPath)
   }, [backConf])
 
   // ---------------- Login modals
@@ -212,7 +212,7 @@ export default function App() {
           <Route path="show/:id" element={<Visualisation logout={logout} />} />
           <Route path="show" element={<Visualisation logout={logout} />} />
           <Route path="user" element={<CatalogueUser editMode={isAdmin} logout={logout} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="metadata" replace />} />
         </Routes>
       </ModalProvider>
     </Router>

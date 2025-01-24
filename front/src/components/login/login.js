@@ -65,6 +65,7 @@ export default function Login({ updateToken }) {
    * @return {Promise} login promise
    */
   const loginUser = async (credentials) =>
+    back?.isLoaded &&
     axios.post(back.getBackFront('login'), JSON.stringify(credentials), {
       headers: { 'Content-Type': 'application/json' },
     })
