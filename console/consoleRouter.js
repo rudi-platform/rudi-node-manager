@@ -7,7 +7,7 @@ import { readFileSync } from 'fs'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getLib, getRoot } from '../back/utils/utils.js'
+import { getNodeModulesLib, getRoot } from '../back/utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -18,7 +18,7 @@ const mod = 'consoleRouter'
 // Helper functions
 // -------------------------------------------------------------------------------------------------
 const relative = (...path) => getRoot('console', ...path)
-const staticDependency = (dep) => express.static(getLib(dep, 'dist'))
+const staticDependency = (dep) => express.static(getNodeModulesLib(dep, 'dist'))
 const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))
 
 // -------------------------------------------------------------------------------------------------
@@ -29,8 +29,8 @@ export const consoleRouter = new express.Router()
 // -------------------------------------------------------------------------------------------------
 // Package dependencies
 // -------------------------------------------------------------------------------------------------
-consoleRouter.use('/dependencies/leaflet', staticDependency('leaflet'))
 consoleRouter.use('/dependencies/leaflet.draw', staticDependency('leaflet-draw'))
+consoleRouter.use('/dependencies/leaflet', staticDependency('leaflet'))
 
 // -------------------------------------------------------------------------------------------------
 // Main routes

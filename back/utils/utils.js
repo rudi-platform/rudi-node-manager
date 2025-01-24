@@ -171,33 +171,38 @@ export const getRoot = (...path) => pathJoin(ROOT, ...path)
 /**
  * Gives the folder where the libraries are installed
  */
-export const getNodeModulesDir = () => {
+export const getNodeModulesLib = (lib) => {
   const nm = 'node_modules'
   const root = getRootDir()
 
-  let libsPath = process.env.NODE_PATH
-  if (libsPath?.endsWith(nm)) return libsPath
-  if (!libsPath) {
-    try {
-      libsPath = execSync('npm root', { encoding: 'utf-8' })
-      if (libsPath.endsWith('\n')) libsPath = libsPath.slice(0, -1)
-      console.debug('LIBS_PATH:', libsPath)
-      return libsPath
-    } catch {
-      for (const lookupFolderLevel of ['', '..', '../..']) {
-        libsPath = pathJoin(root, lookupFolderLevel, nm)
-        if (existsSync(libsPath)) {
-          console.debug('LIBS_PATH:', libsPath)
-          return libsPath
-        }
+  let nodMod = process.env.NODE_PATH
+  let libPath = pathJoin(nodMod, lib)
+  if (nodMod?.endsWith(nm) && existsSync(libPath)) return libPath
+
+  try {
+    nodMod = execSync('npm root', { encoding: 'utf-8' })
+    if (nodMod.endsWith('\n')) nodMod = nodMod.slice(0, -1)
+    let libPath = pathJoin(nodMod, lib)
+    if (existsSync(libPath)) {
+      return nodMod
+    }
+  } catch {
+    console.debug(`Lib not found in ${nodMod}`)
+  }
+  try {
+    for (const lookupFolderLevel of ['', '..', '../..']) {
+      libPath = pathJoin(root, lookupFolderLevel, nm, lib)
+      if (existsSync(libPath)) {
+        console.debug('LIBS_PATH:', libPath)
+        return libPath
       }
     }
-    console.debug('LIBS_PATH:', libsPath)
+    console.debug('LIBS_PATH:', libPath)
+  } catch {
+    console.debug(`Lib not found in ${nodMod}`)
   }
   return root
 }
-const NODE_MODULES = getNodeModulesDir()
-export const getLib = (...path) => pathJoin(NODE_MODULES, ...path)
 
 /**
  * Recursively list all files in a folder
