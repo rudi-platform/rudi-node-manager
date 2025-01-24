@@ -17,9 +17,9 @@ import {
   getBackendListeningAddress,
   getBackendListeningPort,
   getConf,
-  getConsolePublic,
-  getFrontPublic,
-  getManagerPath,
+  getPublicConsole,
+  getPublicFront,
+  getPublicManager,
   getRouterBack,
   getRouterFront,
 } from './config/config.js'
@@ -186,10 +186,10 @@ const modifystaticFiles = (frontDir) => {
   const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
 
   const modifiedStaticFiles = {}
-  logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPublic()}`)
+  logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getPublicFront()}`)
   filesToParse.forEach((filePath) => {
     const fileContent = readFileSync(filePath, 'utf-8')
-    const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPublic()))
+    const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getPublicFront()))
     const fileExtension = getFileExtension(filePath)
     const mime = MIME_TYPES[fileExtension]
     const fileCall = filePath.split('front/build')[1]
@@ -295,7 +295,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getConsolePublic(), authenticate, consoleRouter)
+  managerApp.use(getPublicConsole(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!
@@ -304,7 +304,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
   if (!isDevEnv()) {
     const trace = 'route front'
-    logI(mod, 'serve', `Serving the built static page on ${getFrontPublic()}`)
+    logI(mod, 'serve', `Serving the built static page on ${getPublicFront()}`)
     const __dirname = getRootDir()
     const frontDir = pathJoin(__dirname, 'front/build')
     // Access the favicon
@@ -370,7 +370,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Configure our server to listen on the port defiend by our port variable
   // -----------------------------------------------------------------------------------------------
   const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
-    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getManagerPath()}`)
+    logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getPublicManager()}`)
   )
   managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 

@@ -61,8 +61,8 @@ const getStorageConf = (subSection, altSubSection, altVal) =>
 const RUDI_CATALOG_URL = getCatalogConf('rudi_catalog_url', 'rudi_api_url')
 const RUDI_STORAGE_URL = getStorageConf('rudi_storage_url', 'rudi_media_url')
 
-console.debug(`[CONF] ${CATALOG} url:`, RUDI_CATALOG_URL)
-console.debug(`[CONF] ${STORAGE} url:`, RUDI_STORAGE_URL)
+console.debug(`[CONF] ${CATALOG} url:   `, RUDI_CATALOG_URL)
+console.debug(`[CONF] ${STORAGE} url:   `, RUDI_STORAGE_URL)
 console.debug(`[CONF] ${MANAGER} domain:`, getOptBackDomain())
 
 if (!RUDI_CATALOG_URL) throw new Error(`Configuration error: ${CATALOG} URL should be defined`)
@@ -101,7 +101,7 @@ export const getBackendListeningAddressAndPort = () => `${LISTENING_ADDRESS}:${L
 const HOST_DOMAIN = getOptBackDomain() ?? getBackendListeningAddressAndPort()
 export const getHostDomain = () => HOST_DOMAIN
 
-console.debug(`[CONF] ${MANAGER} host:`, HOST_DOMAIN)
+console.debug(`[CONF] ${MANAGER} host:  `, HOST_DOMAIN)
 console.debug()
 
 const MANAGER_PREFIX = getOptAppPrefix() ?? getConf('server', 'manager_prefix', '')
@@ -110,20 +110,26 @@ const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 const ROUTER_PREFIX = getConf('server', 'router_prefix', MANAGER_PREFIX)
 
-export const getManagerPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
-export const getBackPublic = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
-export const getFrontPublic = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
-export const getConsolePublic = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
+export const getPublicManager = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
+export const getPublicBack = (...args) => getPublicManager(BACKEND_PREFIX, ...args)
+export const getPublicFront = (...args) => getPublicManager(FRONTEND_PREFIX, ...args)
+export const getPublicConsole = (...args) => getPublicManager(CONSOLE_PREFIX, ...args)
 
-export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(ROUTER_PREFIX, ...args))
+console.debug('[CONF] Public prefix Manager:', getPublicManager())
+console.debug('[CONF] Public prefix Backend:', getPublicBack())
+console.debug('[CONF] Public prefix FrontUI:', getPublicFront())
+console.debug('[CONF] Public prefix Console:', getPublicConsole())
+console.debug()
+
+export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(ROUTER_PREFIX), ...args)
 export const getRouterBack = (...args) => getRouterPath(BACKEND_PREFIX, ...args)
 export const getRouterFront = (...args) => getRouterPath(FRONTEND_PREFIX, ...args)
 export const getRouterConsole = (...args) => getRouterPath(CONSOLE_PREFIX, ...args)
 
-console.debug('[CONF] Manager prefix:', getManagerPath())
-console.debug('[CONF] Back prefix:', getBackPublic())
-console.debug('[CONF] Front prefix:', getFrontPublic())
-console.debug('[CONF] Console prefix:', getConsolePublic())
+console.debug('[CONF] Routing Manager:', getRouterPath())
+console.debug('[CONF] Routing Backend:', getRouterBack())
+console.debug('[CONF] Routing FrontUI:', getRouterFront())
+console.debug('[CONF] Routing Console:', getRouterConsole())
 console.debug()
 
 // -------------------------------------------------------------------------------------------------

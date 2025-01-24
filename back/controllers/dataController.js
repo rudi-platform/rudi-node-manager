@@ -10,13 +10,13 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 import {
   CATALOG,
-  getBackPublic,
   getCatalogAdminPath,
   getCatalogUrlAndParams,
-  getConsolePublic,
-  getFrontPublic,
   getHostDomain,
-  getManagerPath,
+  getPublicBack,
+  getPublicConsole,
+  getPublicFront,
+  getPublicManager,
 } from '../config/config.js'
 
 import { getTags } from '../config/backOptions.js'
@@ -84,10 +84,10 @@ export async function getInitData(req, reply) {
       gitHash: tags?.hash,
       catalogPubUrl: data[1],
       storagePubUrl: data[2],
-      consolePath: getConsolePublic(),
-      frontPath: getFrontPublic(),
-      backPath: getBackPublic(),
-      managerPath: getManagerPath(),
+      consolePath: getPublicConsole(),
+      frontPath: getPublicFront(),
+      backPath: getPublicBack(),
+      managerPath: getPublicManager(),
       hostUrl: getHostDomain(),
       portalConnected: !!data[3],
       themeLabels: data[0],
