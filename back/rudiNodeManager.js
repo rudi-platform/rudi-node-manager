@@ -313,7 +313,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     for (const path of [getFrontPath('/'), removeTrailingSlash(getFrontPath())])
       managerApp.get(path, (req, reply) => {
         logD(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
-        reply.send(homePageContent)
+        reply.contentType('text/html').send(homePageContent)
       })
 
     // Serving the static ressources
@@ -323,8 +323,8 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     })
 
     // Redirecting everything else to the React front
-    managerApp.get('*', (req, reply) => {
-      logW(mod, trace, `Redirecting this URL to the UI: ${req.url}`)
+    managerApp.get('/*', (req, reply) => {
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPath('/')}`)
       reply.redirect(308, getFrontPath('/'))
     })
   }
