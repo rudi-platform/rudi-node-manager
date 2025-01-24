@@ -22,6 +22,7 @@ import {
   getRouterBack,
   getRouterConsole,
   getRouterFront,
+  getRouterPath,
 } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
@@ -339,7 +340,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     })
 
     // Redirecting everything else to the React front
-    managerApp.get(getRouterFront('*'), (req, reply) => {
+    managerApp.get('*', (req, reply) => {
       logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getRouterFront('/')}`)
       reply.redirect(308, getRouterFront('/'))
     })
@@ -369,9 +370,10 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Configure our server to listen on the port defiend by our port variable
   // -----------------------------------------------------------------------------------------------
-  const managerServer = managerApp.listen(listeningPort, listeningAddress, () =>
+  const managerServer = managerApp.listen(listeningPort, listeningAddress, () => {
     logI(mod, '', `Listening on: ${listeningAddress}:${listeningPort}${getPublicManager()}`)
-  )
+    logI(mod, '', `Routing on:   ${listeningAddress}:${listeningPort}${getRouterPath()}`)
+  })
   managerServer.on('error', (err) => console.error('This error was uncaught:', err))
 
   return managerServer
