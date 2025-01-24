@@ -202,7 +202,6 @@ export default function App() {
         <div id="root"></div>
 
         <Routes>
-          <Route path="" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="/" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="metadata" element={<CatalogueMetadata editMode={isEditor} logout={logout} />} />
           <Route path="producer" element={<CatalogueProducer editMode={isEditor} logout={logout} />} />
