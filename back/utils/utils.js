@@ -183,25 +183,26 @@ export const getNodeModulesLib = (lib) => {
     nodMod = execSync('npm root', { encoding: 'utf-8' })
     if (nodMod.endsWith('\n')) nodMod = nodMod.slice(0, -1)
     let libPath = pathJoin(nodMod, lib)
-    if (existsSync(libPath)) {
-      return nodMod
-    }
+    if (existsSync(libPath)) return libPath
   } catch {
-    console.debug(`Lib not found in ${nodMod}`)
+    console.debug(`D [getNodeModulesLib] Lib not found at ${libPath}`)
   }
   try {
     for (const lookupFolderLevel of ['', '..', '../..']) {
       libPath = pathJoin(root, lookupFolderLevel, nm, lib)
-      if (existsSync(libPath)) {
-        console.debug('LIBS_PATH:', libPath)
-        return libPath
-      }
+      if (existsSync(libPath)) return libPath
     }
-    console.debug('LIBS_PATH:', libPath)
   } catch {
-    console.debug(`Lib not found in ${nodMod}`)
+    console.debug(`W [getNodeModulesLib] Lib not found at ${libPath}`)
   }
   return root
+}
+
+const cacheLib = {}
+export const getLib = (lib, ...args) => {
+  if (!cacheLib[lib]) cacheLib[lib] = getNodeModulesLib(lib)
+  console.debug(`T [getLib] lib ${lib} found at`, pathJoin(cacheLib[lib], ...args))
+  return pathJoin(cacheLib[lib], ...args)
 }
 
 /**

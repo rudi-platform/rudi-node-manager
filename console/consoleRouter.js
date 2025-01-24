@@ -7,7 +7,7 @@ import { readFileSync } from 'fs'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { getNodeModulesLib, getRoot } from '../back/utils/utils.js'
+import { getLib, getRoot } from '../back/utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -18,7 +18,7 @@ const mod = 'consoleRouter'
 // Helper functions
 // -------------------------------------------------------------------------------------------------
 const relative = (...path) => getRoot('console', ...path)
-const staticDependency = (dep) => express.static(getNodeModulesLib(dep, 'dist'))
+const staticDependency = (dep) => express.static(getLib(dep, 'dist'))
 const staticPublicFile = (filePath) => (req, res) => res.sendFile(relative('public', filePath))
 
 // -------------------------------------------------------------------------------------------------
