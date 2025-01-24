@@ -316,7 +316,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
         reply.send(homePageContent)
       })
 
-    // Accessing the static ressources
+    // Serving the static ressources
     managerApp.use(getFrontPath(), (req, res, next) => {
       logD(mod, trace, `Accessing unmodified static file ${req.url}`)
       express.static(frontDir)(req, res, next)
@@ -325,7 +325,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     // Redirecting everything else to the React front
     managerApp.get('*', (req, reply) => {
       logW(mod, trace, `Redirecting this URL to /metadata: ${req.url}`)
-      reply.redirect(308, getFrontPath('/'))
+      reply.redirect(308, getFrontPath(''))
     })
   }
 

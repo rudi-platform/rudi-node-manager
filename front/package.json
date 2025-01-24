@@ -9,7 +9,7 @@
     "prestart": "npm run install:dev",
     "install:dev": "NODE_ENV=development npm i --loglevel=error",
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
-    "start:dev": "GENERATE_SOURCEMAP=false NODE_ENV=development PUBLIC_URL=electricite/manager react-scripts start",
+    "start:dev": "GENERATE_SOURCEMAP=false NODE_ENV=development react-scripts start",
     "build": "npm run build:prod",
     "build:dev": " DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false PUBLIC_URL='' NODE_ENV=development react-scripts build",
     "build:prod": "DISABLE_ESLINT_PLUGIN=true INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false PUBLIC_URL='http://68064ef1-1e5c-4384-8c50-626f52b78c5c' NODE_ENV=production react-scripts build",
