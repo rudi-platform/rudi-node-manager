@@ -315,7 +315,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     for (const path of ['/', '', getFrontPathSlash(), removeTrailingSlash(getFrontPath())])
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
-        reply.contentType('text/html').send(homePageContent)
+        reply.send(homePageContent)
       })
 
     // Serving the static ressources
