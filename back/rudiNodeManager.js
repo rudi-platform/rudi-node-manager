@@ -17,10 +17,10 @@ import {
   getBackendListeningAddress,
   getBackendListeningPort,
   getConf,
-  getPublicConsole,
   getPublicFront,
   getPublicManager,
   getRouterBack,
+  getRouterConsole,
   getRouterFront,
 } from './config/config.js'
 
@@ -295,7 +295,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getPublicConsole(), authenticate, consoleRouter)
+  managerApp.use(getRouterConsole(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!
