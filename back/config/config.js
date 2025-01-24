@@ -111,22 +111,19 @@ const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
 const ROUTER_PREFIX = getConf('server', 'router_prefix', MANAGER_PREFIX)
 
 export const getManagerPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
-export const getBackPubPath = (...args) => getManagerPath(removeTrailingSlash(BACKEND_PREFIX), ...args)
-export const getFrontPubPath = (...args) => getManagerPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
-export const getConsolePubPath = (...args) => getManagerPath(removeTrailingSlash(CONSOLE_PREFIX), ...args)
-
-export const getManagerPathSlash = () => getManagerPath('/')
-export const getFrontPathSlash = () => getFrontPubPath('/')
+export const getBackPublic = (...args) => getManagerPath(BACKEND_PREFIX, ...args)
+export const getFrontPublic = (...args) => getManagerPath(FRONTEND_PREFIX, ...args)
+export const getConsolePublic = (...args) => getManagerPath(CONSOLE_PREFIX, ...args)
 
 export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(ROUTER_PREFIX, ...args))
-export const getBackPrvPath = (...args) => getRouterPath(removeTrailingSlash(BACKEND_PREFIX), ...args)
-export const getFrontPrvPath = (...args) => getRouterPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
-export const getConsolePrvPath = (...args) => getRouterPath(removeTrailingSlash(CONSOLE_PREFIX), ...args)
+export const getRouterBack = (...args) => getRouterPath(BACKEND_PREFIX, ...args)
+export const getRouterFront = (...args) => getRouterPath(FRONTEND_PREFIX, ...args)
+export const getRouterConsole = (...args) => getRouterPath(CONSOLE_PREFIX, ...args)
 
 console.debug('[CONF] Manager prefix:', getManagerPath())
-console.debug('[CONF] Back prefix:', getBackPubPath())
-console.debug('[CONF] Front prefix:', getFrontPubPath())
-console.debug('[CONF] Console prefix:', getConsolePubPath())
+console.debug('[CONF] Back prefix:', getBackPublic())
+console.debug('[CONF] Front prefix:', getFrontPublic())
+console.debug('[CONF] Console prefix:', getConsolePublic())
 console.debug()
 
 // -------------------------------------------------------------------------------------------------

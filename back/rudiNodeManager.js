@@ -16,13 +16,12 @@ import helmet from 'helmet'
 import {
   getBackendListeningAddress,
   getBackendListeningPort,
-  getBackPrvPath,
   getConf,
-  getConsolePubPath,
-  getFrontPathSlash,
-  getFrontPrvPath,
-  getFrontPubPath,
+  getConsolePublic,
+  getFrontPublic,
   getManagerPath,
+  getRouterBack,
+  getRouterFront,
 } from './config/config.js'
 
 import { getBackOptions, isDevEnv, isProdEnv, OPT_BACK_PATH } from './config/backOptions.js'
@@ -172,6 +171,37 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 // -------------------------------------------------------------------------------------------------
 // Launching express app
 // -------------------------------------------------------------------------------------------------
+
+// This is the dummy PUBLIC_URL the front has been built with
+const STATIC_FRONT_BUILD_URL = removeTrailingSlash('http://68064ef1-1e5c-4384-8c50-626f52b78c5c')
+
+// MIME types from the files to be modified
+const MIME_TYPES = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
+
+const modifystaticFiles = (frontDir) => {
+  const here = 'modifystaticFiles'
+
+  // Special treatment: some frontend static files are be parsed (because they cannot be dynamically updated)
+  // The above STATIC_FRONT_BUILD_URL will be replaced with the right URL
+  const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
+
+  const modifiedStaticFiles = {}
+  logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPublic()}`)
+  filesToParse.forEach((filePath) => {
+    const fileContent = readFileSync(filePath, 'utf-8')
+    const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPublic()))
+    const fileExtension = getFileExtension(filePath)
+    const mime = MIME_TYPES[fileExtension]
+    const fileCall = filePath.split('front/build')[1]
+    modifiedStaticFiles[fileCall] = { content, mime }
+    logD(mod, here, 'modifed file:', fileCall)
+  })
+
+  return modifiedStaticFiles
+}
+// -------------------------------------------------------------------------------------------------
+// Launching express app
+// -------------------------------------------------------------------------------------------------
 const managerApp = express()
 
 const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
@@ -254,18 +284,18 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Backend routes
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getBackPrvPath('open'), openApi)
-  managerApp.use(getBackPrvPath('front'), frontApi)
-  managerApp.use(getBackPrvPath('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
-  managerApp.use(getBackPrvPath('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
-  managerApp.use(getBackPrvPath('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
-  managerApp.use(getBackPrvPath('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
-  managerApp.use(getBackPrvPath('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
+  managerApp.use(getRouterBack('open'), openApi)
+  managerApp.use(getRouterBack('front'), frontApi)
+  managerApp.use(getRouterBack('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getRouterBack('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
+  managerApp.use(getRouterBack('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getRouterBack('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
+  managerApp.use(getRouterBack('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
-  managerApp.use(getConsolePubPath(), authenticate, consoleRouter)
+  managerApp.use(getConsolePublic(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!
@@ -274,35 +304,17 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
 
   if (!isDevEnv()) {
     const trace = 'route front'
-    logI(mod, 'serve', `Serving the built static page on ${getFrontPubPath()}`)
+    logI(mod, 'serve', `Serving the built static page on ${getFrontPublic()}`)
     const __dirname = getRootDir()
     const frontDir = pathJoin(__dirname, 'front/build')
     // Access the favicon
     managerApp.use(/.*favicon.ico/, express.static(pathJoin(frontDir, 'favicon.ico')))
 
-    // This is the dummy PUBLIC_URL the front has been built with
-    const STATIC_FRONT_BUILD_URL = removeTrailingSlash('http://68064ef1-1e5c-4384-8c50-626f52b78c5c')
-
-    // Special treatment: some frontend static files are be parsed (because they cannot be dynamically updated)
-    // The above STATIC_FRONT_BUILD_URL will be replaced with the right URL
-    const filesToParse = getAllFiles(frontDir, { extensionFilter: ['json', 'html', 'css', 'js'] })
-    const mimeTypes = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
-
-    const modifiedStaticFiles = {}
-    logD(mod, 'serve', `replacing in files ${STATIC_FRONT_BUILD_URL} -> ${getFrontPubPath()}`)
-    filesToParse.forEach((filePath) => {
-      const fileContent = readFileSync(filePath, 'utf-8')
-      const content = fileContent.replaceAll(STATIC_FRONT_BUILD_URL, removeTrailingSlash(getFrontPubPath()))
-      const fileExtension = getFileExtension(filePath)
-      const mime = mimeTypes[fileExtension]
-      const fileCall = filePath.split('front/build')[1]
-      modifiedStaticFiles[fileCall] = { content, mime }
-      logD(mod, here, 'modifed file:', fileCall)
-    })
+    const modifiedStaticFiles = modifystaticFiles(frontDir)
 
     // Serving modified static files
     for (const file in modifiedStaticFiles) {
-      managerApp.get(getFrontPrvPath(file), (req, reply) => {
+      managerApp.get(getRouterFront(file), (req, reply) => {
         const fileInfo = modifiedStaticFiles[file]
         // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
         // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
@@ -311,25 +323,25 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     }
 
     // Additionaly serving index.html for "/" and ""
-    logD(mod, trace, `front path: ${getFrontPrvPath('/')}`)
+    logD(mod, trace, `front path: ${getRouterFront('/')}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
     const homePageMime = modifiedStaticFiles['/index.html']?.mime
-    for (const path of [getFrontPrvPath('/'), removeTrailingSlash(getFrontPrvPath())])
+    for (const path of [getRouterFront('/'), removeTrailingSlash(getRouterFront())])
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
         reply.contentType(homePageMime).send(homePageContent)
       })
 
     // Serving the static ressources
-    managerApp.use(getFrontPrvPath('/'), (req, res, next) => {
+    managerApp.use(getRouterFront('/'), (req, res, next) => {
       // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
       express.static(frontDir)(req, res, next)
     })
 
     // Redirecting everything else to the React front
-    managerApp.get(getFrontPrvPath('*'), (req, reply) => {
-      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getFrontPathSlash()}`)
-      reply.redirect(308, getFrontPathSlash())
+    managerApp.get(getRouterFront('*'), (req, reply) => {
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getRouterFront('/')}`)
+      reply.redirect(308, getRouterFront('/'))
     })
   }
 
