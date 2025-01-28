@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
+import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, ShareFill, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
 import { BackConfContext } from '../../context/backConfContext.js'
@@ -37,7 +37,7 @@ const eyeButton = (id) => (
 )
 const shareButton = (url) => (
   <a className="btn btn-success" title="Partager la métadonnée" href={url} target="_blank" rel="noopener noreferrer">
-    <Share />
+    <ShareFill />
   </a>
 )
 const editButton = (url) => (
