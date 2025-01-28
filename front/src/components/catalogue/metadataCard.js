@@ -35,7 +35,7 @@ const eyeButton = (id) => (
     </span>
   </Link>
 )
-const shareButton = (url) => (
+const getShareButton = (url) => (
   <a className="btn btn-success" title="Partager la métadonnée" href={url} target="_blank" rel="noopener noreferrer">
     <Share />
   </a>
@@ -115,6 +115,12 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
+  const [shareButton, setShareButton] = useState(backConf)
+  useEffect(
+    () => setShareButton(getShareButton(back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id))),
+    [backConf]
+  )
+
   const { changeOptions, toggle } = useModalContext()
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
@@ -131,12 +137,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
       .then((res) => {
         const options = DefaultOkOption
         options.text = [`La métadonnée ${res.data.resource_title} a été supprimée`]
-        options.buttons = [
-          {
-            text: 'Ok',
-            action: () => refresh(),
-          },
-        ]
+        options.buttons = [{ text: 'Ok', action: () => refresh() }]
         changeOptions(options)
         toggle()
       })
@@ -150,14 +151,8 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     const options = DefaultConfirmOption
     options.text = [`Confirmez vous la suppression de la métadonnée ${metadata.resource_title}?`]
     options.buttons = [
-      {
-        text: 'Oui',
-        action: () => deleteRessource(),
-      },
-      {
-        text: 'Non',
-        action: () => {},
-      },
+      { text: 'Oui', action: () => deleteRessource() },
+      { text: 'Non', action: () => {} },
     ]
     changeOptions(options)
     toggle()
@@ -223,7 +218,6 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
     media.file_storage_status === 'missing' ? displayMissingMedia(media) : displayAvailableMedia(media)
 
   const button = {
-    share: shareButton(back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id)),
     edit: editButton(getFormMeta(`update=${metadata.global_id}`)),
     delete: deleteButton(triggerDeleteRessource),
     download: (url) => downloadButton(url),
@@ -241,13 +235,13 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
             <span className="align-pill-right">{displayMetadataStatus(metadata)}</span>
             {isEdit ? (
               <div className="btn-group" role="group">
-                {button.share}
+                {shareButton}
                 {button.edit}
                 {button.delete}
               </div>
             ) : (
               <div className="btn-group" role="group">
-                {button.share}
+                {shareButton}
               </div>
             )}
           </div>
