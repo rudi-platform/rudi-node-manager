@@ -31,7 +31,7 @@
     ]
   },
   "dependencies": {
-    "@babel/core": "^7.26.0",
+    "@babel/core": "^7.26.7",
     "@svgr/webpack": "^8.1.0",
     "@textea/json-viewer": "4.0.1",
     "axios": "^1.7.9",
@@ -56,7 +56,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.26.5",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-env": "^7.26.7",
     "@babel/preset-react": "^7.26.3",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
