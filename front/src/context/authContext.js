@@ -26,41 +26,43 @@ UserContextProvider.propTypes = { children: PropTypes.object }
  * @return {React.Context.Provider}
  */
 export function UserContextProvider({ children }) {
+  // Retrieve token from context
   const { token } = useContext(JwtContext)
 
+  // Retrieve conf from back-end context
   const { backConf } = useContext(BackConfContext)
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
+  // Retrieve user info
   const [userInfo, setUserInfo] = useState({})
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isEditor, setIsEditor] = useState(false)
-
-  const hasRoleAdmin = (userInfo) =>
-    userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1 || false
-
-  const hasRoleEditor = (userInfo) =>
-    userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1 || false
-
   const getUserInfoFromBack = async (token) => {
     try {
-      if (!token || !back?.isLoaded) return {}
-      return (await axios.get(await back.getBackFront('user-info')))?.data
+      return !token || !back?.isLoaded ? {} : (await axios.get(back.getBackFront('user-info')))?.data
     } catch (err) {
       console.error('E (callAuthBackend)', err.code, err.status, err.message)
       return {}
     }
   }
-  const updateUserInfo = async () => setUserInfo(await getUserInfoFromBack(token))
+  const updateUserInfo = () => {
+    // no return for useEffect!
+    getUserInfoFromBack(token).then((backUserInfo) => setUserInfo(backUserInfo))
+  }
+  useEffect(() => updateUserInfo(), [token, back])
+
+  // Retrieve user's role
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [isEditor, setIsEditor] = useState(false)
+
+  const hasRoleAdmin = (userInfo) =>
+    userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin') > -1 || false
+  const hasRoleEditor = (userInfo) =>
+    userInfo?.roles?.findIndex((role) => role === 'SuperAdmin' || role === 'Admin' || role === 'Editeur') > -1 || false
 
   useEffect(() => {
     setIsAdmin(hasRoleAdmin(userInfo))
     setIsEditor(hasRoleEditor(userInfo))
   }, [userInfo])
-
-  useEffect(() => {
-    updateUserInfo()
-  }, [token, back])
 
   return <UserContext.Provider value={{ userInfo, isAdmin, isEditor }}>{children}</UserContext.Provider>
 }

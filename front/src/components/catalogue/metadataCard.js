@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import PropTypes from 'prop-types'
 import React, { useContext, useEffect, useState } from 'react'
-import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Trash } from 'react-bootstrap-icons'
+import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
 import { BackConfContext } from '../../context/backConfContext.js'
@@ -19,7 +19,11 @@ const getDownloadButton = (url) => (
     </a>
   </button>
 )
-
+const getShareButton = (url) => (
+  <a className="btn btn-success" title="Partager la métadonnée" href={url} target="_blank" rel="noopener noreferrer">
+    <Share />
+  </a>
+)
 const getExternalUrlButton = (url) => (
   <button type="button" className="btn btn-green margin-right">
     <a id="downloadMedia" title="Site externe" href={url}>
@@ -112,8 +116,11 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
 
   const [shareButton, setShareButton] = useState(getShareButton())
   useEffect(
-    () => setShareButton(getShareButton(back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id))),
-    [backConf]
+    () =>
+      setShareButton(
+        getShareButton((back?.isLoaded && back.getCatalogPub('v1/resources', metadata.global_id)) || getShareButton())
+      ),
+    [back]
   )
 
   const { changeOptions, toggle } = useModalContext()
