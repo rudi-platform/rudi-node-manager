@@ -346,21 +346,13 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
       })
 
     // Serving the static ressources
-    managerApp.use(getRouterFront('/'), (req, res, next) => {
-      // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
-      express.static(frontDir)(req, res, next)
-    })
-
-    // Serving the static ressources
-    managerApp.use(getRouterFront(), (req, res, next) => {
-      // logD(mod, trace, `Accessing unmodified static file ${req.url}`)
-      express.static(frontDir)(req, res, next)
-    })
+    managerApp.use(getRouterFront('/'), (req, res, next) => express.static(frontDir)(req, res, next))
+    managerApp.use(getRouterFront(), (req, res, next) => express.static(frontDir)(req, res, next))
 
     // Redirecting everything else to the React front
     managerApp.get('/*', (req, reply) => {
-      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getRouterFront('/')}`)
-      reply.redirect(308, getRouterFront('/'))
+      logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getRouterFront('/metadata')}`)
+      reply.redirect(308, getRouterFront('/metadata'))
     })
   }
 
