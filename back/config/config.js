@@ -125,6 +125,7 @@ export const getRouterBack = (...args) => getRouterPath(BACKEND_PREFIX, ...args)
 export const getDirectBack = (...url) => pathJoin('/', BACKEND_PREFIX, ...url)
 
 export const getRouterFront = (...args) => getRouterPath(removeTrailingSlash(FRONTEND_PREFIX), ...args)
+export const getDirectFront = (...args) => pathJoin('/', removeTrailingSlash(FRONTEND_PREFIX), ...args)
 
 export const getRouterConsole = (...args) => getRouterPath(CONSOLE_PREFIX, ...args)
 export const getDirectConsole = (...args) => pathJoin('/', CONSOLE_PREFIX, ...args)

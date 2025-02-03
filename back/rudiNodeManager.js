@@ -19,6 +19,7 @@ import {
   getConf,
   getDirectBack,
   getDirectConsole,
+  getDirectFront,
   getPublicFront,
   getPublicManager,
   getRouterBack,
@@ -348,6 +349,8 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     // Serving the static ressources
     managerApp.use(getRouterFront('/'), (req, res, next) => express.static(frontDir)(req, res, next))
     managerApp.use(getRouterFront(), (req, res, next) => express.static(frontDir)(req, res, next))
+    managerApp.use(getDirectFront('/'), (req, res, next) => express.static(frontDir)(req, res, next))
+    managerApp.use(getDirectFront(), (req, res, next) => express.static(frontDir)(req, res, next))
 
     // Redirecting everything else to the React front
     managerApp.get('/*', (req, reply) => {
