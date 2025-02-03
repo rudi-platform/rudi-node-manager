@@ -17,6 +17,8 @@ import {
   getBackendListeningAddress,
   getBackendListeningPort,
   getConf,
+  getDirectBack,
+  getDirectConsole,
   getPublicFront,
   getPublicManager,
   getRouterBack,
@@ -293,10 +295,20 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   managerApp.use(getRouterBack('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
   managerApp.use(getRouterBack('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
 
+  // For config where the router prefix is removed
+  managerApp.use(getDirectBack('open'), openApi)
+  managerApp.use(getDirectBack('front'), frontApi)
+  managerApp.use(getDirectBack('catalog'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi)
+  managerApp.use(getDirectBack('data'), authenticate, checkRolePerm([ROLE_ALL]), catalogApi) // Legacy
+  managerApp.use(getDirectBack('storage'), authenticate, checkRolePerm([ROLE_ALL]), storageApi)
+  managerApp.use(getDirectBack('media'), authenticate, checkRolePerm([ROLE_ALL]), storageApi) // Legacy
+  managerApp.use(getDirectBack('secu'), authenticate, checkRolePerm([ROLE_ADMIN]), secuApi)
+
   // -----------------------------------------------------------------------------------------------
   // Serving the console frontend                                                                 !!
   // -----------------------------------------------------------------------------------------------
   managerApp.use(getRouterConsole(), authenticate, consoleRouter)
+  managerApp.use(getDirectConsole(), authenticate, consoleRouter)
 
   // -----------------------------------------------------------------------------------------------
   // Serving the React frontend                                                                   !!

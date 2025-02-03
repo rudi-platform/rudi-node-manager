@@ -108,7 +108,6 @@ const MANAGER_PREFIX = getOptAppPrefix() ?? getConf('server', 'manager_prefix', 
 const BACKEND_PREFIX = getConf('server', 'backend_prefix', 'api')
 const FRONTEND_PREFIX = getConf('server', 'frontend_prefix', '')
 const CONSOLE_PREFIX = getConf('server', 'console_prefix', 'form')
-const ROUTER_PREFIX = getConf('server', 'router_prefix', MANAGER_PREFIX)
 
 export const getPublicManager = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
 export const getPublicBack = (...args) => getPublicManager(BACKEND_PREFIX, ...args)
@@ -121,13 +120,17 @@ console.debug('[CONF] Public prefix FrontUI:', getPublicFront())
 console.debug('[CONF] Public prefix Console:', getPublicConsole())
 console.debug()
 
-export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(ROUTER_PREFIX), ...args)
+export const getRouterPath = (...args) => pathJoin('/', removeTrailingSlash(MANAGER_PREFIX), ...args)
 export const getRouterBack = (...args) => getRouterPath(BACKEND_PREFIX, ...args)
+export const getDirectBack = (...url) => pathJoin('/', BACKEND_PREFIX, ...url)
+
 export const getRouterFront = (...args) => getRouterPath(FRONTEND_PREFIX, ...args)
+
 export const getRouterConsole = (...args) => getRouterPath(CONSOLE_PREFIX, ...args)
+export const getDirectConsole = (...args) => pathJoin('/', CONSOLE_PREFIX, ...args)
 
 console.debug('[CONF] Routing Manager:', getRouterPath())
-console.debug('[CONF] Routing Backend:', getRouterBack())
+console.debug('[CONF] Routing Backend:', getRouterBack(), '|', getDirectBack())
 console.debug('[CONF] Routing FrontUI:', getRouterFront())
 console.debug('[CONF] Routing Console:', getRouterConsole())
 console.debug()
