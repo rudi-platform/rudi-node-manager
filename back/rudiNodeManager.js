@@ -177,7 +177,7 @@ function getHelmetDirectives({ catalogUrl, storageUrl }) {
 // -------------------------------------------------------------------------------------------------
 
 // This is the dummy PUBLIC_URL the front has been built with
-const STATIC_FRONT_BUILD_URL = removeTrailingSlash('http://68064ef1-1e5c-4384-8c50-626f52b78c5c')
+const STATIC_FRONT_BUILD_URL = 'http://68064ef1-1e5c-4384-8c50-626f52b78c5c'
 
 // MIME types from the files to be modified
 const MIME_TYPES = { js: 'application/javascript', css: 'text/css', html: 'text/html', json: 'application/json' }
@@ -330,6 +330,10 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     for (const file in modifiedStaticFiles) {
       managerApp.get(getRouterFront(file), (req, reply) => {
         const fileInfo = modifiedStaticFiles[file]
+        reply.contentType(fileInfo.mime).send(String(fileInfo.content))
+      })
+      managerApp.get(getDirectFront(file), (req, reply) => {
+        const fileInfo = modifiedStaticFiles[file]
         // logD(mod, trace, `Accessing modified static file '${file}' (${fileInfo.mime})`)
         // reply.header('Content-Type', `${fileInfo.mime}`).send(String(fileInfo.content))
         reply.contentType(fileInfo.mime).send(String(fileInfo.content))
@@ -340,17 +344,20 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     logD(mod, trace, `front path: ${getRouterFront('/')}`)
     const homePageContent = modifiedStaticFiles['/index.html']?.content
     const homePageMime = modifiedStaticFiles['/index.html']?.mime
-    for (const path of [getRouterFront('/'), removeTrailingSlash(getRouterFront())])
+    const rootPaths = [
+      getRouterFront('/'),
+      getDirectFront('/'),
+      removeTrailingSlash(getRouterFront()),
+      removeTrailingSlash(getDirectFront()),
+    ]
+    for (const path of rootPaths)
       managerApp.get(path, (req, reply) => {
         logW(mod, trace, `Manager Front accessed from ${path} (original URL: ${req.url})`)
         reply.contentType(homePageMime).send(homePageContent)
       })
 
     // Serving the static ressources
-    managerApp.use(getRouterFront('/'), (req, res, next) => express.static(frontDir)(req, res, next))
-    managerApp.use(getRouterFront(), (req, res, next) => express.static(frontDir)(req, res, next))
-    managerApp.use(getDirectFront('/'), (req, res, next) => express.static(frontDir)(req, res, next))
-    managerApp.use(getDirectFront(), (req, res, next) => express.static(frontDir)(req, res, next))
+    for (const path of rootPaths) managerApp.use(path, (req, res, next) => express.static(frontDir)(req, res, next))
 
     // Redirecting everything else to the React front
     managerApp.get('/*', (req, reply) => {
