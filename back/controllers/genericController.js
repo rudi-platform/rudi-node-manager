@@ -92,13 +92,13 @@ export async function postObject(req, reply) {
     const res = await axios.post(getCatalogAdminApiUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
-    logW(mod, opType, cleanErrMsg(err))
+    logW(mod, opType, cleanErrMsg(err.response?.data ?? err))
     return treatAxiosError(err, CATALOG, req, reply)
   }
 }
 
 export async function putObject(req, reply) {
-  const opType = 'post_object'
+  const opType = 'put_object'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = { params: req?.query, ...getCatalogHeaders() }

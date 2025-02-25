@@ -119,8 +119,8 @@ export function treatAxiosError(err, rudiModuleCalled, req, reply) {
   }
   if (err.code?.startsWith('E')) {
     statusCode = err.status ?? 400
-    const message = err.message ?? 'Bad Request'
-    return reply.headerSent || reply.status(err.status ?? 400).json({ statusCode, message })
+    const errData = err.response?.data ?? { statusCode, message: err.message ?? 'Bad Request' }
+    return reply.headerSent || reply.status(err.status ?? 400).json(errData)
   }
   reply.headerSent || reply.status(err.code ?? 400).json(err)
 }
