@@ -84,10 +84,7 @@ export async function postObject(req, reply) {
   const opType = 'post_object'
   const { objectType } = req.params
   if (!checkObjectType(req, reply, opType, objectType)) return
-  const opts = {
-    params: req?.query,
-    ...getCatalogHeaders(),
-  }
+  const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
     const res = await axios.post(getCatalogAdminApiUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
