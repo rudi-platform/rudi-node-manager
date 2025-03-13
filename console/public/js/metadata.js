@@ -650,7 +650,7 @@ class MediaFile extends ForeignFile {
 /** The object representing services for rudi resources */
 class MediaService {
   constructor(uuid, media_name, media_caption, media_visual, media_dates, connector) {
-    this.media_id = uuid ?? uuidv4()
+    this.media_id = uuid || uuidv4()
     this.media_name = media_name
     this.media_caption = media_caption
     this.media_visual = media_visual
