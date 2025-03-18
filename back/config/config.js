@@ -192,6 +192,9 @@ export const getDefaultKey = () => DEFAULT_MANAGER_KEY
 export const getKeyForCatalog = () => KEY_FOR_CATALOG
 export const getKeyForStorage = () => KEY_FOR_STORAGE
 
+const SSH_PUB_DIR = getConf('auth', 'ssh_pub_dir')
+export const getSshPubDir = () => SSH_PUB_DIR
+
 const ID_FOR_CATALOG = getCatalogConf('pm_api_id', 'pm_catalog_id')
 const ID_FOR_STORAGE = getStorageConf('pm_media_id', 'pm_storage_id')
 export const getIdForCatalog = () => ID_FOR_CATALOG

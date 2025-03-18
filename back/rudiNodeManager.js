@@ -274,7 +274,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // Passport middleware
   managerApp.use(passportInitialize())
 
-  const authenticate = passportAuthenticate('jwt', { session: false })
+  const authenticate = passportAuthenticate(['jwt-usr', 'jwt-admin'], { session: false })
 
   // -----------------------------------------------------------------------------------------------
   // Get conf (this module URLs)

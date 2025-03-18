@@ -3,8 +3,9 @@ const mod = 'secu'
 // -------------------------------------------------------------------------------------------------
 // External dependencies
 // -------------------------------------------------------------------------------------------------
-import { forgeToken, readPrivateKeyFile, tokenStringToJwtObject } from '@aqmo.org/jwt-lib'
+import { forgeToken, readPrivateKeyFile, readPublicKeyPem, tokenStringToJwtObject } from '@aqmo.org/jwt-lib'
 import axios from 'axios'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 import _jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 const { sign } = _jwt
@@ -12,6 +13,7 @@ const { sign } = _jwt
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
+import { basename } from 'path'
 import { getOptBackDomain, isProdEnv } from '../config/backOptions.js'
 import {
   getConf,
@@ -20,6 +22,7 @@ import {
   getIdForStorage,
   getKeyForCatalog,
   getKeyForStorage,
+  getSshPubDir,
   getStorageUrl,
   MANAGER,
   STORAGE,
@@ -27,7 +30,7 @@ import {
 import { dbGetUserRolesByUsername } from '../database/database.js'
 import { ForbiddenError, RudiError } from './errors.js'
 import { logE, logW } from './logger.js'
-import { cleanErrMsg, timeEpochS, toInt } from './utils.js'
+import { cleanErrMsg, pathJoin, timeEpochS, toInt } from './utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -319,4 +322,31 @@ const getPrvKey = (name) => {
   // log.d(mod, fun, `keyPath (${name}}: ${keyPath}`)
   prvKeyCache[name] = readPrivateKeyFile(keyPath)
   return prvKeyCache[name]
+}
+
+const managerPubKeys = []
+let SSH_PUB_DIR = getSshPubDir()
+export const getManagerPubKeys = () => {
+  const fun = 'getManagerPubKeys'
+  if (!SSH_PUB_DIR || managerPubKeys.length > 0) return managerPubKeys
+  if (!existsSync(SSH_PUB_DIR)) {
+    logW(mod, fun, `This folder does not exist '${SSH_PUB_DIR}'`)
+    SSH_PUB_DIR = undefined
+    return []
+  }
+  readdirSync(SSH_PUB_DIR).forEach((file) => {
+    if (!file.endsWith('.pub')) return
+    const pubKeyName = basename(file).slice(0, -4)
+    // logD(mod, fun, `Found public key: '${pubKeyName}'`)
+    try {
+      const pubKeyPem = readFileSync(pathJoin(SSH_PUB_DIR, file))
+      const pubKey = readPublicKeyPem(pubKeyPem)
+      managerPubKeys.push({ name: pubKeyName, pem: pubKeyPem, key: pubKey })
+    } catch (err) {
+      logW(mod, fun, `This key couldn't be read: '${file}' | ERR: ${err}`)
+    }
+  })
+  // logD(mod, fun, `Found public keys: '${beautify(Object.keys(managerPubKeys))}'`)
+
+  return managerPubKeys
 }

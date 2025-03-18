@@ -21,7 +21,7 @@ import { makeRequestable } from '../utils/utils.js'
 // Routing
 // -------------------------------------------------------------------------------------------------
 export const frontApi = new express.Router()
-const authenticate = passportAuthenticate('jwt', { session: false })
+const authenticate = passportAuthenticate(['jwt-usr', 'jwt-admin'], { session: false })
 
 frontApi.post('/register', postRegister)
 frontApi.put('/change-password', putPassword) // Delayed auth
