@@ -1775,8 +1775,565 @@
 					]
 				},
 				{
+					"name": "Orgs",
+					"item": [
+						{
+							"name": "Add org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!mem.get('orgId')) pm.collectionVariables.set('orgId', rand.uuid())",
+											"if (!mem.get('orgName')) pm.collectionVariables.set('orgName', `Rennes ${mem.get('stamp')}`)",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"{{orgName}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit org Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set('orgName', `Rennes 1 ${mem.get('stamp')}`)",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"{{orgName}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get orgs",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get organizations\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    pm.collectionVariables.set('org1', responseJson[0].organization_id)",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations?limit=5",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get org 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/{{org1}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										"{{org1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del org",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Del 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const org = pm.response.json()",
+											"    pm.expect(org.organization_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"Rennes {{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/organizations/{{orgId}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"organizations",
+										"{{orgId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Contact",
+					"item": [
+						{
+							"name": "Add contact",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!pm.collectionVariables.get('contId')) pm.collectionVariables.set('contId', rand.uuid())",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ville_de_{{stamp}}@rennes.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit contact",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ma_ville@{{stamp}}.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get contacts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get contacts\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    pm.collectionVariables.set('cont1', responseJson[0].contact_id)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts?sort=-updateAt",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "-updateAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get cont 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.contact_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/{{cont1}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										"{{cont1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Del contact",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Get 1 organization\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const res = pm.response.json()",
+											"    pm.expect(res.contact_id).to.be.not.undefined",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"Rennes {{stamp}}\",\n    \"email\": \"add-{{stamp}}@irisa.fr\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/contacts/{{contId}}",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"contacts",
+										"{{contId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Metadata",
 					"item": [
+						{
+							"name": "Add resource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Add resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const metaId1 = responseJson.global_id",
+											"    pm.collectionVariables.set('metaTest', metaId1)",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
+											"",
+											"if (!pm.collectionVariables.get('apiVersion')) pm.collectionVariables.set('apiVersion', '1.3.0')",
+											"",
+											"if (!pm.collectionVariables.get('org1Id')) pm.collectionVariables.set('org1Id', rand.uuid())",
+											"if (!pm.collectionVariables.get('org1Name')) pm.collectionVariables.set('org1Name', `Rennes ${mem.get('stamp')}`)",
+											"if (!pm.collectionVariables.get('org1Addr')) pm.collectionVariables.set('org1Addr', `Université de Rennes, Campus de Beaulieu, 263 avenue Général Leclerc, CS 74205 35042 RENNES`)",
+											"",
+											"if (!pm.collectionVariables.get('cont1Id')) pm.collectionVariables.set('cont1Id', rand.uuid())",
+											"if (!pm.collectionVariables.get('cont1Name')) pm.collectionVariables.set('cont1Name', rand.get('{{$randomFullName}}'))",
+											"if (!pm.collectionVariables.get('cont1Mail')) pm.collectionVariables.set('cont1Mail', rand.getContactEmail(pm.collectionVariables.get('contName')))",
+											"",
+											"pm.collectionVariables.set('now', time.now())"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\",\n        \"collection_tag\": \"{{stamp}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"{{cont1Mail}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2016-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit resource",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Edit resource\", () => {",
+											"    pm.expect(pm.response.code).to.eql(200);",
+											"    const responseJson = pm.response.json()",
+											"    const metaId1 = responseJson.global_id",
+											"    pm.expect(match.uuid(metaId1))",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"",
+											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
+											"pm.collectionVariables.set('now', time.now())"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"cont1Mail\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2017-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{managerUrl}}/api/data/resources",
+									"host": [
+										"{{managerUrl}}"
+									],
+									"path": [
+										"api",
+										"data",
+										"resources"
+									]
+								}
+							},
+							"response": []
+						},
 						{
 							"name": "Get resources",
 							"event": [
@@ -2174,119 +2731,6 @@
 							"response": []
 						},
 						{
-							"name": "Add resource",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Add resource\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const responseJson = pm.response.json()",
-											"    const metaId1 = responseJson.global_id",
-											"    pm.collectionVariables.set('metaTest', metaId1)",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
-											"pm.collectionVariables.set('now', time.now())"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"{{cont1Mail}}\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2016-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/resources",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"resources"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Edit resource",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Edit resource\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const responseJson = pm.response.json()",
-											"    const metaId1 = responseJson.global_id",
-											"    pm.expect(match.uuid(metaId1))",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"",
-											"if (!pm.collectionVariables.get('metaId1')) pm.collectionVariables.set('metaId1', rand.uuid())",
-											"pm.collectionVariables.set('now', time.now())"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"collection_tag\": \"{{stamp}}\",\n    \"metadata_info\": {\n        \"api_version\": \"{{apiVersion}}\",\n        \"metadata_dates\": {\n            \"created\": \"{{now}}\",\n            \"updated\": \"{{now}}\"\n        }\n    },\n    \"global_id\": \"{{metaId1}}\",\n    \"local_id\": \"id-{{stamp}}\",\n    \"resource_title\": \"test CA 2009 - Ville de Rennes - Budget Principal\",\n    \"synopsis\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"summary\": [\n        {\n            \"lang\": \"fr\",\n            \"text\": \"Les données du Compte administratif de la Ville de Rennes sont des données de consommation effective qui sont en général publiées en juin de l'année suivante.\"\n        }\n    ],\n    \"theme\": \"economy\",\n    \"keywords\": [\n        \"budget\",\n        \"CA\",\n        \"Compte administratif\"\n    ],\n    \"producer\": {\n        \"organization_id\": \"{{org1Id}}\",\n        \"organization_name\": \"{{org1Name}}\",\n        \"organization_address\": \"{{org1Addr}}\"\n    },\n    \"contacts\": [\n        {\n            \"contact_id\": \"{{cont1Id}}\",\n            \"contact_name\": \"{{cont1Name}}\",\n            \"email\": \"cont1Mail\"\n        }\n    ],\n    \"available_formats\": [\n        {\n            \"connector\": {\n                \"url\": \"https://data-rudi.aqmo.org/media/download/6ccbd350-c780-41e8-be51-cef47401fb4a\",\n                \"interface_contract\": \"dwnl\"\n            },\n            \"file_type\": \"application/json\",\n            \"file_size\": 202502,\n            \"checksum\": {\n                \"algo\": \"MD5\",\n                \"hash\": \"2bbf2076ba604188be40e41584d830ee\"\n            },\n            \"media_id\": \"6ccbd350-c780-41e8-be51-cef47401fb4a\",\n            \"media_type\": \"FILE\",\n            \"media_name\": \"media-{{stamp}}\",\n            \"collection_tag\": \"{{stamp}}\"\n        }\n    ],\n    \"resource_languages\": [\n        \"fr\"\n    ],\n    \"dataset_dates\": {\n        \"created\": \"2015-04-05T00:00:00.000Z\",\n        \"updated\": \"2017-04-05T09:22:33.000Z\"\n    },\n    \"storage_status\": \"online\",\n    \"access_condition\": {\n        \"confidentiality\": {\n            \"restricted_access\": false,\n            \"gdpr_sensitive\": false\n        },\n        \"licence\": {\n            \"licence_type\": \"STANDARD\",\n            \"licence_label\": \"odbl-1.0\"\n        }\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/resources",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"resources"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Del resources",
 							"event": [
 								{
@@ -2327,433 +2771,6 @@
 										"data",
 										"resources",
 										"{{metaId1}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Orgs",
-					"item": [
-						{
-							"name": "Get orgs",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Get organizations\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const responseJson = pm.response.json()",
-											"    pm.collectionVariables.set('org1', responseJson[0].organization_id)",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{managerUrl}}/api/data/organizations?limit=5",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"organizations"
-									],
-									"query": [
-										{
-											"key": "limit",
-											"value": "5"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get org 1",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Get 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const org = pm.response.json()",
-											"    pm.expect(org.organization_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{managerUrl}}/api/data/organizations/{{org1}}",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"organizations",
-										"{{org1}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Add org",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Edit 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const org = pm.response.json()",
-											"    pm.expect(org.organization_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"if (!pm.collectionVariables.get('orgId')) pm.collectionVariables.set('orgId', rand.uuid())",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"Rennes {{stamp}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/organizations/",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"organizations",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Edit org Copy",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Edit 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const org = pm.response.json()",
-											"    pm.expect(org.organization_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"organization_id\": \"{{orgId}}\",\n    \"organization_name\": \"Rennes 1 {{stamp}}\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/organizations/",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"organizations",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Del org",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Del 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const org = pm.response.json()",
-											"    pm.expect(org.organization_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"organization_id\": \"{{orgId1}}\",\n    \"organization_name\": \"Rennes {{stamp}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/organizations/{{orgId}}",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"organizations",
-										"{{orgId}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Contact",
-					"item": [
-						{
-							"name": "Get contacts",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Get contacts\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const responseJson = pm.response.json()",
-											"    pm.collectionVariables.set('cont1', responseJson[0].contact_id)",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{managerUrl}}/api/data/contacts?sort=-updateAt",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"contacts"
-									],
-									"query": [
-										{
-											"key": "sort",
-											"value": "-updateAt"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get cont 1",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Get 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const res = pm.response.json()",
-											"    pm.expect(res.contact_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{managerUrl}}/api/data/contacts/{{cont1}}",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"contacts",
-										"{{cont1}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Add contact",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"if (!pm.collectionVariables.get('contId')) pm.collectionVariables.set('contId', rand.uuid())",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ville_de_{{stamp}}@rennes.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/contacts/",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"contacts",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Edit contact",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"contact_id\": \"{{contId}}\",\n    \"contact_name\": \"Ville de {{stamp}}\",\n    \"email\": \"ma_ville@{{stamp}}.fr\",\n    \"collection_tag\": \"{{stamp}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/contacts/",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"contacts",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Del contact",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Get 1 organization\", () => {",
-											"    pm.expect(pm.response.code).to.eql(200);",
-											"    const res = pm.response.json()",
-											"    pm.expect(res.contact_id).to.be.not.undefined",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"contact_id\": \"{{contId1}}\",\n    \"contact_name\": \"Rennes {{stamp}}\",\n    \"email\": \"add-{{stamp}}@irisa.fr\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{managerUrl}}/api/data/contacts/{{contId}}",
-									"host": [
-										"{{managerUrl}}"
-									],
-									"path": [
-										"api",
-										"data",
-										"contacts",
-										"{{contId}}"
 									]
 								}
 							},
@@ -4170,7 +4187,7 @@
 					"        return randVal",
 					"    },",
 					"",
-					"    getContactEmail: (contactName) => `${contactName",
+					"    getContactEmail: (contactName='contact.test') => `${contactName",
 					"        .replace(/(Miss|(Ms|Mrs|Mr|Dr)\\.)\\s|'Jr\\.'/gi, '')",
 					"        .toLowerCase()",
 					"        .replace(/\\s+|\\.\\./g, '.')",
