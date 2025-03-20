@@ -113,6 +113,7 @@ class SshJwtStrategy extends PassportStrategy {
     }
     throw new UnauthorizedError('No valid key found')
   }
+
   extractJwt = ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderAsBearerToken()])
 
   async authenticate(req) {
@@ -123,6 +124,8 @@ class SshJwtStrategy extends PassportStrategy {
       const { payload } = this.verify(jwt)
       logD(mod, fun, `payload for validated JWT: ${beautify(payload)}`)
       const usr = await dbGetUserById(null, 0)
+      usr.roles = await dbGetUserRolesByUsername(null, usr.username) // NO SONAR
+
       this.success(usr)
     } catch (err) {
       logW(mod, fun, err)
