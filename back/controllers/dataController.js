@@ -56,6 +56,27 @@ const callCatalog = async (url, req, reply) => {
   }
 }
 
+export const testPortalConnection = async (req, reply) => {
+  const fun = 'testPortalConnection'
+  try {
+    const res = await Promise.all([
+      axios.get(getCatalogUrlAndParams(getCatalogAdminPath('portal/token'), req), getCatalogHeaders()),
+      getPortalUrl(),
+    ])
+    const catalogRes = res[0]?.data
+    const portalUrl = res[1]
+    const portalJwt = catalogRes?.access_token
+    if (!!portalJwt) {
+      return reply.status(200).send({ status: 'Connected', portalUrl })
+    }
+    return reply.status(200).send({ status: 'Not connected', portalUrl })
+  } catch (err) {
+    // treatAxiosError(err, CATALOG, req, reply)
+    const error = err.response?.data
+    return reply.status(500).send({ status: 'Not connected', portalUrl: await getPortalUrl(), error })
+  }
+}
+
 // Controllers
 export const getCatalogVersion = (req, reply) => callCatalog(getCatalogAdminPath('version'), req, reply)
 export function getEnum(req, reply) {

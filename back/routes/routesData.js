@@ -8,7 +8,13 @@ import express from 'express'
 // -------------------------------------------------------------------------------------------------
 import { uuidv4 } from '../utils/utils.js'
 
-import { getCatalogVersion, getEnum, getLicences, getThemeByLang } from '../controllers/dataController.js'
+import {
+  getCatalogVersion,
+  getEnum,
+  getLicences,
+  getThemeByLang,
+  testPortalConnection,
+} from '../controllers/dataController.js'
 import { expressErrorHandler } from '../controllers/errorHandler.js'
 import {
   deleteObject,
@@ -36,6 +42,7 @@ catalogApi.get('/enum', getEnum)
 catalogApi.get('/enum/themes/:lang', getThemeByLang)
 catalogApi.get('/enum/themes', getThemeByLang)
 catalogApi.get('/licences', getLicences)
+catalogApi.get('/portal/test', testPortalConnection)
 
 // TODO : propagate res.status
 catalogApi.get(`/counts`, getCounts)
