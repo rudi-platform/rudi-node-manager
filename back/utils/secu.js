@@ -247,9 +247,7 @@ export function getStorageHeaders(additionalHeaders) {
       Authorization: `Bearer ${getStorageJwt()}`,
       Accept: 'application/json, text/plain, */*',
     }
-  return additionalHeaders
-    ? { headers: { ..._cachedStorageHeaders, ...additionalHeaders } }
-    : { headers: _cachedStorageHeaders }
+  return { headers: { ..._cachedStorageHeaders, ...additionalHeaders } }
 }
 
 let _cachedCatalogJwt
@@ -268,7 +266,7 @@ export const getCatalogHeaders = (headersEntries) => {
   if (!isJwtValid(_cachedCatalogJwt))
     _cachedCatalogHeaders = { Authorization: `Bearer ${getCatalogJwt()}`, Accept: 'application/json, text/plain, */*' }
 
-  return headersEntries ? { headers: { ..._cachedCatalogHeaders, headersEntries } } : { headers: _cachedCatalogHeaders }
+  return { headers: { ..._cachedCatalogHeaders, ...headersEntries } }
 }
 
 /**

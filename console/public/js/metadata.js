@@ -234,7 +234,7 @@ export class MetadataForm extends RudiForm {
     try {
       const mediaInfo = JSON.parse(JSON.stringify(mediaFile))
       mediaInfo.media_name = encodeURI(mediaFile.media_name)
-      const postMediaOpts = await this.getStorageHeaders({ file_metadata: JSON.stringify(mediaInfo) })
+      const postMediaOpts = await this.getStorageHeaders({ 'File-Metadata': JSON.stringify(mediaInfo) })
       if (!postMediaOpts) return
 
       const mediaId = mediaFile.media_id

@@ -94,11 +94,11 @@ export function getDownloadById(req, reply, next) {
   const { id } = req.params
   return axios
     .get(getStorageDwnlUrl(id), {
-      headers: { 'media-access-method': 'Direct', 'media-access-compression': true },
+      headers: { 'Media-Access-Method': 'Direct', 'Media-Access-Compression': true },
     })
     .then((resRUDI) => {
       const results = resRUDI.data
-      reply.status(200).contentType(resRUDI.headers['content-type']).json(results)
+      reply.status(200).contentType(resRUDI.headers['Content-Type']).json(results)
     })
     .catch((err) => {
       handleError(req, reply, err, 500, 'get_download', 'media', `media+${id}`)
