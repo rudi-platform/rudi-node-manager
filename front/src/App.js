@@ -76,13 +76,17 @@ export default function App() {
    * @param {string} gitHash the abbreviated git hash
    * @return {ReactNode} the code to display the version tag (if defined)
    */
-  const displayVersion = () =>
-    back?.isLoaded && (
-      <div id="displayTags">
-        <div className="appTag">{back.appTag}</div>
-        <div className="gitTag">{back.gitHash}</div>
-      </div>
+  const displayVersion = () => {
+    console.log('back.gitHash:', back.gitHash)
+    return (
+      back?.isLoaded && (
+        <div id="displayTags">
+          <div className="appTag">{back.appTag}</div>
+          <div className="gitTag">{back.gitHash}</div>
+        </div>
+      )
     )
+  }
 
   const [displayTags, setDisplayTags] = useState(displayVersion())
 
