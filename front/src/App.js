@@ -79,18 +79,15 @@ export default function App() {
   const displayVersion = () => {
     console.log('back.gitHash:', back.gitHash)
     return (
-      back?.isLoaded && (
-        <div id="displayTags">
-          <div className="appTag">{back.appTag}</div>
-          <div className="gitTag">{back.gitHash}</div>
-        </div>
-      )
+      <div id="displayTags">
+        <div className="appTag">{back?.appTag}</div>
+        <div className="gitTag">{back?.gitHash}</div>
+      </div>
     )
   }
 
   const [displayTags, setDisplayTags] = useState(displayVersion())
-
-  useEffect(() => setDisplayTags(displayVersion()), [backConf])
+  useEffect(() => setDisplayTags(displayVersion()), [back])
 
   /**
    *
