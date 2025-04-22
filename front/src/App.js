@@ -77,7 +77,7 @@ export default function App() {
    * @return {ReactNode} the code to display the version tag (if defined)
    */
   const displayVersion = () => {
-    console.log('back.gitHash:', back.gitHash)
+    // console.log('back.gitHash:', back.gitHash)
     return (
       <div id="displayTags">
         <div className="appTag">{back?.appTag}</div>
