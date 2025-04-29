@@ -121,6 +121,7 @@ export const nowEpochS = () => Math.floor(new Date().getTime() / 1000)
 export const dateISO = (date) => new Date(date).toISOString()
 
 const pad = (number, length = 2) => String(number).padStart(length, '0')
+
 export function toLocalIsoStrWithoutOffset(dateInput = new Date()) {
   const date = new Date(dateInput) // parse if needed
 
@@ -142,6 +143,8 @@ export function toLocalIsoStrWithOffset(dateInput = new Date()) {
   const offsetMins = pad(Math.abs(offsetMinutes) % 60)
   return `${toLocalIsoStrWithoutOffset(dateInput)}${offsetSign}${offsetHours}${offsetMins}`
 }
+
+export function fromLocalIsoWithoutOffsetToUtcDate(localDate) {}
 
 export const padEndModulo = (str, base, padSign = '=') => {
   const modulo = str.length % base
