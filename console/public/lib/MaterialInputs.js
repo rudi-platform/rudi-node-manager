@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 'use strict'
 
 /**
@@ -1209,11 +1208,11 @@ export const SelectListMixin = (superclass) =>
           this.focusElement(this.optionById.get(this.getId(findValue)))
         }
 
-        if (event.key == 'Backspace') {
+        if (event.key === 'Backspace') {
           this.searchText = undefined
           this.focusElement(this.optionById.get(''))
           event.preventDefault()
-        } else if (event.key == 'Enter') {
+        } else if (event.key === 'Enter') {
           event.stopPropagation()
           this.showList()
         }
@@ -1258,7 +1257,7 @@ export const SelectListMixin = (superclass) =>
       // Read newOptions to fill option wrapper
       if (Array.isArray(newOptions)) {
         for (let opt of newOptions) {
-          if (typeof opt == 'object') {
+          if (typeof opt === 'object') {
             this.optionById.set(this.getId(opt.value), addToOption(opt.value, opt.name))
           } else this.optionById.set(this.getId(opt), addToOption(opt, opt))
         }
@@ -1291,7 +1290,7 @@ export const SelectListMixin = (superclass) =>
       }
 
       option.addEventListener('keyup', (event) => {
-        if (event.key == 'Enter') {
+        if (event.key === 'Enter') {
           this.select(option)
           event.stopPropagation()
         }
@@ -1305,7 +1304,7 @@ export const SelectListMixin = (superclass) =>
      * Should always return the same id for the same value
      */
     getId(value) {
-      return typeof value == 'object' ? JSON.stringify(value) : value
+      return typeof value === 'object' ? JSON.stringify(value) : value
     }
 
     /** Return the option div with the given value */
@@ -1321,7 +1320,7 @@ export const SelectListMixin = (superclass) =>
     hide(value) {
       let option = this.getOption(value)
       option.toggleAttribute('hidden', true)
-      if (option == this.focusedElement) this.focusedElement = this.focusNext() ?? this.focusPrevious()
+      if (option === this.focusedElement) this.focusedElement = this.focusNext() ?? this.focusPrevious()
     }
 
     show(value) {
@@ -1334,7 +1333,7 @@ export const SelectListMixin = (superclass) =>
      * @return the dom element selected
      */
     select(option) {
-      let selectedOption = typeof option == 'string' ? this.getOption(option) : option
+      let selectedOption = typeof option === 'string' ? this.getOption(option) : option
 
       // Reset search
       this.searchText = undefined
@@ -1416,7 +1415,7 @@ export class ActionIcon extends HTMLElement {
     this.shadowRoot.appendChild(this.icon)
 
     this.addEventListener('keyup', (e) => {
-      if (e.key == 'Enter') {
+      if (e.key === 'Enter') {
         e.stopImmediatePropagation()
         this.click()
       }
@@ -1431,7 +1430,7 @@ export class ActionIcon extends HTMLElement {
   /** @inheritdoc  */
   addEventListener(type, listener, ...rest) {
     let customListener =
-      type == 'click'
+      type === 'click'
         ? (event, ...other) => {
             if (this.attributes.disabled || this.attributes.readonly) return
             event.stopPropagation()
@@ -1647,7 +1646,7 @@ export class TextInput extends BaseTextInput {
   }
 
   #setValidation(name) {
-    if (name == 'email') this.#validationHandler = this.#emailValidation
+    if (name === 'email') this.#validationHandler = this.#emailValidation
     else this.#validationHandler = undefined
   }
 
@@ -1658,7 +1657,7 @@ export class TextInput extends BaseTextInput {
 
   // Lifecycle
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name == 'validation') this.#setValidation(newValue)
+    if (name === 'validation') this.#setValidation(newValue)
     else super.attributeChangedCallback(name, oldValue, newValue)
   }
 
@@ -1682,7 +1681,7 @@ export class NumberInput extends BaseTextInput {
 export class DateInput extends BaseTextInput {
   constructor(...styles) {
     super(dateStyle, ...styles)
-    this.input.setAttribute('type', 'date')
+    this.input.setAttribute('type', 'datetime-local')
     this.iconBefore.textContent = 'event'
     this.input.addEventListener('blur', () => {
       this.value = this.input.value
@@ -1691,7 +1690,7 @@ export class DateInput extends BaseTextInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.value = newValue?.substring(0, 10) ?? ''
+    this.input.valueAsDate = new Date(newValue)
   }
   get value() {
     return super.value
@@ -1895,7 +1894,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
       let inRange = dataDiv.name.toLowerCase().startsWith(this.input.value.toLowerCase())
       dataDiv.toggleAttribute('show', inRange)
       if (inRange) {
-        if (count == 0) firstElement = dataDiv
+        if (count === 0) firstElement = dataDiv
         count++
       }
     }
@@ -1981,7 +1980,7 @@ export class DataListInput extends ListMixin(BaseTextInput) {
     // Read newOptions to fill option wrapper
     if (Array.isArray(newDataList)) {
       for (let data of newDataList) {
-        if (typeof data == 'object') {
+        if (typeof data === 'object') {
           this.dataById.set(data.value, addToData(data.value, data.name))
         } else this.dataById.set(data, addToData(data, data))
       }
@@ -2170,7 +2169,7 @@ export class BaseCardsBlock extends BaseInput {
     return function* () {
       let children = [...this.children]
       for (let card of children) {
-        if (card.slot == 'display') yield card
+        if (card.slot === 'display') yield card
       }
     }
   }
@@ -2378,7 +2377,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
 
   removeTab(tab) {
     if (!tab) return
-    if (tab == this.currentTab) this.currentTab = this.tabNext() ?? this.tabPrevious()
+    if (tab === this.currentTab) this.currentTab = this.tabNext() ?? this.tabPrevious()
     tab.remove()
     this.action.show(tab.tabValue)
     if (!this.currentTab) {
@@ -2395,7 +2394,7 @@ export class MultiTextArea extends ActionMixin(BaseInput) {
   }
 
   tabTo(tab) {
-    if (!tab || tab == this.currentTab) return
+    if (!tab || tab === this.currentTab) return
     if (this.currentTab) {
       this.currentTab.toggleAttribute('selected', false)
       // this.currentTab.setAttribute('tabindex', -1);

@@ -62,9 +62,7 @@ function addOverlay(overlay, easyClose = true) {
     overlay.style.top = Math.floor(verticalMargin + scrollTop) + 'px'
     var scrollHeight = document.documentElement.scrollHeight
     overlayManager.style.height =
-      defaultScrollHeight < scrollHeight
-        ? `calc(8em + ${scrollHeight}px)`
-        : defaultScrollHeight + 'px'
+      defaultScrollHeight < scrollHeight ? `calc(8em + ${scrollHeight}px)` : defaultScrollHeight + 'px'
     if (overlay.onoverlayshow) overlay.onoverlayshow()
   }
 

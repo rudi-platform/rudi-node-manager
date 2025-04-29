@@ -1,31 +1,39 @@
-/* eslint-disable no-undef */
-const globals = require('globals')
+import globals from 'globals'
 
-const js = require('@eslint/js')
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
-const unusedImports = require('eslint-plugin-unused-imports')
+import babelParser from '@babel/eslint-parser'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import unusedImports from 'eslint-plugin-unused-imports'
 
-module.exports = [
-  js.configs.recommended,
+export default [
   {
-    ignores: ['**/node_modules/**', '**/tests/**', '**/*.pub', 'cypress/**', 'dev/**'],
+    ignores: [
+      '**/node_modules/',
+      'front/**',
+      'console/**',
+      '**/.ssh/',
+      '**/.env/',
+      '**/tests/',
+      '**/coverage/',
+      '**/*.spec.js',
+      '**/*.test.js',
+    ],
     languageOptions: {
-      globals: { ...globals.browser, require: true, process: true },
+      globals: { ...globals.node },
       ecmaVersion: 'latest',
+      parser: babelParser,
+      parserOptions: {
+        requireConfigFile: false,
+        presets: [['@babel/preset-env', { shippedProposals: true, targets: { node: 'current' } }]],
+      },
     },
     rules: {
       'arrow-body-style': 'off',
       'comma-dangle': ['error', 'only-multiline'],
       complexity: ['warn', { max: 20 }],
-      'cypress/no-assigning-return-values': 'error',
-      'cypress/no-unnecessary-waiting': 'error',
-      'cypress/assertion-before-screenshot': 'warn',
-      'cypress/no-force': 'warn',
-      'cypress/no-async-tests': 'error',
-      'cypress/no-pause': 'error',
+      eqeqeq: ['error', 'smart'],
       indent: 'off',
       'no-await-in-loop': 'error',
-      'no-console': 'off',
+      'no-console': 'warn',
       'no-dupe-keys': 'error',
       'no-empty': 'error',
       'no-extend-native': ['error', { exceptions: ['RegExp'] }],
@@ -51,7 +59,7 @@ module.exports = [
         },
       ],
     },
-    plugins: { 'unused-imports': unusedImports, cypress },
+    plugins: { 'unused-imports': unusedImports },
   },
   eslintPluginPrettierRecommended,
 ]

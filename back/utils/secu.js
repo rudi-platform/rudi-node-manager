@@ -14,7 +14,7 @@ const { sign } = _jwt
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { basename } from 'path'
-import { getOptBackDomain, isProdEnv } from '../config/backOptions.js'
+import { getOptBackDomain, isDevEnv, isProdEnv } from '../config/backOptions.js'
 import {
   getConf,
   getDefaultKey,
@@ -87,10 +87,10 @@ export const getFrontCookieOpts = (exp, overwrite) => ({
   overwrite,
 })
 
-const JWT_SECRET = `${uuidv4()}${uuidv4()}`
+const JWT_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuidv4()}${uuidv4()}`
 export const jwtSecretKey = () => JWT_SECRET
 
-const INIT_PWD_SECRET = `${uuidv4()}${uuidv4()}`
+const INIT_PWD_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuidv4()}${uuidv4()}`
 export const initPwdSecret = () => INIT_PWD_SECRET
 
 export function createFrontUserTokens(userInfo) {

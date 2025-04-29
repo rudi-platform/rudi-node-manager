@@ -16,12 +16,7 @@
           "class": ["row"],
           "children": [
             { "id": "global", "tag": "h1" },
-            {
-              "id": "@name",
-              "tag": "text-input",
-              "class": ["col", "s4", "m8", "l12"],
-              "attr": { "required": true }
-            }
+            { "id": "@name", "tag": "text-input", "class": ["col", "s4", "m8", "l12"], "attr": { "required": true } }
           ]
         },
         {
@@ -65,28 +60,16 @@
     { "tag": "form-footer", "children": [{ "id": "@submit_btn", "tag": "button" }] }
   ],
   "submitBtn": "submit_btn",
-  "submitTemplate": {
-    "name": "name",
-    "url": "url",
-    "prop": "prop",
-    "pem": "pem",
-    "key": "key",
-    "type": "type"
-  },
+  "submitTemplate": { "name": "name", "url": "url", "prop": "prop", "pem": "pem", "key": "key", "type": "type" },
   "fragmentSet": {
     "fr": {
       "title": { "textContent": "Clé d'accès restreint" },
       "global": { "textContent": "Général" },
       "submit_btn": { "textContent": "Générer la clé" },
       "name": { "attr": { "label": "Nom de la clé", "helper": "Identifiant unique" } },
-      "url": {
-        "attr": { "label": "URL de la clé", "helper": "URL accessible où l'on peut trouver la clé" }
-      },
+      "url": { "attr": { "label": "URL de la clé", "helper": "URL accessible où l'on peut trouver la clé" } },
       "prop": {
-        "attr": {
-          "label": "Propriété",
-          "helper": "Si l'URL renvoie un objet, nom de la propiété où trouver la clé"
-        }
+        "attr": { "label": "Propriété", "helper": "Si l'URL renvoie un objet, nom de la propiété où trouver la clé" }
       },
       "pem": { "attr": { "label": "PEM (Clé publique)", "helper": "Clé publique écrite en PEM" } },
       "key": { "attr": { "label": "Clé", "helper": "Clé" } },

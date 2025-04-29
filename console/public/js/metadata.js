@@ -99,11 +99,16 @@ export class MetadataForm extends RudiForm {
       htmlCtrl.resource_languages.value = ['fr']
       htmlCtrl.storage_status.value = 'pending'
       htmlCtrl.metadata_api_version.value = await this.getPmStr('catalog/version')
-      htmlCtrl.created.value = new Date().toISOString() //.slice(0, 10)
+
+      // These dates are initialized in case they are not already given
+      const now = new Date()
+      htmlCtrl.created.value = now
+      htmlCtrl.updated.value = now
+      htmlCtrl.metadata_created.value = now
 
       await this.getEditModeAndFillData('resources')
-
-      htmlCtrl.updated.value = new Date().toISOString() //.slice(0, 10)
+      // This date should be overridden
+      htmlCtrl.metadata_updated.value = now
 
       // Enable dev paste
       this.devPaste()
@@ -256,7 +261,6 @@ export class MetadataForm extends RudiForm {
     }
   }
 
-  // eslint-disable-next-line complexity
   async publish(data) {
     // NOSONAR
     const here = 'publish'
@@ -276,6 +280,9 @@ export class MetadataForm extends RudiForm {
       for (const media of data.available_formats) {
         if (media instanceof MediaFile && media.hasFileAttached()) {
           mediaFilesPromises.push(openEncryptAndChecksum(media, publicKey, publicPEM, keyName, 'SHA-256'))
+          const now = new Date()
+          data.dataset_dates.updated = now
+          this.customForm.htmlController.updated.value = now
         }
       }
       mediaFiles = await Promise.all(mediaFilesPromises)
@@ -426,14 +433,14 @@ export class MetadataForm extends RudiForm {
       metadataForm.ok(here, 'getTemplate')
 
       metadataForm.load()
-      metadataForm.ok(here, 'load')
+      metadataForm.ok(here, 'load', JSON.stringify(metadataForm?.dataset_dates))
 
       await metadataForm.prefill()
-      metadataForm.ok(here, 'prefill')
+      metadataForm.ok(here, 'prefill', JSON.stringify(metadataForm?.dataset_dates))
 
       window.rudiForm = metadataForm
 
-      metadataForm.ok(here)
+      metadataForm.ok(here, JSON.stringify(metadataForm?.dataset_dates))
     } catch (e) {
       metadataForm.ko(here, 'ERF02 rudiForm', e)
       metadataForm.addErrorMsg(e)

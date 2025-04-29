@@ -2,11 +2,7 @@
 
 import { HttpRequest } from './Http.js'
 import { STYLE_THN } from './Rudi.js'
-import {
-  generateRsaOaepKeyPair,
-  privateCryptoKeyToPem,
-  publicCryptoKeyToPem,
-} from './RudiCrypto.js'
+import { generateRsaOaepKeyPair, privateCryptoKeyToPem, publicCryptoKeyToPem } from './RudiCrypto.js'
 import { RudiObjForm } from './rudiObj.js'
 
 /**
@@ -25,11 +21,7 @@ export class RudiKeyForm extends RudiObjForm {
    */
   async updateKeyDisplay() {
     const here = 'updateKeyDisplay'
-    if (
-      this.customForm.hasAttribute('readonly') ||
-      this.customForm.htmlController.switch.value != 'URL'
-    )
-      return
+    if (this.customForm.hasAttribute('readonly') || this.customForm.htmlController.switch.value != 'URL') return
 
     // Clear display
     this.customForm.htmlController.pem.value = ''
@@ -106,8 +98,7 @@ export class RudiKeyForm extends RudiObjForm {
       return outputValue
     }
   }
-  submitListener = () =>
-    super.submitListener(async (outputvalue) => this.treatOutputValue(outputvalue))
+  submitListener = () => super.submitListener(async (outputvalue) => this.treatOutputValue(outputvalue))
 
   // Function to download data to a file
   download(data, filename, type) {

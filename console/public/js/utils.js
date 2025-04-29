@@ -118,6 +118,31 @@ export const checkCookieExp = (cookieStr) => {
 
 export const nowEpochS = () => Math.floor(new Date().getTime() / 1000)
 
+export const dateISO = (date) => new Date(date).toISOString()
+
+const pad = (number, length = 2) => String(number).padStart(length, '0')
+export function toLocalIsoStrWithoutOffset(dateInput = new Date()) {
+  const date = new Date(dateInput) // parse if needed
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1) // months are 0-indexed
+  const day = pad(date.getDate())
+  const hour = pad(date.getHours())
+  const minute = pad(date.getMinutes())
+  const second = pad(date.getSeconds())
+  const ms = pad(date.getMilliseconds(), 3)
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}`
+}
+
+export function toLocalIsoStrWithOffset(dateInput = new Date()) {
+  const date = new Date(dateInput) // parse if needed
+  const offsetMinutes = date.getTimezoneOffset()
+  const offsetSign = offsetMinutes > 0 ? '-' : '+'
+  const offsetHours = pad(Math.floor(Math.abs(offsetMinutes) / 60))
+  const offsetMins = pad(Math.abs(offsetMinutes) % 60)
+  return `${toLocalIsoStrWithoutOffset(dateInput)}${offsetSign}${offsetHours}${offsetMins}`
+}
+
 export const padEndModulo = (str, base, padSign = '=') => {
   const modulo = str.length % base
   return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1))
@@ -157,3 +182,18 @@ export const fetchConf = () =>
   fetch(pathJoin(getPageInfo('path'), 'conf'))
     .then((response) => response.json())
     .catch((error) => console.error('Error fetching config:', error))
+
+export const beautify = (obj) => {
+  const seen = []
+  return JSON.stringify(
+    obj,
+    (key, val) => {
+      if (val != null && typeof val == 'object') {
+        if (seen.indexOf(val) >= 0) return
+        seen.push(val)
+      }
+      return val
+    },
+    2
+  )
+}

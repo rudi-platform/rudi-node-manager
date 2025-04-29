@@ -79,10 +79,7 @@ class JsonHttpRequest extends HttpRequest {
       res = JSON.parse(res)
     } catch (e) {
       if (e instanceof SyntaxError)
-        throw new SyntaxError(
-          `Cannot parse result of request '${this.method} ${this.url}'\n${res}`,
-          { cause: e }
-        )
+        throw new SyntaxError(`Cannot parse result of request '${this.method} ${this.url}'\n${res}`, { cause: e })
       console.error(e)
       throw e
     }
