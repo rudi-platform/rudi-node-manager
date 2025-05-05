@@ -2722,9 +2722,12 @@ export class MapInput extends BaseInput {
     this.currentLayer = undefined
 
     if (geography) {
-      geography.geographic_distribution.properties = geography.geographic_distribution.properties ?? {}
-      let geoJsonLayers = L.geoJson(geography.geographic_distribution)
+      console.log('T [MapInput] geography:', geography)
+      geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
+      const geoJsonLayers = L.geoJson(geography.geographic_distribution)
+      console.log('T [MapInput] geoJsonLayers :', geoJsonLayers)
       this.currentLayer = geoJsonLayers.getLayers()[0]
+      console.log('T [MapInput] this.currentLayer :', this.currentLayer)
       this.drawnItems.addLayer(this.currentLayer)
     }
 
@@ -2734,15 +2737,27 @@ export class MapInput extends BaseInput {
 
   get value() {
     if (!this.currentLayer) return undefined
-
-    let bounds = this.currentLayer.getBounds()
-    return {
-      bounding_box: {
+    let bounding_box
+    if (typeof this.currentLayer.getBounds === 'function') {
+      const bounds = this.currentLayer.getBounds()
+      bounding_box = {
         west_longitude: bounds._southWest.lng,
         east_longitude: bounds._northEast.lng,
         north_latitude: bounds._northEast.lat,
         south_latitude: bounds._southWest.lat,
-      },
+      }
+    } else if (typeof this.currentLayer.getLatLng()) {
+      const latLng = this.currentLayer.getLatLng()
+      bounding_box = {
+        west_longitude: latLng.lng,
+        east_longitude: latLng.lng,
+        north_latitude: latLng.lat,
+        south_latitude: latLng.lat,
+      }
+    }
+
+    return {
+      bounding_box,
       geographic_distribution: this.currentLayer.toGeoJSON(),
       projection: 'WGS 84',
     }
