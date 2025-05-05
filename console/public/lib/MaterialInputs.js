@@ -2842,7 +2842,7 @@ export class ForeignFile {
   constructor(name, size, type, file_storage_status) {
     this.name = name
     this.size = size
-    this.type = type
+    this.type = type === 'application/x-yaml' ? 'text/x-yaml' : type
     this.file_storage_status = file_storage_status
   }
 }

@@ -95,9 +95,10 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
 
   const handleRoleChange = (event) => {
     const toggledRole = event.target.id
-    const userRoles = userInfo?.roles
+    const userRoles = userInfo?.roles ?? []
+
     let nextUserRoles
-    if (!userRoles?.length == 0) {
+    if (userRoles.length == 0) {
       nextUserRoles = [toggledRole]
     } else {
       nextUserRoles = []
@@ -109,7 +110,7 @@ export default function AddUserModal({ roleList, visible, toggleEdit, refresh })
       })
       if (!wasFound) nextUserRoles.push(toggledRole)
     }
-    // console.log('(handleRoleChange) usrRoles:', userRoles, '=>', nextUserRoles)
+    // console.log('T (handleRoleChange) usrRoles:', userRoles, '=>', nextUserRoles)
     editUserInfo('roles', nextUserRoles)
   }
   const resetState = () => setUserInfo(() => ({}))
