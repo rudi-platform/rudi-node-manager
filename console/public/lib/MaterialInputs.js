@@ -1682,6 +1682,7 @@ export class DateInput extends BaseTextInput {
   constructor(...styles) {
     super(dateStyle, ...styles)
     this.input.setAttribute('type', 'datetime-local')
+    this.input.setAttribute('step', '1')
     this.iconBefore.textContent = 'event'
     this.input.addEventListener('blur', () => {
       this.value = this.input.value
@@ -1690,7 +1691,16 @@ export class DateInput extends BaseTextInput {
 
   // Getters / Setters
   set value(newValue) {
-    this.input.valueAsDate = new Date(newValue)
+    const fun = 'MaterialInputs.DateInput'
+    try {
+      if (!newValue) return
+      const newDate = new Date(newValue).toISOString().replace('Z', '')
+      if (newDate.length > 19 && !newDate.endsWith('.000')) this.input.setAttribute('step', '.001')
+      this.input.value = newDate
+    } catch (e) {
+      console.debug(`T [${fun}] Value couldn't be handled as a date:`, newValue)
+      console.error(`E [${fun}]`, e)
+    }
   }
   get value() {
     return super.value
@@ -2722,12 +2732,12 @@ export class MapInput extends BaseInput {
     this.currentLayer = undefined
 
     if (geography) {
-      console.log('T [MapInput] geography:', geography)
+      // console.log('T [MapInput] geography:', geography)
       geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
       const geoJsonLayers = L.geoJson(geography.geographic_distribution)
-      console.log('T [MapInput] geoJsonLayers :', geoJsonLayers)
+      // console.log('T [MapInput] geoJsonLayers :', geoJsonLayers)
       this.currentLayer = geoJsonLayers.getLayers()[0]
-      console.log('T [MapInput] this.currentLayer :', this.currentLayer)
+      // console.log('T [MapInput] this.currentLayer :', this.currentLayer)
       this.drawnItems.addLayer(this.currentLayer)
     }
 
