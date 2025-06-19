@@ -394,7 +394,7 @@ export function dbCreateRoles(openedDb, roles) {
           logI(
             mod,
             fun,
-            `(${TBL_ROLES}) A role has been created with name '${role.role}'`,
+            `(${TBL_ROLES}) A role has been created with name '${beautify(role.role)}'`,
             getContext(null, { opType: 'add_role' })
           )
         })
