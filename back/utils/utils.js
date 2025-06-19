@@ -185,7 +185,7 @@ export const getNodeModulesLib = (lib) => {
     let libPath = pathJoin(nodMod, lib)
     if (existsSync(libPath)) return libPath
   } catch {
-    console.debug(`D [getNodeModulesLib] Lib not found at ${libPath}`)
+    // console.debug(`D [getNodeModulesLib] Lib not found at ${libPath}`)
   }
   try {
     for (const lookupFolderLevel of ['', '..', '../..']) {

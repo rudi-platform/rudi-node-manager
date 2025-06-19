@@ -3,7 +3,7 @@ const here = (where) => `[proxy${where && '.' + where}]`
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const { pathJoin } = require('./utils/utils.js')
 
-const PUBLIC_URL = process.env.PUBLIC_URL ?? '/electricite/manager'
+const PUBLIC_URL = process.env.PUBLIC_URL ?? '/manager'
 console.log('PUBLIC_URL:', PUBLIC_URL)
 
 const BACK_PREFIX = 'api'
