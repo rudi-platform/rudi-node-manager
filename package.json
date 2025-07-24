@@ -25,12 +25,12 @@
     "prettify": "npx prettier --write .",
     "quality": "npm run prettify && npm run lintBack -- --fix",
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
-    "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
+    "cleanup": "( rm -fR ./node_modules ) & ; ( rm -fR ./front/node_modules ) & ; ( rm -fR **/package-lock.json 2> /dev/null ) & ; ( rm -fR **/yarn.lock 2> /dev/null )"
   },
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.13",
     "@aqmo.org/rudi_logger": "^1.1.6",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
