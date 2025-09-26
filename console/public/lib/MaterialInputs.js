@@ -2863,11 +2863,24 @@ export class MapInput extends BaseInput {
 }
 
 /** Represent a foreign file for the file input */
+function normalyseType(type) {
+  if (type === 'application/x-yaml') return 'text/x-yaml'
+  if (type === 'text/x-markdown') return 'text/markdown'
+  return [
+    'application/zip-compressed',
+    'application/x-zip-compressed',
+    'application/x-zip',
+    'multipart/x-zip',
+  ].includes(type)
+    ? 'application/zip'
+    : type
+}
+
 export class ForeignFile {
   constructor(name, size, type, file_storage_status) {
     this.name = name
     this.size = size
-    this.type = type === 'application/x-yaml' ? 'text/x-yaml' : type
+    this.type = normalyseType(type)
     this.file_storage_status = file_storage_status
   }
 }

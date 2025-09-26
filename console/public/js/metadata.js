@@ -480,7 +480,18 @@ const safeJsonParse = (str) => {
 }
 
 /* ---- FILES ---- */
-
+function normalyseType(type = 'application/octet-stream') {
+  if (type === 'application/x-yaml') return 'text/x-yaml'
+  if (type === 'text/x-markdown') return 'text/markdown'
+  return [
+    'application/zip-compressed',
+    'application/x-zip-compressed',
+    'application/x-zip',
+    'multipart/x-zip',
+  ].includes(type)
+    ? 'application/zip'
+    : type
+}
 /** The object representing files for rudi resources */
 class MediaFile extends ForeignFile {
   constructor( // NOSONAR
@@ -556,7 +567,7 @@ class MediaFile extends ForeignFile {
     const date = new Date(file.lastModified).toISOString()
     let fileType = file.type // Value extractred in MaterialInput.js and is one of JS Blob.types
     if (MetadataForm.apiFileTypes) {
-      if (!fileType || Object.values(MetadataForm.apiFileTypes).indexOf(fileType) === -1)
+      if (!fileType || !Object.values(MetadataForm.apiFileTypes).includes(fileType))
         fileType = MetadataForm.apiFileTypes[getFileExtension(file.name)]
     }
     if (!fileType) fileType = 'application/octet-stream'
