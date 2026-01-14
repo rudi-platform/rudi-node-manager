@@ -141,6 +141,11 @@
               ]
             },
             {
+              "id": "@dataset_update_frequency",
+              "tag": "select-input",
+              "class": ["col", "s4"]
+            },
+            {
               "id": "@storage_status",
               "tag": "select-input",
               "class": ["col", "s4", "m4"],
@@ -264,6 +269,7 @@
       "updated": "updated",
       "deleted": "deleted"
     },
+    "dataset_update_frequency": "dataset_update_frequency",
     "storage_status": "storage_status",
     "access_condition": {
       "confidentiality": { "gdpr_sensitive": "gdpr_sensitive" },
@@ -299,7 +305,13 @@
       "global": { "textContent": "Général" },
       "temporal_spread": { "textContent": "Étendue temporelle" },
       "dataset_size": { "textContent": "Taille de la donnée" },
-      "dataset_dates": { "textContent": "Date de référence" },
+      "dataset_dates": { "textContent": "Dates de référence" },
+      "dataset_update_frequency": {
+        "attr": {
+          "label": "Fréquence de mise à jour du jeu de données",
+          "helper": "Fréquence de mise à jour du jeu de données"
+        }
+      },
       "access_condition": { "textContent": "Contraintes d'accès" },
       "confidentiality": { "textContent": "Confidentialité" },
       "licence": { "textContent": "Licence" },
@@ -409,7 +421,7 @@
         }
       },
       "metadata_metadata_dates": {
-        "attr": { "label": "Date de référence", "helper": "Dates des actions réalisées sur la métadonnée" }
+        "attr": { "label": "Dates de référence", "helper": "Dates des actions réalisées sur la métadonnée" }
       },
       "metadata_created": { "attr": { "label": "Date de création", "helper": "Date de création de la métadonnée" } },
       "metadata_updated": {
@@ -452,6 +464,7 @@
       "contacts": "opt_contacts",
       "resource_languages": "opt_language",
       "storage_status": { "init": { "setOptions": ["$storagestatus"] } },
+      "dataset_update_frequency": { "init": { "setOptions": ["$updatefrequencies"] } },
       "restricted_access": { "init": { "setOptions": ["$publickeys"] } },
       "licence_type": { "init": { "setOptions": ["$licencetypes", true] } },
       "licence_label": { "init": { "setOptions": ["$licences", true] } },

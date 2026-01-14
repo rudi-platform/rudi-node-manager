@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import { BackConfContext } from '../../context/backConfContext.js'
@@ -81,9 +81,11 @@ export default function ObjCatalogue({
   useEffect(() => refresh(), [shouldRefresh])
 
   const [isTabVisible, setIsTabVisible] = useState(true)
-  document.addEventListener('visibilitychange', () => {
-    setIsTabVisible(document.visibilityState === 'visible')
-  })
+  useEffect(() => {
+    const handler = () => setIsTabVisible(document.visibilityState === 'visible')
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [])
   useEffect(() => {
     if (isTabVisible) refresh()
   }, [isTabVisible])

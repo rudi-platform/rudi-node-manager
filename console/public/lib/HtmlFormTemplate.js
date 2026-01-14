@@ -134,23 +134,29 @@ function generateResult(template, callbackfn) {
   let recur = (template) => {
     let result
     if (typeof template == 'string') {
+      // console.debug('T template is a', typeof template)
       // An id
       result = callbackfn(template)
-    }
-    if (template instanceof Array) {
+      // console.debug('T generateResult', result)
+    } else if (template instanceof Array) {
+      // console.debug('T template is an', typeof template)
       result = []
       for (let element of template) {
         let res = recur(element)
         if (res) result.push(res)
       }
       if (result.length != 0) result = undefined
+      // } else if (template instanceof Map) {
     } else if (template instanceof Object) {
+      // console.debug('T template is an', typeof template)
       result = {}
-      for (let propertie in template) {
-        let res = recur(template[propertie])
-        if (res) result[propertie] = res
+      for (let prop in template) {
+        let res = recur(template[prop])
+        if (res) result[prop] = res
       }
       if (Object.keys(result).length == 0) result = undefined
+    } else {
+      console.error('T !!!! typeof template is ', typeof template)
     }
     return result
   }
@@ -213,7 +219,9 @@ class CustomForm extends HTMLElement {
     if (!clear) return false
 
     // Iterate over ids of inputs (leafs of submitTemplate) and clear associated inputs
-    for (let inputId of leafOf(this.submitTemplate)) this.htmlController[inputId].value = undefined
+    for (let inputId of leafOf(this.submitTemplate)) {
+      if (this.htmlController?.[inputId]?.value) delete this.htmlController[inputId].value
+    }
 
     // Replay bindings
     if (this.formBindings) playBindings(this.formBindings, this.htmlController)
@@ -280,7 +288,14 @@ class CustomForm extends HTMLElement {
       let result
       try {
         let formElement = this.htmlController[id]
+        if (!formElement) {
+          console.error(`E [dev] No element '${id}' in this.htmlController`)
+          console.error(`E [dev] this.htmlController:`, this.htmlController)
+        }
         result = formElement.getAttribute('hidden') == null ? formElement.value : null
+        if (`${formElement.tagName}`.toLowerCase() == 'select-input' && result == '0') {
+          result = undefined
+        }
         if (!result && formElement.getAttribute('required') != null) {
           if (
             this.dispatchEvent(new CustomEvent('required', { cancelable: true, bubbles: false, detail: formElement }))
@@ -296,10 +311,10 @@ class CustomForm extends HTMLElement {
         console.error(`Missing element '${id}' when generating result`)
         result = `ERROR : Missing element '${id}' when generating result`
       }
+      // console.debug('T [form]', id, '->', result)
       values[id] = result
       return result
     })
-    if (error) throw res
     return res
   }
 

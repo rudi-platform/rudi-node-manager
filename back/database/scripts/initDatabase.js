@@ -12,7 +12,15 @@ import { dirname } from 'path'
 // -------------------------------------------------------------------------------------------------
 import { hashPassword } from '@aqmo.org/jwt-lib'
 import { getOptSuCreds } from '../../config/backOptions.js'
-import { getConfSuId, getConfSuMail, getConfSuName, getDbPath, setConfSuName } from '../../config/config.js'
+import {
+  getConfSuId,
+  getConfSuMail,
+  getConfSuName,
+  getConfSuPwd,
+  getDbPath,
+  isConfSuPwdHashed,
+  setConfSuName,
+} from '../../config/config.js'
 import { decodeCredentials } from '../../controllers/authControllerPassport.js'
 import { RudiError, statusOK } from '../../utils/errors.js'
 import { getContext, logD, logE, logV, logW, sysInfo } from '../../utils/logger.js'
@@ -339,6 +347,7 @@ const dbCreateSuperUser = async (db) => {
     const id = getConfSuId()
     const dbSuInfo = await dbGetUserById(db, id) // NOSONAR
     if (dbSuInfo) {
+      logD(mod, fun, dbSuInfo)
       logV(mod, fun, `Super User '${dbSuInfo.username}' exists in DB, no action required`)
       return
     }
@@ -346,25 +355,35 @@ const dbCreateSuperUser = async (db) => {
     const email = getConfSuMail()
     const roles = [ROLE_SU]
 
-    const clearPassword = uuidv4()
-    const password = hashPassword(clearPassword)
-    // const b64Password = encodeBase64url(clearPassword)
+    const confSuPwd = getConfSuPwd()
 
+    let clearPassword, password
+    if (!confSuPwd) {
+      clearPassword = uuidv4()
+      password = hashPassword(clearPassword)
+    } else {
+      password = isConfSuPwdHashed() ? confSuPwd : hashPassword(confSuPwd)
+    }
     const suInfo = { id, username, password, email }
     const suRoleInfo = { userId: id, username, roles }
 
     await dbCreateUserCheckExists(db, suInfo)
     await dbUpdateUserRoles(db, suRoleInfo)
+
     logW(mod, fun, `Super user created: '${username}' (id ${id}, role ${ROLE_SU})`)
-    console.error('')
-    console.error('=============================================================================')
-    console.error(`==                                                                         ==`)
-    console.error(`==             A PASSWORD WAS GENERATED FOR THE SUPER USER:                ==`)
-    console.error(`==                                                                         ==`)
-    console.error(`==                 ${clearPassword}                    ==`)
-    console.error(`==                                                                         ==`)
-    console.error('=============================================================================')
-    console.error('')
+    if (!confSuPwd) {
+      console.error('')
+      console.error('=============================================================================')
+      console.error(`==                                                                         ==`)
+      console.error(`==             A PASSWORD WAS GENERATED FOR THE SUPER USER:                ==`)
+      console.error(`==                                                                         ==`)
+      console.error(`==                 ${clearPassword}                    ==`)
+      console.error(`==                                                                         ==`)
+      console.error('=============================================================================')
+      console.error('')
+    } else {
+      logW(mod, fun, `SU password from conf`)
+    }
   } catch (err) {
     logE(mod, fun, `Error: ${err}`)
   }
@@ -376,6 +395,8 @@ export async function dbInitialize() {
     const DB_DIR = dirname(getDbPath())
     if (!statSync(DB_DIR).isDirectory())
       throw new RudiError(`Database folder not found: ${DB_DIR}`, 500, 'Config error')
+    logD(mod, fun, `DB_DIR=${DB_DIR}`)
+    logD(mod, fun, `DB_PATH=${getDbPath()}`)
 
     const db = await dbOpenOrCreate()
 

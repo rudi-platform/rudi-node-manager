@@ -384,14 +384,13 @@ export function dbCreateRoles(openedDb, roles) {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       roles.forEach((role) => {
-        const role_name = role.role
         db.run(`INSERT INTO ${TBL_ROLES}(role,desc,hide) VALUES(?,?,?)`, [role.role, role.desc, !!role.hide], (err) => {
           if (err) {
             logE(mod, fun, err.message)
             if (!openedDb) dbClose(db)
             return reject(err)
           }
-          const msg = `(${TBL_ROLES}) A role has been created with name '${role_name}'`
+          const msg = `(${TBL_ROLES}) A role has been created with name '${role.role}'`
           sysInfo(mod, fun, msg, getContext(null, { opType: 'add_role' }))
         })
       })

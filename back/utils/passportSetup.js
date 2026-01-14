@@ -49,12 +49,9 @@ const checkUsrPwd = async (username, password) => {
       logE(mod, fun, `User not found: ${username}`)
       throw new UnauthorizedError('No user found')
     }
-    try {
-      if (!matchPassword(password, dbUserHash)) {
-        logE(mod, fun, `Password mismatch`)
-        throw new UnauthorizedError('Wrong password')
-      }
-    } catch (e) {
+
+    if (!matchPassword(password, dbUserHash)) {
+      logE(mod, fun, `Password mismatch`)
       throw new UnauthorizedError('Wrong password')
     }
 

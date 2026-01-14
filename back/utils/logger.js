@@ -112,7 +112,7 @@ const toString = (...msg) => {
   let str = ''
   for (let m of msg) {
     let mStr = `${m}`
-    if (mStr === '[Object]: Object' || mStr === '[object Object]') mStr = beautify(m)
+    if (mStr == '[Object]: Object' || mStr == '[object Object]') mStr = beautify(m)
     str = str ? `${str} ${mStr}` : mStr
   }
   return str

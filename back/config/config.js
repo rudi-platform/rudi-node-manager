@@ -164,7 +164,7 @@ export const getStorageDwnlUrl = (id) => getStorageUrl('download', id)
 // -------------------------------------------------------------------------------------------------
 // DB
 // -------------------------------------------------------------------------------------------------
-const getDbConf = (subSection, altVal) => getConf('database', subSection, altVal).trim()
+const getDbConf = (subSection, altVal) => `${getConf('database', subSection, altVal)}`.trim()
 
 const DB_PATH = getBackOptions(OPT_DB_PATH, pathJoin(getDbConf('db_directory'), getDbConf('db_filename')))
 export const getDbPath = () => DB_PATH

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 import PropTypes from 'prop-types'
 import { Search, XCircle } from 'react-bootstrap-icons'
@@ -86,9 +86,11 @@ export default function CatalogueMetadata({ editMode, logout }) {
   }, [currentOffset])
 
   const [isTabVisible, setIsTabVisible] = useState(true)
-  document.addEventListener('visibilitychange', () => {
-    setIsTabVisible(document.visibilityState === 'visible')
-  })
+  useEffect(() => {
+    const handler = () => setIsTabVisible(document.visibilityState === 'visible')
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [])
   useEffect(() => {
     if (isTabVisible) refresh()
   }, [isTabVisible])

@@ -52,6 +52,7 @@ module.exports = [
       quotes: ['error', 'single', { allowTemplateLiterals: true }],
       'prefer-arrow-callback': 'warn',
       'prettier/prettier': 'warn',
+      'react/react-in-jsx-scope': 'off',
       'space-before-function-paren': ['error', { anonymous: 'always', named: 'never', asyncArrow: 'always' }],
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [

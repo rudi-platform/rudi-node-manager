@@ -360,7 +360,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
     for (const path of rootPaths) managerApp.use(path, (req, res, next) => express.static(frontDir)(req, res, next))
 
     // Redirecting everything else to the React front
-    managerApp.get('/*', (req, reply) => {
+    managerApp.get(/.*/, (req, reply) => {
       logW(mod, trace, `Redirecting the following URL to the UI: ${req.url} -> ${getRouterFront('/')}`)
       reply.redirect(308, getRouterFront('/'))
     })
@@ -380,7 +380,7 @@ const launchManagerRouter = async ({ catalogUrl, storageUrl }) => {
   // -----------------------------------------------------------------------------------------------
   // Catch any bad requests
   // -----------------------------------------------------------------------------------------------
-  managerApp.get('*', (req, reply) => reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`))
+  managerApp.all(/.*/, (req, reply) => reply.status(404).send(`Route '${req?.method} ${req?.url}' not found`))
 
   // -----------------------------------------------------------------------------------------------
   // Catch any error

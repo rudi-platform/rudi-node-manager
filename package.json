@@ -1,7 +1,7 @@
 {
   "description": "Application d'administration du noeud RUDI",
   "name": "rudi-node-manager",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
@@ -25,20 +25,20 @@
     "prettify": "npx prettier --write .",
     "quality": "npm run prettify && npm run lintBack -- --fix",
     "stats": "find . -name \"node_modules\" -type d -prune | xargs du -chs",
-    "cleanup": "( rm -fR ./node_modules ) & ; ( rm -fR ./front/node_modules ) & ; ( rm -fR **/package-lock.json 2> /dev/null ) & ; ( rm -fR **/yarn.lock 2> /dev/null )"
+    "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.14",
     "@aqmo.org/rudi_logger": "^1.1.6",
-    "axios": "^1.12.2",
-    "body-parser": "^1.20.3",
+    "axios": "^1.13.2",
+    "body-parser": "^2.2.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
-    "express": "^4.21.2",
+    "express": "^5.2.1",
     "helmet": "^8.1.0",
-    "ini": "^5.0.0",
-    "jsonwebtoken": "^9.0.2",
+    "ini": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "lodash": "^4.17.21",
@@ -47,22 +47,22 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "sqlite3": "^5.1.7",
-    "uuid": "^11.1.0"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/eslint-parser": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/eslint-parser": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "braces": "^3.0.3",
-    "eslint": "^9.36.0",
+    "eslint": "^9.39.2",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-unused-imports": "^4.2.0",
-    "nodemon": "^3.1.10",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "nodemon": "^3.1.11",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2"
+    "prettier": "^3.7.4"
   },
   "overrides": {
     "braces": "$braces",

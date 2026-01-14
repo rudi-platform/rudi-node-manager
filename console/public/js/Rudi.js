@@ -100,7 +100,7 @@ export class RudiForm {
     } catch (err) {
       this.ko(here, err)
       console.error(`La conf n'a pas été trouvée à l'adresse: ${'/conf'}`, err)
-      return this.fail('reach_pm')
+      return this.fail('reach_manager')
     }
   }
 
@@ -139,7 +139,7 @@ export class RudiForm {
       return await (isJson ? JsonHttpRequest : HttpRequest).get(url, this.pmHeaders).send()
     } catch {
       console.error(`Prod manager ne peut être joint à l'adresse: ${url}`)
-      return this.fail('reach_pm')
+      return this.fail('reach_manager')
     }
   }
 
@@ -268,8 +268,11 @@ export class RudiForm {
         this.customForm.readOnly()
         this.setValue(value)
       } else {
+        // if (this.isDev) this.ok(here, `Creating a new metadata`)
+        // this.customForm?.htmlController['organization_id']
         this.customForm?.htmlController?.organization_id?.toggleAttribute('disabled')
       }
+      // this.ok(here)
     } catch (e) {
       this.ko(here)
       console.error(`E [${here}]`, e)

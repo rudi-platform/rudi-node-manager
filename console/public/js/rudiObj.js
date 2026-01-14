@@ -80,9 +80,13 @@ export class RudiObjForm extends RudiForm {
 
         return
       }
+      this.addMessage(`T Output value: ${outputValue}`, STYLE_NRM)
 
-      if (treatOutputValue) await treatOutputValue(outputValue)
+      if (treatOutputValue) {
+        await treatOutputValue(outputValue)
+      }
       if (this.isDev) console.log('outputValue:', outputValue)
+      this.addMessage(`T Output value post: ${outputValue}`, STYLE_NRM)
 
       await this.publish(outputValue)
       this.ok(here)

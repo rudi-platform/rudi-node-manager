@@ -1266,7 +1266,6 @@ export const SelectListMixin = (superclass) =>
           this.optionById.set(this.getId(value), addToOption(value, name))
         }
       }
-
       this.listWrapper.appendChild(frag)
       this.firstOpt = this.listWrapper.firstElementChild
     }
@@ -2511,7 +2510,7 @@ export class FileCard extends ActionCard {
   }
 
   humanReadableByteCountSI(bytes) {
-    let si = ['k', 'M', 'G', 'T', 'P', 'E']
+    const si = ['k', 'M', 'G', 'T', 'P', 'E']
     let i = 0
     while (bytes <= -999_950 || bytes >= 999_950) {
       bytes /= 1000
@@ -2633,6 +2632,26 @@ export class Checkbox extends ActionMixin(MatFormElement) {
   }
 }
 
+function bboxToGeoJSONFeature(bbox) {
+  const { west_longitude, east_longitude, south_latitude, north_latitude } = bbox
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [west_longitude, south_latitude], // SW
+          [east_longitude, south_latitude], // SE
+          [east_longitude, north_latitude], // NE
+          [west_longitude, north_latitude], // NW
+          [west_longitude, south_latitude], // close polygon with SW
+        ],
+      ],
+    },
+  }
+}
+
 export class MapInput extends BaseInput {
   constructor(...styles) {
     super(mapStyle, ...styles)
@@ -2730,15 +2749,24 @@ export class MapInput extends BaseInput {
     // Reset
     if (this.currentLayer) this.drawnItems.removeLayer(this.currentLayer)
     this.currentLayer = undefined
+    console.log('T [MatIn.MapInput] geography:', geography)
 
     if (geography) {
-      // console.log('T [MapInput] geography:', geography)
-      geography.geographic_distribution.properties = geography.geographic_distribution.properties || {}
-      const geoJsonLayers = L.geoJson(geography.geographic_distribution)
-      // console.log('T [MapInput] geoJsonLayers :', geoJsonLayers)
-      this.currentLayer = geoJsonLayers.getLayers()[0]
-      // console.log('T [MapInput] this.currentLayer :', this.currentLayer)
-      this.drawnItems.addLayer(this.currentLayer)
+      if (!geography.geographic_distribution)
+        if (geography.bounding_box) {
+          geography.geographic_distribution = bboxToGeoJSONFeature(geography.bounding_box)
+        }
+      // console.log('T [MatIn.MapInput] geography:', geography)
+      try {
+        const geoJsonLayers = L.geoJson(geography.geographic_distribution)
+        // console.log('T [MatIn.MapInput] geoJsonLayers :', geoJsonLayers)
+        this.currentLayer = geoJsonLayers.getLayers()[0]
+        // console.log('T [MatIn.MapInput] this.currentLayer :', this.currentLayer)
+        this.drawnItems.addLayer(this.currentLayer)
+      } catch (e) {
+        console.error('E [MatIn.MapInput] L.geoJson =>', e)
+        console.error('E [MatIn.MapInput] geography =>', JSON.stringify(geography))
+      }
     }
 
     this.#updateControls()
@@ -2863,25 +2891,24 @@ export class MapInput extends BaseInput {
 }
 
 /** Represent a foreign file for the file input */
-function normalyseType(type) {
-  if (type === 'application/x-yaml') return 'text/x-yaml'
-  if (type === 'text/x-markdown') return 'text/markdown'
-  return [
-    'application/zip-compressed',
-    'application/x-zip-compressed',
-    'application/x-zip',
-    'multipart/x-zip',
-  ].includes(type)
-    ? 'application/zip'
-    : type
-}
-
 export class ForeignFile {
   constructor(name, size, type, file_storage_status) {
     this.name = name
     this.size = size
-    this.type = normalyseType(type)
+    this.type = this.normalizeType(type)
     this.file_storage_status = file_storage_status
+  }
+
+  normalizeType(type = 'application/octet-stream') {
+    if (type === 'application/x-yaml') return 'text/x-yaml'
+    if (type === 'text/x-markdown') return 'text/markdown'
+    const zip_alternatives = [
+      'application/zip-compressed',
+      'application/x-zip-compressed',
+      'application/x-zip',
+      'multipart/x-zip',
+    ]
+    return zip_alternatives.includes(type) ? 'application/zip' : type
   }
 }
 

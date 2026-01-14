@@ -166,7 +166,7 @@ export class MetadataForm extends RudiForm {
     if (!outputValue.access_condition.confidentiality) outputValue.access_condition.confidentiality = {}
     outputValue.access_condition.confidentiality.restricted_access = Boolean(
       (outputValue.restricted_access && hasLocalFile) ||
-        originalValue?.access_condition?.confidentiality?.restricted_access
+      originalValue?.access_condition?.confidentiality?.restricted_access
     )
 
     // REMOVE OR API FAIL WHEN PUBLISHING NEW RESTRICTED DATA
@@ -480,18 +480,6 @@ const safeJsonParse = (str) => {
 }
 
 /* ---- FILES ---- */
-function normalyseType(type = 'application/octet-stream') {
-  if (type === 'application/x-yaml') return 'text/x-yaml'
-  if (type === 'text/x-markdown') return 'text/markdown'
-  return [
-    'application/zip-compressed',
-    'application/x-zip-compressed',
-    'application/x-zip',
-    'multipart/x-zip',
-  ].includes(type)
-    ? 'application/zip'
-    : type
-}
 /** The object representing files for rudi resources */
 class MediaFile extends ForeignFile {
   constructor( // NOSONAR
