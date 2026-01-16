@@ -1,7 +1,7 @@
 {
   "description": "Application d'administration du noeud RUDI",
   "name": "rudi-node-manager",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
