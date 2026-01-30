@@ -401,7 +401,7 @@ export async function dbInitialize() {
     const db = await dbOpenOrCreate()
 
     const initRolesRes = await dbInitTable(db, TBL_ROLES, sqlCreateRoleTable)
-    if (initRolesRes.message?.startsWith('Table created')) await dbCreateRoles(db, initialRoles)
+    if (`${initRolesRes.message}`.startsWith('Table created')) await dbCreateRoles(db, initialRoles)
     else await dbNormalizeRoleTable(db)
     logD(mod, fun, 'Table initialized: Roles')
 

@@ -148,7 +148,7 @@ export function fromLocalIsoWithoutOffsetToUtcDate(localDate) {}
 
 export const padEndModulo = (str, base, padSign = '=') => {
   const modulo = str.length % base
-  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign?.substring(0, 1))
+  return modulo === 0 ? str : str.padEnd(str.length + base - modulo, padSign.substring(0, 1))
 }
 export const padWithEqualSignBase4 = (str) => padEndModulo(str, 4)
 

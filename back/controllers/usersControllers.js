@@ -24,7 +24,7 @@ import {
 } from '../database/database.js'
 import { BadRequestError, ForbiddenError, NotFoundError, RudiError } from '../utils/errors.js'
 import { logW } from '../utils/logger.js'
-import { initPwdSecret } from '../utils/secu.js'
+import { initPwdSecret, isInvalidUsername } from '../utils/secu.js'
 import { formatError } from './errorHandler.js'
 
 const INIT_PWD = initPwdSecret()
@@ -128,6 +128,10 @@ export async function createUser(req, reply) {
     if (!email) return reply.status(400).json(new BadRequestError('La requête doit comporter un email non null'))
     if (!roles || !Array.isArray(roles) || roles.length === 0)
       return reply.status(400).json(new BadRequestError('La requête doit définir un rôle pour l‘utilisateur'))
+    if (isInvalidUsername(username)) {
+      const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
+      return reply.status(400).json(new BadRequestError(errMsg))
+    }
 
     const hashedPassword = hashPassword(password ?? INIT_PWD)
 
@@ -162,12 +166,19 @@ export async function createUser(req, reply) {
 }
 
 export async function editUser(req, reply, next) {
+  const fun = 'editUser'
   try {
     const { id, email, roles } = req.body
     let username = req.body.username
     if ((id !== 0 && !id) || !username || !email || !roles) {
       return reply.status(400).json(new BadRequestError('Payload attendue: {id, username, email, roles}'))
     }
+    if (isInvalidUsername(username)) {
+      const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
+      logW(mod, fun, errMsg)
+      return reply.status(400).json(new BadRequestError(errMsg))
+    }
+
     const db = dbOpen()
     const reqUsername = req?.user?.username
     if (reqUsername) {

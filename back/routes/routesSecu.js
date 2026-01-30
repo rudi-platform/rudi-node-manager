@@ -28,7 +28,7 @@ secuApi.post('/hash-password', (req, reply) => {
   if (!req?.body?.pwd)
     throw new BadRequestError(`Input should be a JSON { pwd: <mandatory_pwd>, encoding: 'base64url|base64|null' }`)
   const inputPwd = req.body.pwd
-  const encoding = `${req.body.encoding}`?.toLowerCase()
+  const encoding = `${req.body.encoding}`.toLowerCase()
   let pwd = inputPwd
   if (encoding === 'base64') pwd = decodeBase64(inputPwd)
   else if (encoding === 'base64url') pwd = decodeBase64url(inputPwd)

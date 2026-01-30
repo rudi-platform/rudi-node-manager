@@ -28,8 +28,8 @@ import {
   STORAGE,
 } from '../config/config.js'
 import { dbGetUserRolesByUsername } from '../database/database.js'
-import { ForbiddenError, RudiError } from './errors.js'
-import { logE, logW } from './logger.js'
+import { BadRequestError, ForbiddenError, RudiError } from './errors.js'
+import { logE, logI, logW } from './logger.js'
 import { cleanErrMsg, pathJoin, timeEpochS, toInt } from './utils.js'
 
 // -------------------------------------------------------------------------------------------------
@@ -53,6 +53,19 @@ function isJwtValid(jwt) {
   const jwtParts = tokenStringToJwtObject(jwt)
   // logD(mod, 'isJwtValid', 'exp > now:', jwtParts?.payload?.exp > timeEpochS())
   return jwtParts?.payload?.exp > timeEpochS()
+}
+
+export function isInvalidUsername(username) {
+  const fun = 'isInvalidUsername'
+  try {
+    if (!username || `${username}`.length > 60) return true
+    const isValid = /^[a-zA-Z_ \-]{4,60}$/.test(username)
+    logI(mod, fun, `User "${username}" is valid: ${isValid}`)
+    return !isValid
+  } catch (err) {
+    logW(mod, `${fun}.err`, cleanErrMsg(err))
+    throw err
+  }
 }
 
 export const extractCookieFromReq = (req, cookieName = CONSOLE_TOKEN_NAME) => req?.cookies?.[cookieName]
@@ -135,6 +148,12 @@ export const login = async (req, reply, user) => {
   if (!user) return reply.status(401).send(ERR_401_MSG)
   try {
     const username = user.username
+    if (isInvalidUsername(username)) {
+      const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
+      logW(mod, fun, errMsg)
+      return reply.status(400).json(new BadRequestError(errMsg))
+    }
+
     const roles = await dbGetUserRolesByUsername(null, username) // NO SONAR
     if (!roles?.length) {
       const errMsg = `Admin validation is required for this user: '${user.username}'`
@@ -156,7 +175,7 @@ export const login = async (req, reply, user) => {
     })
   } catch (er) {
     logE(mod, fun, er)
-    logout()
+    logout(req, reply)
     return reply.status(er?.statusCode || 501).send(er)
   }
 }
@@ -179,7 +198,7 @@ export function sendJsonAndTokens(req, reply, data) {
       .json(data)
   } catch (err) {
     logW(mod, `${fun}.err`, cleanErrMsg(err))
-    logout()
+    logout(req, reply)
   }
 }
 

@@ -18,11 +18,12 @@ export default [
       '**/*.test.js',
     ],
     languageOptions: {
-      globals: { ...globals.node },
       ecmaVersion: 'latest',
+      globals: { ...globals.node },
       parser: babelParser,
       parserOptions: {
         requireConfigFile: false,
+        sourceType: 'module', // <--- add this
         presets: [['@babel/preset-env', { shippedProposals: true, targets: { node: 'current' } }]],
       },
     },
@@ -43,7 +44,7 @@ export default [
       'no-self-assign': 'warn',
       'no-self-compare': 'warn',
       'no-undef': 'error',
-      'no-unused-vars': 'off',
+      'no-unused-vars': 'warn',
       quotes: ['error', 'single', { allowTemplateLiterals: true }],
       'prefer-arrow-callback': 'warn',
       'prettier/prettier': 'warn',

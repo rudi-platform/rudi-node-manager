@@ -18,7 +18,7 @@ import {
 import { BadRequestError, RudiError, UnauthorizedError } from '../utils/errors.js'
 import { logE, logW } from '../utils/logger.js'
 import { passportAuthenticate } from '../utils/passportSetup.js'
-import { ERR_401_MSG, initPwdSecret, login, logout } from '../utils/secu.js'
+import { ERR_401_MSG, initPwdSecret, isInvalidUsername, login, logout } from '../utils/secu.js'
 import { decodeBase64, decodeBase64url, toBase64 } from '../utils/utils.js'
 import { formatError } from './errorHandler.js'
 
@@ -40,16 +40,17 @@ export async function postLogin(req, reply, next) {
       logW(mod, fun, err)
       return reply.status(400).send(err)
     }
-    if (!user) {
-      const errMsg = info?.message ?? `User not found or incorrect password: '${req?.body?.username}'`
+    if (isInvalidUsername(user.username)) {
+      const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
       logW(mod, fun, errMsg)
-      return reply.status(401).send(ERR_401_MSG)
+      return reply.status(400).json(new BadRequestError(errMsg))
     }
+
     try {
       await login(req, reply, user)
     } catch (er) {
       logE(mod, fun, er)
-      logout()
+      logout(req, reply)
       return reply.status(er?.statusCode ?? 501).send(er)
     }
     // TODO : remove .json() for cookie only? or give refresh token instead
@@ -62,7 +63,11 @@ export async function postRegister(req, reply) {
     const { username, email, password, confirmPassword } = req.body
     if (!password || password !== confirmPassword)
       throw new BadRequestError('Password and its confirmation should not be null and be the same.')
-
+    if (isInvalidUsername(username)) {
+      const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
+      logW(mod, fun, errMsg)
+      return reply.status(400).json(new BadRequestError(errMsg))
+    }
     const user = await dbRegisterUser(null, { username, email, password })
     reply.status(200).send(user)
   } catch (err) {
@@ -91,10 +96,16 @@ export async function putPassword(req, reply, next) {
   const fun = 'changePwd'
   try {
     const { username, password, newPassword, confirmNewPassword } = req.body
-    if (!username || !password || !newPassword || newPassword === password || newPassword !== confirmNewPassword) {
+    if (
+      isInvalidUsername(username) ||
+      !password ||
+      !newPassword ||
+      newPassword === password ||
+      newPassword !== confirmNewPassword
+    ) {
       const errMsg = 'Prerequisites not met'
       logW(mod, fun, errMsg)
-      reply.status(401).send(errMsg)
+      return reply.status(401).send(errMsg)
     }
     const db = dbOpen()
     const dbUserInfo = await dbGetHashedPassword(db, username)
@@ -145,9 +156,16 @@ export async function resetPassword(req, reply, next) {
  * @returns if usr was defined: a base64 encoded string with colon-separated <username>:<hashed password>. Otherwise : the hashed password (not encoded)
  */
 export function hashCredentials(pwd, usr, encoding) {
+  const fun = 'hashCredentials'
   if (!pwd) throw new BadRequestError('Input password should be defined')
+  if (isInvalidUsername(usr)) {
+    const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
+    logW(mod, fun, errMsg)
+    throw new BadRequestError(errMsg)
+  }
+
   let decode
-  switch (encoding?.toLowerCase()) {
+  switch (`${encoding}`.toLowerCase()) {
     case 'base64':
       decode = (x) => decodeBase64(x)
       break
@@ -173,6 +191,8 @@ export function decodeCredentials(b64Credentials) {
   }
   try {
     const [usr, pwd] = creds.split(':')
+    if (isInvalidUsername(usr))
+      throw new BadRequestError('Username should be less than 60 characters and only letters.')
     return [usr, pwd]
   } catch {
     throw new BadRequestError('Credentials should be a <usr>:<pwd> string')

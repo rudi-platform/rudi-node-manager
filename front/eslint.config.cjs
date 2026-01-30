@@ -2,7 +2,7 @@
 const globals = require('globals')
 
 const js = require('@eslint/js')
-const cypress = require('eslint-plugin-cypress')
+// const cypress = require('eslint-plugin-cypress')
 const eslintReact = require('eslint-plugin-react')
 const eslintOnlyWarn = require('eslint-plugin-only-warn')
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended')
@@ -29,12 +29,6 @@ module.exports = [
       'arrow-body-style': 'off',
       'comma-dangle': ['error', 'only-multiline'],
       complexity: ['warn', { max: 20 }],
-      'cypress/no-assigning-return-values': 'error',
-      'cypress/no-unnecessary-waiting': 'error',
-      'cypress/assertion-before-screenshot': 'warn',
-      'cypress/no-force': 'warn',
-      'cypress/no-async-tests': 'error',
-      'cypress/no-pause': 'error',
       eqeqeq: ['error', 'smart'],
       indent: 'off',
       'no-await-in-loop': 'error',
@@ -59,13 +53,13 @@ module.exports = [
         'warn',
         {
           vars: 'all',
-          varsIgnorePattern: '^(_|fun|mod|err)$',
+          varsIgnorePattern: '^(React|_|fun|mod|err)$',
           args: 'after-used',
           argsIgnorePattern: '^(_|req|reply|res|next|fun|mod|err)$',
         },
       ],
     },
-    plugins: { react: eslintReact, 'only-warn': eslintOnlyWarn, 'unused-imports': unusedImports, cypress },
+    plugins: { react: eslintReact, 'only-warn': eslintOnlyWarn, 'unused-imports': unusedImports },
     settings: { react: { version: 'detect' } },
   },
   eslintPluginPrettierRecommended,

@@ -169,7 +169,7 @@ export async function dbExistsUser(openedDb, username) {
 }
 
 export function dbGetUsers(openedDb) {
-  const fun = 'getUsers'
+  const fun = 'dbGetUsers'
   const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.all(
@@ -379,7 +379,7 @@ export function dbDeleteUserWithName(openedDb, name, silent = false) {
 
 // ROLES
 export function dbCreateRoles(openedDb, roles) {
-  const fun = 'createRoles'
+  const fun = 'dbCreateRoles'
   const db = openedDb ?? dbOpen()
   return new Promise((resolve, reject) => {
     db.serialize(() => {
@@ -569,9 +569,9 @@ export function dbCreateUserRole(openedDb, { userId, username, role }) {
         if (!openedDb) dbClose(db)
         if (err) {
           logE(mod, fun, err.message)
-          if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
+          if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: UNIQUE constraint failed'))
             return reject(new BadRequestError(`Role already assigned to user`))
-          if (`${err.message}`?.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
+          if (`${err.message}`.startsWith('SQLITE_CONSTRAINT: FOREIGN KEY constraint failed')) {
             return reject(
               new BadRequestError(`User ${userId}` + (username && ` (${username})`) + ` or role '${role}' not found`)
             )

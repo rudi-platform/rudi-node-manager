@@ -35,7 +35,7 @@ export async function safeAxiosGet(rudiModuleCalled, url, opts) {
     logE(mod, `${fun}-(${url})`, cleanErrMsg(axiosErr))
     let { message, code, status } = axiosErr
     const axiosGenericMsg = 'Request failed with status code '
-    if (!status && message?.startsWith(axiosGenericMsg)) {
+    if (!status && `${message}`.startsWith(axiosGenericMsg)) {
       status = toInt(message.split(axiosGenericMsg)[1])
       if (axiosErr?.response?.data) {
         logE(mod, fun + '.axiosMsg', axiosErr?.response.data)

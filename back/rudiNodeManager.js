@@ -53,6 +53,7 @@ import { ConnectionError } from './utils/errors.js'
 import { passportAuthenticate, passportInitialize } from './utils/passportSetup.js'
 import { checkRolePerm } from './utils/roleCheck.js'
 import {
+  backoffDelay,
   getAllFiles,
   getDomain,
   getFileExtension,
@@ -90,22 +91,32 @@ const connectToModule = (moduleCall, moduleName, errMsg) =>
       })
   )
 
-async function connectToRudiModules(attemptLeft = 20) {
-  if (attemptLeft === 0) return checkUrls()
+async function connectToRudiModules(maxAttempts = 20) {
+  let attempt = 0
+  if (moduleUrls.catalog && moduleUrls.storage) return [moduleUrls.catalog, moduleUrls.storage]
 
-  try {
-    const promises = []
-    if (!moduleUrls.catalog)
-      promises.push(connectToModule(getCatalogPublicUrl, 'catalog', `attempt #${attemptLeft}: Catalog not responding`))
-    if (!moduleUrls.storage)
-      promises.push(connectToModule(getStoragePublicUrl, 'storage', `attempt #${attemptLeft}: Storage not responding`))
-    await Promise.all(promises)
-    return [moduleUrls.catalog, moduleUrls.storage]
-  } catch {
-    await sleep(1000)
-    // log.d(mod, fun, `attempt ${attemptLeft}`)
-    return connectToRudiModules(attemptLeft - 1)
+  while (attempt < maxAttempts) {
+    try {
+      const promises = []
+      if (!moduleUrls.catalog)
+        promises.push(
+          connectToModule(getCatalogPublicUrl, 'catalog', `attempt #${attempt + 1}: Catalog not responding`)
+        )
+      if (!moduleUrls.storage)
+        promises.push(
+          connectToModule(getStoragePublicUrl, 'storage', `attempt #${attempt + 1}: Storage not responding`)
+        )
+      await Promise.all(promises)
+      return [moduleUrls.catalog, moduleUrls.storage]
+    } catch {
+      attempt++
+      if (attempt >= maxAttempts) break
+      const delay = backoffDelay(attempt)
+      logW(mod, 'connectToRudiModules', `retrying in ${Math.round(delay)}ms (attempt ${attempt}/${maxAttempts})`)
+      await sleep(delay)
+    }
   }
+  return checkUrls()
 }
 
 /**

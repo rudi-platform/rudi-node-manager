@@ -117,7 +117,7 @@ export function treatAxiosError(err, rudiModuleCalled, req, reply) {
     if (reply) return reply.status(statusCode).json({ statusCode, message })
     throw new ConnectionError(error.message)
   }
-  if (err.code?.startsWith('E')) {
+  if (`${err.code}`.startsWith('E')) {
     statusCode = err.status ?? 400
     const errData = err.response?.data ?? { statusCode, message: err.message ?? 'Bad Request' }
     return reply.headerSent || reply.status(err.status ?? 400).json(errData)
@@ -139,9 +139,10 @@ export function expressErrorHandler(err, req, reply) {
   // res.status(500)
   // res.render('error', { time: now.getTime(), error: err })
   logE(mod, fun + '.uncaught', errMsg)
-  reply?.status(500).json({
-    error: `An error was thrown, please contact the Admin with the information bellow`,
-    message: errMsg,
-    time: now.getTime(),
-  })
+  reply &&
+    reply.status(500).json({
+      error: `An error was thrown, please contact the Admin with the information bellow`,
+      message: errMsg,
+      time: now.getTime(),
+    })
 }

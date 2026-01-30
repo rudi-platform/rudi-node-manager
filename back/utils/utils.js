@@ -156,6 +156,11 @@ export function uuidv4(nb) {
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export const backoffDelay = (attempt, { base = 500, max = 30_000 } = {}) => {
+  const exp = Math.min(max, base * 2 ** attempt)
+  return Math.random() * exp
+}
+
 // -------------------------------------------------------------------------------------------------
 // Files
 // -------------------------------------------------------------------------------------------------
@@ -177,7 +182,7 @@ export const getNodeModulesLib = (lib) => {
 
   let nodMod = process.env.NODE_PATH
   let libPath = pathJoin(nodMod, lib)
-  if (nodMod?.endsWith(nm) && existsSync(libPath)) return libPath
+  if (`${nodMod}`.endsWith(nm) && existsSync(libPath)) return libPath
 
   try {
     nodMod = execSync('npm root', { encoding: 'utf-8' })

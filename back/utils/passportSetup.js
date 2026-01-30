@@ -40,7 +40,7 @@ import { beautify, timeEpochS } from './utils.js'
 // -------------------------------------------------------------------------------------------------
 
 const checkUsrPwd = async (username, password) => {
-  const fun = 'checkPassport'
+  const fun = 'checkUsrPwd'
   const db = dbOpen()
   try {
     const dbUserInfo = await dbGetHashedPassword(db, username)

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BoxArrowUpRight, CloudDownload, CloudSlash, Eye, Pencil, Share, Trash } from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom'
 
@@ -178,7 +178,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
    * calcule la taille total des fichiers
    * @return {Number} taille totale
    */
-  const getTotalFileSize = () => metadata.available_formats.reduce((acc, cur) => acc + cur.file_size, 0)
+  const getTotalFileSize = () => metadata.available_formats?.reduce((acc, cur) => acc + cur.file_size, 0)
 
   /**
    * Check if the metadata has restricted access
@@ -269,7 +269,7 @@ export default function MetadataCard({ editMode, metadata, refresh, logout }) {
           <a href="#" className="btn btn-secondary card-margin">
             <ThemeDisplay value={metadata.theme}></ThemeDisplay>
           </a>
-          <span className="card-text">{metadata.available_formats.map((media) => displayMedia(media))}</span>
+          <span className="card-text">{metadata.available_formats?.map((media) => displayMedia(media))}</span>
         </div>
       </div>
     </div>

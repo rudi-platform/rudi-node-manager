@@ -134,32 +134,34 @@ export class MetadataForm extends RudiForm {
     const outputValue = { ...formValue }
 
     let hasLocalFile = false
-    if (!formValue.available_formats) {
-      this.ko(here, 'No available_formats found')
-    } else {
-      let mediaFiles = formValue.available_formats.files?.map((file) => {
-        if (file instanceof MediaFile) {
-          this.ok(here, 'file:', file)
-          return file
-        } else if (file instanceof File) {
-          hasLocalFile = true
-          return MediaFile.fromFile(file, this.storageUrl)
-        } else throw new Error('Wrong type of file')
-      })
+    if (formValue.available_formats) {
+      const mediaFiles =
+        formValue.available_formats.files?.map((file) => {
+          if (file instanceof MediaFile) {
+            this.ok(here, 'file:', file)
+            return file
+          } else if (file instanceof File) {
+            hasLocalFile = true
+            return MediaFile.fromFile(file, this.storageUrl)
+          } else throw new Error('Wrong type of file')
+        }) ?? []
 
-      let mediaServices = formValue.available_formats.services?.map((service) => MediaService.fromService(service))
+      const mediaServices =
+        formValue.available_formats.services?.map((service) => MediaService.fromService(service)) ?? []
 
-      let af = [].concat(mediaFiles ?? [], mediaServices ?? [])
+      const af = mediaFiles.concat(mediaServices)
       outputValue.available_formats = af.length ? af : undefined
 
       if (originalValue) {
         // Conserve other type of media from original value
-        for (let media of originalValue.available_formats) {
+        for (const media of originalValue.available_formats) {
           if (media.media_type != 'FILE' && media.media_type != 'SERVICE') {
             outputValue.available_formats.push(media)
           }
         }
       }
+    } else {
+      this.ok(here, 'No available_formats found')
     }
 
     // Set restricted_access bool value
@@ -300,6 +302,10 @@ export class MetadataForm extends RudiForm {
       return this.fail('meta_send')
     }
     try {
+      if (!mediaFiles) {
+        this.ok(here, 'No media for this metadata')
+        return this.end(this.isUpdate ? 'edit' : 'create')
+      }
       this.state = 'send_files'
       // Sending the files
       const storageResponse = await Promise.all(

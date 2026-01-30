@@ -42,7 +42,7 @@ export function checkRolePerm(expectedRoles) {
       })
       .catch((err) => {
         // log.d(mod, fun, 'CATCH')
-        if (err?.statusCode === 401 && err?.message?.startsWith('User not found')) {
+        if (err?.statusCode === 401 && `${err?.message}`.startsWith('User not found')) {
           logE(mod, fun, 'Deleted user?')
           return logout(req, reply)
         }
