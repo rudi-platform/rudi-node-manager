@@ -37,6 +37,9 @@ import { cleanErrMsg, pathJoin, timeEpochS, toInt } from './utils.js'
 // -------------------------------------------------------------------------------------------------
 const REGEX_JWT = /^[\w-]+\.[\w-]+\.([\w-]+={0,3})$/
 
+const USERNAME_MAXLEN = 60
+const USERNAME_REGEX = /^[a-zA-Z][\w \-]{2,58}\w$/
+
 const OFFSET_USR_ID = 5000
 const DEFAULT_EXP = getConf('auth', 'exp_time_s', 600)
 
@@ -59,7 +62,7 @@ export function isInvalidUsername(username) {
   const fun = 'isInvalidUsername'
   try {
     if (!username || `${username}`.length > 60) return true
-    const isValid = /^[a-zA-Z_ \-]{4,60}$/.test(username)
+    const isValid = USERNAME_REGEX.test(username)
     logI(mod, fun, `User "${username}" is valid: ${isValid}`)
     return !isValid
   } catch (err) {
