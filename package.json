@@ -28,7 +28,7 @@
     "cleanup": "rm -fR ./node_modules &; rm -fR ./front/node_modules &; rm -fR **/package-lock.json 2> /dev/null; rm -fR **/yarn.lock 2> /dev/null"
   },
   "dependencies": {
-    "@aqmo.org/jwt-lib": "^1.1.14",
+    "@aqmo.org/jwt-lib": "^1.1.15",
     "@aqmo.org/rudi_logger": "^1.1.6",
     "axios": "^1.16.0",
     "body-parser": "^2.2.2",
@@ -46,6 +46,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
+    "path-to-regexp": "^8.4.2",
+    "qs": "^6.15.1",
     "sqlite3": "^6.0.1",
     "uuid": "^14.0.0"
   },
