@@ -20,7 +20,7 @@
               "id": "@organization_id",
               "tag": "text-input",
               "class": ["col", "s4", "m4", "l6"],
-              "attr": { "required": true, "disabled": true }
+              "attr": { "required": true, "disabled": false }
             },
             {
               "id": "@organization_name",
