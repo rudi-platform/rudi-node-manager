@@ -51,12 +51,12 @@
     "react-router": "^6.30.3",
     "react-router-dom": "^6.30.3",
     "react-scripts": "^5.0.1",
-    "sass": "^1.99.0",
+    "sass": "^1.100.0",
     "serialize-javascript": "^7.0.5",
     "underscore": "^1.13.8",
     "uuid": "^14.0.0",
     "web-vitals": "^5.2.0",
-    "webpack-dev-server": "^5.2.3"
+    "webpack-dev-server": "^5.2.4"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
@@ -74,7 +74,7 @@
     "eslint-plugin-only-warn": "^1.2.1",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.15",
     "prettier": "^3.8.3"
   },
   "overrides": {
