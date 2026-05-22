@@ -68,6 +68,7 @@
   },
   "overrides": {
     "braces": "$braces",
-    "postcss": "$postcss"
+    "postcss": "$postcss",
+    "uuid": "$uuid"
   }
 }
