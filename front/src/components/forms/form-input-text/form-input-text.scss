@@ -1,0 +1,339 @@
+/* ---- Theme Style ---- */
+.form-input-text {
+  --primary-rgb: 33, 150, 243;
+  --text-rgb: 0, 0, 0;
+  --error-color: 176, 0, 32;
+  --background-color: 255, 255, 255;
+  --input-height: 3.5em;
+  --input-padding: 0 0.75em 0 1em;
+  --line-height: 4.5em;
+
+  display: flex;
+
+  margin-top: 8px;
+  font-family: inherit; // ensure correct font rendering
+
+  /* ---- Base Elements ---- */
+
+  .wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 0.5em;
+    box-sizing: border-box;
+    font-size: inherit;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    // Focus states logic
+    &:focus-within {
+      .content {
+        border-color: rgb(var(--primary-rgb));
+        box-shadow:
+                inset 1px 0 rgb(var(--primary-rgb)),
+                inset 0 1px rgb(var(--primary-rgb)),
+                inset -1px 0 rgb(var(--primary-rgb)),
+                inset 0 -1px rgb(var(--primary-rgb));
+      }
+
+      .label_wrapper label {
+        color: rgb(var(--primary-rgb));
+      }
+
+      .label_wrapper::before,
+      .label_wrapper::after {
+        border-top: solid 1px;
+        border-top-color: rgb(var(--primary-rgb));
+        box-shadow: inset 0 1px rgb(var(--primary-rgb));
+      }
+    }
+  }
+
+  .content {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    outline: none;
+    height: var(--input-height);
+    padding: var(--input-padding);
+    line-height: 1.5em;
+    text-indent: 0.1em;
+
+    border: solid 1px rgba(var(--text-rgb), 0.6);
+    border-radius: 4px;
+
+    background-color: transparent;
+    box-shadow: none;
+
+    color: rgba(var(--text-rgb), 0.87);
+    font-family: inherit;
+    font-size: inherit;
+    caret-color: rgb(var(--primary-rgb));
+
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  .helper_wrapper {
+    display: block;
+    line-height: 1.2em;
+    padding-left: 0.8em;
+    min-height: 1.2em;
+
+    span {
+      display: block;
+      color: rgba(var(--text-rgb), 0.6);
+      font-size: 0.8em;
+      line-height: inherit;
+    }
+  }
+
+  /* ---- Label & Required ---- */
+
+  .label_wrapper {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 100%;
+    border-color: rgba(var(--text-rgb), 0.6);
+    color: rgba(var(--text-rgb), 0.6);
+    cursor: text;
+    transition: color 0.2s;
+    pointer-events: none;
+    user-select: none;
+
+    &::before,
+    &::after {
+      content: "";
+      display: block;
+      box-sizing: border-box;
+      height: 10px;
+      min-width: calc(1em - 4px);
+      margin-top: 0.5em;
+      border-top: solid 1px rgba(var(--text-rgb), 0.6);
+      pointer-events: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    &::before {
+      margin-right: 4px;
+      border-left: solid 1px transparent;
+      border-radius: 4px 0;
+    }
+
+    &::after {
+      flex-grow: 1;
+      margin-left: 4px;
+      border-right: solid 1px transparent;
+      border-radius: 0 4px;
+    }
+  }
+
+  label,
+  .required_star {
+    overflow: hidden;
+    font-size: 0.8em;
+    line-height: 1em;
+    font-weight: 500;
+    transition: font-size 0.2s, line-height 0.2s;
+  }
+
+  .required_star {
+    color: red;
+    white-space: pre;
+  }
+
+  /* ---- Modifiers & States ---- */
+
+  // Quand le label est actif
+  &.has-label,
+  &.is-required {
+    .label_wrapper {
+      display: flex;
+    }
+
+    .wrapper:focus-within .content {
+      border-top-color: transparent;
+      box-shadow:
+              inset 1px 0 rgb(var(--primary-rgb)),
+              inset -1px 0 rgb(var(--primary-rgb)),
+              inset 0 -1px rgb(var(--primary-rgb));
+    }
+
+    .content {
+      border-top-color: transparent;
+    }
+  }
+
+  // Slim variant
+  &.is-slim {
+    --input-height: 2.5em;
+    --input-padding: 0 0.75em 0 0.5em;
+    --line-height: 3.5em;
+  }
+
+  /* ---- Placeholder / Floating Label Logic ---- */
+  // Material logic: if placeholder is visible (empty field) and not focused, move label inside
+  .wrapper:not(:focus-within) .content:placeholder-shown {
+    border-top-color: rgba(var(--text-rgb), 0.6);
+
+    + .label_wrapper {
+      label, .required_star {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 1em;
+        line-height: var(--line-height);
+        font-weight: 400;
+      }
+
+      &::before, &::after {
+        border-top: none;
+      }
+    }
+  }
+
+
+  /* ---- Error State ---- */
+  &.has-error {
+    .wrapper {
+      .content {
+        border-color: rgb(var(--error-color));
+        caret-color: rgb(var(--error-color));
+      }
+
+      .label_wrapper label {
+        color: rgb(var(--error-color));
+      }
+
+      .label_wrapper::before,
+      .label_wrapper::after {
+        border-top-color: rgb(var(--error-color));
+      }
+
+      &:focus-within {
+        .label_wrapper::before,
+        .label_wrapper::after {
+          box-shadow: inset 0 1px rgb(var(--error-color));
+        }
+
+        .content {
+          box-shadow:
+                  inset 1px 0 rgb(var(--error-color)),
+                  inset 0 1px rgb(var(--error-color)),
+                  inset -1px 0 rgb(var(--error-color)),
+                  inset 0 -1px rgb(var(--error-color));
+              // IMPORTANT: On s'assure que le border-top reste transparent au focus
+              border-top-color: transparent;
+        }
+      }
+    }
+
+    // CORRECTION ICI :
+    // On combine les sélecteurs pour dire :
+    // "Si on est en erreur ET qu'on a un label (has-label ou is-required)"
+    // ALORS la bordure du haut de l'input DOIT être transparente.
+    &.has-label .wrapper .content,
+    &.is-required .wrapper .content {
+        border-top-color: transparent;
+    }
+
+    &.has-label .wrapper:focus-within .content,
+    &.is-required .wrapper:focus-within .content {
+      // On garde le box-shadow rouge mais on force la transparence du top
+      border-top-color: transparent; 
+      
+      box-shadow:
+              inset 1px 0 rgb(var(--error-color)),
+              inset -1px 0 rgb(var(--error-color)),
+              inset 0 -1px rgb(var(--error-color)); // Pas de shadow en haut
+    }
+
+    .helper_wrapper span {
+      color: rgb(var(--error-color));
+    }
+
+    // Error + Placeholder shown
+    .wrapper:not(:focus-within) .content:placeholder-shown {
+      border-top-color: rgb(var(--error-color));
+    }
+  }
+
+
+  /* ---- Disabled State ---- */
+  &.is-disabled {
+    .content, label {
+      color: rgba(var(--text-rgb), 0.6);
+    }
+
+    .content {
+      border-color: rgba(var(--text-rgb), 0.4);
+      cursor: not-allowed;
+    }
+
+    .label_wrapper::before,
+    .label_wrapper::after {
+      border-top: 1px solid rgba(var(--text-rgb), 0.4);
+    }
+
+    .wrapper:not(:focus-within) .content:placeholder-shown {
+      border-top-color: rgba(var(--text-rgb), 0.4);
+    }
+  }
+
+
+  /* ---- Readonly State ---- */
+  &.is-readonly {
+    .wrapper:focus-within .content:placeholder-shown {
+      border-top: 1px solid rgb(var(--primary-rgb));
+      box-shadow:
+              inset 1px 0 rgb(var(--primary-rgb)),
+              inset 0 1px rgb(var(--primary-rgb)),
+              inset -1px 0 rgb(var(--primary-rgb)),
+              inset 0 -1px rgb(var(--primary-rgb));
+    }
+
+    &.has-error .wrapper:focus-within .content:placeholder-shown {
+      border-top: 1px solid rgb(var(--error-color));
+      box-shadow:
+              inset 1px 0 rgb(var(--error-color)),
+              inset 0 1px rgb(var(--error-color)),
+              inset -1px 0 rgb(var(--error-color)),
+              inset 0 -1px rgb(var(--error-color));
+    }
+
+    .content:placeholder-shown + .label_wrapper {
+      label, .required_star {
+        font-size: 1em;
+        line-height: 4.5em;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .search-button {
+    z-index: 2;
+    height: 3.2em;
+    width: 3.2em;
+    margin-left: 0px;
+    margin-top: 7px;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+  }
+
+  &.has-search {
+    .content{
+      border-radius: 4px 0 0 4px;
+    }
+
+    border-radius: 4px 0 0 4px;
+
+    .label_wrapper {
+      &::after {
+        border-radius: 0;
+      }
+    }
+
+  }
+}

@@ -16,7 +16,7 @@ import {
   dbUpdatePasswordWithField,
 } from '../database/database.js'
 import { BadRequestError, RudiError, UnauthorizedError } from '../utils/errors.js'
-import { logE, logW } from '../utils/logger.js'
+import { logE, logI, logW } from '../utils/logger.js'
 import { passportAuthenticate } from '../utils/passportSetup.js'
 import { ERR_401_MSG, initPwdSecret, isInvalidUsername, login, logout } from '../utils/secu.js'
 import { decodeBase64, decodeBase64url, toBase64 } from '../utils/utils.js'
@@ -163,9 +163,10 @@ export function hashCredentials(pwd, usr, encoding) {
     logW(mod, fun, errMsg)
     throw new BadRequestError(errMsg)
   }
-
+  logI(mod, fun, `encoding: ${encoding}`)
+  logI(mod, fun, `encoding: ${encoding == undefined}`)
   let decode
-  switch (`${encoding}`.toLowerCase()) {
+  switch (encoding?.toLowerCase()) {
     case 'base64':
       decode = (x) => decodeBase64(x)
       break

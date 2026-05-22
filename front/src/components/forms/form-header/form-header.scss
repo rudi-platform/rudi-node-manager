@@ -1,0 +1,23 @@
+@import '../../../styles/App';
+
+.form-header {
+  margin-bottom: 21px;
+}
+
+.form-header-container {
+  display: flex;
+  margin: 0;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0.7rem 0;
+    font-size: 3.5rem;
+    overflow-wrap: anywhere;
+    color: $secondary;
+  }
+}
+hr {
+  margin: 0.5rem 0;
+  border: 2.5px solid black;
+}

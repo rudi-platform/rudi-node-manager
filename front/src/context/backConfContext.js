@@ -15,6 +15,7 @@ export class InitData {
     this.catalogPubUrl = this.conf.catalogPubUrl
     this.storagePubUrl = this.conf.storagePubUrl
 
+    this.portalUrl = this.conf.portalUrl
     this.portalConnected = this.conf.portalConnected
 
     this.appTag = this.conf.appTag

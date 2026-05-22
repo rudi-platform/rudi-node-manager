@@ -1,13 +1,16 @@
-import { useContext } from 'react'
+import { useNotification } from '../components/toasts/toastContext'
 
-import { DefaultErrorOption, ModalContext } from '../components/modals/genericModalContext'
+// import { useContext } from 'react'
+// import { DefaultErrorOption, ModalContext } from '../components/modals/genericModalContext'
 
 /**
  * defaultErrorHandler hooks
  * @return {*} defaultErrorHandler hooks
  */
 export default function useDefaultErrorHandler() {
-  const { changeOptions, toggle } = useContext(ModalContext)
+  const { notifyError } = useNotification()
+  // const { changeOptions, toggle } = useContext(ModalContext)
+
   const errorHandler = (err) => {
     // console.error(err)
     const options = DefaultErrorOption
@@ -24,7 +27,6 @@ export default function useDefaultErrorHandler() {
     toggle()
   }
 
-  const displayMsg = (msg) => (typeof msg == 'string' ? msg : JSON.stringify(msg))
-
-  return { defaultErrorHandler: errorHandler }
+  return { defaultErrorHandler: notifyError }
+  // return { defaultErrorHandler: errorHandler }
 }

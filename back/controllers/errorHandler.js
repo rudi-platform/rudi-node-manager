@@ -136,6 +136,10 @@ export function expressErrorHandler(err, req, reply) {
 
   if (reply?.headersSent) return
 
+  if (err instanceof RudiError) {
+    return reply && reply.status(err.statusCode).json({ error: err.description, message: errMsg, time: now.getTime() })
+  }
+
   // res.status(500)
   // res.render('error', { time: now.getTime(), error: err })
   logE(mod, fun + '.uncaught', errMsg)

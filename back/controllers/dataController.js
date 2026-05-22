@@ -96,22 +96,28 @@ export const getPortalUrl = () => callCatalog(getCatalogAdminPath('check/portal/
 
 export async function getInitData(req, reply) {
   try {
-    const data = await Promise.all([getThemes(req), getCatalogPublicUrl(), getStoragePublicUrl(), getPortalUrl()])
+    const [themeLabels, catalogPubUrl, storagePubUrl, portalUrl] = await Promise.all([
+      getThemes(req),
+      getCatalogPublicUrl(),
+      getStoragePublicUrl(),
+      getPortalUrl(),
+    ])
     // console.log(data)
-
+    const portalConnected = `${portalUrl}`.startsWith('http')
     const tags = getTags()
     const initData = {
       appTag: tags?.tag,
       gitHash: tags?.hash,
-      catalogPubUrl: data[1],
-      storagePubUrl: data[2],
+      catalogPubUrl,
+      storagePubUrl,
       consolePath: getPublicConsole(),
       frontPath: getPublicFront(),
       backPath: getPublicBack(),
       managerPath: getPublicManager(),
       hostUrl: getHostDomain(),
-      portalConnected: !!data[3],
-      themeLabels: data[0],
+      portalUrl,
+      portalConnected,
+      themeLabels,
     }
     return reply ? reply.status(200).json(initData) : initData
   } catch (e) {

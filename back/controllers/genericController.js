@@ -8,7 +8,7 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { CATALOG, getCatalogAdminUrl as getCatalogAdminApiUrl } from '../config/config.js'
+import { CATALOG, getCatalogAdminUrl as getCatalogAdminApiUrl, getCatalogAdminPath } from '../config/config.js'
 
 import { logD, logE, logW } from '../utils/logger.js'
 import { getCatalogHeaders, sendJsonAndTokens } from '../utils/secu.js'
@@ -161,5 +161,20 @@ export async function getCounts(req, reply) {
   } catch (err) {
     logE(mod, fun, 'Could not get counts -> ERR ', err)
     reply.status(500).json({ statusCode: err.statusCode ?? 500, message: err.message })
+  }
+}
+
+export async function getCatalogLogs(req, reply) {
+  const fun = `${mod}.getCatalogLogs`
+  try {
+    const res = await axios.get(getCatalogAdminApiUrl('logs'), { params: req?.query, ...getCatalogHeaders() })
+    return sendJsonAndTokens(req, reply, res.data)
+  } catch (err) {
+    logW(mod, fun + '.reqUrl', req.url)
+    logW(mod, fun + '.catalogUrl', getCatalogAdminPath('logs'))
+    logW(mod, fun + '.catalogUrl', getCatalogAdminApiUrl('logs'))
+    logW(mod, fun, err)
+    logW(mod, fun, cleanErrMsg(err))
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }

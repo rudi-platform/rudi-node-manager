@@ -3,7 +3,7 @@ import './login.css'
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { Eye, EyeSlash } from 'react-bootstrap-icons'
 import Form from 'react-bootstrap/Form'
@@ -79,7 +79,7 @@ export default function Login({ updateToken }) {
     loginUser({ username: username, password })
       .then(() => updateToken())
       .catch((error) => {
-        const errMsg = `${error.response?.data}`.startsWith('Admin validation required for user')
+        const errMsg = error.response?.data?.startsWith('Admin validation required for user')
           ? ACCOUNT_VALIDATION_MSG
           : ['Utilisateur ou mot de passe incorrect']
 

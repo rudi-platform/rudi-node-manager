@@ -8,9 +8,10 @@ import { BackConfContext } from '../../context/backConfContext.js'
 import useDefaultErrorHandler from '../../utils/useDefaultErrorHandler'
 import { lastMonth } from '../../utils/utils'
 import { getOptConfirm, getOptOk, useModalContext } from '../modals/genericModalContext'
-import ObjCatalogue from './objCatalogue'
+import ObjCatalogue from '../generic/objCatalogue'
+import CatalogueReports from './catalogueReports'
 
-CatalogueReports.propTypes = {
+ReportsPage.propTypes = {
   editMode: PropTypes.bool,
   logout: PropTypes.func,
 }
@@ -19,7 +20,7 @@ CatalogueReports.propTypes = {
  * Composant : CatalogueReports
  * @return {void}
  */
-export default function CatalogueReports({ editMode, logout }) {
+export default function ReportsPage({ editMode, logout }) {
   const { backConf } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
@@ -78,7 +79,7 @@ export default function CatalogueReports({ editMode, logout }) {
             </div>
           </div>
         </div>
-        <ObjCatalogue
+        <CatalogueReports
           editMode={editMode}
           shouldPad={false}
           shouldRefresh={refreshState}
@@ -90,6 +91,7 @@ export default function CatalogueReports({ editMode, logout }) {
           propNamesToDisplay={{
             id: 'report_id',
             resource_id: 'resource_id',
+            // object_type: 'object_type',
             submission_date: 'soumission',
             treatment_date: 'traitement',
             integration_status: 'statut',

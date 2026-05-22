@@ -43,17 +43,22 @@ export class MetadataForm extends RudiForm {
           this.getPmJson('catalog/contacts'),
           this.getPmJson('catalog/organizations'),
           this.getPmJson('catalog/pub_keys?type=rsa'),
+          this.getPmStr('front/portal-url'),
         ])
       } catch (err) {
         this.ko(here, err)
         return this.fail('get_api_data')
       }
-      const [enums, contacts, organizations, publicKeys] = data
-      // this.ok(here, 'retrieved org:', organizations[0])
+      const [enums, contacts, organizations, publicKeys, portalUrl] = data
+      const portalConnected = `${portalUrl}`.startsWith('http')
 
       // Build final enum
       enums.contacts = contacts.map((c) => ({ name: c.contact_name, value: c }))
-      enums.organizations = organizations.map((o) => ({ name: o.organization_name, value: o }))
+
+      enums.organizations = organizations
+        .filter((o) => !portalConnected || o.linked_producer_status === 'VALIDATED')
+        .map((o) => ({ name: o.organization_name, value: o }))
+
       enums.publickeys = publicKeys.map((k) => {
         pubKeys[k.name] = k.pem
         return k.name

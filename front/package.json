@@ -1,7 +1,7 @@
 {
   "description": "Interface d'administration du noeud RUDI",
   "name": "rudi-prodmanager-front",
-  "version": "2.6.0",
+  "version": "2.5.0",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
@@ -35,32 +35,33 @@
     "@svgr/webpack": "^8.1.0",
     "@textea/json-viewer": "4.0.1",
     "@tootallnate/once": "^3.0.1",
-    "axios": "^1.16.0",
+    "axios": "^1.16.1",
     "bootstrap": "^5.3.8",
     "history": "^5.3.0",
-    "http-proxy-middleware": "^3.0.5",
+    "http-proxy-middleware": "^4.0.0",
     "jsonwebtoken": "^9.0.3",
-    "jspreadsheet-ce": "^4.15.0",
-    "nth-check": "^2.1.1",
+    "jspreadsheet-ce": "^5.0.4",
+    "nth-check": "^3.0.1",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.10",
     "react-bootstrap-icons": "^1.11.6",
     "react-dom": "^18.3.1",
-    "react-infinite-scroll-component": "^6.1.1",
+    "react-infinite-scroll-component": "^7.2.0",
     "react-router": "^6.30.3",
     "react-router-dom": "^6.30.3",
     "react-scripts": "^5.0.1",
     "sass": "^1.99.0",
     "serialize-javascript": "^7.0.5",
     "underscore": "^1.13.8",
-    "web-vitals": "^4.2.4",
+    "uuid": "^14.0.0",
+    "web-vitals": "^5.2.0",
     "webpack-dev-server": "^5.2.3"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.6",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-env": "^7.29.3",
+    "@babel/preset-env": "^7.29.5",
     "@babel/preset-react": "^7.28.5",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -79,6 +80,7 @@
   "overrides": {
     "@svgr/webpack": "$@svgr/webpack",
     "nth-check": "$nth-check",
-    "postcss": "$postcss"
+    "postcss": "$postcss",
+    "uuid": "$uuid"
   }
 }

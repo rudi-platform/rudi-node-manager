@@ -12,6 +12,7 @@ $restricted: #ffd3cd;
 $header-bkg: #282c34;
 $header-font: white;
 $app-link: #61dafb;
+$disabled: #d8d8d8;
 
 // change the theme
 $custom-colors: (
@@ -252,6 +253,7 @@ a {
 .status-pill {
   @extend .badge;
   @extend .rounded-pill;
+  margin-left: 10px;
 }
 .align-pill-right {
   margin-right: 10px;
@@ -370,4 +372,72 @@ a {
 .on-right-box {
   float: right;
   padding: 0.5em 0.2em 0 0;
+}
+
+.primary-btn {
+  background-color: $primary;
+  color: white;
+  border-color: white;
+}
+
+.primary-btn:hover {
+  border-color: $primary;
+  background-color: $primary;
+  color: white;
+}
+
+.primary-btn:disabled {
+  border-color: #f8f8f8;
+  background-color: silver;
+  color: black;
+}
+
+.btn-danger,
+.btn-danger:disabled {
+  border-color: #f8f8f8;
+}
+
+.btn-warning,
+.btn-warning:disabled {
+  border-color: #f8f8f8;
+}
+
+.btn-green,
+.btn-green:disabled {
+  border-color: #f8f8f8;
+}
+
+.btn-success,
+.btn-success:disabled {
+  border-color: #f8f8f8;
+}
+
+.text-bg-rudi {
+  background-color: #e6f1fd;
+  color: $primary;
+}
+
+.margin-left {
+  margin-left: $marginSides;
+}
+
+.navbarRow {
+  display: flex;
+  width: 100%;
+}
+
+.rightGroup {
+  margin-left: auto; /* pushes whole block to the right */
+  display: flex;
+  align-items: right;
+}
+
+#displayTags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* right-align tag text */
+}
+
+.icon-portal {
+  height: 20px;
 }

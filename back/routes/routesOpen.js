@@ -16,8 +16,9 @@ import { expressErrorHandler } from '../controllers/errorHandler.js'
 export const openApi = new express.Router()
 
 openApi.post('/hash-credentials', (req, reply) => {
-  let { usr, pwd, encoding } = req.body
-  return reply.status(200).send(hashCredentials(pwd, usr, encoding))
+  const { usr, pwd, encoding } = req.body
+  const hashedCreds = hashCredentials(pwd, usr, encoding)
+  return reply.status(200).send(hashedCreds)
 })
 
 openApi.get('/test', (req, reply) => reply.status(200).send('test'))

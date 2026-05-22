@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import PropTypes from 'prop-types'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Pencil, Plus, Trash } from 'react-bootstrap-icons'
 
 import { BackConfContext } from '../../context/backConfContext.js'
@@ -127,6 +127,8 @@ EditObjCard.propTypes = {
   deleteMsg: PropTypes.func,
   btnTextAdd: PropTypes.string,
   btnTextChg: PropTypes.string,
+  canAdd: PropTypes.bool,
+  canDelete: PropTypes.bool,
 }
 
 /**
@@ -142,6 +144,8 @@ export function EditObjCard({
   deleteConfirmMsg,
   deleteMsg,
   refresh,
+  canAdd = true,
+  canDelete = true,
 }) {
   const { backConf } = useContext(BackConfContext)
   const { defaultErrorHandler } = useDefaultErrorHandler()
@@ -184,7 +188,7 @@ export function EditObjCard({
   }
 
   const button = {
-    edit: (
+    edit: canAdd ? (
       <a
         href={getFormObj(objType, `update=${editID}`)}
         target="_blank"
@@ -193,9 +197,13 @@ export function EditObjCard({
       >
         <Pencil />
       </a>
+    ) : (
+      <button type="button" className="btn btn-warning" disabled>
+        <Pencil />
+      </button>
     ),
     delete: (
-      <button type="button" className="btn btn-danger" onClick={() => triggerDeleteObj(editID)}>
+      <button type="button" className="btn btn-danger" onClick={() => triggerDeleteObj(editID)} disabled={!canDelete}>
         <Trash />
       </button>
     ),
@@ -218,6 +226,7 @@ export function EditObjCard({
                 placeholder={idField}
                 value={editID}
                 onChange={handleChange}
+                disabled={!canAdd && !canDelete}
               />
 
               {button.edit}

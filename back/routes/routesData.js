@@ -19,6 +19,7 @@ import { expressErrorHandler } from '../controllers/errorHandler.js'
 import {
   deleteObject,
   deleteObjects,
+  getCatalogLogs,
   getCounts,
   getObjectById,
   getObjectList,
@@ -43,6 +44,7 @@ catalogApi.get('/enum/themes/:lang', getThemeByLang)
 catalogApi.get('/enum/themes', getThemeByLang)
 catalogApi.get('/licences', getLicences)
 catalogApi.get('/portal/test', testPortalConnection)
+catalogApi.get(`/logs`, getCatalogLogs)
 
 // TODO : propagate res.status
 catalogApi.get(`/counts`, getCounts)
