@@ -56,7 +56,7 @@ export class MetadataForm extends RudiForm {
       enums.contacts = contacts.map((c) => ({ name: c.contact_name, value: c }))
 
       enums.organizations = organizations
-        .filter((o) => !portalConnected || o.linked_producer_status === 'VALIDATED')
+        // .filter((o) => !portalConnected || o.linked_producer_status === 'VALIDATED')
         .map((o) => ({ name: o.organization_name, value: o }))
 
       enums.publickeys = publicKeys.map((k) => {
