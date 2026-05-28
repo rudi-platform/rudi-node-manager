@@ -43,7 +43,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => {
     refresh()
-  }, [back, currentFilters])
+  }, [currentFilters])
 
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(-1)
