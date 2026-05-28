@@ -139,7 +139,7 @@ export class MetadataForm extends RudiForm {
     const outputValue = { ...formValue }
 
     let hasLocalFile = false
-    if (formValue.available_formats) {
+    if (formValue?.available_formats) {
       const mediaFiles =
         formValue.available_formats.files?.map((file) => {
           if (file instanceof MediaFile) {
@@ -157,7 +157,7 @@ export class MetadataForm extends RudiForm {
       const af = mediaFiles.concat(mediaServices)
       outputValue.available_formats = af.length ? af : undefined
 
-      if (originalValue) {
+      if (originalValue?.available_formats) {
         // Conserve other type of media from original value
         for (const media of originalValue.available_formats) {
           if (media.media_type != 'FILE' && media.media_type != 'SERVICE') {
@@ -168,7 +168,6 @@ export class MetadataForm extends RudiForm {
     } else {
       this.ok(here, 'No available_formats found')
     }
-
     // Set restricted_access bool value
     if (!outputValue.access_condition.confidentiality) outputValue.access_condition.confidentiality = {}
     outputValue.access_condition.confidentiality.restricted_access = Boolean(
@@ -179,6 +178,8 @@ export class MetadataForm extends RudiForm {
     // REMOVE OR API FAIL WHEN PUBLISHING NEW RESTRICTED DATA
     outputValue.restricted_access = undefined
     outputValue.keywords = multiSplit(formValue.keywords, [',', ';'], true)
+
+    if (!outputValue?.available_formats) outputValue.available_formats = []
 
     return outputValue
   }
