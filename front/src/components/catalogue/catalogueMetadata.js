@@ -84,21 +84,21 @@ export default function CatalogueMetadata({ editMode, logout }) {
 
   const refresh = (onDelete = false) => {
     if (!back?.isLoaded) return // Don't reset UI if we can't fetch yet
-    console.debug('refreshing')
     setAllCountByFilters([]) // Clear old counts immediately
     setMetadataList([])
     setHasMore(true)
-    getInitialData()
+    refreshCounts().then(() => loadPage(0))
   }
+  useEffect(() => {
+    if (back?.isLoaded) refresh()
+  }, [back?.isLoaded])
 
   const filterConf = [
     {
       name: 'metadata_status',
       text: 'Statut :',
       values: [],
-      toFilterParam: (elem) => {
-        return { metadata_status: `"${elem?.metadata_status}"` }
-      },
+      toFilterParam: (elem) => ({ metadata_status: `"${elem?.metadata_status}"` }),
       display: metadataDisplay,
     },
     {
@@ -240,7 +240,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
   /**
    * recup la 1er page des métadonnéees et les countBy
    */
-  const getInitialData = () =>
+  const refreshCounts = () =>
     back?.isLoaded &&
     Promise.all(
       filterConf.map((count) =>
@@ -255,7 +255,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
           return filter
         })
         setAllCountByFilters(updatedFilter)
-        loadPage(0)
+        return updatedFilter
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
 
@@ -306,7 +306,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
     refresh()
   }
   const toggleExtSearch = () => setIsExtSearch(!isExtSearch)
-  const getLeftTabCounts = () =>
+  const getLeftTabCounts = (allCountByFilters) =>
     allCountByFilters?.map((filterObject, i) => {
       // console.trace(filterObject)
       // console.trace(filterObject?.values)
@@ -427,7 +427,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
               </div>
               <div className="left-hand-blocks">
                 <div className="label-lv1">Filtrer</div>
-                <div className="row no-row-margin">{getLeftTabCounts()}</div>
+                <div className="row no-row-margin">{getLeftTabCounts(allCountByFilters)}</div>
               </div>
             </div>
           </div>
