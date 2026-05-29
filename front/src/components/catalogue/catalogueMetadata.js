@@ -30,16 +30,30 @@ CatalogueMetadata.propTypes = {
 export default function CatalogueMetadata({ editMode, logout }) {
   const { defaultErrorHandler } = useDefaultErrorHandler()
 
+  //----- Get global conf
   const { backConf } = useContext(BackConfContext)
   const [back, setBack] = useState(backConf)
   useEffect(() => setBack(backConf), [backConf])
 
-  // console.log('-- Catalogue')
+  //----- Users' editing rights
   const [isEdit, setIsEdit] = useState(!!editMode)
   useEffect(() => setIsEdit(!!editMode), [editMode])
 
+  //----- Refresh when back from console
+  const [isTabVisible, setIsTabVisible] = useState(true)
+  useEffect(() => {
+    const handler = () => setIsTabVisible(document.visibilityState === 'visible')
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [])
+  useEffect(() => {
+    if (isTabVisible) refresh()
+  }, [isTabVisible])
+
+  //----- Get data
   const [metadataList, setMetadataList] = useState([])
   const [allCountByFilters, setAllCountByFilters] = useState([])
+
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => {
     refresh()
@@ -53,6 +67,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
 
   const searchText = useRef(null)
 
+  //----- Helpers
   const deleteUrl = (id) => back?.isLoaded && back.getBackCatalog('resources', id)
   const deleteConfirmMsg = (id) => `Confirmez vous la suppression de la métadonnée ${id}?`
   const deleteMsg = (data) => `La métadonnée ${data.resource_title} a été supprimée`
@@ -66,13 +81,14 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const themeDisplay = (filterValue, filter) => (
     <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
   )
+
   const refresh = (onDelete = false) => {
     if (!back?.isLoaded) return // Don't reset UI if we can't fetch yet
     console.debug('refreshing')
-    setHasMore(true)
+    setAllCountByFilters([]) // Clear old counts immediately
     setMetadataList([])
+    setHasMore(true)
     getInitialData()
-    loadPage(0)
   }
 
   const filterConf = [
@@ -239,6 +255,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
           return filter
         })
         setAllCountByFilters(updatedFilter)
+        loadPage(0)
       })
       .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
 
@@ -289,6 +306,40 @@ export default function CatalogueMetadata({ editMode, logout }) {
     refresh()
   }
   const toggleExtSearch = () => setIsExtSearch(!isExtSearch)
+  const getLeftTabCounts = () =>
+    allCountByFilters?.map((filterObject, i) => {
+      // console.trace(filterObject)
+      // console.trace(filterObject?.values)
+      return !filterObject?.values ? (
+        'No values'
+      ) : (
+        <div className={i ? 'col border rounded' : 'border rounded'} key={filterObject.name}>
+          <div className="label-lv2">{filterObject.text}</div>
+          <ul className="list-group">
+            {(filterObject.values?.items ?? filterObject.values)?.map((filterValue, i) => {
+              const filterLabel = getFilterLabel(filterValue, filterObject)
+              const key = filterLabel + i
+              return (
+                <li
+                  className="filter-items"
+                  key={key}
+                  onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
+                >
+                  {filterObject.display ? filterObject.display(filterValue, filterObject) : filterLabel}
+                  <span
+                    className={`badge rounded-pill text-bg-${
+                      isSelectedFilter(filterObject.toFilterParam(filterValue)) ? 'success' : 'primary'
+                    }`}
+                  >
+                    {filterValue.count}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )
+    })
 
   // TODO :  sticky-top ?
   return (
@@ -376,41 +427,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
               </div>
               <div className="left-hand-blocks">
                 <div className="label-lv1">Filtrer</div>
-                <div className="row no-row-margin">
-                  {allCountByFilters.map((filterObject, i) => {
-                    // console.trace(filterObject)
-                    // console.trace(filterObject?.values)
-                    return !filterObject?.values ? (
-                      'No values'
-                    ) : (
-                      <div className={i ? 'col border rounded' : 'border rounded'} key={filterObject.name}>
-                        <div className="label-lv2">{filterObject.text}</div>
-                        <ul className="list-group">
-                          {(filterObject.values?.items ?? filterObject.values)?.map((filterValue, i) => {
-                            const filterLabel = getFilterLabel(filterValue, filterObject)
-                            const key = filterLabel + i
-                            return (
-                              <li
-                                className="filter-items"
-                                key={key}
-                                onClick={() => addToFilter(filterObject.toFilterParam(filterValue))}
-                              >
-                                {filterObject.display ? filterObject.display(filterValue, filterObject) : filterLabel}
-                                <span
-                                  className={`badge rounded-pill text-bg-${
-                                    isSelectedFilter(filterObject.toFilterParam(filterValue)) ? 'success' : 'primary'
-                                  }`}
-                                >
-                                  {filterValue.count}
-                                </span>
-                              </li>
-                            )
-                          })}
-                        </ul>
-                      </div>
-                    )
-                  })}
-                </div>
+                <div className="row no-row-margin">{getLeftTabCounts()}</div>
               </div>
             </div>
           </div>
