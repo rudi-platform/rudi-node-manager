@@ -43,10 +43,10 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const [currentFilters, setCurrentFilters] = useState([{ sort_by: `-updatedAt` }])
   useEffect(() => {
     refresh()
-  }, [currentFilters])
+  }, [backConf, currentFilters])
 
   const [hasMore, setHasMore] = useState(true)
-  const [currentOffset, setCurrentOffset] = useState(-1)
+  const [currentOffset, setCurrentOffset] = useState(0)
   const [isExtSearch, setIsExtSearch] = useState(false)
 
   const initialRender = useRef(true)
@@ -66,34 +66,14 @@ export default function CatalogueMetadata({ editMode, logout }) {
   const themeDisplay = (filterValue, filter) => (
     <ThemeDisplay value={getFilterLabel(filterValue, filter)}></ThemeDisplay>
   )
-  const refresh = () => {
+  const refresh = (onDelete = false) => {
+    if (!back?.isLoaded) return // Don't reset UI if we can't fetch yet
+    console.debug('refreshing')
     setHasMore(true)
     setMetadataList([])
     getInitialData()
-    // console.log('-- gotInitialData')
-
-    if (currentOffset === 0) {
-      setCurrentOffset(-1)
-    } else {
-      setCurrentOffset(0)
-    }
+    loadPage(0)
   }
-
-  useEffect(() => {
-    if (initialRender.current) initialRender.current = false
-    else if (currentOffset < 0) setCurrentOffset(0)
-    else fetchMoreData()
-  }, [currentOffset])
-
-  const [isTabVisible, setIsTabVisible] = useState(true)
-  useEffect(() => {
-    const handler = () => setIsTabVisible(document.visibilityState === 'visible')
-    document.addEventListener('visibilitychange', handler)
-    return () => document.removeEventListener('visibilitychange', handler)
-  }, [])
-  useEffect(() => {
-    if (isTabVisible) refresh()
-  }, [isTabVisible])
 
   const filterConf = [
     {
@@ -265,16 +245,17 @@ export default function CatalogueMetadata({ editMode, logout }) {
   /**
    * récupere la page suivante
    */
-  function fetchMoreData() {
+  function loadPage(offset) {
     back?.isLoaded &&
       axios
         .get(back.getBackCatalog(`resources${searchMode()}`), {
-          params: createParams({ limit: PAGE_SIZE, offset: currentOffset }),
+          params: createParams({ limit: PAGE_SIZE, offset }),
         })
         .then((res) => {
           const data = isSearchMode() ? res.data.items : res.data
           if (data.length < PAGE_SIZE) setHasMore(false)
-          setMetadataList((metadatas) => metadatas.concat(data))
+          setMetadataList((prev) => (offset === 0 ? data : prev.concat(data)))
+          setCurrentOffset(offset + PAGE_SIZE)
         })
         .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
   }
@@ -444,12 +425,12 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   deleteMsg={deleteMsg}
                   btnTextAdd={btnTextAdd}
                   btnTextChg={btnTextChg}
-                  refresh={refresh}
+                  refresh={() => refresh(true)}
                 ></EditObjCard>
               )}
               <InfiniteScroll
                 dataLength={metadataList.length}
-                next={() => setCurrentOffset(currentOffset + PAGE_SIZE)}
+                next={() => loadPage(currentOffset)}
                 hasMore={hasMore}
                 loader={<h4>Loading...</h4>}
                 endMessage={<i>Aucune donnée supplémentaire</i>}
@@ -458,7 +439,7 @@ export default function CatalogueMetadata({ editMode, logout }) {
                   <MetadataCard
                     editMode={isEdit}
                     metadata={metadata}
-                    refresh={refresh}
+                    refresh={() => refresh(true)}
                     key={metadata.global_id}
                   ></MetadataCard>
                 ))}
