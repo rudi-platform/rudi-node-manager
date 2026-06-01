@@ -104,7 +104,7 @@
             },
             { "id": "@collection_tag", "tag": "text-input", "class": ["col", "s4", "m4"] },
             { "id": "@synopsis", "tag": "multi-textarea", "class": ["col", "s4"], "attr": { "required": true } },
-            { "id": "@summary", "tag": "multi-textarea", "class": ["col", "s4"], "attr": { "required": true } },
+            { "id": "@summary", "tag": "multi-rich-textarea", "class": ["col", "s4"], "attr": { "required": true } },
             { "id": "@theme", "tag": "select-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
             { "id": "@keywords", "tag": "datalist-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
             { "id": "@producer", "tag": "select-input", "class": ["col", "s4"], "attr": { "required": true } },

@@ -8,7 +8,7 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { CATALOG, getCatalogAdminUrl as getCatalogAdminApiUrl, getCatalogAdminPath } from '../config/config.js'
+import { CATALOG, getCatalogAdminPath, getCatalogAdminUrl } from '../config/config.js'
 
 import { logD, logE, logW } from '../utils/logger.js'
 import { getCatalogHeaders, sendJsonAndTokens } from '../utils/secu.js'
@@ -40,7 +40,7 @@ export async function searchObjects(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
     const opts = { params: req?.query, ...getCatalogHeaders() }
-    const res = await axios.get(getCatalogAdminApiUrl(objectType, 'search'), opts)
+    const res = await axios.get(getCatalogAdminUrl(objectType, 'search'), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -57,7 +57,7 @@ export async function getObjectList(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
     const opts = { params: req?.query, ...getCatalogHeaders() }
-    const res = await axios.get(getCatalogAdminApiUrl(objectType), opts)
+    const res = await axios.get(getCatalogAdminUrl(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -72,7 +72,7 @@ export async function getObjectById(req, reply) {
   // log.d(mod, opType + '.params', beautify(req.params))
   if (!checkObjectType(req, reply, opType, objectType)) return
   try {
-    const res = await axios.get(getCatalogAdminApiUrl(objectType, id), getCatalogHeaders())
+    const res = await axios.get(getCatalogAdminUrl(objectType, id), getCatalogHeaders())
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -86,7 +86,7 @@ export async function postObject(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    const res = await axios.post(getCatalogAdminApiUrl(objectType), req.body, opts)
+    const res = await axios.post(getCatalogAdminUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err.response?.data ?? err))
@@ -100,7 +100,7 @@ export async function putObject(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    const res = await axios.put(getCatalogAdminApiUrl(objectType), req.body, opts)
+    const res = await axios.put(getCatalogAdminUrl(objectType), req.body, opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -114,7 +114,7 @@ export async function deleteObject(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    const res = await axios.delete(getCatalogAdminApiUrl(objectType, id), opts)
+    const res = await axios.delete(getCatalogAdminUrl(objectType, id), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -128,7 +128,7 @@ export async function deleteObjects(req, reply) {
   if (!checkObjectType(req, reply, opType, objectType)) return
   const opts = { params: req?.query, ...getCatalogHeaders() }
   try {
-    const res = await axios.delete(getCatalogAdminApiUrl(objectType), opts)
+    const res = await axios.delete(getCatalogAdminUrl(objectType), opts)
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -143,8 +143,8 @@ export async function getCounts(req, reply) {
   try {
     res = await Promise.all(
       COUNT_BY_LABELS.map((label) => {
-        logD(mod, fun, `${label}: ` + getCatalogAdminApiUrl(`resources?count_by=${label}`))
-        return axios.get(getCatalogAdminApiUrl(`resources?count_by=${label}`), getCatalogHeaders())
+        logD(mod, fun, `${label}: ` + getCatalogAdminUrl(`resources?count_by=${label}`))
+        return axios.get(getCatalogAdminUrl(`resources?count_by=${label}`), getCatalogHeaders())
       })
     )
   } catch (err) {
@@ -167,12 +167,12 @@ export async function getCounts(req, reply) {
 export async function getCatalogLogs(req, reply) {
   const fun = `${mod}.getCatalogLogs`
   try {
-    const res = await axios.get(getCatalogAdminApiUrl('logs'), { params: req?.query, ...getCatalogHeaders() })
+    const res = await axios.get(getCatalogAdminUrl('logs'), { params: req?.query, ...getCatalogHeaders() })
     return sendJsonAndTokens(req, reply, res.data)
   } catch (err) {
     logW(mod, fun + '.reqUrl', req.url)
     logW(mod, fun + '.catalogUrl', getCatalogAdminPath('logs'))
-    logW(mod, fun + '.catalogUrl', getCatalogAdminApiUrl('logs'))
+    logW(mod, fun + '.catalogUrl', getCatalogAdminUrl('logs'))
     logW(mod, fun, err)
     logW(mod, fun, cleanErrMsg(err))
     return treatAxiosError(err, CATALOG, req, reply)

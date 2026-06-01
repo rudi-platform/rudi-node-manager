@@ -9,14 +9,7 @@ import axios from 'axios'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import {
-  CATALOG,
-  getCatalogAdminUrl as getCatalogAdminApiUrl,
-  getStorageDwnlUrl,
-  getStorageUrl,
-  MANAGER,
-  STORAGE,
-} from '../config/config.js'
+import { CATALOG, getCatalogAdminUrl, getStorageDwnlUrl, getStorageUrl, MANAGER, STORAGE } from '../config/config.js'
 import { dbGetUserByUsername } from '../database/database.js'
 import { NotFoundError, RudiError, UnauthorizedError } from '../utils/errors.js'
 import { logD, logE, logW } from '../utils/logger.js'
@@ -81,7 +74,7 @@ export async function getMediaInfoById(req, reply, next) {
   const opType = 'get_media_info_by_id'
   const { id } = req.params
   try {
-    const res = await axios.get(getCatalogAdminApiUrl('media', id), getCatalogHeaders())
+    const res = await axios.get(getCatalogAdminUrl('media', id), getCatalogHeaders())
     reply.status(200).json(res.data)
   } catch (err) {
     logW(mod, opType, cleanErrMsg(err))
@@ -179,9 +172,9 @@ const commitOnStorage = async (mediaId, commitId, zoneName) => {
 const commitOnCatalog = async (mediaId, commitId) => {
   const fun = 'commitOnCatalog'
   try {
-    logD(mod, fun, getCatalogAdminApiUrl('media', mediaId, 'commit'))
+    logD(mod, fun, getCatalogAdminUrl('media', mediaId, 'commit'))
     const res = await axios.post(
-      getCatalogAdminApiUrl('media', mediaId, 'commit'),
+      getCatalogAdminUrl('media', mediaId, 'commit'),
       { commit_id: commitId },
       getCatalogHeaders()
     )
