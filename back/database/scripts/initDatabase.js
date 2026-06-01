@@ -11,6 +11,7 @@ import { dirname } from 'path'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 import { hashPassword } from '@aqmo.org/jwt-lib'
+import { v4 as uuid4 } from 'uuid'
 import { getOptSuCreds } from '../../config/backOptions.js'
 import {
   getConfSuId,
@@ -24,7 +25,6 @@ import {
 import { decodeCredentials } from '../../controllers/authControllerPassport.js'
 import { RudiError, statusOK } from '../../utils/errors.js'
 import { getContext, logD, logE, logV, logW, sysInfo } from '../../utils/logger.js'
-import { uuidv4 } from '../../utils/utils.js'
 import {
   dbClose,
   dbCreateRoles,
@@ -359,7 +359,7 @@ const dbCreateSuperUser = async (db) => {
 
     let clearPassword, password
     if (!confSuPwd) {
-      clearPassword = uuidv4()
+      clearPassword = uuid4()
       password = hashPassword(clearPassword)
     } else {
       password = isConfSuPwdHashed() ? confSuPwd : hashPassword(confSuPwd)

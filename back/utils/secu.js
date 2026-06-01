@@ -7,7 +7,7 @@ import { forgeToken, readPrivateKeyFile, readPublicKeyPem, tokenStringToJwtObjec
 import axios from 'axios'
 import { existsSync, readdirSync, readFileSync } from 'fs'
 import _jwt from 'jsonwebtoken'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuid4 } from 'uuid'
 const { sign } = _jwt
 
 // -------------------------------------------------------------------------------------------------
@@ -103,10 +103,10 @@ export const getFrontCookieOpts = (exp, overwrite) => ({
   overwrite,
 })
 
-const JWT_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuidv4()}${uuidv4()}`
+const JWT_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuid4()}${uuid4()}`
 export const jwtSecretKey = () => JWT_SECRET
 
-const INIT_PWD_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuidv4()}${uuidv4()}`
+const INIT_PWD_SECRET = isDevEnv() ? '40811b16-5d91-44dc-95c8-d6c18bd25122' : `${uuid4()}${uuid4()}`
 export const initPwdSecret = () => INIT_PWD_SECRET
 
 export function createFrontUserTokens(userInfo) {
@@ -252,7 +252,7 @@ export function getStorageJwt() {
       getPrvKey('storage'),
       {},
       {
-        jti: uuidv4(),
+        jti: uuid4(),
         iat: timeEpochS(),
         exp: timeEpochS(toInt(DEFAULT_EXP)),
         sub: 'auth',

@@ -154,6 +154,10 @@ export function uuidv4(nb) {
   return uuidArray
 }
 
+export const REGEX_UUID = /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i
+export const isUUID = (id) => validateSchema(id, REGEX_UUID)
+export const validateSchema = (schemaStr, regExPattern) => !!schemaStr.match(new RegExp(regExPattern))
+
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const backoffDelay = (attempt, { base = 500, max = 30_000 } = {}) => {

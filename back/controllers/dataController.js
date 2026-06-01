@@ -21,7 +21,9 @@ import {
 
 import { getTags } from '../config/backOptions.js'
 
+import { BadRequestError, NotFoundError } from '../utils/errors.js'
 import { getCatalogHeaders } from '../utils/secu.js'
+import { isUUID } from '../utils/utils.js'
 import { handleError, treatAxiosError } from './errorHandler.js'
 import { getStoragePublicUrl } from './mediaController.js'
 
@@ -44,7 +46,9 @@ let cache = {}
 const callCatalog = async (url, req, reply) => {
   const fun = 'callCatalog'
   try {
-    if (cache[url]) return reply ? reply.status(200).send(cache[url]) : cache[url]
+    // altered to consider query parameters changing
+    let checkUrl = req?.url ? req.url : url
+    if (cache[checkUrl]) return reply ? reply.status(200).send(cache[checkUrl]) : cache[checkUrl]
     const res = await axios.get(getCatalogUrlAndParams(url, req), getCatalogHeaders())
     const data = res.data
     cache[url] = data
@@ -124,5 +128,19 @@ export async function getInitData(req, reply) {
     // log.e(mod, 'getInitData', cleanErrMsg(e))
     if (reply) handleError(req, reply, e, 500, 'getInitData', 'init_data')
     else throw new Error(`Couldn't get init data: ${e.message}`)
+  }
+}
+
+export const getPortalOrg = (req, reply) => {
+  const id = req?.params?.id
+  if (id && !isUUID(id)) throw BadRequestError(`Not a valid UUID: '${id}'`)
+
+  const act = req?.params?.act
+  if (act && !id) throw NotFoundError(`Incorrect route: ${req.url}`)
+
+  try {
+    return callCatalog(getCatalogAdminPath('/portal/organizations', id, act), req, reply)
+  } catch (err) {
+    return treatAxiosError(err, CATALOG, req, reply)
   }
 }
