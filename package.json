@@ -1,7 +1,7 @@
 {
   "description": "Application d'administration du noeud RUDI",
   "name": "rudi-node-manager",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
@@ -29,9 +29,9 @@
   },
   "dependencies": {
     "@aqmo.org/jwt-lib": "^1.1.15",
-    "@aqmo.org/rudi_logger": "^1.1.6",
-    "axios": "^1.16.1",
-    "body-parser": "^2.2.2",
+    "@aqmo.org/rudi_logger": "^1.1.7",
+    "axios": "^1.18.1",
+    "body-parser": "^2.3.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
@@ -47,9 +47,10 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "path-to-regexp": "^8.4.2",
-    "qs": "^6.15.2",
+    "qs": "^6.15.3",
     "sqlite3": "^6.0.1",
-    "uuid": "^14.0.0"
+    "undici": "^8.7.0",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -63,12 +64,13 @@
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-unused-imports": "^4.4.1",
     "nodemon": "^3.1.14",
-    "postcss": "^8.5.15",
-    "prettier": "^3.8.3"
+    "postcss": "^8.5.16",
+    "prettier": "^3.9.4"
   },
   "overrides": {
     "braces": "$braces",
     "postcss": "$postcss",
+    "undici": "$undici",
     "uuid": "$uuid"
   }
 }

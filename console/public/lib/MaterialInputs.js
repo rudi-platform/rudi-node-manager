@@ -3065,8 +3065,8 @@ export class FileCard extends ActionCard {
       throw new SetValueError(this, file, new TypeError('Value should be a File or ForeignFile instance'))
     console.debug('T [MatIn.FileCard]', 'file.size', file.size)
     this.#value = file
-    this.name.textContent = file?.name
-    this.type.textContent = file?.type
+    this.name.textContent = file.name
+    this.type.textContent = file.type || document.apiFileTypes[file.name.split('.').pop()]
     if (file.size) {
       this.size.textContent = this.humanReadableByteCountSI(file.size)
       if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"

@@ -20,10 +20,9 @@ const PROP_PUB_KEY_NAME = 'pub_key_name'
 const MEDIA_COMMIT_OK = 'commit_ready'
 
 export class MetadataForm extends RudiForm {
-  apiFileTypes = undefined
-
   constructor(language) {
     super(language)
+    this.apiFileTypes = undefined
   }
 
   async getTemplate() {
@@ -74,6 +73,7 @@ export class MetadataForm extends RudiForm {
       Object.assign(this.template.fragmentSet.enums.$, enums)
 
       this.apiFileTypes = enums.fileextensions
+      document.apiFileTypes = enums.fileextensions
       // this.ok(here)
     } catch (err) {
       this.ko(here, err)
@@ -566,11 +566,18 @@ class MediaFile extends ForeignFile {
   static fromFile(file, mediaUrl) {
     const date = new Date(file.lastModified).toISOString()
     let fileType = file.type // Value extractred in MaterialInput.js and is one of JS Blob.types
+    console.debug('D fileType', fileType)
+    console.debug('D file name', file.name)
     if (MetadataForm.apiFileTypes) {
-      if (!fileType || !Object.values(MetadataForm.apiFileTypes).includes(fileType))
+      console.debug('D apiFileTypes', MetadataForm.apiFileTypes)
+      if (!fileType || !Object.values(MetadataForm.apiFileTypes).includes(fileType)) {
+        console.debug('D apiFileTypes', MetadataForm.apiFileTypes)
         fileType = MetadataForm.apiFileTypes[getFileExtension(file.name)]
+      }
     }
-    if (!fileType) fileType = 'application/octet-stream'
+    if (!fileType) {
+      fileType = 'application/octet-stream'
+    }
     const uuid = uuidv4()
     const media = new MediaFile(
       uuid,
