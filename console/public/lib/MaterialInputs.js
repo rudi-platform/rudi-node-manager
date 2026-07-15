@@ -3067,6 +3067,7 @@ export class FileCard extends ActionCard {
     this.#value = file
     this.name.textContent = file.name
     this.type.textContent = file.type || document.apiFileTypes[file.name.split('.').pop()]
+
     if (file.size) {
       this.size.textContent = this.humanReadableByteCountSI(file.size)
       if (file.file_storage_status === 'missing') this.size.innerHTML = "<span class='alert'>indisponible</span>"
@@ -3465,8 +3466,13 @@ export class ForeignFile {
   constructor(name, size, type, file_storage_status) {
     this.name = name
     this.size = size
-    this.type = type === 'application/x-yaml' ? 'text/x-yaml' : type
     this.file_storage_status = file_storage_status
+    this.type = ForeignFile._checkType(type, name)
+  }
+  static _checkType(type, name) {
+    if (type === 'application/x-yaml') return 'text/x-yaml'
+    if (type && type != 'application/octet-stream') return type
+    return document.apiFileTypes?.[name.split('.').pop()] || 'application/octet-stream'
   }
 }
 

@@ -12,7 +12,7 @@ import { ForeignFile } from '../lib/MaterialInputs.js'
 import { HttpRequest, JsonHttpRequest } from './Http.js'
 import { RudiForm, STYLE_BLD, STYLE_ERR, STYLE_THN } from './Rudi.js'
 import { encryptRsaOaepAesGcm, importPublicRsaKey } from './RudiCrypto.js'
-import { getFileExtension, multiSplit, pathJoin, uuidv4 } from './utils.js'
+import { multiSplit, pathJoin, uuidv4 } from './utils.js'
 
 // ---- Access conf values -----
 const pubKeys = {}
@@ -565,19 +565,8 @@ class MediaFile extends ForeignFile {
    */
   static fromFile(file, mediaUrl) {
     const date = new Date(file.lastModified).toISOString()
-    let fileType = file.type // Value extractred in MaterialInput.js and is one of JS Blob.types
-    console.debug('D fileType', fileType)
-    console.debug('D file name', file.name)
-    if (MetadataForm.apiFileTypes) {
-      console.debug('D apiFileTypes', MetadataForm.apiFileTypes)
-      if (!fileType || !Object.values(MetadataForm.apiFileTypes).includes(fileType)) {
-        console.debug('D apiFileTypes', MetadataForm.apiFileTypes)
-        fileType = MetadataForm.apiFileTypes[getFileExtension(file.name)]
-      }
-    }
-    if (!fileType) {
-      fileType = 'application/octet-stream'
-    }
+    const fileType = this._checkType(file.type, file.name) // Value extractred in MaterialInput.js and is one of JS Blob.types
+
     const uuid = uuidv4()
     const media = new MediaFile(
       uuid,

@@ -27,7 +27,7 @@ export const lastElementOfArray = (anArray) => anArray.slice(-1)[0]
 /**
  * Get the extension of a file name
  */
-export const getFileExtension = (fileName) => lastElementOfArray(`${fileName}`.split('.'))
+export const getFileExtension = (fileName) => `${fileName}`.split('.').pop()
 
 /**
  * Split an input string with an array of single characters
