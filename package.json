@@ -36,7 +36,7 @@
     "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
     "express": "^5.2.1",
-    "helmet": "^8.2.0",
+    "helmet": "^8.3.0",
     "ini": "^7.0.0",
     "jsonwebtoken": "^9.0.3",
     "leaflet": "^1.9.4",
@@ -57,15 +57,15 @@
     "@babel/eslint-parser": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "braces": "^3.0.3",
-    "eslint": "^9.39.4",
+    "eslint": "^9.39.5",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-only-warn": "^1.2.1",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-unused-imports": "^4.4.1",
     "nodemon": "^3.1.14",
-    "postcss": "^8.5.16",
-    "prettier": "^3.9.4"
+    "postcss": "^8.5.19",
+    "prettier": "^3.9.5"
   },
   "overrides": {
     "braces": "$braces",
