@@ -31,7 +31,6 @@
     ]
   },
   "dependencies": {
-    "@babel/core": "^7.29.7",
     "@svgr/webpack": "^8.1.0",
     "@textea/json-viewer": "4.0.1",
     "@tootallnate/once": "^3.0.1",
@@ -59,17 +58,16 @@
     "webpack-dev-server": "^5.2.6"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.29.7",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-env": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
+    "@babel/core": "^8.0.1",
+    "@babel/eslint-parser": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-react": "^8.0.1",
     "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.6.6",
-    "eslint": "^8.57.1",
-    "eslint-config-google": "^0.14.0",
-    "eslint-config-prettier": "^9.1.2",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-only-warn": "^1.2.1",
     "eslint-plugin-prettier": "^5.5.6",
