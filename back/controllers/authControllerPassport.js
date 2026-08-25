@@ -38,8 +38,11 @@ export async function postLogin(req, reply, next) {
   passportAuthenticate('local', async (err, user, info) => {
     if (err) {
       logW(mod, fun, err)
-      return reply.status(400).send(err)
+      return err.statusCode == 401
+        ? reply.status(401).send('Utilisateur ou mot de passe incorrect')
+        : reply.status(400).send(err)
     }
+
     if (isInvalidUsername(user.username)) {
       const errMsg = `Le nom d'utilisateur doit comporter au minimum 4 lettres, et être composé de lettres, espace, signe moins ou underscore`
       logW(mod, fun, errMsg)
