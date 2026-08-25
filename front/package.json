@@ -1,7 +1,7 @@
 {
   "description": "Interface d'administration du noeud RUDI",
   "name": "rudi-prodmanager-front",
-  "version": "2.5.0",
+  "version": "2.7.7a",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
