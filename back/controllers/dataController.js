@@ -133,10 +133,10 @@ export async function getInitData(req, reply) {
 
 export const getPortalOrg = (req, reply) => {
   const id = req?.params?.id
-  if (id && !isUUID(id)) throw BadRequestError(`Not a valid UUID: '${id}'`)
+  if (id && !isUUID(id)) throw new BadRequestError(`Not a valid UUID: '${id}'`)
 
   const act = req?.params?.act
-  if (act && !id) throw NotFoundError(`Incorrect route: ${req.url}`)
+  if (act && !id) throw new NotFoundError(`Incorrect route: ${req.url}`)
 
   try {
     return callCatalog(getCatalogAdminPath('/portal/organizations', id, act), req, reply)

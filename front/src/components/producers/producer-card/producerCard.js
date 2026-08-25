@@ -64,7 +64,7 @@ export function ProducerCard({ editMode, producer, deleteUrl, refresh, attachUrl
   const { options, changeOptions } = useGenericModalOptions()
   const { toggle, visible } = useGenericModal()
   const { isVisibleDetachModal, toggleDetachModal } = useDetachProducerModal()
-  const { notifySuccess, notifyWarning } = useNotification()
+  const { notify, notifySuccess, notifyWarning, notifyError } = useNotification()
 
   const getFormProducer = (producer, query) => back?.isLoaded && back.getConsole(producer, query)
 
@@ -114,12 +114,21 @@ export function ProducerCard({ editMode, producer, deleteUrl, refresh, attachUrl
     setAttachLoading(true)
     setShowAttachButton(false)
     axios
-      .post(attachUrl(id))
+      .get(attachUrl(id))
       .then(() => {
         setAttachLoading(false)
+        notifySuccess('Tâche effectuée avec succès. Votre demande de rattachement est soumise à modération auprès des équipes Rudi.')
       })
-      .catch((err) => {
-        defaultErrorHandler(err)
+      .catch(() => {
+        notify(
+          <span>
+            Une erreur est survenue. Veuillez relancer la procédure. Si l&apos;erreur persiste, merci de contacter l&apos;équipe technique{' '}
+            <a href="https://rudi.fr/?contact" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'underline' }}>
+              en cliquant ici
+            </a>
+          </span>,
+          'danger'
+        )
 
         // An error occurred, hide the attach button
         // The page must be reloaded to display the current status of the organization
@@ -130,7 +139,7 @@ export function ProducerCard({ editMode, producer, deleteUrl, refresh, attachUrl
 
   const detachProducer = (id) => {
     axios
-      .post(detachOrgUrl(id))
+      .get(detachOrgUrl(id))
       .then(() => {
         setHasPendingTask(true)
         notifySuccess("Votre demande a bien été soumise à l'équipe administrative du portail.")
@@ -150,7 +159,7 @@ export function ProducerCard({ editMode, producer, deleteUrl, refresh, attachUrl
 
   const checkOrgHasTaskThenDetach = (id) => {
     axios
-      .post(hasTaskOrgUrl(id))
+      .get(hasTaskOrgUrl(id))
       .then((res) => {
         if (res.data) {
           notifyWarning('Une demande est déjà en cours pour cette organisation.')

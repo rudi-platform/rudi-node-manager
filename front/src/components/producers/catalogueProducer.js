@@ -28,6 +28,7 @@ export default function CatalogueProducer({ editMode, logout }) {
   const [producerList, setProducerList] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [currentOffset, setCurrentOffset] = useState(-1)
+  const [isLoading, setIsLoading] = useState(true)
   const initialRender = useRef(true)
 
   const getCatalogUrlObj = (suffix) => back?.isLoaded && back.getBackCatalog('organizations', suffix)
@@ -39,6 +40,7 @@ export default function CatalogueProducer({ editMode, logout }) {
   const refresh = () => {
     setHasMore(true)
     setProducerList([])
+    setIsLoading(true)
     getInitialData()
 
     if (currentOffset === 0) {
@@ -74,7 +76,10 @@ export default function CatalogueProducer({ editMode, logout }) {
       .then((res) => {
         if (res.data?.length < PAGE_SIZE) setHasMore(false)
       })
-      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
+      .catch((err) => {
+        setIsLoading(false)
+        return err.response?.status == 401 ? logout() : defaultErrorHandler(err)
+      })
   }
 
   /**
@@ -90,8 +95,12 @@ export default function CatalogueProducer({ editMode, logout }) {
         const data = res.data
         if (data.length < PAGE_SIZE) setHasMore(false)
         setProducerList((producers) => producers.concat(data))
+        setIsLoading(false)
       })
-      .catch((err) => (err.response?.status == 401 ? logout() : defaultErrorHandler(err)))
+      .catch((err) => {
+        setIsLoading(false)
+        return err.response?.status == 401 ? logout() : defaultErrorHandler(err)
+      })
   }
   return (
     <div className={'tempPaddingTop'}>
@@ -99,12 +108,15 @@ export default function CatalogueProducer({ editMode, logout }) {
         <div className="col-9">
           <div className="row">
             <ProducerManagmentCard></ProducerManagmentCard>
+            {isLoading ? (
+              <h4>Loading...</h4>
+            ) : (
             <InfiniteScroll
               dataLength={producerList.length}
               next={() => setCurrentOffset(currentOffset + PAGE_SIZE)}
               hasMore={hasMore}
               loader={<h4>Loading...</h4>}
-              endMessage={<i>Aucune donnée supplémentaire</i>}
+              endMessage={producerList.length === 0 ? <i>Aucune donnée supplémentaire</i> : null}
             >
               {producerList.map((producer) => (
                 <ProducerCard
@@ -116,6 +128,7 @@ export default function CatalogueProducer({ editMode, logout }) {
                 ></ProducerCard>
               ))}
             </InfiniteScroll>
+            )}
           </div>
         </div>
       </div>

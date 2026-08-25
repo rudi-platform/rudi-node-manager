@@ -99,6 +99,8 @@ const ALLOWED_ATTR = [
   'title',
   'valign',
   'value',
+  // inline styles (filtered to safe properties in the hook below)
+  'style',
 ]
 
 // DOMPurify post-processing hook (runs AFTER attribute sanitization).
@@ -130,7 +132,17 @@ purifier.addHook('afterSanitizeAttributes', (node) => {
       node.setAttribute('rel', 'nofollow noopener noreferrer')
     }
 
-    // Case 2: <blockquote> and <q> (citations)
+    // Case 2: inline style — only allow text-align
+  } else if (node.hasAttribute('style')) {
+    const style = node.getAttribute('style')
+    const textAlignMatch = style.match(/text-align\s*:\s*(left|center|right|justify)/i)
+    if (textAlignMatch) {
+      node.setAttribute('style', `text-align: ${textAlignMatch[1].toLowerCase()}`)
+    } else {
+      node.removeAttribute('style')
+    }
+
+    // Case 3: <blockquote> and <q> (citations)
   } else if (tag === 'BLOCKQUOTE' || tag === 'Q') {
     // The citation source URL
     const cite = node.getAttribute('cite')
