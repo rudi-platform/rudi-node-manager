@@ -145,7 +145,7 @@ const setupPassport = () => {
       .then((user) => done(null, user))
       .catch((err) => {
         logE(mod, 'passport.deserializeUser', `User ID not found: ${id}`)
-        return done(new UnauthorizedError('User not found'), false)
+        return done(new UnauthorizedError('User not found'))
       })
   )
 
@@ -156,7 +156,7 @@ const setupPassport = () => {
         .then(() => done(null, { username }))
         .catch((err) => {
           logW(mod, 'LocalStrategy', `Error login: ${err}`)
-          return done(null, false, err)
+          return done(err)
         })
     })
   )

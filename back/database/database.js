@@ -90,7 +90,7 @@ export async function dbGetHashedPassword(openedDb, username) {
         logE(mod, fun, err.message)
         reject(err)
       } else {
-        if (!row) return reject(new UnauthorizedError('No user found'))
+        if (!row) return reject(new UnauthorizedError('User not found'))
         return resolve({ username, password: row.password })
       }
     })
