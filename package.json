@@ -1,7 +1,7 @@
 {
   "description": "Application d'administration du noeud RUDI",
   "name": "rudi-node-manager",
-  "version": "2.7.7a",
+  "version": "2.7.8",
   "author": "Yann Porret <yporret@micropole.com>, Olivier Martineau <olivier.martineau@irisa.fr>",
   "license": "EUPL-1.2",
   "private": true,
@@ -48,16 +48,16 @@
     "passport-local": "^1.0.0",
     "path-to-regexp": "^8.4.2",
     "qs": "^6.16.0",
-    "sqlite3": "^6.0.1",
     "tar": "^7.5.22",
     "undici": "^8.10.2",
     "uuid": "^14.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.5",
-    "@babel/eslint-parser": "^8.0.5",
-    "@babel/preset-env": "^8.0.5",
-    "eslint": "^10.10.0",
+    "@babel/core": "^8.0.6",
+    "@babel/eslint-parser": "^8.0.6",
+    "@babel/preset-env": "^8.0.6",
+    "browserslist": "^4.29.0",
+    "eslint": "^10.11.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-only-warn": "^1.2.1",
@@ -66,8 +66,7 @@
     "globals": "^17.12.0",
     "nodemon": "^3.1.14",
     "postcss": "^8.5.28",
-    "prettier": "^3.9.8",
-    "browserslist": "^4.29.0"
+    "prettier": "^3.9.8"
   },
   "overrides": {
     "postcss": "$postcss",

@@ -7,7 +7,6 @@ import express from 'express'
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
 
-import { v4 as uuid4 } from 'uuid'
 import {
   getCatalogVersion,
   getEnum,
@@ -30,6 +29,7 @@ import {
 } from '../controllers/genericController.js'
 import { ROLE_ADMIN, ROLE_EDIT } from '../database/scripts/initDatabase.js'
 import { checkRolePerm } from '../utils/roleCheck.js'
+import { uuidv4 } from '../utils/utils.js'
 
 // -------------------------------------------------------------------------------------------------
 // Routing
@@ -38,7 +38,7 @@ import { checkRolePerm } from '../utils/roleCheck.js'
 // Proxy for the Catalog API
 export const catalogApi = new express.Router()
 
-catalogApi.get('/uuid', (req, reply) => reply.status(200).send(uuid4(req.query?.nb)))
+catalogApi.get('/uuid', (req, reply) => reply.status(200).send(uuidv4(req.query?.nb)))
 catalogApi.get('/version', getCatalogVersion)
 catalogApi.get('/enum/themes/:lang', getThemeByLang)
 catalogApi.get('/enum/themes', getThemeByLang)

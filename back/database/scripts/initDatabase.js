@@ -90,35 +90,26 @@ const sqlCreateUserRoleTable =
 // -------------------------------------------------------------------------------------------------
 // Functions
 // -------------------------------------------------------------------------------------------------
-const dbInitTable = (openedDb, tableName, sqlCreateReq) => {
+const dbInitTable = async (openedDb, tableName, sqlCreateReq) => {
   const fun = 'initTable'
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    db.get(sqlGet, [tableName], (err, row) => {
-      if (err) {
-        if (!openedDb) dbClose(db)
-        return reject(err)
-      }
-      if (row) {
-        if (!openedDb) dbClose(db)
-        return resolve(statusOK(`Table exists: '${tableName}'`))
-      }
-      db.run(sqlCreateReq, (err) => {
-        if (!openedDb) dbClose(db)
-        if (err) {
-          logE(mod, `${fun}.${tableName}.create`, err.message)
-          return reject(err)
-        }
-        sysInfo(
-          mod,
-          `${fun}.${tableName}.create`,
-          `Table Created : ${tableName}`,
-          getContext(null, { opType: `init_table_${tableName}`.toLowerCase() })
-        )
-        return resolve(statusOK(`Table created: ${tableName}`))
-      })
-    })
-  })
+  try {
+    const row = db.prepare(sqlGet).get(tableName)
+    if (row) return statusOK(`Table exists: '${tableName}'`)
+    db.exec(sqlCreateReq)
+    sysInfo(
+      mod,
+      `${fun}.${tableName}.create`,
+      `Table Created : ${tableName}`,
+      getContext(null, { opType: `init_table_${tableName}`.toLowerCase() })
+    )
+    return statusOK(`Table created: ${tableName}`)
+  } catch (err) {
+    logE(mod, `${fun}.${tableName}.create`, err.message)
+    throw err
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
 
 const dbNormalizeRoleTable = async (openedDb) => {
@@ -128,154 +119,97 @@ const dbNormalizeRoleTable = async (openedDb) => {
   await dbRenameUserRoles(db)
   if (!openedDb) dbClose(db)
 }
-const dbNormalizeRoleTableAddHide = (openedDb) => {
+const dbNormalizeRoleTableAddHide = async (openedDb) => {
   const fun = 'dbNormalizeRoleTableAddHide'
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    db.all(`PRAGMA table_info(${TBL_ROLES})`, (err, rows) => {
-      if (err) {
-        if (!openedDb) dbClose(db)
-        logD(mod, `${fun}.pragma`, err.message)
-        return reject(new RudiError(`RoleHide Pragma failed: ${err.message}`))
-      }
-      if (rows.find((row) => row.name === 'hide')) {
-        if (!openedDb) dbClose(db)
-        // log.d(mod, `${fun}`, `Column 'hide' exists`)
-        return resolve(statusOK(`Column 'hide' exists`))
-      }
-      db.run(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1) DEFAULT 0`, (err) => {
-        if (err) {
-          if (!openedDb) dbClose(db)
-          logD(mod, `${fun}.addHide`, err.message)
-          return reject(err)
-        }
-        db.run(`UPDATE ${TBL_ROLES} SET hide=1 WHERE role='${ROLE_SU}' OR role='Moniteur' `, (err) => {
-          if (err) {
-            if (!openedDb) dbClose(db)
-            logD(mod, `${fun}.setHideFlag`, err.message)
-            return reject(err)
-          }
-          return resolve(statusOK(`Column 'hide added & role flags set`))
-        })
-      })
-    })
-  })
+  try {
+    const rows = db.prepare(`PRAGMA table_info(${TBL_ROLES})`).all()
+    if (rows.find((row) => row.name === 'hide')) {
+      // log.d(mod, `${fun}`, `Column 'hide' exists`)
+      return statusOK(`Column 'hide' exists`)
+    }
+    db.exec(`ALTER TABLE ${TBL_ROLES} ADD hide INTEGER(1) DEFAULT 0`)
+    db.exec(`UPDATE ${TBL_ROLES} SET hide=1 WHERE role='${ROLE_SU}' OR role='Moniteur' `)
+    return statusOK(`Column 'hide added & role flags set`)
+  } catch (err) {
+    logD(mod, `${fun}.pragma`, err.message)
+    throw new RudiError(`RoleHide Pragma failed: ${err.message}`)
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
-const dbRenameUserRoles = (openedDb) => {
+const dbRenameUserRoles = async (openedDb) => {
   const fun = 'dbRenameUserRoles'
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    dbGetUserRoles(db).then((roleList) => {
-      const found = roleList.find(
-        (roleDescPair) =>
-          roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
-      )
-      if (!found) {
-        if (!openedDb) dbClose(db)
-        logD(mod, `${fun}`, `UserRoles already renamed`)
-        return resolve(statusOK(`UserRoles already renamed`))
-      }
-      db.run(`UPDATE ${TBL_USER_ROLES} SET role='Lecteur' WHERE role='Createur' OR role='Créateur'`, (err) => {
-        if (err) {
-          if (!openedDb) dbClose(db)
-          logD(mod, `${fun}.Lecteur`, err.message)
-          return reject(new RudiError(`${fun}.Lecteur: ${err}`))
-        }
-        db.run(`UPDATE ${TBL_USER_ROLES} SET role='Editeur' WHERE role='Gestionnaire'`, (err) => {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            logD(mod, `${fun}.Editeur`, err.message)
-            return reject(new RudiError(`${fun}.Editeur: ${err}`))
-          }
-          logD(mod, `${fun}`, `UserRoles renamed`)
-          return resolve(statusOK(`UserRoles renamed`))
-        })
-      })
-    })
-  })
+  try {
+    const roleList = await dbGetUserRoles(db)
+    const found = roleList.find(
+      (roleDescPair) =>
+        roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
+    )
+    if (!found) {
+      logD(mod, `${fun}`, `UserRoles already renamed`)
+      return statusOK(`UserRoles already renamed`)
+    }
+    db.exec(`UPDATE ${TBL_USER_ROLES} SET role='Lecteur' WHERE role='Createur' OR role='Créateur'`)
+    db.exec(`UPDATE ${TBL_USER_ROLES} SET role='Editeur' WHERE role='Gestionnaire'`)
+    logD(mod, `${fun}`, `UserRoles renamed`)
+    return statusOK(`UserRoles renamed`)
+  } catch (err) {
+    logD(mod, `${fun}`, err.message)
+    throw new RudiError(`${fun}: ${err}`)
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
-const dbRenameRoles = (openedDb) => {
+const dbRenameRoles = async (openedDb) => {
   const fun = 'dbRenameRoles'
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    dbGetRoles(db)
-      .then((roleList) => {
-        const found = roleList.find(
-          (roleDescPair) =>
-            roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
-        )
-        if (!found) {
-          if (!openedDb) dbClose(db)
-          logD(mod, `${fun}`, `Roles already renamed`)
-          return resolve(statusOK(`Roles already renamed`))
-        }
-        db.run(
-          `UPDATE ${TBL_ROLES} SET role='Lecteur', desc='lecture seule des métadonnées' WHERE role='Createur' OR role='Créateur'`,
-          (err) => {
-            if (err) {
-              if (!openedDb) dbClose(db)
-              logD(mod, `${fun}.Lecteur`, err.message)
-              return reject(new RudiError(`${fun}.Lecteur: ${err}`))
-            }
-            db.run(
-              `UPDATE ${TBL_ROLES} SET role='Editeur',desc='édition et suppression des métadonnées' WHERE role='Gestionnaire'`,
-              (err) => {
-                if (!openedDb) dbClose(db)
-                if (err) {
-                  logD(mod, `${fun}.Editeur`, err.message)
-                  return reject(new RudiError(`${fun}.Editeur: ${err}`))
-                }
-                logD(mod, `${fun}`, `Roles renamed`)
-                return resolve(statusOK(`Roles renamed`))
-              }
-            )
-          }
-        )
-      })
-      .catch((err) => {
-        if (!openedDb) dbClose(db)
-        reject(new RudiError(`RenameRoles.getRoles: ${err}`))
-      })
-  })
+  try {
+    const roleList = await dbGetRoles(db)
+    const found = roleList.find(
+      (roleDescPair) =>
+        roleDescPair.role === 'Createur' || roleDescPair.role === 'Créateur' || roleDescPair.role === 'Gestionnaire'
+    )
+    if (!found) {
+      logD(mod, `${fun}`, `Roles already renamed`)
+      return statusOK(`Roles already renamed`)
+    }
+    db.exec(
+      `UPDATE ${TBL_ROLES} SET role='Lecteur', desc='lecture seule des métadonnées' WHERE role='Createur' OR role='Créateur'`
+    )
+    db.exec(
+      `UPDATE ${TBL_ROLES} SET role='Editeur',desc='édition et suppression des métadonnées' WHERE role='Gestionnaire'`
+    )
+    logD(mod, `${fun}`, `Roles renamed`)
+    return statusOK(`Roles renamed`)
+  } catch (err) {
+    logD(mod, `${fun}`, err.message)
+    throw new RudiError(`${fun}: ${err}`)
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
 
-const dbNormalizeUserTableName = (openedDb, oldTblName) => {
+const dbNormalizeUserTableName = async (openedDb, oldTblName) => {
   const fun = 'dbNormalizeUsersTableName'
   const tempName = `x${oldTblName}x`
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`, [], (err, row) => {
-      if (err) {
-        if (!openedDb) dbClose(db)
-        logE(mod, `${fun}.check`, err.message)
-        return reject(err)
-      }
-      if (!row) {
-        if (!openedDb) dbClose(db)
-        return resolve(`No table found with name '${oldTblName}'`)
-      }
-      logD(mod, `${fun}.check`, JSON.stringify(row))
+  try {
+    const row = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='${oldTblName}'`).get()
+    if (!row) return `No table found with name '${oldTblName}'`
+    logD(mod, `${fun}.check`, JSON.stringify(row))
 
-      db.run(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`, [], (err, row) => {
-        if (err) {
-          if (!openedDb) dbClose(db)
-          logE(mod, `${fun}.renameToto`, err.message)
-          return reject(err)
-        }
-        logD(mod, `${fun}.renameToto`, JSON.stringify(row))
-        db.run(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`, [], (err, row) => {
-          if (!openedDb) dbClose(db)
-          if (err) {
-            logE(mod, `${fun}.renameReal`, err.message)
-            reject(err)
-          } else {
-            logD(mod, fun, JSON.stringify(row))
-            resolve('Users table name normalized')
-          }
-        })
-      })
-    })
-  })
+    db.exec(`ALTER TABLE '${oldTblName}' RENAME TO '${tempName}'`)
+    db.exec(`ALTER TABLE '${tempName}' RENAME TO '${TBL_USERS}'`)
+    logD(mod, fun, 'Users table name normalized')
+    return 'Users table name normalized'
+  } catch (err) {
+    logE(mod, `${fun}.rename`, err.message)
+    throw err
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
 
 const dbNormalizeUserTableId = async (db) => {
@@ -347,7 +281,7 @@ const dbCreateSuperUser = async (db) => {
     const id = getConfSuId()
     const dbSuInfo = await dbGetUserById(db, id) // NOSONAR
     if (dbSuInfo) {
-      logD(mod, fun, dbSuInfo)
+      logD(mod, fun, `SU info: ${JSON.stringify(dbSuInfo)}`)
       logV(mod, fun, `Super User '${dbSuInfo.username}' exists in DB, no action required`)
       return
     }
@@ -434,7 +368,7 @@ export async function dbInitialize() {
  * the Super User credentials will be (over)written in the user database.
  * Otherwise, if no Super User is found in the DB, the credentials given in the custom configuration file will be used.
  * If no CLI/var env are given and a super user already exists in DB, we leave things as they are.
- * @param {*} db an sqlite3 database (possibly null)
+ * @param {*} db a node:sqlite database (possibly null)
  */
 const checkSuperUser = async (db) => {
   const fun = 'checkSuperUser'

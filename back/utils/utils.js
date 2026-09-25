@@ -146,12 +146,9 @@ export function checkIsURL(url) {
 
 export function uuidv4(nb) {
   if (!nb) return v4()
-  if (!isInteger(parseInt(nb))) throw new Error('Input parameter should be an integer')
-  const uuidArray = []
-  for (let i = 0; i < nb; i++) {
-    uuidArray.push(v4())
-  }
-  return uuidArray
+  nb = parseInt(nb)
+  if (!isInteger(nb)) throw new Error('Input parameter should be an integer')
+  return Array.from({ length: nb }, () => v4())
 }
 
 export const REGEX_UUID = /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i

@@ -3,9 +3,9 @@ const mod = 'database'
 // -------------------------------------------------------------------------------------------------
 // Internal dependencies
 // -------------------------------------------------------------------------------------------------
-import { statusOK } from '../../utils/errors'
-import { getContext, logE, sysError, sysInfo } from '../../utils/logger'
-import { dbClose, dbOpen } from '../database'
+import { statusOK } from '../../utils/errors.js'
+import { getContext, sysError, sysInfo } from '../../utils/logger.js'
+import { dbClose, dbOpen } from '../database.js'
 
 // -------------------------------------------------------------------------------------------------
 // Constants
@@ -21,29 +21,19 @@ const sqlCreateDefaultFormTable =
 // -------------------------------------------------------------------------------------------------
 // Functions
 // -------------------------------------------------------------------------------------------------
-export function dbInitDefaultFormTable(openedDb) {
+export async function dbInitDefaultFormTable(openedDb) {
   const fun = 'dbInitDefaultFormTable'
   const db = openedDb ?? dbOpen()
-  return new Promise((resolve, reject) => {
-    db.get(`SELECT name FROM sqlite_master WHERE type=? AND name=?`, ['table', DEFAULT_VAL_FORM], (err, row) => {
-      if (err) {
-        if (!openedDb) dbClose(db)
-        logE(mod, fun + ' select', err.message)
-        return reject(err)
-      }
-      if (row) {
-        if (!openedDb) dbClose(db)
-        return resolve({ status: `Table exists: '${DEFAULT_VAL_FORM}'` })
-      }
-      db.run(sqlCreateDefaultFormTable, (err) => {
-        if (!openedDb) dbClose(db)
-        if (err) {
-          sysError(mod, `${fun}.create`, err.message, getContext(null, { opType: 'init_table_defaultForm' }))
-          return reject(err)
-        }
-        sysInfo(mod, fun, `Table created: ${DEFAULT_VAL_FORM}`, getContext(null, { opType: 'init_table_defaultForm' }))
-        resolve(statusOK(`Table created: ${DEFAULT_VAL_FORM}`))
-      })
-    })
-  })
+  try {
+    const row = db.prepare(`SELECT name FROM sqlite_master WHERE type=? AND name=?`).get('table', DEFAULT_VAL_FORM)
+    if (row) return { status: `Table exists: '${DEFAULT_VAL_FORM}'` }
+    db.exec(sqlCreateDefaultFormTable)
+    sysInfo(mod, fun, `Table created: ${DEFAULT_VAL_FORM}`, getContext(null, { opType: 'init_table_defaultForm' }))
+    return statusOK(`Table created: ${DEFAULT_VAL_FORM}`)
+  } catch (err) {
+    sysError(mod, `${fun}.create`, err.message, getContext(null, { opType: 'init_table_defaultForm' }))
+    throw err
+  } finally {
+    if (!openedDb) dbClose(db)
+  }
 }
