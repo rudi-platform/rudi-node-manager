@@ -521,7 +521,7 @@ export async function dbUpdateUserRoles(openedDb, userInfo) {
     await Promise.all(
       targetRoles.map((newRole) => {
         return new Promise((resolve, reject) => {
-          const i = origRoles.indexOf(newRole)
+          const i = origRoles?.indexOf(newRole)
           if (i === -1) {
             dbCreateUserRole(db, { userId, role: newRole, username })
               .then((res) => {

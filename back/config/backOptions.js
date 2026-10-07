@@ -68,7 +68,6 @@ export const OPTIONS = {
     env: 'MANAGER_SU',
   },
 }
-// if (argv.indexOf('--opts') > -1) {
 console.log('--------------------------------------------------------------')
 
 console.log('Options to run this app: ')
@@ -78,7 +77,6 @@ Object.keys(OPTIONS).forEach((opt) =>
   )
 )
 console.log('--------------------------------------------------------------')
-// }
 
 // -------------------------------------------------------------------------------------------------
 // Extract command line arguments
