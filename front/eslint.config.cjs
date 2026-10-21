@@ -24,6 +24,10 @@ module.exports = [
     languageOptions: {
       globals: { ...globals.browser, require: true, process: true },
       ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
     },
     rules: {
       'arrow-body-style': 'off',

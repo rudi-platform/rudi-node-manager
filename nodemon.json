@@ -1,0 +1,4 @@
+{
+  "watch": ["back", "console", "run-rudinode-manager.js"],
+  "ignore": ["**/node_modules/**"]
+}
