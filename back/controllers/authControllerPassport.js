@@ -98,7 +98,6 @@ export async function putPassword(req, reply, next) {
   logD(fun)
   try {
     const { username, password, newPassword, confirmNewPassword } = req.body
-    logD(mod, fun, `changing pwd for user '${username}': '${password}'->'${newPassword}'/'${confirmNewPassword}'`)
     if (
       isInvalidUsername(username) ||
       !password ||
@@ -120,11 +119,10 @@ export async function putPassword(req, reply, next) {
           logE(mod, fun, err)
           reply.status(400).send(err.message)
         })
-    logD(mod, fun, `matches init: ${matchPassword(INIT_PWD, dbUserHash)}`)
     if (matchPassword(INIT_PWD, dbUserHash)) return updatePwd(db, username, newPassword)
 
     passportAuthenticate('local', (err, user, info) => {
-      logD(mod, fun, `err:\n${err}\n\nuser:\n${user}\n\ninfo: ${info}`)
+      // logD(mod, fun, `err:\n${err}\n\nuser:\n${user}\n\ninfo: ${info}`)
       if (err) return reply.status(400).send(err)
       if (!user) {
         const errMsg = info.message ?? 'User not found'
