@@ -109,7 +109,14 @@
             { "id": "@keywords", "tag": "datalist-input", "class": ["col", "s4", "m4"], "attr": { "required": true } },
             { "id": "@producer", "tag": "select-input", "class": ["col", "s4"], "attr": { "required": true } },
             { "id": "@contacts", "tag": "selectm-input", "class": ["col", "s4"], "attr": { "required": true } },
-            { "id": "@resource_languages", "tag": "selectm-input", "class": ["col", "s4", "m4"] },
+            {
+              "tag": "form-section",
+              "class": ["row"],
+              "children": [
+                { "id": "@extras", "tag": "json-input", "class": ["col", "s4", "m4"] },
+                { "id": "@resource_languages", "tag": "selectm-input", "class": ["col", "s4", "m4"] }
+              ]
+            },
             {
               "tag": "form-section",
               "class": ["row"],
@@ -286,6 +293,7 @@
       "other_constraints": "other_constraints"
     },
     "collection_tag": "collection_tag",
+    "extras": "extras",
     "metadata_info": {
       "api_version": "metadata_api_version",
       "metadata_dates": {
@@ -414,6 +422,7 @@
       "geography": {
         "attr": { "label": "Distribution géographique", "helper": "Localisation géographique de la donnée" }
       },
+      "extras": { "attr": { "label": "Extras", "helper": "JSON pour étendre la métadonnée" } },
       "metadata_api_version": {
         "attr": {
           "label": "Version de la métadonnée",

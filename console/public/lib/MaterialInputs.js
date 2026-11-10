@@ -665,6 +665,18 @@ div.wrapper:not(:focus-within) .content:placeholder-shown + span.label_wrapper s
 
 `
 
+let jsonInputStyle = `
+/* ---- JSON Input Style ---- */
+
+textarea.content {
+    height: 10em;
+    font-family: monospace;
+    font-size: 0.9em;
+    white-space: pre;
+    overflow: auto;
+}
+`
+
 let actionCardStyle = `
 /* ---- Card Style ---- */
 
@@ -2093,6 +2105,51 @@ export class TextareaInput extends BaseTextInput {
   }
 }
 
+export class JsonInput extends TextareaInput {
+  constructor() {
+    super(jsonInputStyle)
+    this.input.setAttribute('spellcheck', 'false')
+  }
+
+  // Serialize the value (a dict, a list or a JSON string) for display
+  set value(newValue) {
+    this.toggleAttribute('error', false)
+    if (newValue == null || newValue === '') {
+      this.input.value = ''
+      return
+    }
+
+    let value = newValue
+    if (typeof newValue === 'string') {
+      try {
+        value = JSON.parse(newValue)
+      } catch {
+        this.input.value = newValue
+        this.setAttribute('error', 'JSON invalide')
+        return
+      }
+    }
+    this.input.value = JSON.stringify(value, null, 2)
+  }
+
+  // Deserialize the edited JSON back to a dict/list
+  get value() {
+    const raw = this.input.value.trim()
+    if (!raw) {
+      this.toggleAttribute('error', false)
+      return undefined
+    }
+    try {
+      const value = JSON.parse(raw)
+      this.toggleAttribute('error', false)
+      return value
+    } catch (e) {
+      this.setAttribute('error', `JSON invalide : ${e.message}`)
+      return undefined
+    }
+  }
+}
+
 export class ActionCard extends HTMLElement {
   constructor(...styles) {
     super()
@@ -3497,6 +3554,7 @@ customElements.define('select-input', SelectInput)
 customElements.define('selectm-input', SelectMultipleInput)
 customElements.define('datalist-input', DataListInput)
 customElements.define('textarea-input', TextareaInput)
+customElements.define('json-input', JsonInput)
 customElements.define('multi-textarea', MultiTextArea)
 customElements.define('multi-rich-textarea', MultiRichTextArea)
 customElements.define('file-input', FilesInput)
